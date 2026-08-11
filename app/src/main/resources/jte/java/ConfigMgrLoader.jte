@@ -2,11 +2,9 @@
 @param ConfigMgrLoaderModel model
 package ${model.pkg};
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
+import java.util.Set;
 
 public class ConfigMgrLoader {
 
@@ -16,7 +14,7 @@ public class ConfigMgrLoader {
         if (schemaLength <= 0) {
             return null;
         } else {
-            return configgen.genjava.SchemaDeserializer.deserialize(input);
+            return (configgen.genjava.SchemaInterface) configgen.genjava.SchemaDeserializer.deserialize(input);
         }
     }
 
@@ -26,7 +24,6 @@ public class ConfigMgrLoader {
     }
 
     public static ConfigMgr load(ConfigMgr mgr, configgen.genjava.ConfigInput input) {
-
         // 2. 初始化 StringPool 和 LangTextPool
         input.readStringPool();
         input.readLangTextPool();
@@ -49,24 +46,49 @@ public class ConfigMgrLoader {
             }
         }
 
-        for (ConfigLoader configLoader : allConfigLoaders.values()) {
+        for (var configLoader : allConfigLoaders.values()) {
             configLoader.resolveAll(mgr);
-        }
-
-        for (Consumer<ConfigMgr> refSetter : getAllRefSetters()) {
-            refSetter.accept(mgr);
         }
 
         return mgr;
     }
 
-    public static List<Consumer<ConfigMgr>> getAllRefSetters() {
-        List<Consumer<ConfigMgr>> allRefSetters = new ArrayList<>();
-        @for(String fc : model.setAllRefs_FullClassNames)
-        allRefSetters.add(mgr -> ${fc}.setAllRefs(mgr));
-        @endfor
+    public static void loadPartialAndSetMgr(configgen.genjava.ConfigInput input, ConfigMgr oldMgr, Set<String> tableNames) {
+        ConfigMgr newMgr = new ConfigMgr();
+        newMgr.copyFrom(oldMgr);
 
-        return allRefSetters;
+        input.readStringPool();
+        input.readLangTextPool();
+
+        int c = input.readInt();
+
+        Map<String, ConfigLoader> allConfigLoaders = getAllConfigLoaders();
+        for (int i = 0; i < c; i++) {
+            String tableName = input.readString();
+            int tableSize = input.readInt();
+            if (tableNames.contains(tableName)) {
+                ConfigLoader configLoader = allConfigLoaders.get(tableName);
+                if (configLoader != null) {
+                    configLoader.createAll(newMgr, input);
+                } else {
+                    input.skipBytes(tableSize);
+                }
+            } else {
+                input.skipBytes(tableSize);
+            }
+        }
+
+        for (var configLoader : allConfigLoaders.values()) {
+            configLoader.resolveAll(newMgr);
+        }
+
+        ConfigMgr.setMgr(newMgr);
+    }
+
+    public static void applySetAllRefs(ConfigMgr mgr) {
+        @for(String fc : model.setAllRefs_FullClassNames)
+        ${fc}.setAllRefs(mgr);
+        @endfor
     }
 
     public static Map<String, ConfigLoader> getAllConfigLoaders() {

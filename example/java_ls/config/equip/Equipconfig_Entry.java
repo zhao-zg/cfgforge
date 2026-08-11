@@ -18,7 +18,7 @@ public class Equipconfig_Entry {
 
     void setRef(config.ConfigMgr mgr) {
         ref = mgr.equip_equipconfig_All.get(value);
-        java.util.Objects.requireNonNull(ref);
+        configgen.genjava.LoadValueErrs.requireNonNull(ref, "equip.equipconfig.setRef", value);
     }
 
     public static void setAllRefs(config.ConfigMgr mgr) {

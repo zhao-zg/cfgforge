@@ -128,12 +128,12 @@ public class Jewelry {
 
     public void _resolveDirect(config.ConfigMgr mgr) {
         RefLvlRank = mgr.equip_jewelryrandom_All.get(lvlRank);
-        java.util.Objects.requireNonNull(RefLvlRank);
+        configgen.genjava.LoadValueErrs.requireNonNull(RefLvlRank, "equip.jewelry.LvlRank -> equip.jewelryrandom", lvlRank);
         RefJType = config.equip.Jewelrytype.get(jType);
-        java.util.Objects.requireNonNull(RefJType);
+        configgen.genjava.LoadValueErrs.requireNonNull(RefJType, "equip.jewelry.JType -> equip.jewelrytype", jType);
         NullableRefSuitID = mgr.equip_jewelrysuit_All.get(suitID);
         RefKeyAbility = config.equip.Ability.get(keyAbility);
-        java.util.Objects.requireNonNull(RefKeyAbility);
+        configgen.genjava.LoadValueErrs.requireNonNull(RefKeyAbility, "equip.jewelry.KeyAbility -> equip.ability", keyAbility);
     }
 
     public void _resolve(config.ConfigMgr mgr) {

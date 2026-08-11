@@ -93,7 +93,7 @@ public class Signin {
             RefVipitem2vipcountMap = new java.util.LinkedHashMap<>(vipitem2vipcountMap.size());
             for (java.util.Map.Entry<Integer, Integer> e : vipitem2vipcountMap.entrySet()) {
                 config.other.Loot rv = mgr.other_loot_All.get(e.getValue());
-                java.util.Objects.requireNonNull(rv);
+                configgen.genjava.LoadValueErrs.requireNonNull(rv, "other.signin.vipitem2vipcountMap -> other.loot", e.getValue());
                 RefVipitem2vipcountMap.put(e.getKey(), rv);
             }
         }

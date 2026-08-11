@@ -2,16 +2,17 @@ package config;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 public class ConfigMgrLoader {
 
-    public static configgen.genjava.Schema loadSchema(configgen.genjava.ConfigInput input) {
+    public static configgen.genjava.SchemaInterface loadSchema(configgen.genjava.ConfigInput input) {
         // 1. 读取 Schema（如果有）
         int schemaLength = input.readInt();
         if (schemaLength <= 0) {
             return null;
         } else {
-            return configgen.genjava.SchemaDeserializer.deserialize(input);
+            return (configgen.genjava.SchemaInterface) configgen.genjava.SchemaDeserializer.deserialize(input);
         }
     }
 
@@ -21,7 +22,6 @@ public class ConfigMgrLoader {
     }
 
     public static ConfigMgr load(ConfigMgr mgr, configgen.genjava.ConfigInput input) {
-
         // 2. 初始化 StringPool 和 LangTextPool
         input.readStringPool();
         input.readLangTextPool();
@@ -44,19 +44,53 @@ public class ConfigMgrLoader {
             }
         }
 
-        for (ConfigLoader configLoader : allConfigLoaders.values()) {
+        for (var configLoader : allConfigLoaders.values()) {
             configLoader.resolveAll(mgr);
         }
-
-        config.equip.Equipconfig_Entry.setAllRefs(mgr);
-        config.equip.Jewelrysuit_Entry.setAllRefs(mgr);
-        config.equip.Rank.setAllRefs(mgr);
-        config.other.ArgCaptureMode.setAllRefs(mgr);
 
         return mgr;
     }
 
-    private static Map<String, ConfigLoader> getAllConfigLoaders() {
+    public static void loadPartialAndSetMgr(configgen.genjava.ConfigInput input, ConfigMgr oldMgr, Set<String> tableNames) {
+        ConfigMgr newMgr = new ConfigMgr();
+        newMgr.copyFrom(oldMgr);
+
+        input.readStringPool();
+        input.readLangTextPool();
+
+        int c = input.readInt();
+
+        Map<String, ConfigLoader> allConfigLoaders = getAllConfigLoaders();
+        for (int i = 0; i < c; i++) {
+            String tableName = input.readString();
+            int tableSize = input.readInt();
+            if (tableNames.contains(tableName)) {
+                ConfigLoader configLoader = allConfigLoaders.get(tableName);
+                if (configLoader != null) {
+                    configLoader.createAll(newMgr, input);
+                } else {
+                    input.skipBytes(tableSize);
+                }
+            } else {
+                input.skipBytes(tableSize);
+            }
+        }
+
+        for (var configLoader : allConfigLoaders.values()) {
+            configLoader.resolveAll(newMgr);
+        }
+
+        ConfigMgr.setMgr(newMgr);
+    }
+
+    public static void applySetAllRefs(ConfigMgr mgr) {
+        config.equip.Equipconfig_Entry.setAllRefs(mgr);
+        config.equip.Jewelrysuit_Entry.setAllRefs(mgr);
+        config.equip.Rank.setAllRefs(mgr);
+        config.other.ArgCaptureMode.setAllRefs(mgr);
+    }
+
+    public static Map<String, ConfigLoader> getAllConfigLoaders() {
         Map<String, ConfigLoader> allConfigLoaders = new LinkedHashMap<>();
         allConfigLoaders.put("ai.ai", new config.ai.Ai._ConfigLoader());
         allConfigLoaders.put("ai.ai_action", new config.ai.Ai_action._ConfigLoader());
@@ -76,7 +110,6 @@ public class ConfigMgrLoader {
         allConfigLoaders.put("task.task", new config.task.Task._ConfigLoader());
         allConfigLoaders.put("task.task2", new config.task.Task2._ConfigLoader());
         allConfigLoaders.put("task.taskextraexp", new config.task.Taskextraexp._ConfigLoader());
-
         return allConfigLoaders;
     }
 }

@@ -58,7 +58,7 @@ public class LevelRank {
 
     public void _resolveDirect(config.ConfigMgr mgr) {
         RefRank = config.equip.Rank.get(rank);
-        java.util.Objects.requireNonNull(RefRank);
+        configgen.genjava.LoadValueErrs.requireNonNull(RefRank, "LevelRank.Rank -> equip.rank", rank);
     }
 
     public void _resolve(config.ConfigMgr mgr) {

@@ -8,6 +8,7 @@ import configgen.genjava.*;
 import java.io.IOException;
 import java.nio.file.*;
 //import java.util.concurrent.Executors;
+import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
@@ -23,12 +24,26 @@ public class LoadConfig {
             boolean compatible = codeSchema.compatible(dataSchema);
             if (compatible) {
                 ConfigMgr mgr = ConfigMgrLoader.load(input);
+                LoadValueErrs.start(true);
                 ConfigMgr.setMgr(mgr);
             } else {
                 throw new SchemaCompatibleException("schema not compatible, ignore load configdata");
             }
         }
     }
+
+    public static void loadPartial(String fn) throws IOException {
+        try (ConfigInput input = new ConfigInput(Path.of(fn))) {
+            ConfigMgrLoader.loadSchema(input);
+            LoadValueErrs.start(false);
+            ConfigMgrLoader.loadPartialAndSetMgr(input, ConfigMgr.getMgr(), Set.of("ai.ai"));
+            for (LoadValueErrs.Error error : LoadValueErrs.getErrors()) {
+                System.out.println(error);
+            }
+
+        }
+    }
+
 
     public static void autoReload(ScheduledExecutorService executorService, String fn, Runnable afterReload) throws IOException {
         listen(executorService, Paths.get(fn), () -> {
@@ -85,6 +100,9 @@ public class LoadConfig {
             repl.run();
 
         } else {
+
+            loadPartial(fn);
+
             new BytesInspector(fn).match("eq");
             CodeDataInspector inspector = new CodeDataInspector(ConfigMgr.getMgr(), ConfigCodeSchema.getCodeSchema());
             CodeDataPrinter printer = new CodeDataPrinter(inspector);
@@ -92,6 +110,7 @@ public class LoadConfig {
             System.out.println(printer.get("other.keytest", "1,2"));
             System.out.println(printer.query("1234", ""));
             System.out.println(printer.schema("monster"));
+
             // ScheduledExecutorService watcher = Executors.newSingleThreadScheduledExecutor();
             // autoReload(watcher, fn, null);
             // System.out.println("read ok");

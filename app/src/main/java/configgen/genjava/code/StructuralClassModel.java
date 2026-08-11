@@ -9,7 +9,6 @@ import static configgen.util.StringUtil.lower1;
 public class StructuralClassModel {
     public final Structural structural;
     public final NameableName name;
-    public final List<String> mapsInMgr;
 
     public final String pkg;
     public final String className;
@@ -37,10 +36,9 @@ public class StructuralClassModel {
     }
 
     public StructuralClassModel(Structural structural, NameableName name, boolean isTableAndNeedBuilder,
-                                List<String> mapsInMgr, String sourceComment) {
+                                String sourceComment) {
         this.structural = structural;
         this.name = name;
-        this.mapsInMgr = mapsInMgr;
         this.sourceComment = sourceComment;
         this.pkg = name.pkg;
         this.className = name.className;

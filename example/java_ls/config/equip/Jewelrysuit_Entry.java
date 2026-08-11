@@ -19,7 +19,7 @@ public class Jewelrysuit_Entry {
 
     void setRef(config.ConfigMgr mgr) {
         ref = mgr.equip_jewelrysuit_All.get(value);
-        java.util.Objects.requireNonNull(ref);
+        configgen.genjava.LoadValueErrs.requireNonNull(ref, "equip.jewelrysuit.setRef", value);
     }
 
     public static void setAllRefs(config.ConfigMgr mgr) {

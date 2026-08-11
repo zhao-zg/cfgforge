@@ -11,22 +11,14 @@
     }
     @if(table.primaryKey().fields().size() > 1)
 @template.java.GenKeyClass(keySchema = table.primaryKey())
-    @endif@template.java.GenMapGetBy(keySchema = table.primaryKey(), name = model.name, isPrimaryKey = true, codeTopPkg = model.codeTopPkg, mapsInMgr = model.mapsInMgr, isSeq = primarySeq)
+    @endif@template.java.GenMapGetBy(keySchema = table.primaryKey(), name = model.name, isPrimaryKey = true, codeTopPkg = model.codeTopPkg)
     @for(KeySchema keySchema : table.uniqueKeys())
-        !{ boolean ukSeq = keySchema.fieldSchemas().size() == 1 && keySchema.fieldSchemas().getFirst().isSeq(); }
         @if(keySchema.fields().size() > 1)@template.java.GenKeyClass(keySchema = keySchema)
-        @endif@template.java.GenMapGetBy(keySchema = keySchema, name = model.name, isPrimaryKey = false, codeTopPkg = model.codeTopPkg, mapsInMgr = model.mapsInMgr, isSeq = ukSeq)
+        @endif@template.java.GenMapGetBy(keySchema = keySchema, name = model.name, isPrimaryKey = false, codeTopPkg = model.codeTopPkg)
     @endfor
     !{
-        String primaryMapName = model.name.containerPrefix  + "All";
+        String primaryMapName = model.name.containerPrefix + "All";
         String functionAllName = "all" + Arrays.stream(model.structural.name().split("\\.")).map(Name::pascalName).collect(Collectors.joining());
-        if (primarySeq) {
-            model.mapsInMgr.add(String.format("public java.util.List<%s> %s() { return java.util.Arrays.asList(%s); }",
-                    model.name.fullName, functionAllName, primaryMapName));
-        } else {
-            model.mapsInMgr.add(String.format("public java.util.Collection<%s> %s() { return %s.values(); }",
-                    model.name.fullName, functionAllName, primaryMapName));
-        }
     }
     @if(primarySeq)
     public static java.util.List<${model.className}> all() {

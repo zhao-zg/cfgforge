@@ -87,22 +87,20 @@ public class JavaCodeGenerator extends GeneratorWithTag {
         boolean isLangSwitch = ctx.nullableLangSwitch() != null;
         TypeStr.isLangSwitch = isLangSwitch; //辅助 Text的类型声明和创建
 
-        List<String> mapsInMgr = new ArrayList<>();
+        List<NameableName> tableDataNames = new ArrayList<>();
         List<String> setAllRefsInMgrLoader = new ArrayList<>();
 
         if (buildersFilename != null) {
             readNeedBuilderTables();
         }
         // struct/interface 类与 table 类各自生成独立文件，互不依赖；并发渲染。
-        // mapsInMgr / setAllRefs 在模板渲染时被 add，且被后续 ConfigMgr/ConfigMgrLoader 消费、顺序敏感——
-        // 故每个任务用独立的 local 列表，渲染后按原序合并，保证字节级一致。
-        List<Callable<List<String>>> structTasks = new ArrayList<>();
+        // tableDataNames / setAllRefs 顺序敏感——故每个 table 任务用独立 local 列表，渲染后按原序合并，保证字节级一致。
+        List<Callable<Void>> structTasks = new ArrayList<>();
         for (Nameable nameable : cfgValue.schema().items()) {
             switch (nameable) {
                 case StructSchema s -> structTasks.add(() -> {
-                    List<String> local = new ArrayList<>();
-                    generateStructClass(s, local);
-                    return local;
+                    generateStructClass(s);
+                    return null;
                 });
                 case InterfaceSchema iface -> {
                     final InterfaceSchema ifaceF = iface;
@@ -110,11 +108,10 @@ public class JavaCodeGenerator extends GeneratorWithTag {
                     // 串行下 impl 后写覆盖 interface；任务内保持先 interface 后 impls 的顺序，避免并发竞态写反。
                     structTasks.add(() -> {
                         generateInterfaceClass(ifaceF);
-                        List<String> local = new ArrayList<>();
                         for (StructSchema impl : ifaceF.impls()) {
-                            generateStructClass(impl, local);
+                            generateStructClass(impl);
                         }
-                        return local;
+                        return null;
                     });
                 }
                 case TableSchema _ -> {
@@ -126,21 +123,19 @@ public class JavaCodeGenerator extends GeneratorWithTag {
         for (VTable vtable : cfgValue.tables()) {
             final VTable vt = vtable;
             tableTasks.add(() -> {
-                List<String> localMaps = new ArrayList<>();
+                List<NameableName> localDataNames = new ArrayList<>();
                 List<String> localSetAllRefs = new ArrayList<>();
-                generateTableClass(vt, localMaps, localSetAllRefs);
-                return new TableRefs(localMaps, localSetAllRefs);
+                generateTableClass(vt, localDataNames, localSetAllRefs);
+                return new TableRefs(localDataNames, localSetAllRefs);
             });
         }
 
         try (ExecutorService executor = Executors.newWorkStealingPool()) {
-            // 两个 invokeAll 屏障：struct 阶段先于 table 阶段完成，保持 mapsInMgr 里 struct 项先于 table 项的顺序
-            for (List<String> maps : invokeAllAndWait(executor, structTasks)) {
-                mapsInMgr.addAll(maps);
-            }
+            // 两阶段并发：struct 先于 table（struct 不再贡献 ConfigMgr 成员，仅为顺序稳定的并发渲染）
+            invokeAllAndWait(executor, structTasks);
             for (TableRefs r : invokeAllAndWait(executor, tableTasks)) {
-                mapsInMgr.addAll(r.maps);
-                setAllRefsInMgrLoader.addAll(r.setAllRefs);
+                tableDataNames.addAll(r.dataNames());
+                setAllRefsInMgrLoader.addAll(r.setAllRefs());
             }
         }
 
@@ -153,7 +148,7 @@ public class JavaCodeGenerator extends GeneratorWithTag {
 
         try (var ps = createCode("ConfigMgr.java")) {
             JteEngine.render("java/ConfigMgr.jte",
-                    Map.of("pkg", Name.codeTopPkg, "mapsInMgr", mapsInMgr), ps);
+                    Map.of("pkg", Name.codeTopPkg, "tableDataNames", tableDataNames), ps);
         }
 
         try (var ps = createCode("ConfigLoader.java")) {
@@ -173,8 +168,8 @@ public class JavaCodeGenerator extends GeneratorWithTag {
         copyConfigGenSourcesIfNeed();
     }
 
-    // 单个 table 任务的并发产物：本任务往 mapsInMgr / setAllRefsInMgrLoader 累加的项
-    private record TableRefs(List<String> maps, List<String> setAllRefs) {
+    // 单个 table 任务的并发产物：本任务收集的 dataName（供 ConfigMgr 渲染成员）与 setAllRefs 类名
+    private record TableRefs(List<NameableName> dataNames, List<String> setAllRefs) {
     }
 
     private void readNeedBuilderTables() {
@@ -214,10 +209,10 @@ public class JavaCodeGenerator extends GeneratorWithTag {
         return mainCc.get().printer(dstDir.resolve(fn), encoding);
     }
 
-    private void generateStructClass(StructSchema struct, List<String> mapsInMgr) {
+    private void generateStructClass(StructSchema struct) {
         NameableName name = new NameableName(struct);
         try (var ps = createCode(name.path)) {
-            StructuralClassModel model = new StructuralClassModel(struct, name, false, mapsInMgr,
+            StructuralClassModel model = new StructuralClassModel(struct, name, false,
                     SourceComment.of(struct, null));
             JteEngine.render("java/GenStructuralClass.jte", model, ps);
         }
@@ -231,7 +226,7 @@ public class JavaCodeGenerator extends GeneratorWithTag {
         }
     }
 
-    private void generateTableClass(VTable vTable, List<String> mapsInMgr, List<String> setAllRefsInMgrLoader) {
+    private void generateTableClass(VTable vTable, List<NameableName> tableDataNames, List<String> setAllRefsInMgrLoader) {
         boolean isNeedReadData = true;
         String dataPostfix = "";
         TableSchema schema = vTable.schema();
@@ -266,10 +261,11 @@ public class JavaCodeGenerator extends GeneratorWithTag {
 
         if (isNeedReadData) {
             NameableName name = new NameableName(schema, dataPostfix);
+            tableDataNames.add(name);
             boolean isTableNeedBuilder = needBuilderTables != null && needBuilderTables.contains(vTable.name());
             try (var ps = createCode(name.path)) {
                 StructuralClassModel model = new StructuralClassModel(vTable.schema(), name, isTableNeedBuilder,
-                        mapsInMgr, sourceComment);
+                        sourceComment);
                 JteEngine.render("java/GenStructuralClass.jte", model, ps);
             }
 

@@ -41,7 +41,7 @@ public enum ArgCaptureMode {
 
     void setRef(config.ConfigMgr mgr) {
         ref = mgr.other_ArgCaptureMode_All.get(value);
-        java.util.Objects.requireNonNull(ref);
+        configgen.genjava.LoadValueErrs.requireNonNull(ref, "other.ArgCaptureMode.setRef", value);
     }
 
     public static void setAllRefs(config.ConfigMgr mgr) {

@@ -9,6 +9,7 @@ public class ConfigMgr {
 
     public static void setMgr(ConfigMgr newMgr) {
         mgr = newMgr;
+        ConfigMgrLoader.applySetAllRefs(mgr);
     }
 
     public java.util.Map<Integer, config.ai.Ai> ai_ai_All;
@@ -135,4 +136,29 @@ public class ConfigMgr {
 
     public java.util.Collection<config.task.Taskextraexp> allTaskTaskextraexp() { return task_taskextraexp_All.values(); }
 
+
+    public void copyFrom(config.ConfigMgr src) {
+        this.ai_ai_All = src.ai_ai_All;
+        this.ai_ai_action_All = src.ai_ai_action_All;
+        this.ai_ai_condition_All = src.ai_ai_condition_All;
+        this.equip_equipconfig_All = src.equip_equipconfig_All;
+        this.equip_jewelry_All = src.equip_jewelry_All;
+        this.equip_jewelryrandom_All = src.equip_jewelryrandom_All;
+        this.equip_jewelrysuit_All = src.equip_jewelrysuit_All;
+        this.equip_rank_All = src.equip_rank_All;
+        this.other_ArgCaptureMode_All = src.other_ArgCaptureMode_All;
+        this.other_ArgCaptureMode_IdMap = src.other_ArgCaptureMode_IdMap;
+        this.other_drop_All = src.other_drop_All;
+        this.other_keytest_All = src.other_keytest_All;
+        this.other_keytest_Id1Id3Map = src.other_keytest_Id1Id3Map;
+        this.other_keytest_Id2Map = src.other_keytest_Id2Map;
+        this.other_keytest_Id2Id3Map = src.other_keytest_Id2Id3Map;
+        this.other_loot_All = src.other_loot_All;
+        this.other_lootitem_All = src.other_lootitem_All;
+        this.other_monster_All = src.other_monster_All;
+        this.other_signin_All = src.other_signin_All;
+        this.task_task_All = src.task_task_All;
+        this.task_task2_All = src.task_task2_All;
+        this.task_taskextraexp_All = src.task_taskextraexp_All;
+    }
 }

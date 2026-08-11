@@ -2,12 +2,15 @@
 @param ConfigMgrLoaderModel model
 package ${model.pkg};
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ConfigMgrLoader {
 
-    public static configgen.genjava.Schema loadSchema(configgen.genjava.ConfigInput input) {
+    public static configgen.genjava.SchemaInterface loadSchema(configgen.genjava.ConfigInput input) {
         // 1. 读取 Schema（如果有）
         int schemaLength = input.readInt();
         if (schemaLength <= 0) {
@@ -50,20 +53,27 @@ public class ConfigMgrLoader {
             configLoader.resolveAll(mgr);
         }
 
-        @for(String fc : model.setAllRefs_FullClassNames)
-            ${fc}.setAllRefs(mgr);
-        @endfor
-
+        for (Consumer<ConfigMgr> refSetter : getAllRefSetters()) {
+            refSetter.accept(mgr);
+        }
 
         return mgr;
     }
 
-    private static Map<String, ConfigLoader> getAllConfigLoaders() {
+    public static List<Consumer<ConfigMgr>> getAllRefSetters() {
+        List<Consumer<ConfigMgr>> allRefSetters = new ArrayList<>();
+        @for(String fc : model.setAllRefs_FullClassNames)
+        allRefSetters.add(mgr -> ${fc}.setAllRefs(mgr));
+        @endfor
+
+        return allRefSetters;
+    }
+
+    public static Map<String, ConfigLoader> getAllConfigLoaders() {
         Map<String, ConfigLoader> allConfigLoaders = new LinkedHashMap<>();
         @for(configgen.genjava.code.ConfigMgrLoaderModel.TableInfo t : model.tables)
         allConfigLoaders.put("${t.name()}", new ${t.fullName()}._ConfigLoader());
         @endfor
-
 
         return allConfigLoaders;
     }

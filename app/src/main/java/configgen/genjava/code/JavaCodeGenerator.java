@@ -53,6 +53,7 @@ public class JavaCodeGenerator extends GeneratorWithTag {
 
             "ConfigErr.java",
             "ConfigInput.java",
+            "LoadValueErrs.java",
 
             "BytesInspector.java",
             "JsonValue.java",

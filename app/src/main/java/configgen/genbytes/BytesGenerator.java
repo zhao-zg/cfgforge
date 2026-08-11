@@ -3,10 +3,7 @@ package configgen.genbytes;
 import configgen.ctx.Context;
 import configgen.gen.GeneratorWithTag;
 import configgen.gen.Parameter;
-import configgen.genjava.ConfigOutput;
-import configgen.genjava.Schema;
-import configgen.genjava.SchemaParser;
-import configgen.genjava.SchemaSerializer;
+import configgen.genjava.*;
 import configgen.i18n.LangSwitchable;
 import configgen.i18n.LangSwitchableRuntime;
 import configgen.util.CachedFileOutputStream;
@@ -54,8 +51,8 @@ public class BytesGenerator extends GeneratorWithTag {
             // 序列化 schema（使用小端序 ConfigOutput）
             schemaContent = new ByteArrayOutputStream(1024 * 64);
             try (ConfigOutput schemaOutput = new ConfigOutput(schemaContent)) {
-                Schema schema = SchemaParser.parse(cfgValue, langSwitch);
-                new SchemaSerializer(schemaOutput).serialize(schema);
+                SchemaInterface schema = SchemaParser.parse(cfgValue, langSwitch);
+                new SchemaSerializer(schemaOutput).serializeInterface(schema);
             }
         }
 

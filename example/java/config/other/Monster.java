@@ -105,16 +105,16 @@ public class Monster {
 
     public void _resolveDirect(config.ConfigMgr mgr) {
         RefLoot = mgr.other_lootitem_All.get(new config.other.Lootitem.LootidItemidKey(lootId, lootItemId) );
-        java.util.Objects.requireNonNull(RefLoot);
+        configgen.genjava.LoadValueErrs.requireNonNull(RefLoot, "other.monster.Loot -> other.lootitem", "" + lootId + "," + lootItemId);
         RefAllLoot = mgr.other_loot_All.get(lootId);
-        java.util.Objects.requireNonNull(RefAllLoot);
+        configgen.genjava.LoadValueErrs.requireNonNull(RefAllLoot, "other.monster.AllLoot -> other.loot", lootId);
         if (enumMap2.isEmpty()) {
             RefEnumMap2 = java.util.Collections.emptyMap();
         } else {
             RefEnumMap2 = new java.util.LinkedHashMap<>(enumMap2.size());
             for (java.util.Map.Entry<Integer, String> e : enumMap2.entrySet()) {
                 config.other.ArgCaptureMode rv = config.other.ArgCaptureMode.get(e.getValue());
-                java.util.Objects.requireNonNull(rv);
+                configgen.genjava.LoadValueErrs.requireNonNull(rv, "other.monster.enumMap2 -> other.ArgCaptureMode", e.getValue());
                 RefEnumMap2.put(e.getKey(), rv);
             }
         }

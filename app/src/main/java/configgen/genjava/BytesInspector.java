@@ -41,7 +41,7 @@ public class BytesInspector {
             int schemaLength = input.readInt();
             if (schemaLength > 0) {
                 byte[] schemaBytes = input.readRawBytes(schemaLength);
-                rootSchema = (SchemaInterface) SchemaDeserializer.deserialize(new ConfigInput(schemaBytes));
+                rootSchema = SchemaDeserializer.deserialize(new ConfigInput(schemaBytes));
             } else {
                 println("no schema in data file");
                 return out.toString();

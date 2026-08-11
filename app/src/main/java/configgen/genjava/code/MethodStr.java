@@ -29,6 +29,18 @@ public class MethodStr {
         return keySchema.fields().stream().map(e -> pre + lower1(e)).collect(Collectors.joining(", "));
     }
 
+    /**
+     * 生成"作为 LoadValueErrs.requireNonNull 的 key 显示参数"的源码表达式：
+     * 单字段直接用变量名（零开销），多字段拼成 {@code "f1,f2"} 字符串（仅多字段外键，少见）。
+     */
+    public static String keyDisplayExpr(KeySchema keySchema) {
+        List<String> fields = keySchema.fields();
+        if (fields.size() == 1) {
+            return lower1(fields.getFirst());
+        }
+        return "\"\" + " + fields.stream().map(StringUtil::lower1).collect(Collectors.joining(" + \",\" + "));
+    }
+
     public static String hashCodes(List<FieldSchema> fs) {
         String paramList = fs.stream().map(f -> lower1(f.name())).collect(Collectors.joining(", "));
         return String.format("java.util.Objects.hash(%s)", paramList) ;

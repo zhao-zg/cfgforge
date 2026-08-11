@@ -21,7 +21,8 @@ public class Context {
 
                              String i18nFilename,
                              String langSwitchDir,
-                             String langSwitchDefaultLang) {
+                             String langSwitchDefaultLang,
+                             boolean allowValueErr) {
 
         public ContextCfg {
             Objects.requireNonNull(dataDir);
@@ -30,7 +31,8 @@ public class Context {
         }
 
         public static ContextCfg of(Path dataDir) {
-            return new ContextCfg(dataDir, null, HeadRows.A2_Default, "UTF-8", null, null, null);
+            return new ContextCfg(dataDir, null, HeadRows.A2_Default, "UTF-8",
+                    null, null, null, false);
         }
     }
 
@@ -169,10 +171,10 @@ public class Context {
     }
 
     public CfgValue makeValue(String tag) {
-        return makeValue(tag, false);
+        return makeValue(tag, contextCfg.allowValueErr);
     }
 
-    public synchronized CfgValue makeValue(String tag, boolean allowErr) {
+    public synchronized CfgValue makeValue(String tag, boolean allowValueErr) {
         if (tag != null && tag.isEmpty()) {
             throw new IllegalArgumentException("tag不能为空");
         }
@@ -185,7 +187,7 @@ public class Context {
         // 编辑器 handler 线程与 reload 线程可能并发，必须互斥。
         if (lastCfgValue != null
                 && Objects.equals(tag, lastCfgValueTag)
-                && (!lastCfgValueAllowErr || allowErr)) {
+                && (!lastCfgValueAllowErr || allowValueErr)) {
             return lastCfgValue;
         }
         lastCfgValue = null; //让它可以被尽快gc
@@ -205,11 +207,11 @@ public class Context {
         CfgValueParser clientValueParser = new CfgValueParser(tagSchema, this, valueErrs);
         CfgValue cfgValue = clientValueParser.parseCfgValue();
         String prefix = tag == null ? "value" : String.format("[%s] filtered value", tag);
-        valueErrs.checkErrors(prefix, allowErr);
+        valueErrs.checkErrors(prefix, allowValueErr);
 
         lastCfgValue = cfgValue;
         lastCfgValueTag = tag;
-        lastCfgValueAllowErr = allowErr;
+        lastCfgValueAllowErr = allowValueErr;
         return lastCfgValue;
     }
 

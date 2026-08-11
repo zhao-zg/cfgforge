@@ -7,7 +7,16 @@ public final class SchemaSerializer {
         this.output = output;
     }
 
-    public void serialize(Schema schema) {
+    public void serializeInterface(SchemaInterface interfaceSchema) {
+        output.writeInt(Schema.INTERFACE);
+        output.writeInt(interfaceSchema.implementations.size());
+        for (var entry : interfaceSchema.implementations.entrySet()) {
+            output.writeString(entry.getKey());
+            serialize(entry.getValue());
+        }
+    }
+
+    private void serialize(Schema schema) {
         switch (schema) {
             case SchemaPrimitive primitive -> serializePrimitive(primitive);
             case SchemaRef ref -> serializeRef(ref);
@@ -69,12 +78,5 @@ public final class SchemaSerializer {
         }
     }
 
-    private void serializeInterface(SchemaInterface interfaceSchema) {
-        output.writeInt(Schema.INTERFACE);
-        output.writeInt(interfaceSchema.implementations.size());
-        for (var entry : interfaceSchema.implementations.entrySet()) {
-            output.writeString(entry.getKey());
-            serialize(entry.getValue());
-        }
-    }
+
 }

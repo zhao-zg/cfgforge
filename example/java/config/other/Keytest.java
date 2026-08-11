@@ -93,19 +93,19 @@ public class Keytest {
             RefIds = new java.util.ArrayList<>(ids.size());
             for (Integer e : ids) {
                 config.other.Signin r = mgr.other_signin_All.get(e);
-                java.util.Objects.requireNonNull(r);
+                configgen.genjava.LoadValueErrs.requireNonNull(r, "other.keytest.ids -> other.signin", e);
                 RefIds.add(r);
             }
         }
         RefEnumTest = config.other.ArgCaptureMode.get(enumTest);
-        java.util.Objects.requireNonNull(RefEnumTest);
+        configgen.genjava.LoadValueErrs.requireNonNull(RefEnumTest, "other.keytest.enumTest -> other.ArgCaptureMode", enumTest);
         if (enumList.isEmpty()) {
             RefEnumList = java.util.Collections.emptyList();
         } else {
             RefEnumList = new java.util.ArrayList<>(enumList.size());
             for (String e : enumList) {
                 config.other.ArgCaptureMode r = config.other.ArgCaptureMode.get(e);
-                java.util.Objects.requireNonNull(r);
+                configgen.genjava.LoadValueErrs.requireNonNull(r, "other.keytest.enumList -> other.ArgCaptureMode", e);
                 RefEnumList.add(r);
             }
         }

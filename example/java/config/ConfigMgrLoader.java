@@ -1,11 +1,14 @@
 package config;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ConfigMgrLoader {
 
-    public static configgen.genjava.Schema loadSchema(configgen.genjava.ConfigInput input) {
+    public static configgen.genjava.SchemaInterface loadSchema(configgen.genjava.ConfigInput input) {
         // 1. 读取 Schema（如果有）
         int schemaLength = input.readInt();
         if (schemaLength <= 0) {
@@ -48,15 +51,23 @@ public class ConfigMgrLoader {
             configLoader.resolveAll(mgr);
         }
 
-        config.equip.Equipconfig_Entry.setAllRefs(mgr);
-        config.equip.Jewelrysuit_Entry.setAllRefs(mgr);
-        config.equip.Rank.setAllRefs(mgr);
-        config.other.ArgCaptureMode.setAllRefs(mgr);
+        for (Consumer<ConfigMgr> refSetter : getAllRefSetters()) {
+            refSetter.accept(mgr);
+        }
 
         return mgr;
     }
 
-    private static Map<String, ConfigLoader> getAllConfigLoaders() {
+    public static List<Consumer<ConfigMgr>> getAllRefSetters() {
+        List<Consumer<ConfigMgr>> allRefSetters = new ArrayList<>();
+        allRefSetters.add(mgr -> config.equip.Equipconfig_Entry.setAllRefs(mgr));
+        allRefSetters.add(mgr -> config.equip.Jewelrysuit_Entry.setAllRefs(mgr));
+        allRefSetters.add(mgr -> config.equip.Rank.setAllRefs(mgr));
+        allRefSetters.add(mgr -> config.other.ArgCaptureMode.setAllRefs(mgr));
+        return allRefSetters;
+    }
+
+    public static Map<String, ConfigLoader> getAllConfigLoaders() {
         Map<String, ConfigLoader> allConfigLoaders = new LinkedHashMap<>();
         allConfigLoaders.put("ai.ai", new config.ai.Ai._ConfigLoader());
         allConfigLoaders.put("ai.ai_action", new config.ai.AiAction._ConfigLoader());
@@ -76,7 +87,6 @@ public class ConfigMgrLoader {
         allConfigLoaders.put("task.task", new config.task.Task._ConfigLoader());
         allConfigLoaders.put("task.task2", new config.task.Task2._ConfigLoader());
         allConfigLoaders.put("task.taskextraexp", new config.task.Taskextraexp._ConfigLoader());
-
         return allConfigLoaders;
     }
 }

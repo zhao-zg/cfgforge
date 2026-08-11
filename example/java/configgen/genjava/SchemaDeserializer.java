@@ -2,14 +2,25 @@ package configgen.genjava;
 
 public final class SchemaDeserializer {
 
-    public static Schema deserialize(ConfigInput input) {
-        return new SchemaDeserializer(input).deserialize();
+    public static SchemaInterface deserialize(ConfigInput input) {
+        return new SchemaDeserializer(input).deserializeInterface();
     }
 
     private final ConfigInput input;
 
     private SchemaDeserializer(ConfigInput input) {
         this.input = input;
+    }
+
+    private SchemaInterface deserializeInterface() {
+        SchemaInterface interfaceSchema = new SchemaInterface();
+        int size = input.readInt();
+        for (int i = 0; i < size; i++) {
+            String name = input.readString();
+            Schema schema = deserialize();
+            interfaceSchema.addImp(name, schema);
+        }
+        return interfaceSchema;
     }
 
     private Schema deserialize() {
@@ -75,14 +86,4 @@ public final class SchemaDeserializer {
         return enumSchema;
     }
 
-    private SchemaInterface deserializeInterface() {
-        SchemaInterface interfaceSchema = new SchemaInterface();
-        int size = input.readInt();
-        for (int i = 0; i < size; i++) {
-            String name = input.readString();
-            Schema schema = deserialize();
-            interfaceSchema.addImp(name, schema);
-        }
-        return interfaceSchema;
-    }
 }

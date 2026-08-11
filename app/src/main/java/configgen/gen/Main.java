@@ -139,7 +139,8 @@ public final class Main {
     }
 
     private static int run(String[] args) {
-        String datadir = null;
+        boolean allowValueErr = false;
+        String dataDir = null;
         String headRowId = System.getProperty("configgen.headrow");
         String csvDefaultEncoding = "GBK";
         String asRoot = null;
@@ -149,7 +150,6 @@ public final class Main {
         String i18nfile = null;
         String langSwitchDir = null;
         String langSwitchDefaultLang = "zh_cn";
-
 
         List<NamedTool> tools = new ArrayList<>();
         List<NamedGenerator> generators = new ArrayList<>();
@@ -182,6 +182,7 @@ public final class Main {
                 }
                 case "-nowarn" -> Logger.setWarningEnabled(false);
                 case "-weakwarn" -> Logger.setWeakWarningEnabled(true);
+                case "-allowvalueerr" -> allowValueErr = true;
 
                 case "-tool" -> {
                     String name = args[++i];
@@ -192,7 +193,7 @@ public final class Main {
                     tools.add(new NamedTool(name, tool));
                 }
 
-                case "-datadir" -> datadir = args[++i];
+                case "-datadir" -> dataDir = args[++i];
                 case "-headrow" -> headRowId = args[++i];
                 case "-encoding" -> csvDefaultEncoding = args[++i];
 
@@ -223,13 +224,13 @@ public final class Main {
             nt.tool.call();
         }
 
-        if (datadir == null) {
+        if (dataDir == null) {
             if (!generators.isEmpty()) {
                 return help("-datadir is required");
             }
             return 0;
         }
-        Path dataDir = Paths.get(datadir);
+        Path dataDirPath = Paths.get(dataDir);
 
         if (headRowId == null) {
             headRowId = "2";
@@ -244,8 +245,8 @@ public final class Main {
 
         Logger.profile(String.format("start total memory %dm", Runtime.getRuntime().maxMemory() / 1024 / 1024));
 
-        Context context = new Context(new Context.ContextCfg(dataDir, explicitDir, headRow, csvDefaultEncoding,
-                i18nfile, langSwitchDir, langSwitchDefaultLang));
+        Context context = new Context(new Context.ContextCfg(dataDirPath, explicitDir, headRow, csvDefaultEncoding,
+                i18nfile, langSwitchDir, langSwitchDefaultLang, allowValueErr));
 
         for (NamedGenerator ng : generators) {
             Logger.verbose("-----generate %s", ng.gen.parameter.toString());

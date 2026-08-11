@@ -132,7 +132,7 @@ public ${model.isEnum ? "enum" : "class"} ${model.className} {
             @else
                 ref = mgr.${model.name.containerPrefix}All.get(value);
             @endif
-            java.util.Objects.requireNonNull(ref);
+            configgen.genjava.LoadValueErrs.requireNonNull(ref, "${model.table.name()}.setRef", value);
         }
 
         @if(model.isEnum)

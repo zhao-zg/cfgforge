@@ -46,7 +46,7 @@ public class BlockMigrationTool extends Tool {
 
     @Override
     public void call() {
-        ContextCfg cfg = new ContextCfg(dataDir, null, headRow, encoding, null, null, null);
+        ContextCfg cfg = new ContextCfg(dataDir, null, headRow, encoding, null, null, null, false);
         Context ctx = new Context(cfg);
         MigrationReport report = compare(ctx);
         String text = formatReport(report);

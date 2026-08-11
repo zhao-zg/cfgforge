@@ -152,6 +152,7 @@ tasks.register('copyGenJavaSources', Copy) {
                 'SchemaDeserializer.java',
                 'ConfigErr.java',
                 'ConfigInput.java',
+                'LoadValueErrs.java',
                 'BytesInspector.java',
                 'JsonValue.java',
                 'CodeDataInspector.java',

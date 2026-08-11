@@ -57,7 +57,7 @@ public final class KillMonster implements config.task.completecondition.Complete
 
     public void _resolveDirect(config.ConfigMgr mgr) {
         RefMonsterid = mgr.other_monster_All.get(monsterid);
-        java.util.Objects.requireNonNull(RefMonsterid);
+        configgen.genjava.LoadValueErrs.requireNonNull(RefMonsterid, "KillMonster.monsterid -> other.monster", monsterid);
     }
 
     @Override

@@ -57,7 +57,7 @@ public enum Rank {
 
     void setRef(config.ConfigMgr mgr) {
         ref = mgr.equip_rank_All[value];
-        java.util.Objects.requireNonNull(ref);
+        configgen.genjava.LoadValueErrs.requireNonNull(ref, "equip.rank.setRef", value);
     }
 
     public static void setAllRefs(config.ConfigMgr mgr) {

@@ -15,7 +15,7 @@ public void _resolveDirect(${codeTopPkg}.ConfigMgr mgr) {
                 @if(firstField.type() instanceof FieldType.SimpleType)
                     ${refName} = ${MethodStr.tableGet(refTable, refSimple, MethodStr.actualParams(fk.key().fields()))};
                     @if(!refSimple.nullable())
-                        java.util.Objects.requireNonNull(${refName});
+                        configgen.genjava.LoadValueErrs.requireNonNull(${refName}, "${structural.name()}.${fk.name()} -> ${refTable.name()}", ${MethodStr.keyDisplayExpr(fk.key())});
                     @endif
                 @elseif(firstField.type() instanceof FieldType.FList fList)
                     !{
@@ -27,7 +27,7 @@ public void _resolveDirect(${codeTopPkg}.ConfigMgr mgr) {
                         ${refName} = new java.util.ArrayList<>(${firstFieldName}.size());
                         for (${TypeStr.boxType(fList.item())} e : ${firstFieldName}) {
                             ${Name.refType(refTable)} r = ${MethodStr.tableGet(refTable, refSimple, "e")};
-                            java.util.Objects.requireNonNull(r);
+                            configgen.genjava.LoadValueErrs.requireNonNull(r, "${structural.name()}.${fk.name()} -> ${refTable.name()}", e);
                             ${refName}.add(r);
                         }
                     }
@@ -41,7 +41,7 @@ public void _resolveDirect(${codeTopPkg}.ConfigMgr mgr) {
                         ${refName} = new java.util.LinkedHashMap<>(${firstFieldName}.size());
                         for (java.util.Map.Entry<${TypeStr.boxType(fMap.key())}, ${TypeStr.boxType(fMap.value())}> e : ${firstFieldName}.entrySet()) {
                             ${Name.refType(refTable)} rv = ${MethodStr.tableGet(refTable, refSimple, "e.getValue()")};
-                            java.util.Objects.requireNonNull(rv);
+                            configgen.genjava.LoadValueErrs.requireNonNull(rv, "${structural.name()}.${fk.name()} -> ${refTable.name()}", e.getValue());
                             ${refName}.put(e.getKey(), rv);
                         }
                     }

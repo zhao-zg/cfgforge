@@ -142,42 +142,4 @@ public class GoCodeGenerator extends GeneratorWithTag {
     }
 
 
-    public static String keyClassName(KeySchema keySchema) {
-        if (keySchema.fieldSchemas().size() > 1)
-            return "Key" + keySchema.fields().stream().map(StringUtil::upper1).collect(Collectors.joining());
-        else return type(keySchema.fieldSchemas().getFirst().type());
-    }
-
-    public static String mapName(KeySchema keySchema) {
-        if (keySchema.fieldSchemas().size() > 1) {
-            return StringUtil.lower1(keySchema.fields().stream().map(StringUtil::upper1).collect(Collectors.joining()));
-        } else {
-            return StringUtil.lower1(keySchema.fields().getFirst());
-        }
-    }
-
-    public static String type(FieldType t) {
-        return switch (t) {
-            case BOOL -> "bool";
-            case INT -> "int32";
-            case LONG -> "int64";
-            case FLOAT -> "float32";
-            case STRING -> "string";
-            case TEXT -> "string"; // 默认返回 string，实际类型由 StructModel.type() 根据 isLangSwitch 决定
-            case StructRef structRef -> {
-                Fieldable fieldable = structRef.obj();
-                yield switch (fieldable) {
-                    case StructSchema ignored -> "*" + ClassName(fieldable);
-                    case InterfaceSchema ignored -> ClassName(fieldable);
-                };
-            }
-            case FList fList -> "[]" + type(fList.item());
-            case FMap fMap -> String.format("map[%s]%s", type(fMap.key()), type(fMap.value()));
-        };
-    }
-
-    public static String ClassName(Nameable variable) {
-        var varName = new GoName(variable);
-        return varName.className;
-    }
 }

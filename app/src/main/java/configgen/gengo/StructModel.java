@@ -45,13 +45,21 @@ public class StructModel {
     }
 
     public String type(FieldType t) {
+        if (t == TEXT) {
+            return gen.isLangSwitch ? "*Text" : "string";
+        }
+        return plainType(t);
+    }
+
+    /// 与实例type的区别仅在TEXT：key/映射键等不涉isLangSwitch的场景用string
+    public static String plainType(FieldType t) {
         return switch (t) {
             case BOOL -> "bool";
             case INT -> "int32";
             case LONG -> "int64";
             case FLOAT -> "float32";
             case STRING -> "string";
-            case TEXT -> gen.isLangSwitch ? "*Text" : "string";
+            case TEXT -> "string";
             case StructRef structRef -> {
                 Fieldable fieldable = structRef.obj();
                 yield switch (fieldable) {
@@ -59,8 +67,8 @@ public class StructModel {
                     case InterfaceSchema ignored -> ClassName(fieldable);
                 };
             }
-            case FList fList -> "[]" + type(fList.item());
-            case FMap fMap -> String.format("map[%s]%s", type(fMap.key()), type(fMap.value()));
+            case FList fList -> "[]" + plainType(fList.item());
+            case FMap fMap -> String.format("map[%s]%s", plainType(fMap.key()), plainType(fMap.value()));
         };
     }
 
@@ -85,7 +93,7 @@ public class StructModel {
                         return "[]*" + ClassName(fk.refTableSchema());
                     }
                     case FMap fMap -> {
-                        return String.format("map[%s]*%s", GoCodeGenerator.type(fMap.key()), ClassName(fk.refTableSchema()));
+                        return String.format("map[%s]*%s", plainType(fMap.key()), ClassName(fk.refTableSchema()));
                     }
                 }
             }
@@ -110,7 +118,7 @@ public class StructModel {
     public static String keyClassName(KeySchema keySchema) {
         if (keySchema.fieldSchemas().size() > 1)
             return "Key" + keySchema.fields().stream().map(StringUtil::upper1).collect(Collectors.joining());
-        else return GoCodeGenerator.type(keySchema.fieldSchemas().getFirst().type());
+        else return plainType(keySchema.fieldSchemas().getFirst().type());
     }
 
     public static String mapName(KeySchema keySchema) {
@@ -135,7 +143,7 @@ public class StructModel {
 
     public static String GetVarDefines(KeySchema keySchema) {
         return keySchema.fieldSchemas().stream()
-                .map(f -> StringUtil.lower1(f.name()) + " " + GoCodeGenerator.type(f.type()))
+                .map(f -> StringUtil.lower1(f.name()) + " " + plainType(f.type()))
                 .collect(Collectors.joining(", "));
     }
 
@@ -145,7 +153,7 @@ public class StructModel {
         if (refPrimary) {
             return "Get";
         } else if (fieldCnt > 1) {
-            return "GetBy" + GoCodeGenerator.keyClassName(keySchema);
+            return "GetBy" + keyClassName(keySchema);
         } else {
             return "GetBy" + GetParamVars(keySchema);
         }

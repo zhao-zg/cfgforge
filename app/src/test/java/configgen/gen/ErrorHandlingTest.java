@@ -10,9 +10,9 @@ class ErrorHandlingTest {
         // Given: 无效的生成器参数
         String arg = "java,unknown=param";
 
-        // When & Then: 验证参数验证失败
+        // When & Then: 验证参数验证失败（命令行使用错误，非程序断言失败）
         ParameterParser parser = new ParameterParser(arg);
-        assertThrows(AssertionError.class, parser::assureNoExtra);
+        assertThrows(Main.CliException.class, parser::assureNoExtra);
     }
 
     @Test

@@ -23,9 +23,9 @@ class ParameterParserTest {
         // Given: 带额外参数的生成器参数
         String arg = "java,output=src";
 
-        // When & Then: 验证抛出异常
+        // When & Then: 验证抛出异常（命令行使用错误，非程序断言失败）
         ParameterParser parser = new ParameterParser(arg);
-        assertThrows(AssertionError.class, parser::assureNoExtra);
+        assertThrows(Main.CliException.class, parser::assureNoExtra);
     }
 
     @Test
@@ -56,12 +56,26 @@ class ParameterParserTest {
     }
 
     @Test
+    void shouldParseExplicitBooleanValue() {
+        ParameterParser parser = new ParameterParser("java,verbose=false");
+        assertFalse(parser.has("verbose"));
+        assertTrue(new ParameterParser("java,verbose=true").has("verbose"));
+    }
+
+    @Test
+    void shouldThrow_whenBooleanValueInvalid() {
+        // yes/ok/ture这类垃圾值原来被Boolean.parseBoolean静默当false，必须报错
+        ParameterParser parser = new ParameterParser("java,verbose=yes");
+        assertThrows(Main.CliException.class, () -> parser.has("verbose"));
+    }
+
+    @Test
     void error_ShouldThrowException_whenExtraParametersNotConsumed() {
         // Given: 带未使用参数的生成器参数
         String arg = "java,output=src,unknown=value";
 
-        // When & Then: 验证抛出异常
+        // When & Then: 验证抛出异常（命令行使用错误，非程序断言失败）
         ParameterParser parser = new ParameterParser(arg);
-        assertThrows(AssertionError.class, parser::assureNoExtra);
+        assertThrows(Main.CliException.class, parser::assureNoExtra);
     }
 }

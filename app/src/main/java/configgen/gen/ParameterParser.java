@@ -24,16 +24,24 @@ public class ParameterParser implements Parameter {
 
     @Override
     public boolean has(String key, String messageId) {
-        if (params.containsKey(key.toLowerCase())) {
-            String v = params.remove(key.toLowerCase());
-            if (v != null) {
-                return Boolean.parseBoolean(v);
-            } else {
-                return true;
-            }
-        } else {
+        String lowered = key.toLowerCase();
+        if (!params.containsKey(lowered)) {
             return false;
         }
+        String v = params.remove(lowered);
+        // 无值flag（如 -gen java,beautifulName）在map里存null，视为true
+        if (v == null || v.isEmpty()) {
+            return true;
+        }
+        // 严格解析：Boolean.parseBoolean对垃圾值（如yes、ok、ture）静默返回false，
+        // 用户以为开了开关实际没开，必须报错
+        if (v.equalsIgnoreCase("true")) {
+            return true;
+        }
+        if (v.equalsIgnoreCase("false")) {
+            return false;
+        }
+        throw new Main.CliException("invalid boolean value for parameter '" + key + "': " + v + " (expect true/false), arg: " + arg);
     }
 
     public String id() {
@@ -42,7 +50,7 @@ public class ParameterParser implements Parameter {
 
     void assureNoExtra() {
         if (!params.isEmpty()) {
-            throw new AssertionError("-gen " + id + " not support parameter: " + params);
+            throw new Main.CliException("unsupported parameter(s) for '" + id + "': " + params.keySet() + ", arg: " + arg);
         }
     }
 

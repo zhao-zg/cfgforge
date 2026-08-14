@@ -1,6 +1,6 @@
 package configgen.schema.cfg;
 
-import configgen.data.DataUtil;
+import configgen.util.FileNameUtil;
 import configgen.schema.CfgSchema;
 import configgen.schema.Nameable;
 
@@ -64,7 +64,7 @@ public class CfgUtil {
         try (Stream<Path> subPaths = Files.list(cur)) {
             for (Path path : subPaths.toList()) {
                 String fn = path.getFileName().toString();
-                String codeName = DataUtil.getCodeName(fn);
+                String codeName = FileNameUtil.getCodeName(fn);
                 if (codeName != null && codeName.equals(name)) {
                     return path;
                 }

@@ -2,6 +2,7 @@ package configgen.write;
 
 import configgen.ctx.DirectoryStructure;
 import configgen.data.DataUtil;
+import configgen.util.FileNameUtil;
 import configgen.util.CachedFileOutputStream;
 import configgen.value.CfgValue.VStruct;
 import configgen.value.ValueToJson;
@@ -109,7 +110,7 @@ public class VTableJsonStorage {
                 if (!Files.isDirectory(p)) {
                     continue;
                 }
-                String codeName = DataUtil.getCodeName(p.getFileName().toString());
+                String codeName = FileNameUtil.getCodeName(p.getFileName().toString());
                 if (modulePart.equals(codeName)) {
                     return p.getFileName().toString();
                 }

@@ -6,6 +6,7 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import static configgen.data.DataUtil.*;
+import static configgen.util.FileNameUtil.getCodeName;
 import static configgen.data.DataUtil.FileFmt.*;
 
 /// # 文件目录规范

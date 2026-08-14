@@ -1,5 +1,7 @@
 package configgen.data;
 
+import configgen.util.FileNameUtil;
+
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +60,7 @@ public class DataUtil {
         List<String> codeNames = new ArrayList<>();
         for (Path path : filePath) {
             String fileName = path.getFileName().toString();
-            String codeName = getCodeName(fileName);
+            String codeName = FileNameUtil.getCodeName(fileName);
             if (codeName == null) {
                 return null;
             }
@@ -85,51 +87,6 @@ public class DataUtil {
         return new TableNameIndex(tableName, index);
     }
 
-    public static String getCodeName(String fileName) {
-        if (fileName.isEmpty()) {
-            return null;
-        }
-
-        // 只接受首字母是英文字母的
-        if (isFirstNotAzChar(fileName)) {
-            return null;
-        }
-
-        // 不要后缀
-        int i = fileName.indexOf('.');
-        if (i >= 0) {
-            fileName = fileName.substring(0, i);
-        }
-
-        // 有没有汉字
-        int hanIdx = findFirstHanIndex(fileName);
-        if (hanIdx == -1) {
-            return fileName.toLowerCase(); // 所有的文件名都小写，但最后尊重cfg文件里的大小写
-        }
-
-        // 只要汉字前的，不包括_
-        int end = hanIdx;
-        if (fileName.charAt(hanIdx - 1) == '_') {
-            end = hanIdx - 1;
-        }
-        return fileName.substring(0, end).toLowerCase();
-    }
-
-    public static boolean isFirstNotAzChar(String name) {
-        char firstChar = name.charAt(0);
-        return ('a' > firstChar || firstChar > 'z') && ('A' > firstChar || firstChar > 'Z');
-    }
-
-    private static int findFirstHanIndex(String s) {
-        for (int i = 0; i < s.length(); ) {
-            int codepoint = s.codePointAt(i);
-            if (Character.UnicodeScript.of(codepoint) == Character.UnicodeScript.HAN) {
-                return i;
-            }
-            i += Character.charCount(codepoint);
-        }
-        return -1;
-    }
 
 
     public static String getJsonTableDirName(String tableName) {
@@ -144,12 +101,12 @@ public class DataUtil {
         }
         String sub = dirName.substring(1);
         // _后要是英文字母
-        if (sub.isEmpty() || isFirstNotAzChar(sub)) {
+        if (sub.isEmpty() || FileNameUtil.isFirstNotAzChar(sub)) {
             return null;
         }
 
         // 不能含中文
-        int hanIdx = findFirstHanIndex(sub);
+        int hanIdx = FileNameUtil.findFirstHanIndex(sub);
         if (hanIdx != -1) {
             return null;
         }

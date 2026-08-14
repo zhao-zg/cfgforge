@@ -1,6 +1,5 @@
 package configgen.value;
 
-import configgen.gen.Generator;
 import configgen.schema.*;
 import configgen.util.StringUtil;
 

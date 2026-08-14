@@ -31,9 +31,12 @@ public class EditorServer extends GeneratorWithTag {
     private final int port;
     private final String noteCsvPath;
 
-    private Context context;
-    private volatile CfgValue cfgValue;  // 引用可以被改变，指向不同的CfgValue
-    private volatile TableSchemaRefGraph graph;
+    // context/cfgValue/graph 三者必须配套（同一代数据），合并为单一快照，
+    // 消除读handler两次读字段期间reload插入导致的跨代错配
+    private volatile State state;
+
+    private record State(Context context, CfgValue cfgValue, TableSchemaRefGraph graph) {
+    }
 
     private HttpServer server;
     private NoteEditService noteEditService;
@@ -79,7 +82,7 @@ public class EditorServer extends GeneratorWithTag {
 
 
         if (waitSecondsAfterWatchEvt > 0) {
-            WatchAndPostRun.INSTANCE.startWatch(context, waitSecondsAfterWatchEvt);
+            WatchAndPostRun.INSTANCE.startWatch(state.context(), waitSecondsAfterWatchEvt);
             WatchAndPostRun.INSTANCE.registerPostRunCallback(this::initFromCtx);
             if (postRun != null) {
                 WatchAndPostRun.INSTANCE.registerPostRunBat(postRun);
@@ -87,16 +90,16 @@ public class EditorServer extends GeneratorWithTag {
         }
     }
 
-    private void initFromCtx(Context newContext) {
-        this.context = newContext;
+    // synchronized与写handler互斥：写handler基于旧数据算出的新值，不能覆盖掉reload装入的新一代状态
+    private synchronized void initFromCtx(Context newContext) {
         // 可以包含tag，这样更灵活，方便查看filter过后的数据
         // 此时所有的修改指令将返回错误 serverNotEditable
-        cfgValue = context.makeValue(tag, true);
-        graph = new TableSchemaRefGraph(cfgValue.schema());
+        CfgValue newCfgValue = newContext.makeValue(tag, true);
+        state = new State(newContext, newCfgValue, new TableSchemaRefGraph(newCfgValue.schema()));
     }
 
     private void handleSchemas(HttpExchange exchange) throws IOException {
-        SchemaService.Schema schema = SchemaService.fromCfgValue(cfgValue);
+        SchemaService.Schema schema = SchemaService.fromCfgValue(state.cfgValue());
         sendResponse(exchange, schema);
     }
 
@@ -128,7 +131,7 @@ public class EditorServer extends GeneratorWithTag {
         String maxStr = query.get("max");
 
         int max = parseIntAndIgnoreErr(maxStr, 30);
-        SearchService.SearchResult result = SearchService.search(cfgValue, q, max);
+        SearchService.SearchResult result = SearchService.search(state.cfgValue(), q, max);
         sendResponse(exchange, result);
     }
 
@@ -158,7 +161,8 @@ public class EditorServer extends GeneratorWithTag {
         int maxIds = parseIntAndIgnoreErr(maxIdsStr, 30);
 
 
-        RecordRefIdsService.RecordRefIdsResponse response = new RecordRefIdsService(cfgValue, graph, table, id, inDepth, outDepth, maxIds).retrieve();
+        State st = state;
+        RecordRefIdsService.RecordRefIdsResponse response = new RecordRefIdsService(st.cfgValue(), st.graph(), table, id, inDepth, outDepth, maxIds).retrieve();
         sendResponse(exchange, response);
     }
 
@@ -185,7 +189,8 @@ public class EditorServer extends GeneratorWithTag {
             requestType = refsStr != null ? RequestType.requestRefs : RequestType.requestRecord;
         }
 
-        RecordResponse record = new RecordService(cfgValue, graph, table, id, depth, in, maxObjs, requestType).retrieve();
+        State st = state;
+        RecordResponse record = new RecordService(st.cfgValue(), st.graph(), table, id, depth, in, maxObjs, requestType).retrieve();
         sendResponse(exchange, record);
     }
 
@@ -204,10 +209,11 @@ public class EditorServer extends GeneratorWithTag {
 
         RecordEditResult result;
         synchronized (this) {
-            var res = RecordEditService.addOrUpdateRecord(context, cfgValue, table, jsonStr);
+            State st = state;
+            var res = RecordEditService.addOrUpdateRecord(st.context(), st.cfgValue(), table, jsonStr);
             result = res.result();
             if (result.resultCode() == addOk || result.resultCode() == updateOk) {
-                cfgValue = res.newCfgValue();
+                state = new State(st.context(), res.newCfgValue(), st.graph());
             }
         }
 
@@ -227,10 +233,11 @@ public class EditorServer extends GeneratorWithTag {
 
         RecordEditResult result;
         synchronized (this) {
-            var res = RecordEditService.deleteRecord(context, cfgValue, table, id);
+            State st = state;
+            var res = RecordEditService.deleteRecord(st.context(), st.cfgValue(), table, id);
             result = res.result();
             if (result.resultCode() == deleteOk) {
-                cfgValue = res.newCfgValue();
+                state = new State(st.context(), res.newCfgValue(), st.graph());
             }
         }
 
@@ -242,7 +249,8 @@ public class EditorServer extends GeneratorWithTag {
     private void handlePrompt(HttpExchange exchange) throws IOException {
         Map<String, String> query = queryToMap(exchange.getRequestURI().getQuery());
         String table = query.get("table");
-        PromptService.PromptResult result = PromptService.gen(context, cfgValue, table);
+        State st = state;
+        PromptService.PromptResult result = PromptService.gen(st.context(), st.cfgValue(), table);
         sendResponse(exchange, result);
     }
 
@@ -257,7 +265,7 @@ public class EditorServer extends GeneratorWithTag {
         byte[] bytes = exchange.getRequestBody().readAllBytes();
         String raw = new String(bytes, StandardCharsets.UTF_8);
 
-        CheckJsonResult result = CheckJsonService.checkJson(cfgValue, table, raw);
+        CheckJsonResult result = CheckJsonService.checkJson(state.cfgValue(), table, raw);
 //        logger.info(result.toString());
         sendResponse(exchange, result);
     }

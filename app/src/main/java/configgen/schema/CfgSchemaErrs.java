@@ -30,6 +30,12 @@ public record CfgSchemaErrs(List<Err> errs,
         weakWarns.add(Objects.requireNonNull(weakWarn));
     }
 
+    public void merge(CfgSchemaErrs other) {
+        errs.addAll(other.errs);
+        warns.addAll(other.warns);
+        weakWarns.addAll(other.weakWarns);
+    }
+
     public void checkErrors() {
         checkErrors("schema");
     }

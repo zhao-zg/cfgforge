@@ -98,24 +98,27 @@ public record CfgDataReader(HeadRow headRow,
             Logger.profile("data read");
 
             // parse head & data cell
-            List<Callable<CfgDataStat>> parseTasks = new ArrayList<>(data.tables().size());
+            // errs 非线程安全（内部是ArrayList），并行任务各自收集，主线程merge
+            List<Callable<ParseResult>> parseTasks = new ArrayList<>(data.tables().size());
             for (CfgData.DTable table : data.tables().values()) {
                 parseTasks.add(() -> {
                     CfgDataStat tStat = new CfgDataStat();
+                    CfgSchemaErrs tErrs = CfgSchemaErrs.of();
                     boolean isColumnMode = SchemaUtil.isColumnMode(nullableCfgSchema, table.tableName());
                     try {
-                        HeadParser.parse(table, tStat, headRow, isColumnMode, errs);
+                        HeadParser.parse(table, tStat, headRow, isColumnMode, tErrs);
                         CellParser.parse(table, tStat, headRow.rowCount(), isColumnMode);
                     } catch (Exception e) {
                         throw new RuntimeException("parse table failed: " + table.tableName(), e);
                     }
-                    return tStat;
+                    return new ParseResult(tStat, tErrs);
                 });
             }
-            List<Future<CfgDataStat>> parseFutures = executor.invokeAll(parseTasks);
-            for (Future<CfgDataStat> future : parseFutures) {
-                CfgDataStat tStat = future.get();
-                stat.merge(tStat);
+            List<Future<ParseResult>> parseFutures = executor.invokeAll(parseTasks);
+            for (Future<ParseResult> future : parseFutures) {
+                ParseResult pr = future.get();
+                stat.merge(pr.stat());
+                errs.merge(pr.errs());
             }
             Logger.profile("data parse");
             stat.tableCount = data.tables().size();
@@ -134,5 +137,8 @@ public record CfgDataReader(HeadRow headRow,
             CfgData.DTable newTable = CfgData.DTable.of(tableName, sheets, nullableAddTag);
             cfgData.tables().put(tableName, newTable);
         }
+    }
+
+    private record ParseResult(CfgDataStat stat, CfgSchemaErrs errs) {
     }
 }

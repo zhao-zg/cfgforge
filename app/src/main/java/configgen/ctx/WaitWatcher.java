@@ -73,7 +73,12 @@ public class WaitWatcher {
         } else if (lastEvtMillis > 0) {
             if (System.currentTimeMillis() - lastEvtMillis >= waitMillisAfterWatchEvt) {
                 lastEvtMillis = 0;
-                listener.run();
+                try {
+                    listener.run();
+                } catch (Exception e) {
+                    // listener抛异常不能无声杀死轮询线程，否则后续文件变更全部失效
+                    Logger.log("WaitWatcher listener err: %s", e.toString());
+                }
             }
         }
     }

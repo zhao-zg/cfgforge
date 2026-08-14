@@ -46,6 +46,8 @@ public class Context {
     private final ReadCsv csvReader;
     private CfgSchema cfgSchema;
     private volatile CfgData cfgData;
+    // 本次加载是否触发了autoFix写回config.cfg（供watch层检测写-触发循环）
+    private boolean lastLoadDidAutoFix;
 
     /**
      * 优化，避免gen多次时，重复生成value
@@ -111,6 +113,7 @@ public class Context {
                     alignedSchema);
             sourceStructure = sourceStructure.reload();
             Logger.profile("schema write");
+            lastLoadDidAutoFix = true;
             return false;
         } else {
             schema.printDiff(alignedSchema);
@@ -150,6 +153,10 @@ public class Context {
      */
     public CfgData cfgData() {
         return cfgData;
+    }
+
+    boolean lastLoadDidAutoFix() {
+        return lastLoadDidAutoFix;
     }
 
     /**

@@ -23,6 +23,7 @@ public class Watcher {
     private volatile long lastEvtMillis;
     private final AtomicInteger eventVersion = new AtomicInteger(0);
     private Thread startedThread;
+    private volatile WatchService watchService;
     private final Map<WatchKey, Path> keys = new HashMap<>();
 
     public Watcher(Path rootDir, ExplicitDir explicitDir) {
@@ -35,23 +36,37 @@ public class Watcher {
         startedThread = Thread.startVirtualThread(() -> {
             try {
                 watchLoop();
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException | InterruptedException | ClosedWatchServiceException e) {
                 Logger.log("Watcher stopped by %s", e.toString());
             }
         });
     }
 
+    // watchService.take()不响应interrupt（JDK已知限制），必须close让take()抛ClosedWatchServiceException才能退出
     public void stop() {
-        if (startedThread == null) {
+        Thread thread = startedThread;
+        if (thread == null) {
             return;
         }
-        startedThread.interrupt();
+        startedThread = null;
+
+        WatchService ws = watchService;
+        if (ws != null) {
+            try {
+                ws.close();
+            } catch (IOException e) {
+                Logger.verbose("close watch service err: %s", e.toString());
+            }
+        }
+
+        thread.interrupt();
         try {
-            startedThread.join();
+            thread.join(5000);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        } finally {
-            startedThread = null;
+            Thread.currentThread().interrupt();
+        }
+        if (thread.isAlive()) {
+            Logger.log("Watcher thread did not stop in 5s");
         }
     }
 
@@ -87,6 +102,7 @@ public class Watcher {
 
     private void watchLoop() throws IOException, InterruptedException {
         WatchService watchService = FileSystems.getDefault().newWatchService();
+        this.watchService = watchService;
         keys.clear();
         boolean recursiveSupport = false;
 

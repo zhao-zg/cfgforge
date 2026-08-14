@@ -88,7 +88,7 @@ public class StructModel {
     public String refName(ForeignKeySchema fk) {
         switch (fk.refKey()) {
             case RefKey.RefList ignored -> {
-                return "RefList" + upper1(fk.name());
+                return "ListRef" + upper1(fk.name());
             }
             case RefKey.RefSimple refSimple -> {
                 if (refSimple.nullable()) {

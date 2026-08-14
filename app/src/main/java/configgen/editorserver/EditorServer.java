@@ -22,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 import configgen.util.Logger;
@@ -229,16 +230,9 @@ public class EditorServer extends GeneratorWithTag {
         byte[] bytes = exchange.getRequestBody().readAllBytes();
         String jsonStr = new String(bytes, StandardCharsets.UTF_8);
 
-        RecordEditResult result;
-        synchronized (this) {
-            State st = state;
-            var res = RecordEditService.addOrUpdateRecord(st.context(), st.cfgValue(), table, jsonStr);
-            result = res.result();
-            if (result.resultCode() == addOk || result.resultCode() == updateOk) {
-                state = new State(st.context(), res.newCfgValue(), st.graph());
-            }
-        }
-
+        RecordEditResult result = editRecord(
+                (ctx, cfgValue) -> RecordEditService.addOrUpdateRecord(ctx, cfgValue, table, jsonStr),
+                addOk, updateOk);
         sendResponse(exchange, result);
     }
 
@@ -251,17 +245,28 @@ public class EditorServer extends GeneratorWithTag {
         String table = query.get("table");
         String id = query.get("id");
 
+        RecordEditResult result = editRecord(
+                (ctx, cfgValue) -> RecordEditService.deleteRecord(ctx, cfgValue, table, id),
+                deleteOk);
+        sendResponse(exchange, result);
+    }
+
+    /**
+     * 写操作统一临界区：基于当前State快照调用编辑服务，命中成功码则在同一临界区内装配新State，
+     * 避免与reload交错产生跨代状态。所有写接口必须经此进入，不得自行取快照。
+     */
+    private RecordEditResult editRecord(BiFunction<Context, CfgValue, RecordEditService.ResultWithNewCfgValue> editCall,
+                                        RecordEditService.ResultCode... successCodes) {
         RecordEditResult result;
         synchronized (this) {
             State st = state;
-            var res = RecordEditService.deleteRecord(st.context(), st.cfgValue(), table, id);
+            RecordEditService.ResultWithNewCfgValue res = editCall.apply(st.context(), st.cfgValue());
             result = res.result();
-            if (result.resultCode() == deleteOk) {
+            if (Arrays.asList(successCodes).contains(result.resultCode())) {
                 state = new State(st.context(), res.newCfgValue(), st.graph());
             }
         }
-
-        sendResponse(exchange, result);
+        return result;
     }
 
 
@@ -328,12 +333,14 @@ public class EditorServer extends GeneratorWithTag {
         }
     };
 
+    private static final Set<String> LOOPBACK_HOSTS = Set.of("localhost", "127.0.0.1", "[::1]");
+
     private boolean isOriginAllowed(String origin) {
         if (origin.isBlank() || origin.equalsIgnoreCase("null")) {
             return false;
         }
         String o = origin.toLowerCase(Locale.ROOT);
-        for (String host : new String[]{"localhost", "127.0.0.1", "[::1]"}) {
+        for (String host : LOOPBACK_HOSTS) {
             if (o.equals("http://" + host) || o.equals("https://" + host)
                     || o.startsWith("http://" + host + ":") || o.startsWith("https://" + host + ":")) {
                 return true;

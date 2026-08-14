@@ -7,13 +7,16 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 public class CachedFiles {
     // 表生成并发：writeFile/keepFile 会被多个工作线程同时调用，必须用并发安全 Set
     private static final Set<String> filename_set = ConcurrentHashMap.newKeySet();
 
-    private static final List<File> deleteFiles = new ArrayList<>(1);
-    private static final List<File> deleteKeepMetaWithSuffixFiles = new ArrayList<>(1);
+    // Main.run末尾的finalExit会迭代这两个列表，而watch的bat虚拟线程可能同时在跑
+    // generator注册清理目录，必须用并发安全容器
+    private static final List<File> deleteFiles = new CopyOnWriteArrayList<>();
+    private static final List<File> deleteKeepMetaWithSuffixFiles = new CopyOnWriteArrayList<>();
     private static final Set<String> metaSuffixSet = Set.of(".meta", ".uid");
 
     public static void deleteOtherFiles(File dir) {
@@ -24,11 +27,17 @@ public class CachedFiles {
         deleteKeepMetaWithSuffixFiles.add(dir);
     }
 
+    // Main.run每次运行末尾都会调用（不只进程退出），登记必须按run清空：
+    // 否则GUI第二次Run会按上一轮的登记再清一遍目录，上一轮之后新生成的文件会被误删。
+    // 清空安全：所有要keep的文件每run都会重新登记（writeFile/copyFileIfNotExist都无条件keepFile）
     public static void finalExit() {
         deleteFiles.stream().filter(File::exists)
                 .forEach(f -> doRemoveFile(f, false));
         deleteKeepMetaWithSuffixFiles.forEach(dir ->
                 doRemoveFile(dir, true));
+        deleteFiles.clear();
+        deleteKeepMetaWithSuffixFiles.clear();
+        filename_set.clear();
     }
 
     public static void writeFile(Path path, byte[] data) throws IOException {

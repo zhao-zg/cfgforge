@@ -4,7 +4,7 @@ import com.github.codeboyzhou.mcp.declarative.McpServers;
 import com.github.codeboyzhou.mcp.declarative.annotation.McpServerApplication;
 import com.github.codeboyzhou.mcp.declarative.server.McpStreamableServerInfo;
 import configgen.ctx.Context;
-import configgen.ctx.WatchAndPostRun;
+import configgen.gen.WatchAndPostRun;
 import configgen.gen.GeneratorWithTag;
 import configgen.gen.Parameter;
 import configgen.util.Logger;

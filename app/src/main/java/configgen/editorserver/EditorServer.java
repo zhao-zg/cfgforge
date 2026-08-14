@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.sun.net.httpserver.*;
 import configgen.ctx.*;
 import configgen.gen.GeneratorWithTag;
+import configgen.gen.WatchAndPostRun;
 import configgen.gen.Parameter;
 import configgen.schema.TableSchemaRefGraph;
 import configgen.value.SearchService;

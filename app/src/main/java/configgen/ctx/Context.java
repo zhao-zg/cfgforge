@@ -155,7 +155,7 @@ public class Context {
         return cfgData;
     }
 
-    boolean lastLoadDidAutoFix() {
+    public boolean lastLoadDidAutoFix() {
         return lastLoadDidAutoFix;
     }
 

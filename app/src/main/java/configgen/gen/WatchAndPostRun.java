@@ -1,7 +1,10 @@
-package configgen.ctx;
+package configgen.gen;
 
-import configgen.gen.Generator;
-import configgen.gen.Generators;
+import configgen.ctx.Context;
+import configgen.ctx.DirectoryStructure;
+import configgen.ctx.WaitWatcher;
+import configgen.ctx.Watcher;
+
 import configgen.util.LocaleUtil;
 import configgen.util.Logger;
 

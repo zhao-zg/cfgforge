@@ -20,7 +20,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
-import static configgen.data.DataUtil.getFileFormat;
 import static configgen.data.DataUtil.getTableNameIndex;
 
 public class DataUpdater {

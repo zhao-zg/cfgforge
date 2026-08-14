@@ -74,9 +74,6 @@ public class DirectoryStructure implements JsonTableFiles {
     public static final String ROOT_CONFIG_FILENAME = "config.cfg";
     public static final String CONFIG_EXT = "cfg";
 
-
-
-
     static class JsonFileList {
         List<JsonFileInfo> list = new ArrayList<>();
         Map<String, JsonFileInfo> map = new LinkedHashMap<>();
@@ -87,8 +84,8 @@ public class DirectoryStructure implements JsonTableFiles {
 
         void sort() {
             list = new ArrayList<>(map.values());
-            if (map.values().stream().allMatch(j -> j.isIntegerId())) {
-                list.sort(Comparator.comparingInt(o -> o.integerId()));
+            if (map.values().stream().allMatch(JsonFileInfo::isIntegerId)) {
+                list.sort(Comparator.comparingInt(JsonFileInfo::integerId));
             }
         }
 

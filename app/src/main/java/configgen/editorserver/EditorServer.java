@@ -10,12 +10,19 @@ import configgen.value.SearchService;
 import configgen.value.CfgValue;
 
 import java.io.*;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import configgen.util.Logger;
 
@@ -29,6 +36,8 @@ import static configgen.editorserver.RecordEditService.*;
  */
 public class EditorServer extends GeneratorWithTag {
     private final int port;
+    private final String bindAddress;
+    private final Set<String> extraAllowedOrigins;
     private final String noteCsvPath;
 
     // context/cfgValue/graph 三者必须配套（同一代数据），合并为单一快照，
@@ -46,6 +55,12 @@ public class EditorServer extends GeneratorWithTag {
     public EditorServer(Parameter parameter) {
         super(parameter);
         port = Integer.parseInt(parameter.get("port", "3456"));
+        // 默认只绑回环地址，避免配置写接口暴露给局域网；需要外部访问时显式配置 bind=0.0.0.0
+        bindAddress = parameter.get("bind", "127.0.0.1");
+        // 额外放行的跨域来源（逗号分隔），供编辑器部署在非本机origin时使用
+        String allowOrigin = parameter.get("alloworigin", null);
+        extraAllowedOrigins = allowOrigin == null ? Set.of() : Arrays.stream(allowOrigin.split(","))
+                .map(String::trim).filter(s -> !s.isEmpty()).collect(Collectors.toUnmodifiableSet());
         noteCsvPath = parameter.get("note", "_note.csv");
         waitSecondsAfterWatchEvt = Integer.parseInt(parameter.get("watch", "0"));
         postRun = parameter.get("postrun", null);
@@ -56,11 +71,15 @@ public class EditorServer extends GeneratorWithTag {
         noteEditService = new NoteEditService(Path.of(noteCsvPath));
         initFromCtx(ctx);
 
-        System.gc();
         System.setProperty("java.util.logging.SimpleFormatter.format",
                 "[%1$tF %1$tT] %5$s %n");
 
-        InetSocketAddress listenAddress = new InetSocketAddress(port);
+        InetSocketAddress listenAddress;
+        try {
+            listenAddress = new InetSocketAddress(InetAddress.getByName(bindAddress), port);
+        } catch (UnknownHostException e) {
+            throw new IOException("无法解析bind地址: " + bindAddress, e);
+        }
         server = HttpServer.create(listenAddress, 0);
 
         handle("/schemas", this::handleSchemas);
@@ -109,8 +128,7 @@ public class EditorServer extends GeneratorWithTag {
     }
 
     private void handleNoteUpdate(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestMethod().equals("OPTIONS")) {
-            sendOptionsResponse(exchange);
+        if (!checkPostMethod(exchange)) {
             return;
         }
 
@@ -195,8 +213,13 @@ public class EditorServer extends GeneratorWithTag {
     }
 
     private void handleRecordAddOrUpdate(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestMethod().equals("OPTIONS")) {
-            sendOptionsResponse(exchange);
+        if (!checkPostMethod(exchange)) {
+            return;
+        }
+        // 强制JSON类型：浏览器发text/plain是简单请求可绕过预检，application/json必须预检
+        String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
+        if (contentType == null || !contentType.toLowerCase(Locale.ROOT).contains("application/json")) {
+            sendError(exchange, 415, "Content-Type must be application/json");
             return;
         }
 
@@ -205,7 +228,6 @@ public class EditorServer extends GeneratorWithTag {
 
         byte[] bytes = exchange.getRequestBody().readAllBytes();
         String jsonStr = new String(bytes, StandardCharsets.UTF_8);
-//        logger.info(jsonStr);
 
         RecordEditResult result;
         synchronized (this) {
@@ -217,13 +239,11 @@ public class EditorServer extends GeneratorWithTag {
             }
         }
 
-//        logger.info(result.toString());
         sendResponse(exchange, result);
     }
 
     private void handleRecordDelete(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestMethod().equals("OPTIONS")) {
-            sendOptionsResponse(exchange);
+        if (!checkPostMethod(exchange)) {
             return;
         }
 
@@ -241,7 +261,6 @@ public class EditorServer extends GeneratorWithTag {
             }
         }
 
-//        logger.info(result.toString());
         sendResponse(exchange, result);
     }
 
@@ -256,8 +275,7 @@ public class EditorServer extends GeneratorWithTag {
 
 
     private void handleCheckJson(HttpExchange exchange) throws IOException {
-        if (exchange.getRequestMethod().equals("OPTIONS")) {
-            sendOptionsResponse(exchange);
+        if (!checkPostMethod(exchange)) {
             return;
         }
         Map<String, String> query = queryToMap(exchange.getRequestURI().getQuery());
@@ -266,7 +284,6 @@ public class EditorServer extends GeneratorWithTag {
         String raw = new String(bytes, StandardCharsets.UTF_8);
 
         CheckJsonResult result = CheckJsonService.checkJson(state.cfgValue(), table, raw);
-//        logger.info(result.toString());
         sendResponse(exchange, result);
     }
 
@@ -275,10 +292,18 @@ public class EditorServer extends GeneratorWithTag {
         context.getFilters().add(logging);
     }
 
-    private static final Filter logging = new Filter() {
+    // 浏览器跨站请求（CSRF/DNS rebinding）防线：带外域Origin的请求直接403。
+    // 非浏览器客户端（curl、编辑器本地进程）通常不带Origin，默认放行
+    private final Filter logging = new Filter() {
         @Override
         public void doFilter(HttpExchange http, Chain chain) {
             try {
+                String origin = http.getRequestHeaders().getFirst("Origin");
+                if (origin != null && !isOriginAllowed(origin)) {
+                    Logger.log("rejected origin: " + origin);
+                    sendError(http, 403, "origin not allowed");
+                    return;
+                }
                 chain.doFilter(http);
             } catch (Throwable e) {
                 Logger.log(e.toString());
@@ -303,9 +328,29 @@ public class EditorServer extends GeneratorWithTag {
         }
     };
 
+    private boolean isOriginAllowed(String origin) {
+        if (origin.isBlank() || origin.equalsIgnoreCase("null")) {
+            return false;
+        }
+        String o = origin.toLowerCase(Locale.ROOT);
+        for (String host : new String[]{"localhost", "127.0.0.1", "[::1]"}) {
+            if (o.equals("http://" + host) || o.equals("https://" + host)
+                    || o.startsWith("http://" + host + ":") || o.startsWith("https://" + host + ":")) {
+                return true;
+            }
+        }
+        // cfgeditor的Tauri桌面端webview origin
+        if (o.equals("tauri://localhost") || o.equals("http://tauri.localhost")) {
+            return true;
+        }
+        return extraAllowedOrigins.contains(origin);
+    }
+
     private static void setCorsHeaders(HttpExchange exchange) {
         exchange.getResponseHeaders().set("Content-Type", "application/json");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
+        // 有Origin时回显（配合Credentials不能再用*），无Origin（非浏览器）用*
+        String origin = exchange.getRequestHeaders().getFirst("Origin");
+        exchange.getResponseHeaders().set("Access-Control-Allow-Origin", origin != null ? origin : "*");
         exchange.getResponseHeaders().set("Access-Control-Allow-Credentials", "true");
         exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "POST, GET, DELETE, OPTIONS");
         exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "*");
@@ -315,6 +360,32 @@ public class EditorServer extends GeneratorWithTag {
         setCorsHeaders(exchange);
         exchange.sendResponseHeaders(200, -1);
         exchange.getRequestBody().close();
+    }
+
+    /**
+     * 写接口只接受POST（及OPTIONS预检）。GET等子资源加载（如 img src=...）不带头，
+     * 会绕过Origin校验直接触发写操作，必须按方法拒绝。
+     */
+    private static boolean checkPostMethod(HttpExchange exchange) throws IOException {
+        String method = exchange.getRequestMethod();
+        if (method.equals("OPTIONS")) {
+            sendOptionsResponse(exchange);
+            return false;
+        }
+        if (!method.equals("POST")) {
+            sendError(exchange, 405, "method not allowed");
+            return false;
+        }
+        return true;
+    }
+
+    private static void sendError(HttpExchange exchange, int status, String msg) throws IOException {
+        byte[] bytes = msg.getBytes(StandardCharsets.UTF_8);
+        exchange.getResponseHeaders().set("Content-Type", "text/plain; charset=utf-8");
+        exchange.sendResponseHeaders(status, bytes.length);
+        try (OutputStream out = exchange.getResponseBody()) {
+            out.write(bytes);
+        }
     }
 
     private static void sendResponse(HttpExchange exchange, Object object) throws IOException {
@@ -332,11 +403,17 @@ public class EditorServer extends GeneratorWithTag {
         Map<String, String> result = new HashMap<>();
         if (query != null) {
             for (String param : query.split("&")) {
-                String[] pair = param.split("=");
-                if (pair.length > 1) {
-                    result.put(pair[0], pair[1]);
-                } else {
-                    result.put(pair[0], "");
+                // split("=")会把取值里的=切断，且未decode，中文/编码字符会解析错误
+                int eq = param.indexOf('=');
+                try {
+                    if (eq >= 0) {
+                        result.put(URLDecoder.decode(param.substring(0, eq), StandardCharsets.UTF_8),
+                                URLDecoder.decode(param.substring(eq + 1), StandardCharsets.UTF_8));
+                    } else if (!param.isEmpty()) {
+                        result.put(URLDecoder.decode(param, StandardCharsets.UTF_8), "");
+                    }
+                } catch (IllegalArgumentException e) {
+                    Logger.log("bad query param: " + param);
                 }
             }
         }

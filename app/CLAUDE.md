@@ -81,6 +81,8 @@ java -jar cfggen.jar -datadir <dir> -tool <name>[,k=v...]
 4. **错误**：收集式（`CfgSchemaErrs` 三级 / `CfgValueErrs` 两级），结尾 `checkErrors(prefix, allowErr)` 决定是否抛。详见 [`docs/08`](docs/08-errors-and-validation.md)。
 5. **命名**：生成器 `XxxCodeGenerator`、工具 `XxxTool`、工具类 `XxxUtil`、序列化器/反序列化器独立成类。
 6. **GDScript**：`var x: Array[int]: get: return x` 是 Godot 4.x 标准属性语法，引擎自动处理，**不是无限递归**，勿误改。
+7. **ts 生成器无目录清理**：其 dstDir 默认是用户项目根（Config.ts 与 `main.ts`/`package.json` 同目录），任何 `deleteOtherFiles` 类清理都会误删用户文件；且产物仅两个固定文件名、无陈旧堆积。这是刻意行为，勿照搬 cs/lua 的清理调用（详见 [`docs/05`](docs/05-codegen-and-extension.md) 收尾清理一节）。
+8. **分层依赖**：`gen(含 gen*/write/editorserver/mcpserver/tool) → ctx → value → data → schema → util` 单向（value 亦可依赖 i18n）。由 `ArchitectureTest`（ArchUnit）固化，下层 import 上层会直接测试失败。
 
 > 添加生成器、调试、改模板、错误排查、Bytes 格式、写回管道等**详细流程**已迁入 `docs/` 系列（[`05`](docs/05-codegen-and-extension.md) / [`10`](docs/10-dev-workflow.md) / [`08`](docs/08-errors-and-validation.md) / [`06`](docs/06-bytes-format.md) / [`07`](docs/07-write-back-and-servers.md)）。
 

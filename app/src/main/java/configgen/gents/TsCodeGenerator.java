@@ -34,6 +34,11 @@ public class TsCodeGenerator extends GeneratorWithTag {
 
     @Override
     public void generate(Context ctx) throws IOException {
+        // 注意：ts 不做 deleteOtherFiles/keepMetaAndDeleteOtherFiles 收尾清理，这是目录语义决定的、不是遗漏：
+        // 1. dstDir 默认就是用户项目根（不传 dir 时为 "."），Config.ts 与 main.ts/package.json 等
+        //    用户文件同目录，任何清理都会误删它们；cs/lua 的清理作用在 dir.resolve(pkg) 的
+        //    生成器独占子目录，gd 依赖调用方显式传独占目录（dir:config），ts 没有独占目录。
+        // 2. ts 产物仅 Config.ts + ConfigUtil.ts 两个固定文件名，不会产生陈旧文件堆积，无清理需求。
         cfgValue = ctx.makeValue(tag);  // 这里只需要schema，生成value只用于检验数据
         cfgSchema = cfgValue.schema();
         nullableLanguageSwitch = ctx.nullableLangSwitch();

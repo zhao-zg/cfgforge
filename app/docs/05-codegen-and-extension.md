@@ -65,6 +65,18 @@ gen 层消费 `CfgValue`，用模板渲染成各语言的代码与数据文件�
 | `verify` / `search` | `ValueVerifyTool` / `ValueInspectTool` | 校验 / 检索 | 见 [`08`](08-errors-and-validation.md) |
 | `server` / `mcpserver` | `EditorServer` / `CfgMcpServer` | 服务 | 见 [`07`](07-write-back-and-servers.md) |
 
+### 收尾清理（过期文件删除）的目录语义差异
+
+cs 第 4 步的 `keepMetaAndDeleteOtherFiles` **不能**照搬给所有语言，差异源于 dstDir 的语义：
+
+| 语言 | dstDir | 清理 |
+|---|---|---|
+| cs / lua | `dir.resolve(pkg路径)` —— 生成器**独占子目录** | `keepMetaAndDeleteOtherFiles` 安全 |
+| gd | `dir` 本身 | 同上，但依赖调用方显式传独占目录（如 example 的 `dir:config`） |
+| ts | `dir`，**默认 `.`（用户项目根）** | **不清理**：Config.ts 与 `main.ts`/`package.json` 等用户文件同目录，任何清理都会误删；且产物仅 Config.ts + ConfigUtil.ts 两个固定文件名，不存在陈旧堆积 |
+
+> ts 不清理是目录语义决定的刻意行为（`TsCodeGenerator.generate` 注释有同样说明），不是漏掉 cs 式的清理调用，勿"修复"。
+
 ## 并发生成（设计原理）
 
 - struct / interface / table 的渲染**互不依赖**，单阶段并发，实测 ~2–3x（java/cs/go/gd 各自的并发改造，见仓库内性能记录）。

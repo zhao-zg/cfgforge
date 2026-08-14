@@ -118,3 +118,6 @@
 /example/cs/Folder.DotSettings.user
 /.mcp.json
 /cfgeditor/cfgeditorOld.exe
+
+# 架构评审报告（本地文档，不入库）
+/app/ARCHITECTURE_REVIEW.md

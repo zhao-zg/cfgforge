@@ -1,8 +1,5 @@
-package configgen.geni18n;
+package configgen.i18n;
 
-import configgen.i18n.LangTextFinder;
-import configgen.i18n.TextByIdFinder;
-import configgen.i18n.I18nUtils;
 import configgen.util.Logger;
 import org.dhatim.fastexcel.Workbook;
 import org.dhatim.fastexcel.Worksheet;
@@ -35,42 +32,13 @@ public record TodoFile(List<Line> todo,
 
     private static final Line HEADER = new Line("table", "id", "fieldChain", "original", "translated");
 
+    public static Line header() {
+        return HEADER;
+    }
+
 
     public static final String TODO_SHEET_NAME = "todo";
     public static final String DONE_SHEET_NAME = "参考用";
-
-    public static TodoFile ofLangText(LangText lang) {
-        java.util.List<Line> todoLines = new ArrayList<>(32);
-        java.util.List<Line> doneLines = new ArrayList<>(32);
-        todoLines.add(HEADER);
-        doneLines.add(HEADER);
-
-        for (var e : lang.entrySet()) {
-            for (var t : e.getValue().entrySet()) {
-                String table = t.getKey();
-                TextByIdFinder finder = t.getValue();
-                java.util.List<String> fieldChainList = finder.getFieldChainToIndex().keySet().stream().toList();
-                for (var r : finder.getPkToTexts().entrySet()) {
-                    String pk = r.getKey();
-                    OneRecord record = r.getValue();
-                    int idx = 0;
-                    for (OneText ot : record.texts()) {
-                        if (ot != null) {
-                            Line line = new Line(table, pk, fieldChainList.get(idx), ot.original(), ot.translated());
-                            if (ot.translated().isEmpty()) {
-                                todoLines.add(line);
-                            } else {
-                                doneLines.add(line);
-                            }
-                        }
-                        idx++;
-                    }
-                }
-            }
-        }
-        return new TodoFile(todoLines, doneLines);
-    }
-
 
     public static TodoFile read(Path todoFile) {
         try (ReadableWorkbook wb = new ReadableWorkbook(todoFile.toFile(),
@@ -98,7 +66,7 @@ public record TodoFile(List<Line> todo,
         }
     }
 
-    static List<Line> readSheetToLines(Sheet sheet) throws IOException {
+    public static List<Line> readSheetToLines(Sheet sheet) throws IOException {
         List<Row> rows = sheet.read();
         List<Line> lines = new ArrayList<>(rows.size());
         for (Row row : rows) {
@@ -135,7 +103,7 @@ public record TodoFile(List<Line> todo,
         }
     }
 
-    static void saveLinesToSheet(Worksheet ws, List<Line> lines) {
+    public static void saveLinesToSheet(Worksheet ws, List<Line> lines) {
         int row = 0;
         for (Line line : lines) {
             ws.inlineString(row, 0, line.table());

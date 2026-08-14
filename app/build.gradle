@@ -39,6 +39,7 @@ dependencies {
 
     // 测试依赖
     testImplementation 'org.junit.jupiter:junit-jupiter:5.12.2'
+    testImplementation 'com.tngtech.archunit:archunit-junit5:1.5.0'
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 }
 

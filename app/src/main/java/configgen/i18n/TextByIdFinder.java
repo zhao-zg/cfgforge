@@ -1,6 +1,5 @@
 package configgen.i18n;
 
-import configgen.geni18n.TodoFile;
 import org.dhatim.fastexcel.reader.*;
 
 import java.io.File;

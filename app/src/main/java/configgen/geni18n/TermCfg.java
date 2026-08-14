@@ -1,6 +1,8 @@
 package configgen.geni18n;
 
-import configgen.geni18n.TodoFile.Line;
+import configgen.i18n.TodoFile;
+
+import configgen.i18n.TodoFile.Line;
 import configgen.util.CSVUtil;
 import de.siegmar.fastcsv.reader.CsvRecord;
 import org.jetbrains.annotations.NotNull;

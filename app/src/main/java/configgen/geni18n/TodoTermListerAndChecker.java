@@ -1,8 +1,10 @@
 package configgen.geni18n;
 
+import configgen.i18n.TodoFile;
+
 import configgen.gen.Parameter;
 import configgen.gen.Tool;
-import configgen.geni18n.TodoFile.Line;
+import configgen.i18n.TodoFile.Line;
 import configgen.util.Logger;
 
 import java.nio.file.Path;

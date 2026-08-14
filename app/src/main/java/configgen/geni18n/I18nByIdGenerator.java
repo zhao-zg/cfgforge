@@ -1,5 +1,7 @@
 package configgen.geni18n;
 
+import configgen.i18n.TodoFile;
+
 import configgen.ctx.Context;
 import configgen.gen.Generator;
 import configgen.gen.Parameter;
@@ -158,7 +160,7 @@ public final class I18nByIdGenerator extends Generator {
         }
 
         // 额外生成一份_todo_[lang].xlsx汇总文件，跟[lang]文件夹在同一级目录，方便多个语言_todo文件一起选择打包发送
-        TodoFile todoFile = TodoFile.ofLangText(extracted);
+        TodoFile todoFile = todoFileOfLangText(extracted);
         boolean isKeepSame = false;
         boolean exist = false;
         if (needReplace) {
@@ -179,4 +181,36 @@ public final class I18nByIdGenerator extends Generator {
 
     }
 
+
+    private static TodoFile todoFileOfLangText(LangText lang) {
+        List<TodoFile.Line> todoLines = new ArrayList<>(32);
+        List<TodoFile.Line> doneLines = new ArrayList<>(32);
+        todoLines.add(TodoFile.header());
+        doneLines.add(TodoFile.header());
+
+        for (var e : lang.entrySet()) {
+            for (var t : e.getValue().entrySet()) {
+                String table = t.getKey();
+                TextByIdFinder finder = t.getValue();
+                List<String> fieldChainList = finder.getFieldChainToIndex().keySet().stream().toList();
+                for (var r : finder.getPkToTexts().entrySet()) {
+                    String pk = r.getKey();
+                    TextByIdFinder.OneRecord record = r.getValue();
+                    int idx = 0;
+                    for (TextByIdFinder.OneText ot : record.texts()) {
+                        if (ot != null) {
+                            TodoFile.Line line = new TodoFile.Line(table, pk, fieldChainList.get(idx), ot.original(), ot.translated());
+                            if (ot.translated().isEmpty()) {
+                                todoLines.add(line);
+                            } else {
+                                doneLines.add(line);
+                            }
+                        }
+                        idx++;
+                    }
+                }
+            }
+        }
+        return new TodoFile(todoLines, doneLines);
+    }
 }

@@ -2,6 +2,7 @@ package configgen.gen;
 
 import configgen.util.Logger;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -36,6 +37,7 @@ public class ProviderRegistry<P extends ProviderRegistry.Provider<T>, T> {
     }
 
     public Map<String, P> getAllProviders() {
-        return providers;
+        // 不能泄漏内部可变Map，否则Help/GUI等调用方可直接put/remove破坏注册表
+        return Collections.unmodifiableMap(providers);
     }
 }

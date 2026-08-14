@@ -2,7 +2,6 @@ package configgen.data;
 
 import configgen.Resources;
 import configgen.ctx.DirectoryStructure;
-import configgen.ctx.HeadRows;
 import configgen.schema.*;
 import configgen.schema.cfg.CfgReader;
 import configgen.util.Logger;
@@ -231,7 +230,7 @@ class CfgSchemaAlignToDataTest {
         // 直接从文件系统读取
         ReadCsv csvReader = new ReadCsv("UTF-8");
         CfgDataReader fastDataReader = new CfgDataReader(HeadRows.A2_Default, csvReader, ReadByFastExcel.INSTANCE);
-        CfgData cfgData = fastDataReader.readCfgData(new DirectoryStructure(tempDir), null, CfgSchemaErrs.of());
+        CfgData cfgData = fastDataReader.readCfgData(new DirectoryStructure(tempDir).getExcelFiles(), null, CfgSchemaErrs.of());
 
         CfgSchemaErrs errs = CfgSchemaErrs.of();
         CfgSchema aligned = new CfgSchemaAlignToData(HeadRows.A2_Default).align(cfg, cfgData, errs);

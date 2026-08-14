@@ -1,8 +1,5 @@
 package configgen.data;
 
-import configgen.ctx.DirectoryStructure;
-import configgen.ctx.DirectoryStructure.ExcelFileInfo;
-import configgen.ctx.HeadRow;
 import configgen.data.DataUtil.TableNameIndex;
 import configgen.schema.CfgSchema;
 import configgen.schema.CfgSchemaErrs;
@@ -10,6 +7,7 @@ import configgen.schema.SchemaUtil;
 import configgen.util.Logger;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.TreeMap;
@@ -32,18 +30,18 @@ public record CfgDataReader(HeadRow headRow,
         Objects.requireNonNull(excelReader);
     }
 
-    public CfgData readCfgData(DirectoryStructure sourceStructure, CfgSchema nullableCfgSchema, CfgSchemaErrs errs) {
-        Objects.requireNonNull(sourceStructure);
+    public CfgData readCfgData(Collection<ExcelFileInfo> excelFiles, CfgSchema nullableCfgSchema, CfgSchemaErrs errs) {
+        Objects.requireNonNull(excelFiles);
         Objects.requireNonNull(errs);
         try {
-            return _readCfgData(sourceStructure, nullableCfgSchema, errs);
+            return _readCfgData(excelFiles, nullableCfgSchema, errs);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @SuppressWarnings("ExtractMethodRecommender")
-    private CfgData _readCfgData(DirectoryStructure sourceStructure, CfgSchema nullableCfgSchema, CfgSchemaErrs errs)
+    private CfgData _readCfgData(Collection<ExcelFileInfo> excelFiles, CfgSchema nullableCfgSchema, CfgSchemaErrs errs)
             throws Exception {
 //        try(ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors())) {
 //        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
@@ -53,7 +51,7 @@ public record CfgDataReader(HeadRow headRow,
 
             // read all csv/excel files
             List<Callable<ReadResult>> tasks = new ArrayList<>();
-            for (ExcelFileInfo df : sourceStructure.getExcelFiles()) {
+            for (ExcelFileInfo df : excelFiles) {
                 switch (df.fmt()) {
                     case CSV, TXT_AS_TSV -> {
                         TableNameIndex ti = getTableNameIndex(df.relativePath());

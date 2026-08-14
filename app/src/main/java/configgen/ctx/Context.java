@@ -95,7 +95,7 @@ public class Context {
 
 
         CfgSchemaErrs alignErr = CfgSchemaErrs.of();
-        CfgData data = dataReader.readCfgData(sourceStructure, schema, alignErr);
+        CfgData data = dataReader.readCfgData(sourceStructure.getExcelFiles(), schema, alignErr);
         data.verbosePrintStat();
         CfgSchema alignedSchema = new CfgSchemaAlignToData(contextCfg.headRow()).align(schema, data, alignErr);
         new CfgSchemaResolver(alignedSchema, alignErr).resolve();

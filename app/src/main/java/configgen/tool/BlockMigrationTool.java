@@ -2,8 +2,8 @@ package configgen.tool;
 
 import configgen.ctx.Context;
 import configgen.ctx.Context.ContextCfg;
-import configgen.ctx.HeadRow;
-import configgen.ctx.HeadRows;
+import configgen.data.HeadRow;
+import configgen.data.HeadRows;
 import configgen.data.CfgData;
 import configgen.gen.Parameter;
 import configgen.gen.Tool;

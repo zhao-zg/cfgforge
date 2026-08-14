@@ -1,8 +1,6 @@
 package configgen.tool;
 
 import configgen.ctx.DirectoryStructure;
-import configgen.ctx.HeadRow;
-import configgen.ctx.HeadRows;
 import configgen.data.*;
 import configgen.gen.Parameter;
 import configgen.gen.Tool;
@@ -43,11 +41,11 @@ public class ExcelReadDiffTool extends Tool {
         CfgDataReader fastDataReader = new CfgDataReader(headRow, csvReader, ReadByFastExcel.INSTANCE);
 
         CfgSchemaErrs dataErrs = CfgSchemaErrs.of();
-        CfgData dataByPoi = poiDataReader.readCfgData(sourceStructure, schema, dataErrs);
+        CfgData dataByPoi = poiDataReader.readCfgData(sourceStructure.getExcelFiles(), schema, dataErrs);
         dataErrs.checkErrors();
 
         CfgSchemaErrs fastErr = CfgSchemaErrs.of();
-        CfgData dataByFastExcel = fastDataReader.readCfgData(sourceStructure, schema, fastErr);
+        CfgData dataByFastExcel = fastDataReader.readCfgData(sourceStructure.getExcelFiles(), schema, fastErr);
         fastErr.checkErrors();
         compareCellData(dataByPoi, dataByFastExcel);
     }

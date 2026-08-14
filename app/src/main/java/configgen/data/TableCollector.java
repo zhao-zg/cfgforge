@@ -1,19 +1,19 @@
 package configgen.data;
 
-import configgen.ctx.DirectoryStructure;
 import org.dhatim.fastexcel.reader.ReadableWorkbook;
 import org.dhatim.fastexcel.reader.ReadingOptions;
 import org.dhatim.fastexcel.reader.Sheet;
 
 import java.io.IOException;
 import java.util.HashSet;
+import java.util.Collection;
 import java.util.Set;
 
 public class TableCollector {
 
-    public static Set<String> collect(DirectoryStructure sourceStructure) {
+    public static Set<String> collect(Collection<ExcelFileInfo> excelFiles) {
         Set<String> tableSet = new HashSet<>();
-        for (DirectoryStructure.ExcelFileInfo df : sourceStructure.getExcelFiles()) {
+        for (ExcelFileInfo df : excelFiles) {
             switch (df.fmt()) {
                 case CSV, TXT_AS_TSV -> {
                     DataUtil.TableNameIndex ti = DataUtil.getTableNameIndex(df.relativePath());

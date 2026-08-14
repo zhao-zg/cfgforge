@@ -1,6 +1,8 @@
 package configgen.gen;
 
 import configgen.ctx.*;
+import configgen.data.HeadRow;
+import configgen.data.HeadRows;
 import configgen.editorserver.EditorServer;
 import configgen.gen.ui.GuiLauncher;
 import configgen.genbytes.BytesGenerator;

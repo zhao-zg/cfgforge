@@ -1,6 +1,7 @@
 package configgen.ctx;
 
 import configgen.Resources;
+import configgen.data.ExcelFileInfo;
 import configgen.util.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -73,10 +74,10 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then: 应该发现 Excel 文件
-        Collection<DirectoryStructure.ExcelFileInfo> excelFiles = structure.getExcelFiles();
+        Collection<ExcelFileInfo> excelFiles = structure.getExcelFiles();
         assertFalse(excelFiles.isEmpty(), "应该发现至少一个 Excel 文件");
 
-        DirectoryStructure.ExcelFileInfo excelFile = excelFiles.iterator().next();
+        ExcelFileInfo excelFile = excelFiles.iterator().next();
         assertEquals("user.csv", excelFile.relativePath().toString());
         assertTrue(excelFile.lastModified() > 0);
     }
@@ -250,7 +251,7 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then: 应该忽略隐藏文件
-        Collection<DirectoryStructure.ExcelFileInfo> excelFiles = structure.getExcelFiles();
+        Collection<ExcelFileInfo> excelFiles = structure.getExcelFiles();
         assertTrue(excelFiles.isEmpty(), "应该忽略隐藏文件");
 
         // 但应该发现配置文件
@@ -281,10 +282,10 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir, explicitDir);
 
         // Then: 应该只发现显式目录中的文件
-        Collection<DirectoryStructure.ExcelFileInfo> excelFiles = structure.getExcelFiles();
+        Collection<ExcelFileInfo> excelFiles = structure.getExcelFiles();
         assertEquals(1, excelFiles.size(), "应该发现显式目录中的文件");
 
-        DirectoryStructure.ExcelFileInfo excelFile = excelFiles.iterator().next();
+        ExcelFileInfo excelFile = excelFiles.iterator().next();
         assertTrue(excelFile.relativePath().toString().endsWith("excel_files/user.csv") ||
                    excelFile.relativePath().toString().endsWith("excel_files\\user.csv"));
     }

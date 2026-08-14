@@ -1,7 +1,7 @@
 package configgen.value;
 
-import configgen.ctx.HeadRows;
 import configgen.data.CfgData;
+import configgen.data.HeadRows;
 import configgen.schema.*;
 
 import java.util.ArrayList;

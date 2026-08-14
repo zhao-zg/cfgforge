@@ -1,6 +1,5 @@
 package configgen.data;
 
-import configgen.ctx.HeadRow;
 import configgen.util.LocaleUtil;
 import configgen.util.Logger;
 import configgen.schema.*;

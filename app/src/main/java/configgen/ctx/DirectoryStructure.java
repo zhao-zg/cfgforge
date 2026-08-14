@@ -5,6 +5,8 @@ import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Stream;
 
+import configgen.data.ExcelFileInfo;
+
 import static configgen.data.DataUtil.*;
 import static configgen.util.FileNameUtil.getCodeName;
 import static configgen.data.DataUtil.FileFmt.*;
@@ -76,17 +78,6 @@ public class DirectoryStructure {
 
     }
 
-    public record ExcelFileInfo(long lastModified,
-                                Path path,
-                                Path relativePath,
-                                FileFmt fmt,
-                                String nullableAddTag) {
-        public ExcelFileInfo {
-            Objects.requireNonNull(path);
-            Objects.requireNonNull(relativePath);
-            Objects.requireNonNull(fmt);
-        }
-    }
 
     public record JsonFileInfo(long lastModified,
                                Path path,
@@ -524,11 +515,11 @@ public class DirectoryStructure {
             return;
         }
         ExcelFileInfo newInfo = new ExcelFileInfo(
-                oldInfo.path.toFile().lastModified(),
-                oldInfo.path,
+                oldInfo.path().toFile().lastModified(),
+                oldInfo.path(),
                 relativeExcelPath,
-                oldInfo.fmt,
-                oldInfo.nullableAddTag
+                oldInfo.fmt(),
+                oldInfo.nullableAddTag()
         );
         Map<String, ExcelFileInfo> tmp = new LinkedHashMap<>(excelFiles);
         tmp.put(key, newInfo);
@@ -592,7 +583,7 @@ public class DirectoryStructure {
                 return false;
             }
             CfgFileInfo f1 = e.getValue();
-            if (f2.lastModified != f1.lastModified) {
+            if (f2.lastModified() != f1.lastModified()) {
                 return false;
             }
         }
@@ -603,7 +594,7 @@ public class DirectoryStructure {
                 return false;
             }
             ExcelFileInfo f1 = e.getValue();
-            if (f2.lastModified != f1.lastModified) {
+            if (f2.lastModified() != f1.lastModified()) {
                 return false;
             }
         }

@@ -2,8 +2,8 @@ package configgen.write;
 
 import configgen.ctx.Context;
 import configgen.data.CfgData;
-import configgen.data.DataUpdater;
-import configgen.data.DataUpdater.NewCfgDataResult;
+import configgen.ctx.DataUpdater;
+import configgen.ctx.DataUpdater.NewCfgDataResult;
 import configgen.data.Source;
 import configgen.schema.CfgSchema;
 import configgen.value.*;

@@ -1,6 +1,6 @@
 package configgen.value;
 
-import configgen.ctx.HeadRow;
+import configgen.data.HeadRow;
 import configgen.schema.FieldSchema;
 import configgen.schema.HasBlock;
 import configgen.schema.Span;

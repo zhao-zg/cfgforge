@@ -1,4 +1,4 @@
-package configgen.ctx;
+package configgen.data;
 
 import configgen.schema.FieldType;
 import org.junit.jupiter.api.Test;

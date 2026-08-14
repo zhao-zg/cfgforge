@@ -2,7 +2,6 @@ package configgen.data;
 
 import configgen.Resources;
 import configgen.ctx.DirectoryStructure;
-import configgen.ctx.HeadRows;
 import configgen.schema.CfgSchemaErrs;
 import configgen.util.Logger;
 import org.junit.jupiter.api.AfterAll;
@@ -38,7 +37,7 @@ class CfgDataReaderBehaviorTest {
         Resources.addTempFileFromResourceFile(fn, tempDir);
         ReadCsv csvReader = new ReadCsv("GBK");
         CfgDataReader fastDataReader = new CfgDataReader(HeadRows.A2_Default, csvReader, ReadByFastExcel.INSTANCE);
-        return fastDataReader.readCfgData(new DirectoryStructure(tempDir), null, CfgSchemaErrs.of());
+        return fastDataReader.readCfgData(new DirectoryStructure(tempDir).getExcelFiles(), null, CfgSchemaErrs.of());
     }
 
     @Test
@@ -91,7 +90,7 @@ class CfgDataReaderBehaviorTest {
         CfgDataReader fastDataReader = new CfgDataReader(HeadRows.A2_Default, csvReader, ReadByFastExcel.INSTANCE);
 
         // When: 读取配置数据
-        CfgData cfgData = fastDataReader.readCfgData(emptyDir, null, CfgSchemaErrs.of());
+        CfgData cfgData = fastDataReader.readCfgData(emptyDir.getExcelFiles(), null, CfgSchemaErrs.of());
 
         // Then: 返回空数据集
         assertNotNull(cfgData);
@@ -141,7 +140,7 @@ class CfgDataReaderBehaviorTest {
         CfgDataReader fastDataReader = new CfgDataReader(HeadRows.A2_Default, csvReader, ReadByFastExcel.INSTANCE);
 
         // When: 尝试读取不存在的文件
-        CfgData cfgData = fastDataReader.readCfgData(dirWithInvalidFiles, null, CfgSchemaErrs.of());
+        CfgData cfgData = fastDataReader.readCfgData(dirWithInvalidFiles.getExcelFiles(), null, CfgSchemaErrs.of());
 
         // Then: 返回空数据集而不是抛出异常
         assertNotNull(cfgData);

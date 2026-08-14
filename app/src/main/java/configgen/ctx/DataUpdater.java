@@ -1,10 +1,15 @@
-package configgen.data;
+package configgen.ctx;
 
-import configgen.ctx.Context;
-import configgen.ctx.HeadRow;
+import configgen.data.CfgData;
 import configgen.data.CfgData.DRawSheet;
 import configgen.data.CfgData.DTable;
+import configgen.data.CellParser;
+import configgen.data.CfgDataStat;
+import configgen.data.DataUtil;
 import configgen.data.DataUtil.TableNameIndex;
+import configgen.data.HeadParser;
+import configgen.data.HeadRow;
+import configgen.data.ReadResult;
 import configgen.schema.CfgSchemaErrs;
 import configgen.schema.SchemaUtil;
 import org.jetbrains.annotations.NotNull;
@@ -15,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 
+import static configgen.data.DataUtil.getFileFormat;
 import static configgen.data.DataUtil.getTableNameIndex;
 
 public class DataUpdater {

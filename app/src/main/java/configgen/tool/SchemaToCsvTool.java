@@ -24,7 +24,7 @@ public class SchemaToCsvTool extends Tool {
     @Override
     public void call() {
         DirectoryStructure structure = new DirectoryStructure(dataDir);
-        CfgSchema cfgSchema = CfgSchemas.readFromDir(structure);
+        CfgSchema cfgSchema = CfgSchemas.readFromDir(structure.getCfgFiles());
         cfgSchema.resolve().checkErrors();
         Set<String> exsitTableSet = TableCollector.collect(structure.getExcelFiles());
 

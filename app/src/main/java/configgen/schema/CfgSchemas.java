@@ -1,6 +1,5 @@
 package configgen.schema;
 
-import configgen.ctx.DirectoryStructure;
 import configgen.schema.cfg.CfgReader;
 import configgen.schema.cfg.CfgUtil;
 import configgen.schema.cfg.CfgWriter;
@@ -10,6 +9,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -17,12 +17,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import static configgen.ctx.DirectoryStructure.*;
 
 public class CfgSchemas {
 
-    public static CfgSchema readFromDir(DirectoryStructure sourceStructure) {
-        List<CfgFileInfo> files = new ArrayList<>(sourceStructure.getCfgFiles());
+    public static CfgSchema readFromDir(Collection<CfgFileInfo> cfgFiles) {
+        List<CfgFileInfo> files = new ArrayList<>(cfgFiles);
         List<Callable<CfgSchema>> tasks = new ArrayList<>(files.size());
         for (CfgFileInfo c : files) {
             tasks.add(() -> CfgReader.INSTANCE.readToSchema(c.path(), c.pkgNameDot()));

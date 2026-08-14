@@ -1,5 +1,7 @@
 package configgen.value;
 
+import configgen.value.ValueEnv;
+
 import configgen.Resources;
 import configgen.ctx.Context;
 import configgen.data.CfgData;
@@ -45,7 +47,7 @@ class RefValidatorTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), envOf(ctx), valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -76,7 +78,7 @@ class RefValidatorTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), envOf(ctx), valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -110,7 +112,7 @@ class RefValidatorTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), envOf(ctx), valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -141,7 +143,7 @@ class RefValidatorTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), envOf(ctx), valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -173,7 +175,7 @@ class RefValidatorTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), envOf(ctx), valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -216,7 +218,7 @@ class RefValidatorTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), envOf(ctx), valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -257,7 +259,7 @@ class RefValidatorTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), envOf(ctx), valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -268,6 +270,12 @@ class RefValidatorTest {
         assertEquals("employee-2", err.recordId());
         // The value might be null or a different type, check what it actually is
         assertNotNull(err.value());
+    }
+
+
+    private static ValueEnv envOf(Context ctx) {
+        return new ValueEnv(ctx.cfgSchema(), ctx.cfgData(), ctx.contextCfg().headRow(),
+                ctx.nullableLangTextFinder(), ctx.sourceStructure());
     }
 
 }

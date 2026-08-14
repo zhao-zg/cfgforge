@@ -1,6 +1,5 @@
 package configgen.value;
 
-import configgen.ctx.Context;
 import configgen.schema.cfg.CfgWriter;
 import configgen.util.Logger;
 import configgen.data.CfgData;
@@ -16,43 +15,43 @@ import java.util.concurrent.Future;
 import static configgen.value.CfgValue.*;
 
 public record CfgValueParser(CfgSchema subSchema,
-                             Context context,
+                             ValueEnv env,
                              CfgValueErrs errs) {
     /**
      * @param subSchema 这是返会目标CfgValue对应的schema
-     * @param context   全局信息
+     * @param env       全局信息
      * @param errs      错误记录器
      */
     public CfgValueParser {
         Objects.requireNonNull(subSchema);
-        Objects.requireNonNull(context);
+        Objects.requireNonNull(env);
         Objects.requireNonNull(errs);
         subSchema.requireResolved();
-        context.cfgSchema().requireResolved();
+        env.fullSchema().requireResolved();
     }
 
     public CfgValue parseCfgValue() {
         if (Logger.verboseLevel() > 1) {
-            Logger.log(CfgWriter.stringify(context.cfgSchema(), false, true));
+            Logger.log(CfgWriter.stringify(env.fullSchema(), false, true));
         }
 
         List<Callable<OneTableParserResult>> tasks = new ArrayList<>();
         CfgValue cfgValue = of(subSchema);
         for (TableSchema subTable : subSchema.tableMap().values()) {
             String name = subTable.name();
-            TableSchema table = context.cfgSchema().findTable(name);
+            TableSchema table = env.fullSchema().findTable(name);
             Objects.requireNonNull(table);
 
-            CfgData.DTable dTable = context.cfgData().getDTable(name);
+            CfgData.DTable dTable = env.cfgData().getDTable(name);
 
             if (dTable != null) {
                 tasks.add(() -> {
                     long start = System.currentTimeMillis();
                     CfgValueErrs errs = CfgValueErrs.of();
                     VTableParser parser = new VTableParser(subTable, dTable, table,
-                            context.contextCfg().headRow(), errs);
+                            env.headRow(), errs);
                     VTable vTable = parser.parseTable();
-                    TextValue.setTranslatedForTable(vTable, context.nullableLangTextFinder());
+                    TextValue.setTranslatedForTable(vTable, env.nullableLangTextFinder());
                     if (Logger.isProfileEnabled()) {
                         long e = System.currentTimeMillis() - start;
                         if (e > 10) {
@@ -67,9 +66,9 @@ public record CfgValueParser(CfgSchema subSchema,
                     long start = System.currentTimeMillis();
                     CfgValueErrs errs = CfgValueErrs.of();
                     VTableJsonParser parser = new VTableJsonParser(subTable, subSchema.isPartial(),
-                            context.sourceStructure(), table, errs, cfgValue.valueStat());
+                            env.jsonTableFiles(), table, errs, cfgValue.valueStat());
                     VTable vTable = parser.parseTable();
-                    TextValue.setTranslatedForTable(vTable, context.nullableLangTextFinder());
+                    TextValue.setTranslatedForTable(vTable, env.nullableLangTextFinder());
                     if (Logger.isProfileEnabled()) {
                         Logger.log("%40s: %d", name, System.currentTimeMillis() - start);
                     }

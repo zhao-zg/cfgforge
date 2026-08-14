@@ -26,9 +26,9 @@ public class XmlToCfgTool extends Tool {
         CfgSchemas.writeToDir(cfgPath, cfg);
 
         DirectoryStructure sourceStructure = new DirectoryStructure(dataDir);
-        CfgSchema cfg2 = CfgSchemas.readFromDir(sourceStructure);
+        CfgSchema cfg2 = CfgSchemas.readFromDir(sourceStructure.getCfgFiles());
         CfgSchemas.writeToDir(cfgPath, cfg2);
-        CfgSchema cfg3 = CfgSchemas.readFromDir(sourceStructure);
+        CfgSchema cfg3 = CfgSchemas.readFromDir(sourceStructure.getCfgFiles());
 
         if (!cfg2.equals(cfg3)) {
             throw new IllegalStateException("should equal");

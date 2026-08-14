@@ -1,5 +1,7 @@
 package configgen.value;
 
+import configgen.value.ValueEnv;
+
 import configgen.Resources;
 import configgen.ctx.Context;
 import configgen.data.CfgData;
@@ -299,7 +301,8 @@ class ValuePackTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser parser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser parser = new CfgValueParser(ctx.cfgSchema(),
+                new ValueEnv(ctx.cfgSchema(), ctx.cfgData(), ctx.contextCfg().headRow(), ctx.nullableLangTextFinder(), ctx.sourceStructure()), valueErrs);
         CfgValue cfgValue = parser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());

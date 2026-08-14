@@ -6,6 +6,10 @@ import java.util.*;
 import java.util.stream.Stream;
 
 import configgen.data.ExcelFileInfo;
+import configgen.data.JsonFileInfo;
+import configgen.data.JsonTableFiles;
+import configgen.schema.CfgFileInfo;
+import configgen.schema.cfg.CfgUtil;
 
 import static configgen.data.DataUtil.*;
 import static configgen.util.FileNameUtil.getCodeName;
@@ -66,37 +70,11 @@ import static configgen.data.DataUtil.FileFmt.*;
 /// - **冲突**：同一表名不能同时存在嵌套和根级两种目录，否则报错
 ///
 /// > 注：`[moduleDir]`指代通过 getCodeName 解析出模块名的目录，`[subName]`是表名中`.`后面的部分
-public class DirectoryStructure {
+public class DirectoryStructure implements JsonTableFiles {
     public static final String ROOT_CONFIG_FILENAME = "config.cfg";
     public static final String CONFIG_EXT = "cfg";
 
 
-    public record CfgFileInfo(long lastModified,
-                              Path path,
-                              Path relativePath,
-                              String pkgNameDot) {
-
-    }
-
-
-    public record JsonFileInfo(long lastModified,
-                               Path path,
-                               Path relativePath,
-                               boolean isIntegerId,
-                               int integerId) {
-
-        static JsonFileInfo of(Path absPath, Path relativePath) {
-            String fn = relativePath.getFileName().toString();
-            int id = -1;
-            boolean isIntegerId = false;
-            try {
-                id = Integer.parseInt(fn.substring(0, fn.length() - 5));
-                isIntegerId = true;
-            } catch (NumberFormatException ignored) {
-            }
-            return new JsonFileInfo(absPath.toFile().lastModified(), absPath, relativePath, isIntegerId, id);
-        }
-    }
 
 
     static class JsonFileList {
@@ -109,13 +87,13 @@ public class DirectoryStructure {
 
         void sort() {
             list = new ArrayList<>(map.values());
-            if (map.values().stream().allMatch(j -> j.isIntegerId)) {
-                list.sort(Comparator.comparingInt(o -> o.integerId));
+            if (map.values().stream().allMatch(j -> j.isIntegerId())) {
+                list.sort(Comparator.comparingInt(o -> o.integerId()));
             }
         }
 
         void addFile(JsonFileInfo info) {
-            map.put(info.relativePath.toString(), info);
+            map.put(info.relativePath().toString(), info);
         }
 
         JsonFileList copy() {
@@ -156,7 +134,7 @@ public class DirectoryStructure {
         this.rootDir = rootDir;
         this.explicitDir = explicitDir;
 
-        findConfigFilesFromRecursively(rootDir.resolve(ROOT_CONFIG_FILENAME),
+        CfgUtil.findConfigFilesRecursively(rootDir.resolve(ROOT_CONFIG_FILENAME),
                 explicitDir != null ? explicitDir.excelFileDirs() : null,
                 CONFIG_EXT, "",
                 rootDir, cfgFiles);
@@ -211,8 +189,8 @@ public class DirectoryStructure {
     public Path getCfgFilePathByPkgName(String pkgName) {
         String pkgNameDot = pkgName.isEmpty() ? "" : pkgName + ".";
         for (CfgFileInfo c : cfgFiles.values()) {
-            if (c.pkgNameDot.equals(pkgNameDot)) {
-                return c.path;
+            if (c.pkgNameDot().equals(pkgNameDot)) {
+                return c.path();
             }
         }
         return null;
@@ -220,6 +198,11 @@ public class DirectoryStructure {
 
     public Collection<ExcelFileInfo> getExcelFiles() {
         return excelFiles.values();
+    }
+
+    @Override
+    public Collection<JsonFileInfo> jsonFilesOf(String tableName) {
+        return getJsonFilesByTable(tableName);
     }
 
     public Collection<JsonFileInfo> getJsonFilesByTable(String tableName) {
@@ -237,45 +220,6 @@ public class DirectoryStructure {
     public Path getJsonTableDir(String tableName) {
         JsonFileList list = jsonFiles.get(tableName);
         return list == null ? null : list.tableDirRelativePath;
-    }
-
-    public static void findConfigFilesFromRecursively(Path source,
-                                                      Set<String> nullableWhiteListSubDirs,
-                                                      String ext,
-                                                      String pkgNameDot,
-                                                      Path rootDir,
-                                                      Map<String, CfgFileInfo> cfgFiles) {
-        if (Files.exists(source)) {
-            Path relativizeSource = rootDir.relativize(source);
-            cfgFiles.put(relativizeSource.toString(),
-                    new CfgFileInfo(source.toFile().lastModified(), source, relativizeSource, pkgNameDot));
-        }
-        try {
-            try (Stream<Path> paths = Files.list(source.getParent())) {
-                for (Path path : paths.toList()) {
-                    if (!Files.isDirectory(path)) {
-                        continue;
-                    }
-
-                    if (nullableWhiteListSubDirs != null &&
-                            !nullableWhiteListSubDirs.contains(path.getFileName().toString())) {
-                        continue;
-                    }
-
-                    String lastDir = path.getFileName().toString().toLowerCase();
-                    String subPkgName = getCodeName(lastDir);
-                    if (subPkgName == null) {
-                        continue;
-                    }
-                    Path subSource = path.resolve(subPkgName + "." + ext);
-                    String subPkgNameDot = pkgNameDot + subPkgName + ".";
-                    findConfigFilesFromRecursively(subSource, null, ext, subPkgNameDot,
-                            rootDir, cfgFiles);
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private void findExcelFilesRecursively(Path dir) {
@@ -571,7 +515,7 @@ public class DirectoryStructure {
                 JsonFileInfo jf1 = j1.get(i);
                 JsonFileInfo jf2 = j2.get(i);
 
-                if (jf2.lastModified != jf1.lastModified) {
+                if (jf2.lastModified() != jf1.lastModified()) {
                     return false;
                 }
             }

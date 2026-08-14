@@ -6,6 +6,7 @@ import configgen.util.Logger;
 import configgen.schema.*;
 import configgen.schema.CfgSchemas;
 import configgen.value.CfgValue;
+import configgen.value.ValueEnv;
 import configgen.value.CfgValueParser;
 import configgen.value.CfgValueErrs;
 
@@ -85,7 +86,7 @@ public class Context {
     }
 
     private boolean readSchemaAndData(CfgDataReader dataReader, boolean autoFix) {
-        CfgSchema schema = CfgSchemas.readFromDir(sourceStructure);
+        CfgSchema schema = CfgSchemas.readFromDir(sourceStructure.getCfgFiles());
         Logger.profile("schema read");
 
         CfgSchemaErrs errs = schema.resolve();
@@ -211,7 +212,8 @@ public class Context {
         }
 
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(tagSchema, this, valueErrs);
+        ValueEnv env = new ValueEnv(cfgSchema, cfgData, contextCfg.headRow(), nullableLangTextFinder, sourceStructure);
+        CfgValueParser clientValueParser = new CfgValueParser(tagSchema, env, valueErrs);
         CfgValue cfgValue = clientValueParser.parseCfgValue();
         String prefix = tag == null ? "value" : String.format("[%s] filtered value", tag);
         valueErrs.checkErrors(prefix, allowValueErr);

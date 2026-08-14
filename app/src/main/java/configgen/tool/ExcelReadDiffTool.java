@@ -30,7 +30,7 @@ public class ExcelReadDiffTool extends Tool {
     @Override
     public void call() {
         DirectoryStructure sourceStructure = new DirectoryStructure(dataDir);
-        CfgSchema schema = CfgSchemas.readFromDir(sourceStructure);
+        CfgSchema schema = CfgSchemas.readFromDir(sourceStructure.getCfgFiles());
         Logger.profile("schema read");
         CfgSchemaErrs errs = schema.resolve();
         if (!errs.errs().isEmpty()) {

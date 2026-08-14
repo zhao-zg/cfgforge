@@ -1,12 +1,12 @@
 package configgen.value;
 
-import configgen.ctx.DirectoryStructure;
+import configgen.data.JsonFileInfo;
+import configgen.data.JsonTableFiles;
 import configgen.schema.TableSchema;
 
 import java.nio.file.Files;
 import java.util.*;
 
-import static configgen.ctx.DirectoryStructure.*;
 import static configgen.data.Source.*;
 import static configgen.value.CfgValue.*;
 import static configgen.value.CfgValue.VTable;
@@ -17,16 +17,16 @@ public class VTableJsonParser {
     private final CfgValueErrs errs;
     private final ValueJsonParser parser;
     private final CfgValueStat valueStat;
-    private final DirectoryStructure sourceStructure;
+    private final JsonTableFiles jsonTableFiles;
 
     public VTableJsonParser(TableSchema subTableSchema,
                             boolean isPartial,
-                            DirectoryStructure sourceStructure,
+                            JsonTableFiles jsonTableFiles,
                             TableSchema tableSchema,
                             CfgValueErrs errs,
                             CfgValueStat valueStat) {
         this.subTableSchema = subTableSchema;
-        this.sourceStructure = sourceStructure;
+        this.jsonTableFiles = jsonTableFiles;
         this.tableSchema = tableSchema;
         this.parser = new ValueJsonParser(subTableSchema, isPartial, errs);
         this.errs = errs;
@@ -37,7 +37,7 @@ public class VTableJsonParser {
         List<VStruct> valueList = new ArrayList<>();
         String tableName = tableSchema.name();
         Map<String, Long> idMap = new LinkedHashMap<>();
-        Collection<JsonFileInfo> jsonFiles = sourceStructure.getJsonFilesByTable(tableName);
+        Collection<JsonFileInfo> jsonFiles = jsonTableFiles.jsonFilesOf(tableName);
 
         for (JsonFileInfo jf : jsonFiles) {
             String jsonStr = null;

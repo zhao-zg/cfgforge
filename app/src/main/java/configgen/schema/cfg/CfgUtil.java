@@ -1,5 +1,6 @@
 package configgen.schema.cfg;
 
+import configgen.schema.CfgFileInfo;
 import configgen.util.FileNameUtil;
 import configgen.schema.CfgSchema;
 import configgen.schema.Nameable;
@@ -9,6 +10,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
@@ -82,5 +84,42 @@ public class CfgUtil {
         return identifierPattern.matcher(name).matches();
     }
 
+    public static void findConfigFilesRecursively(Path source,
+                                                  Set<String> nullableWhiteListSubDirs,
+                                                  String ext,
+                                                  String pkgNameDot,
+                                                  Path rootDir,
+                                                  Map<String, CfgFileInfo> cfgFiles) {
+        if (Files.exists(source)) {
+            Path relativizeSource = rootDir.relativize(source);
+            cfgFiles.put(relativizeSource.toString(),
+                    new CfgFileInfo(source.toFile().lastModified(), source, relativizeSource, pkgNameDot));
+        }
+        try {
+            try (Stream<Path> paths = Files.list(source.getParent())) {
+                for (Path path : paths.toList()) {
+                    if (!Files.isDirectory(path)) {
+                        continue;
+                    }
 
+                    if (nullableWhiteListSubDirs != null &&
+                            !nullableWhiteListSubDirs.contains(path.getFileName().toString())) {
+                        continue;
+                    }
+
+                    String lastDir = path.getFileName().toString().toLowerCase();
+                    String subPkgName = FileNameUtil.getCodeName(lastDir);
+                    if (subPkgName == null) {
+                        continue;
+                    }
+                    Path subSource = path.resolve(subPkgName + "." + ext);
+                    String subPkgNameDot = pkgNameDot + subPkgName + ".";
+                    findConfigFilesRecursively(subSource, null, ext, subPkgNameDot,
+                            rootDir, cfgFiles);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

@@ -2,6 +2,8 @@ package configgen.ctx;
 
 import configgen.Resources;
 import configgen.data.ExcelFileInfo;
+import configgen.data.JsonFileInfo;
+import configgen.schema.CfgFileInfo;
 import configgen.util.Logger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -50,10 +52,10 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then: 应该发现配置文件
-        Collection<DirectoryStructure.CfgFileInfo> cfgFiles = structure.getCfgFiles();
+        Collection<CfgFileInfo> cfgFiles = structure.getCfgFiles();
         assertFalse(cfgFiles.isEmpty(), "应该发现至少一个配置文件");
 
-        DirectoryStructure.CfgFileInfo configFile = cfgFiles.iterator().next();
+        CfgFileInfo configFile = cfgFiles.iterator().next();
         assertEquals("config.cfg", configFile.relativePath().toString());
         assertTrue(configFile.lastModified() > 0);
     }
@@ -95,10 +97,10 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then: 应该发现 JSON 文件
-        Collection<DirectoryStructure.JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("user");
+        Collection<JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("user");
         assertFalse(jsonFiles.isEmpty(), "应该发现至少一个 JSON 文件");
 
-        DirectoryStructure.JsonFileInfo jsonFile = jsonFiles.iterator().next();
+        JsonFileInfo jsonFile = jsonFiles.iterator().next();
         assertTrue(jsonFile.relativePath().toString().endsWith("_user/1.json") ||
                    jsonFile.relativePath().toString().endsWith("_user\\1.json"));
         assertTrue(jsonFile.lastModified() > 0);
@@ -112,7 +114,7 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then: 应该返回空的 JSON 文件集合
-        Collection<DirectoryStructure.JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("nonexistent");
+        Collection<JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("nonexistent");
         assertTrue(jsonFiles.isEmpty(), "对于不存在的表应该返回空集合");
     }
 
@@ -129,14 +131,14 @@ class DirectoryStructureBehaviorTest {
         String jsonData = "{\"id\": 2, \"name\": \"Bob\"}";
         Files.writeString(newJsonFile, jsonData);
 
-        DirectoryStructure.JsonFileInfo addedFile = structure.addJsonFile("user", Path.of("_user/2.json"));
+        JsonFileInfo addedFile = structure.addJsonFile("user", Path.of("_user/2.json"));
 
         // Then: 应该成功添加 JSON 文件
         assertNotNull(addedFile, "应该返回添加的 JSON 文件信息");
         assertTrue(addedFile.relativePath().toString().endsWith("_user/2.json") ||
                    addedFile.relativePath().toString().endsWith("_user\\2.json"));
 
-        Collection<DirectoryStructure.JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("user");
+        Collection<JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("user");
         assertEquals(1, jsonFiles.size(), "应该包含新添加的 JSON 文件");
     }
 
@@ -157,7 +159,7 @@ class DirectoryStructureBehaviorTest {
         structure.removeJsonFile("user", relativePath);
 
         // Then: 应该成功移除 JSON 文件
-        Collection<DirectoryStructure.JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("user");
+        Collection<JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("user");
         assertTrue(jsonFiles.isEmpty(), "移除后应该返回空集合");
     }
 
@@ -255,7 +257,7 @@ class DirectoryStructureBehaviorTest {
         assertTrue(excelFiles.isEmpty(), "应该忽略隐藏文件");
 
         // 但应该发现配置文件
-        Collection<DirectoryStructure.CfgFileInfo> cfgFiles = structure.getCfgFiles();
+        Collection<CfgFileInfo> cfgFiles = structure.getCfgFiles();
         assertFalse(cfgFiles.isEmpty(), "应该发现配置文件");
     }
 
@@ -306,7 +308,7 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then: 应该通过嵌套路径发现 buff.skill 表的 JSON 文件
-        Collection<DirectoryStructure.JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("buff.skill");
+        Collection<JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("buff.skill");
         assertFalse(jsonFiles.isEmpty(), "应该通过嵌套路径发现 buff.skill 的 JSON 文件");
         assertEquals(1, jsonFiles.size());
     }
@@ -325,7 +327,7 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then: 应该发现 skill.buff 表
-        Collection<DirectoryStructure.JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("skill.buff");
+        Collection<JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("skill.buff");
         assertFalse(jsonFiles.isEmpty(), "应该通过 skill_技能 模块目录发现 skill.buff 的 JSON 文件");
     }
 
@@ -344,7 +346,7 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then
-        Collection<DirectoryStructure.JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("a.b.c");
+        Collection<JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("a.b.c");
         assertFalse(jsonFiles.isEmpty(), "应该发现多层嵌套 a.b.c 的 JSON 文件");
         assertEquals(1, jsonFiles.size());
     }
@@ -362,7 +364,7 @@ class DirectoryStructureBehaviorTest {
         DirectoryStructure structure = new DirectoryStructure(tempDir);
 
         // Then: 应该通过旧格式发现 buff.skill 表
-        Collection<DirectoryStructure.JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("buff.skill");
+        Collection<JsonFileInfo> jsonFiles = structure.getJsonFilesByTable("buff.skill");
         assertFalse(jsonFiles.isEmpty(), "应该通过旧格式根级目录发现 buff.skill 的 JSON 文件");
     }
 

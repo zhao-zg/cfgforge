@@ -1,6 +1,6 @@
 package configgen.schema.cfg;
 
-import configgen.ctx.DirectoryStructure;
+import configgen.schema.CfgFileInfo;
 import configgen.schema.CommentData;
 import configgen.util.Logger;
 import configgen.schema.*;
@@ -13,7 +13,6 @@ import org.w3c.dom.Element;
 import java.nio.file.Path;
 import java.util.*;
 
-import static configgen.ctx.DirectoryStructure.findConfigFilesFromRecursively;
 import static configgen.schema.FieldFormat.AutoOrPack.AUTO;
 import static configgen.schema.FieldFormat.AutoOrPack.PACK;
 import static configgen.schema.FieldType.Primitive.*;
@@ -24,11 +23,11 @@ public enum XmlReader {
 
     public static CfgSchema readFromDir(Path rootDir) {
         CfgSchema destination = CfgSchema.of();
-        Map<String, DirectoryStructure.CfgFileInfo> allXmlFiles = new LinkedHashMap<>();
-        findConfigFilesFromRecursively(rootDir.resolve("config.xml"), null,
+        Map<String, CfgFileInfo> allXmlFiles = new LinkedHashMap<>();
+        CfgUtil.findConfigFilesRecursively(rootDir.resolve("config.xml"), null,
                 "xml", "", rootDir, allXmlFiles);
 
-        for (DirectoryStructure.CfgFileInfo c : allXmlFiles.values()) {
+        for (CfgFileInfo c : allXmlFiles.values()) {
             INSTANCE.readTo(destination, c.path(), c.pkgNameDot());
         }
         return destination;

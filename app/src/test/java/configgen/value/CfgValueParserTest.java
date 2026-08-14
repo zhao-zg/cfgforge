@@ -8,6 +8,7 @@ import configgen.schema.TableSchema;
 import configgen.util.Logger;
 import configgen.value.CfgValue.*;
 import configgen.value.CfgValueErrs.*;
+import configgen.value.ValueEnv;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -567,7 +568,7 @@ class CfgValueParserTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = parserOf(ctx, valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -607,7 +608,7 @@ class CfgValueParserTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = parserOf(ctx, valueErrs);
         clientValueParser.parseCfgValue();
         assertEquals(1, valueErrs.errs().size());
         assertInstanceOf(FieldCellSpanNotEnough.class, valueErrs.errs().getFirst());
@@ -638,7 +639,7 @@ class CfgValueParserTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = parserOf(ctx, valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -665,7 +666,7 @@ class CfgValueParserTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = parserOf(ctx, valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -693,7 +694,7 @@ class CfgValueParserTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = parserOf(ctx, valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -722,7 +723,7 @@ class CfgValueParserTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = parserOf(ctx, valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -753,7 +754,7 @@ class CfgValueParserTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = parserOf(ctx, valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -783,7 +784,7 @@ class CfgValueParserTest {
 
         Context ctx = new Context(tempDir);
         CfgValueErrs valueErrs = CfgValueErrs.of();
-        CfgValueParser clientValueParser = new CfgValueParser(ctx.cfgSchema(), ctx, valueErrs);
+        CfgValueParser clientValueParser = parserOf(ctx, valueErrs);
         clientValueParser.parseCfgValue();
 
         assertEquals(1, valueErrs.errs().size());
@@ -829,5 +830,12 @@ class CfgValueParserTest {
         assertEquals("hello", ((VString) data.values().get(1)).value());
     }
 
+
+
+    private static CfgValueParser parserOf(Context ctx, CfgValueErrs errs) {
+        ValueEnv env = new ValueEnv(ctx.cfgSchema(), ctx.cfgData(), ctx.contextCfg().headRow(),
+                ctx.nullableLangTextFinder(), ctx.sourceStructure());
+        return new CfgValueParser(ctx.cfgSchema(), env, errs);
+    }
 
 }

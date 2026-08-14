@@ -93,6 +93,9 @@ public final class Main {
     public static int runWithCatch(String[] args) {
         try {
             return run(args);
+        } catch (CliException e) {
+            // 命令行使用错误：打印简短原因和usage，不打印堆栈
+            return help(e.getMessage());
         } catch (Throwable t) {
             System.err.print(formatException(t));
             return 1;
@@ -159,7 +162,7 @@ public final class Main {
             String paramType = args[i].toLowerCase();
             switch (paramType) {
                 case "-locale" -> {
-                    String language = args[++i];
+                    String language = nextArg(args, paramType, ++i);
                     Locale locale = Locale.of(language);
                     if (!LocaleUtil.isSupported(locale)) {
                         System.err.println("Specified Locale is not supported: " + locale.toString());
@@ -172,7 +175,10 @@ public final class Main {
                     GuiLauncher.launch();
                     return 0;
                 }
-                case "-h" -> Help.printHelp();
+                case "-h" -> {
+                    Help.printHelp();
+                    return 0;
+                }
                 case "-v" -> Logger.setVerboseLevel(1);
                 case "-vv" -> Logger.setVerboseLevel(2);
                 case "-p" -> Logger.enableProfile();
@@ -185,7 +191,7 @@ public final class Main {
                 case "-allowvalueerr" -> allowValueErr = true;
 
                 case "-tool" -> {
-                    String name = args[++i];
+                    String name = nextArg(args, paramType, ++i);
                     Tool tool = Tools.create(name);
                     if (tool == null) {
                         return help("-tool " + name + " UNKNOWN");
@@ -193,20 +199,20 @@ public final class Main {
                     tools.add(new NamedTool(name, tool));
                 }
 
-                case "-datadir" -> dataDir = args[++i];
-                case "-headrow" -> headRowId = args[++i];
-                case "-encoding" -> csvDefaultEncoding = args[++i];
+                case "-datadir" -> dataDir = nextArg(args, paramType, ++i);
+                case "-headrow" -> headRowId = nextArg(args, paramType, ++i);
+                case "-encoding" -> csvDefaultEncoding = nextArg(args, paramType, ++i);
 
-                case "-asroot" -> asRoot = args[++i];
-                case "-exceldirs" -> excelDirs = args[++i];
-                case "-jsondirs" -> jsonDirs = args[++i];
+                case "-asroot" -> asRoot = nextArg(args, paramType, ++i);
+                case "-exceldirs" -> excelDirs = nextArg(args, paramType, ++i);
+                case "-jsondirs" -> jsonDirs = nextArg(args, paramType, ++i);
 
-                case "-i18nfile" -> i18nfile = args[++i];
-                case "-langswitchdir" -> langSwitchDir = args[++i];
-                case "-defaultlang" -> langSwitchDefaultLang = args[++i];
+                case "-i18nfile" -> i18nfile = nextArg(args, paramType, ++i);
+                case "-langswitchdir" -> langSwitchDir = nextArg(args, paramType, ++i);
+                case "-defaultlang" -> langSwitchDefaultLang = nextArg(args, paramType, ++i);
 
                 case "-gen" -> {
-                    String name = args[++i];
+                    String name = nextArg(args, paramType, ++i);
                     Generator generator = Generators.create(name);
                     if (generator == null) {
                         return help("-gen " + name + " UNKNOWN");
@@ -219,15 +225,20 @@ public final class Main {
             }
         }
 
+        // 参数组合校验必须先于任何执行（tools/generators都有副作用）
+        if (i18nfile != null && langSwitchDir != null) {
+            return help("-不能同时配置-i18nFile和-langSwitchDir");
+        }
+        if (dataDir == null && !generators.isEmpty()) {
+            return help("-datadir is required");
+        }
+
         for (NamedTool nt : tools) {
             Logger.verbose("-----tool %s", nt.tool.parameter);
             nt.tool.call();
         }
 
         if (dataDir == null) {
-            if (!generators.isEmpty()) {
-                return help("-datadir is required");
-            }
             return 0;
         }
         Path dataDirPath = Paths.get(dataDir);
@@ -239,10 +250,6 @@ public final class Main {
 
         ExplicitDir explicitDir = ExplicitDir.parse(asRoot, excelDirs, jsonDirs);
 
-        if (i18nfile != null && langSwitchDir != null) {
-            return help("-不能同时配置-i18nFile和-langSwitchDir");
-        }
-
         Logger.profile(String.format("start total memory %dm", Runtime.getRuntime().maxMemory() / 1024 / 1024));
 
         Context context = new Context(new Context.ContextCfg(dataDirPath, explicitDir, headRow, csvDefaultEncoding,
@@ -253,7 +260,7 @@ public final class Main {
             try {
                 ng.gen.generate(context);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new RuntimeException("generate " + ng.name + " failed", e);
             }
             Logger.profile("generate " + ng.name);
         }
@@ -261,6 +268,13 @@ public final class Main {
         CachedFiles.finalExit();
         Logger.profile("end");
         return 0;
+    }
+
+    private static String nextArg(String[] args, String paramType, int valueIndex) {
+        if (valueIndex >= args.length) {
+            throw new CliException("missing value for " + paramType);
+        }
+        return args[valueIndex];
     }
 
 }

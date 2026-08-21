@@ -1,10 +1,11 @@
 services:
   cfggen:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    # 若使用已发布的镜像，取消下行注释并注释 build 段
-    # image: ghcr.io/stallboy/cfggen:latest
+    # 直接使用 GHCR 已构建的镜像（CI push tag v0.0.1 后自动发布）
+    # 如需本地构建，注释 image 行并取消注释下方 build 段
+    image: ghcr.io/zhao-zg/cfggen:0.0.1
+    # build:
+    #   context: .
+    #   dockerfile: Dockerfile
     ports:
       - "8080:80"
     volumes:

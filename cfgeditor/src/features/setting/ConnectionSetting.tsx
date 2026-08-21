@@ -16,7 +16,7 @@ export const ConnectionSetting = memo(function ConnectionSetting() {
     return <>
         <Title level={4} style={{marginTop: -4}}>{t('connection')}</Title>
         <Form layout="vertical" size="small">
-            <Form.Item label={t('curServer')}>{server}</Form.Item>
+            <Form.Item label={t('curServer')}>{server || '(跟随当前页面域名)'}</Form.Item>
             <Form.Item label={t('newServer')}>
                 <Input.Search enterButton={t('connect')} onSearch={(value: string) => setServer(value)}/>
             </Form.Item>

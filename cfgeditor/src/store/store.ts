@@ -77,7 +77,7 @@ export type StoreState = {
 
 // → cfgeditor.yml（团队共享）
 const sharedPrefState = {
-    server: 'localhost:3456',
+    server: '',
     themeConfig: {
         themeFile: '',
     },

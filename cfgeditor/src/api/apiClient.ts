@@ -26,10 +26,14 @@ function normalizeServer(server: string): string {
 /**
  * 为给定 server 创建带默认超时与 header 的 axios 实例。
  * server 由用户动态配置，故按调用创建（axios.create 开销可忽略）。
+ * server 为空时（Docker 部署场景），跟随当前页面域名，用相对路径请求，
+ * 浏览器自动发到页面所在 host:port，Nginx 反代到容器内 Java 后端。
  */
 function httpClient(server: string) {
+    const normalized = normalizeServer(server);
+    const baseURL = normalized ? `http://${normalized}` : '';
     return axios.create({
-        baseURL: `http://${normalizeServer(server)}`,
+        baseURL,
         timeout: DEFAULT_TIMEOUT_MS,
         headers: { 'Content-Type': 'application/json' },
     });

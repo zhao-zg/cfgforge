@@ -29,8 +29,8 @@ COPY cfgeditor/package.json cfgeditor/pnpm-lock.yaml cfgeditor/pnpm-workspace.ya
 # 安装 pnpm 并装依赖
 RUN npm install -g pnpm@9 && pnpm install --frozen-lockfile
 
-# 复制源码并构建
-COPY cfgeditor/tsconfig.json cfgeditor/vite.config.ts ./
+# 复制源码并构建（tsconfig.json 引用了 tsconfig.node.json，须一起 COPY）
+COPY cfgeditor/tsconfig.json cfgeditor/tsconfig.node.json cfgeditor/vite.config.ts ./
 COPY cfgeditor/index.html ./
 COPY cfgeditor/src ./src
 COPY cfgeditor/public ./public

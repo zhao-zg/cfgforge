@@ -1,0 +1,49 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Build artifacts
+app/build
+app/out
+app/tmp
+cfgeditor/dist
+cfgeditor/src-tauri/target
+example/build
+example/out
+native-image
+
+# Dependencies
+node_modules
+cfgeditor/node_modules
+docs/node_modules
+example/*/node_modules
+
+# Pre-built binaries
+*.jar
+*.exe
+cfggen.jar
+cfggen.zip
+cfgeditor.exe
+
+# IDE & OS
+.idea
+.vscode
+*.swp
+.DS_Store
+Thumbs.db
+
+# Docs site (not needed in image)
+docs/src
+docs/dist
+docs/node_modules
+
+# CI / plans
+.github
+docs/plans
+
+# Docker meta files not needed at build context
+# 注意：.docker/nginx.conf 和 .docker/entrypoint.sh 被 Dockerfile COPY，不能排除
+Dockerfile
+docker-compose.yml
+.dockerignore

@@ -151,6 +151,7 @@ export interface EnumValueAssignedAst {
 }
 
 export interface StructDeclAst {
+  kind: 'struct';
   name: string;          // ns_ident
   metadata: MetadataAst;
   comment: CommentData;  // leading + LC_COMMENT trailing + suffix
@@ -159,6 +160,7 @@ export interface StructDeclAst {
 }
 
 export interface InterfaceDeclAst {
+  kind: 'interface';
   name: string;          // ns_ident
   metadata: MetadataAst;
   comment: CommentData;
@@ -166,6 +168,7 @@ export interface InterfaceDeclAst {
 }
 
 export interface TableDeclAst {
+  kind: 'table';
   name: string;          // ns_ident
   primaryKey: KeyAst;
   metadata: MetadataAst;
@@ -176,6 +179,7 @@ export interface TableDeclAst {
 }
 
 export interface EnumDeclAst {
+  kind: 'enum';
   name: string;          // ns_ident
   metadata: MetadataAst;
   comment: CommentData;

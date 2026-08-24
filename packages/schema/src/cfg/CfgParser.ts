@@ -530,7 +530,7 @@ export class CfgParser {
 
     const comment = commentFromFull(leadingComments, lcToken, suffixComments);
 
-    return { name, metadata, comment, fields, foreignKeys };
+    return { kind: 'struct', name, metadata, comment, fields, foreignKeys };
   }
 
   // interface_decl: leading_comment* INTERFACE ns_ident metadata LC_COMMENT struct_decl+ suffix_comment* RC
@@ -564,7 +564,7 @@ export class CfgParser {
 
     const comment = commentFromFull(leadingComments, lcToken, suffixComments);
 
-    return { name, metadata, comment, structs };
+    return { kind: 'interface', name, metadata, comment, structs };
   }
 
   // table_decl: leading_comment* TABLE ns_ident key metadata LC_COMMENT (field_decl|foreign_decl|key_decl)+ suffix_comment* RC
@@ -600,7 +600,7 @@ export class CfgParser {
 
     const comment = commentFromFull(leadingComments, lcToken, suffixComments);
 
-    return { name, primaryKey, metadata, comment, fields, foreignKeys, uniqueKeys };
+    return { kind: 'table', name, primaryKey, metadata, comment, fields, foreignKeys, uniqueKeys };
   }
 
   // enum_decl: leading_comment* ENUM ns_ident metadata LC_COMMENT (enum_value_empty+|enum_value_assigned+)? suffix_comment* RC
@@ -639,6 +639,6 @@ export class CfgParser {
 
     const comment = commentFromFull(leadingComments, lcToken, suffixComments);
 
-    return { name, metadata, comment, enumValuesEmpty, enumValuesAssigned };
+    return { kind: 'enum', name, metadata, comment, enumValuesEmpty, enumValuesAssigned };
   }
 }

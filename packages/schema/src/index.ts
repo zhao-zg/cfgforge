@@ -46,3 +46,6 @@ export { RefKey, RefPrimary, RefUniq, RefList, RefSimple, isRefPrimary, isRefUni
 export { StructSchema } from './StructSchema';
 export { TableSchema } from './TableSchema';
 export { InterfaceSchema } from './InterfaceSchema';
+export { CfgSchema } from './CfgSchema';
+export { CfgReader } from './cfg/CfgReader';
+export { decodeComment } from './cfg/CfgReader';

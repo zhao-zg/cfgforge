@@ -7,7 +7,7 @@
  */
 
 import * as fs from 'fs';
-import { parse as csvParse } from 'csv-parse';
+import { parse as csvParseSync } from 'csv-parse/sync';
 import { readFromBuffer } from './UnicodeReader';
 import { BomUtf8Writer } from './BomUtf8Writer';
 
@@ -17,8 +17,7 @@ export function readCSV(filePath: string, defaultEncoding: string, fieldSeparato
   const buf = fs.readFileSync(filePath);
   const text = readFromBuffer(buf, defaultEncoding);
 
-  const records: CSVRow[] = [];
-  const parser = csvParse({
+  const records = csvParseSync(text, {
     relax_quotes: true,        // allowExtraCharsAfterClosingQuote
     relax_column_count: true,  // FieldMismatchStrategy.IGNORE
     skip_empty_lines: false,
@@ -26,25 +25,7 @@ export function readCSV(filePath: string, defaultEncoding: string, fieldSeparato
     delimiter: fieldSeparator,
   });
 
-  // Use sync API via parser
-  const remaining: string[] = [];
-  parser.on('readable', () => {
-    let record;
-    while ((record = parser.read()) !== null) {
-      records.push(record as CSVRow);
-    }
-  });
-  parser.on('error', (err) => {
-    throw err;
-  });
-  parser.on('end', () => {
-    remaining.pop(); // signal done
-  });
-
-  parser.write(text);
-  parser.end();
-
-  return records;
+  return records as CSVRow[];
 }
 
 export function readAndNormalizeCSV(filePath: string, defaultEncoding: string): CSVRow[] {

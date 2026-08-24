@@ -3,6 +3,7 @@ export { type DRawRow, EMPTY_ROW } from './DRawRow';
 export { DRawSheet } from './DRawSheet';
 export { ReadResult, OneSheet } from './ReadResult';
 export { readExcel } from './ExcelReader';
+export { readCsv } from './CsvReader';
 export {
   FileFmt,
   TableNameIndex,

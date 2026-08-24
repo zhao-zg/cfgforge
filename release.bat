@@ -53,15 +53,13 @@ echo.
 
 REM --- 3. Check local master is in sync with origin/master ---
 echo [2/5] Checking sync with origin/master...
-for /f "usebackq delims=" %%a in (`git rev-list --left-right --count origin/master...master 2^>nul`) do set "SYNC=%%a"
-if "%SYNC%"=="" (
+set "AHEAD="
+set "BEHIND="
+for /f "delims=" %%a in ('git rev-list --count origin/master..master 2^>nul') do set "AHEAD=%%a"
+for /f "delims=" %%a in ('git rev-list --count master..origin/master 2^>nul') do set "BEHIND=%%a"
+if "%AHEAD%"=="" (
     echo   [WARN] Cannot get origin/master status, skipping sync check.
 ) else (
-    for /f "tokens=1,2" %%a in ("%SYNC%") do (
-        set "AHEAD=%%a"
-        set "BEHIND=%%b"
-    )
-    REM Note: rev-list --left-right outputs "behind ahead"
     if not "%AHEAD%"=="0" (
         echo   [ERROR] Local master is %AHEAD% commits AHEAD of origin/master.
         echo           Please push first: git push %REMOTE% master

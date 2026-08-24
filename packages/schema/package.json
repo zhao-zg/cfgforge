@@ -1,0 +1,15 @@
+{
+  "name": "@cfggen/schema",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "vitest run",
+    "clean": "rimraf dist",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@cfggen/shared": "workspace:*"
+  },
+  "main": "./src/index.ts",
+  "private": true
+}

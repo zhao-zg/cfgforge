@@ -1,0 +1,19 @@
+{
+  "name": "@cfggen/context",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "vitest run",
+    "clean": "rimraf dist",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@cfggen/data": "workspace:*",
+    "@cfggen/value": "workspace:*",
+    "@cfggen/i18n": "workspace:*",
+    "@cfggen/shared": "workspace:*",
+    "@cfggen/schema": "workspace:*"
+  },
+  "main": "./src/index.ts",
+  "private": true
+}

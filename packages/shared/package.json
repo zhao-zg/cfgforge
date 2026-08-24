@@ -1,0 +1,13 @@
+{
+  "name": "@cfggen/shared",
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "test": "vitest run",
+    "clean": "rimraf dist",
+    "build": "tsc"
+  },
+  "dependencies": {},
+  "main": "./src/index.ts",
+  "private": true
+}

@@ -46,10 +46,12 @@ export { StructSchema } from './StructSchema';
 export { TableSchema } from './TableSchema';
 export { InterfaceSchema } from './InterfaceSchema';
 export { CfgSchema } from './CfgSchema';
+export { CommentData } from './CommentData';
 export { CfgReader } from './cfg/CfgReader';
 export { decodeComment } from './cfg/CfgReader';
 export { CfgWriter } from './cfg/CfgWriter';
-export { CfgSchemaErrs, CfgSchemaException } from './CfgSchemaErrs';
+// T2.21: re-export CfgSchemaErrs and all error factory functions/interfaces
+export * from './CfgSchemaErrs';
 // T2.12-T2.17: CfgSchemaResolver and related modules
 export { CfgSchemaResolver } from './CfgSchemaResolver';
 export * from './ForeachSchema';

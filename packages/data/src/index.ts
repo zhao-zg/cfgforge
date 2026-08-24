@@ -17,6 +17,7 @@ export type { HeadRow } from './HeadRows';
 export { HeadParser } from './HeadParser';
 export { CellParser } from './CellParser';
 export { CfgDataReader, type ExcelFileInfo, type ReadCsvFn, type ReadExcelFn, type CfgSchemaErrsLike, type CfgSchemaLike } from './CfgDataReader';
+export { CfgSchemaAlignToData } from './CfgSchemaAlignToData';
 export {
   FileFmt,
   TableNameIndex,

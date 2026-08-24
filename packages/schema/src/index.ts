@@ -64,3 +64,4 @@ export { preCalculateAllHasText, hasText } from './HasText';
 export { walkBlockAncestors } from './BlockAncestorWalker';
 export type { BlockFieldVisitor } from './BlockAncestorWalker';
 export { checkBlockFirstColOverlap } from './BlockFirstColOverlapChecker';
+export { CfgSchemaFilterByTag } from './CfgSchemaFilterByTag';

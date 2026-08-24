@@ -408,7 +408,8 @@ export class CfgReader {
     const meta = Metadata_of();
     for (const entry of ctx.entries) {
       if ('isMinus' in entry && entry.isMinus) {
-        meta.data().set('-' + entry.key, TAG);
+        // Parser already prepends '-' to the key for minus idents (see parseIdentWithOptSingleValue)
+        meta.data().set(entry.key, TAG);
       } else {
         const k = entry.key;
         const val = entry.value;

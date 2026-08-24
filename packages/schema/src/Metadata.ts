@@ -224,7 +224,7 @@ export class Metadata {
   }
 
   hasTag(tag: string): boolean {
-    return this._data.get(tag) === TAG;
+    return this._data.has(tag);
   }
 
   // --- State tags (putLast) ---

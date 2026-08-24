@@ -11,6 +11,8 @@
 import type { Nameable } from './Nameable';
 import type { Fieldable } from './Fieldable';
 import type { TableSchema } from './TableSchema';
+import { CfgSchemaErrs } from './CfgSchemaErrs';
+import { CfgSchemaResolver } from './CfgSchemaResolver';
 
 export class CfgSchema {
   private readonly _items: Nameable[] = [];
@@ -35,15 +37,12 @@ export class CfgSchema {
 
   /**
    * Resolve the schema by running the CfgSchemaResolver.
-   * Returns CfgSchemaErrs (to be implemented in T2.18).
-   * For now, this is a placeholder that just builds index maps.
+   * Returns CfgSchemaErrs containing all errors, warnings, and weak warnings.
    */
-  resolve(): unknown {
-    // TODO: T2.12-T2.17 — CfgSchemaResolver.resolve(this)
-    // For now, build basic index maps
-    this.buildIndexMaps();
-    this._isResolved = true;
-    return null;
+  resolve(): CfgSchemaErrs {
+    const errs = CfgSchemaErrs.of();
+    new CfgSchemaResolver(this, errs).resolve();
+    return errs;
   }
 
   /**

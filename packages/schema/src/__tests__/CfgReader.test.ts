@@ -18,8 +18,7 @@ import { TAG } from '../Metadata';
 // ---------------------------------------------------------------------------
 
 function readFixture(relativePath: string): string {
-  // cwd is packages/schema — need to go up 2 levels to reach repo root
-  const root = join(process.cwd(), '..', '..');
+  const root = process.cwd();
   return readFileSync(join(root, relativePath), 'utf-8');
 }
 

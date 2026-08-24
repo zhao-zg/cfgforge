@@ -22,7 +22,7 @@ import { CommentData } from '../CommentData';
 // ---------------------------------------------------------------------------
 
 function readFixture(relativePath: string): string {
-  const root = join(process.cwd(), '..', '..');
+  const root = process.cwd();
   return readFileSync(join(root, relativePath), 'utf-8');
 }
 

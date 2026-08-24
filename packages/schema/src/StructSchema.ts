@@ -87,11 +87,11 @@ export class StructSchema implements Fieldable, Structural {
   }
 
   namespace(): string {
-    return defaultNamespace(this.fullName());
+    return defaultNamespace(this._name);
   }
 
   lastName(): string {
-    return defaultLastName(this.fullName());
+    return defaultLastName(this._name);
   }
 
   comment(): string {

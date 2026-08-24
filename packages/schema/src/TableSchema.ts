@@ -9,7 +9,7 @@ import { AutoOrPack } from './FieldFormat';
 import type { FieldFormat } from './FieldFormat';
 import type { Metadata } from './Metadata';
 import { KeySchema } from './KeySchema';
-import type { FieldSchema } from './FieldSchema';
+import { FieldSchema } from './FieldSchema';
 import type { ForeignKeySchema } from './ForeignKeySchema';
 import type { EntryType } from './EntryType';
 import type { FieldType } from './FieldType';
@@ -92,9 +92,9 @@ export class TableSchema implements Structural {
     return null;
   }
 
-  namespace(): string { return defaultNamespace(this.name); }
-  lastName(): string { return defaultLastName(this.name); }
-  fullName(): string { return this.name; }
+  namespace(): string { return defaultNamespace(this.name()); }
+  lastName(): string { return defaultLastName(this.name()); }
+  fullName(): string { return this.name(); }
   comment(): string {
     const cd = this._meta.getComment();
     return cd !== null ? cd.encode() : '';

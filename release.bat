@@ -31,7 +31,7 @@ echo [1/5] Checking git working tree...
 set "DIRTY="
 for /f "delims=" %%i in ('git status --porcelain') do set DIRTY=1
 if defined DIRTY (
-    echo   [ERROR] Working tree is not clean. Commit or stash first.
+    echo   [ERROR] Working tree is not clean. Commit or stash first
     echo   ------------------------------------------------------------
     git status --short
     echo   ------------------------------------------------------------
@@ -46,8 +46,8 @@ set "BRANCH="
 for /f "delims=" %%i in ('git branch --show-current') do set BRANCH=%%i
 echo   [INFO] Current branch: %BRANCH%
 if not "%BRANCH%"=="master" (
-    echo   [WARN] Suggested branch is master (current: %BRANCH%).
-    echo         Press Ctrl+C to abort, or continue.
+    echo   [WARN] Suggested branch is master (current: %BRANCH%)
+    echo         Press Ctrl+C to abort, or continue
 )
 echo.
 
@@ -58,21 +58,21 @@ set "BEHIND="
 for /f "delims=" %%a in ('git rev-list --count origin/master..master 2^>nul') do set "AHEAD=%%a"
 for /f "delims=" %%a in ('git rev-list --count master..origin/master 2^>nul') do set "BEHIND=%%a"
 if "%AHEAD%"=="" (
-    echo   [WARN] Cannot get origin/master status, skipping sync check.
+    echo   [WARN] Cannot get origin/master status, skipping sync check
 ) else (
     if not "%AHEAD%"=="0" (
-        echo   [ERROR] Local master is %AHEAD% commits AHEAD of origin/master.
+        echo   [ERROR] Local master is %AHEAD% commits AHEAD of origin/master
         echo           Please push first: git push %REMOTE% master
         pause
         exit /b 1
     )
     if not "%BEHIND%"=="0" (
-        echo   [ERROR] Local master is %BEHIND% commits BEHIND origin/master.
+        echo   [ERROR] Local master is %BEHIND% commits BEHIND origin/master
         echo           Please pull first: git pull %REMOTE% master
         pause
         exit /b 1
     )
-    echo   [OK] Local master is in sync with origin/master.
+    echo   [OK] Local master is in sync with origin/master
 )
 echo.
 
@@ -80,7 +80,7 @@ REM --- 4. Input version ---
 echo [3/5] Enter version (e.g. 1.4.0 or v1.4.0)
 set /p VERSION=  Version: 
 if "%VERSION%"=="" (
-    echo   [ERROR] Version cannot be empty.
+    echo   [ERROR] Version cannot be empty
     pause
     exit /b 1
 )
@@ -103,13 +103,13 @@ REM --- 5. Verify CHANGELOG entry (CI uses it for release notes) ---
 if exist CHANGELOG.md (
     findstr /C:"### [%VERSION%]" CHANGELOG.md >nul 2>&1
     if errorlevel 1 (
-        echo   [WARN] CHANGELOG.md has no "### [%VERSION%]" entry.
-        echo         CI will use default release notes, consider adding one.
+        echo   [WARN] CHANGELOG.md has no "### [%VERSION%]" entry
+        echo         CI will use default release notes, consider adding one
     ) else (
-        echo   [OK] CHANGELOG already has an entry for %VERSION%.
+        echo   [OK] CHANGELOG already has an entry for %VERSION%
     )
 ) else (
-    echo   [WARN] CHANGELOG.md not found.
+    echo   [WARN] CHANGELOG.md not found
 )
 echo.
 
@@ -117,13 +117,13 @@ REM --- 6. Check tag does not exist locally or remotely ---
 echo [4/5] Checking if tag already exists...
 git rev-parse -q --verify "refs/tags/%VERSION%" >nul 2>&1
 if not errorlevel 1 (
-    echo   [ERROR] Tag %VERSION% already exists locally. Use another version.
+    echo   [ERROR] Tag %VERSION% already exists locally. Use another version
     pause
     exit /b 1
 )
 git ls-remote --tags %REMOTE% "%VERSION%" 2>nul | findstr /C:"%VERSION%" >nul
 if not errorlevel 1 (
-    echo   [ERROR] Tag %VERSION% already exists on %REMOTE%. Use another version.
+    echo   [ERROR] Tag %VERSION% already exists on %REMOTE%. Use another version
     pause
     exit /b 1
 )
@@ -134,7 +134,7 @@ REM --- 7. Create annotated tag and push ---
 echo [5/5] Creating annotated tag %VERSION% ...
 git tag -a %VERSION% -m "Release %VERSION%"
 if errorlevel 1 (
-    echo   [ERROR] Failed to create tag.
+    echo   [ERROR] Failed to create tag
     pause
     exit /b 1
 )
@@ -153,7 +153,7 @@ if /i not "%CONFIRM%"=="y" (
 
 git push %REMOTE% %VERSION%
 if errorlevel 1 (
-    echo   [ERROR] Failed to push tag. Check network and permissions.
+    echo   [ERROR] Failed to push tag. Check network and permissions
     echo         Local tag still exists, retry: git push %REMOTE% %VERSION%
     pause
     exit /b 1

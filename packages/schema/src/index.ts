@@ -65,3 +65,5 @@ export { walkBlockAncestors } from './BlockAncestorWalker';
 export type { BlockFieldVisitor } from './BlockAncestorWalker';
 export { checkBlockFirstColOverlap } from './BlockFirstColOverlapChecker';
 export { CfgSchemaFilterByTag } from './CfgSchemaFilterByTag';
+export { CfgSchemas } from './CfgSchemas';
+export type { CfgFileInfo } from './CfgSchemas';

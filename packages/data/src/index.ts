@@ -15,6 +15,7 @@ export { CfgData } from './CfgData';
 export { HeadRows, ParseBoolResult } from './HeadRows';
 export type { HeadRow } from './HeadRows';
 export { HeadParser } from './HeadParser';
+export { CellParser } from './CellParser';
 export {
   FileFmt,
   TableNameIndex,

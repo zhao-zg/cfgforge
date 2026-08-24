@@ -146,6 +146,9 @@ importers:
       '@cfggen/shared':
         specifier: workspace:*
         version: link:../shared
+      fast-xml-parser:
+        specifier: ^5.11.0
+        version: 5.11.0
 
   packages/shared:
     dependencies:

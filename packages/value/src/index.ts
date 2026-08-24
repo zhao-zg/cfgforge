@@ -9,3 +9,5 @@ export * from './VTableParser';
 export * from './ValueDefault';
 export * from './ValueJsonParser';
 export * from './VTableJsonParser';
+export * from './ForeachVStruct';
+export * from './RefValidator';

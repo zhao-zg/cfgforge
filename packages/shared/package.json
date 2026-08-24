@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "csv-parse": "^7.0.2",
+    "fast-xml-parser": "^5.11.0",
     "iconv-lite": "^0.7.3"
   },
   "main": "./src/index.ts",

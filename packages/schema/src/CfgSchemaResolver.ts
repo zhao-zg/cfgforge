@@ -748,8 +748,8 @@ export class CfgSchemaResolver {
 
       needToCheck = [];
       for (const f of needToCheckFieldables.values()) {
-        const notCheckedBefore = collectedFieldableSet.add(f.name());
-        if (notCheckedBefore) {
+        if (!collectedFieldableSet.has(f.name())) {
+          collectedFieldableSet.add(f.name());
           if (f instanceof InterfaceSchema) {
             for (const impl of f.impls()) {
               needToCheck = needToCheck.concat(impl.fields());

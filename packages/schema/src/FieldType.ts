@@ -174,6 +174,15 @@ export function isContainerType(t: FieldType): t is ContainerType {
 }
 
 // ---------------------------------------------------------------------------
+// Copy helper — works for any FieldType (Primitive is immutable)
+// ---------------------------------------------------------------------------
+
+export function copyFieldType(t: FieldType): FieldType {
+  if (typeof t === 'string') return t; // Primitive is immutable
+  return t.copy(); // FList, FMap, StructRef all have copy()
+}
+
+// ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
 

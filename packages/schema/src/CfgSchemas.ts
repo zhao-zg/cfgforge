@@ -2,17 +2,20 @@
  * CfgSchemas — TypeScript port of Java `configgen.schema.CfgSchemas`.
  *
  * Static utility class for reading multiple .cfg files and merging them
- * into a single CfgSchema.
+ * into a single CfgSchema, and writing a CfgSchema back to multiple files.
  *
- * In Java, this uses a work-stealing thread pool for parallel parsing.
+ * In Java, reading uses a work-stealing thread pool for parallel parsing.
  * In TypeScript, parsing is synchronous (CPU-bound string processing),
  * so we parse sequentially. Worker threads can be added later if needed.
- *
- * writeToDir is deferred to T2.23 (depends on CfgUtil.separate).
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
 import { CfgSchema } from './CfgSchema';
 import { CfgReader } from './cfg/CfgReader';
+import { CfgWriter } from './cfg/CfgWriter';
+import { CfgUtil } from './cfg/CfgUtil';
+import { CachedFiles } from '@cfggen/shared';
 import type { Nameable } from './Nameable';
 
 // ---------------------------------------------------------------------------
@@ -57,6 +60,30 @@ export class CfgSchemas {
     }
 
     return destination;
+  }
+
+  /**
+   * Write a CfgSchema to a directory, splitting by namespace.
+   *
+   * Each namespace is written to its own .cfg file, with the directory
+   * structure mirroring the namespace hierarchy.
+   *
+   * Java uses CachedFiles.writeFile for incremental writes (skip if content
+   * unchanged). TS uses the same CachedFiles mechanism.
+   */
+  static writeToDir(destination: string, root: CfgSchema): void {
+    const absoluteDst = path.resolve(destination);
+    const modules = CfgUtil.separate(root);
+    for (const [ns, cfg] of modules) {
+      const dst = CfgUtil.getCfgFilePathByNamespace(ns, absoluteDst);
+      CfgSchemas.writeToOneFile(dst, cfg);
+    }
+  }
+
+  private static writeToOneFile(dst: string, cfg: CfgSchema): void {
+    const content = CfgWriter.stringifyWithOptions(cfg, true, false);
+    const data = Buffer.from(content, 'utf-8');
+    CachedFiles.writeFile(dst, data);
   }
 
 }

@@ -69,3 +69,4 @@ export { CfgSchemas } from './CfgSchemas';
 export type { CfgFileInfo } from './CfgSchemas';
 export { XmlReader } from './cfg/XmlReader';
 export type { XmlElement } from './cfg/XmlReader';
+export { CfgUtil } from './cfg/CfgUtil';

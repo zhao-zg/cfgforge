@@ -15,8 +15,11 @@
  */
 
 import { XMLParser } from 'fast-xml-parser';
+import * as path from 'path';
 import { Logger } from '@cfggen/shared';
 import { CfgSchema } from '../CfgSchema';
+import { CfgUtil } from './CfgUtil';
+import type { CfgFileInfo } from '../CfgSchemas';
 import { TableSchema } from '../TableSchema';
 import { StructSchema } from '../StructSchema';
 import { InterfaceSchema } from '../InterfaceSchema';
@@ -48,6 +51,30 @@ export interface XmlElement {
 // ---------------------------------------------------------------------------
 
 export class XmlReader {
+
+  /**
+   * Read XML configuration files from a directory tree.
+   *
+   * Looks for `config.xml` in rootDir, then recursively finds sub-directory
+   * XML files (e.g. `equip/equip.xml`, `equip/weapon/weapon.xml`).
+   *
+   * Java reads from disk via DOMUtil.rootElement(file).
+   * TS uses CfgUtil.findConfigFilesRecursively to discover files, then reads
+   * content and passes to readTo.
+   */
+  static readFromDir(rootDir: string): CfgSchema {
+    const destination = CfgSchema.of();
+    const allXmlFiles = new Map<string, CfgFileInfo>();
+    const rootXml = path.join(rootDir, 'config.xml');
+    CfgUtil.findConfigFilesRecursively(
+      rootXml, null, 'xml', '', rootDir, allXmlFiles,
+    );
+
+    for (const c of allXmlFiles.values()) {
+      XmlReader.readTo(destination, c.content, c.pkgNameDot);
+    }
+    return destination;
+  }
 
   /**
    * Parse an XML string and add schemas to the destination CfgSchema.

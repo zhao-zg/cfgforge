@@ -8,3 +8,4 @@ export * from './VTableBlockParser';
 export * from './VTableParser';
 export * from './ValueDefault';
 export * from './ValueJsonParser';
+export * from './VTableJsonParser';

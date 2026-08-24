@@ -99,7 +99,7 @@ export class ValueUtil {
   }
 
   static extractPrimaryKeyValue(vStruct: VStruct, tableSchema: TableSchema): Value {
-    const keyIndices = findFieldIndices(tableSchema, tableSchema.primaryKey());
+    const keyIndices = findFieldIndices(tableSchema, tableSchema.primaryKey);
     return ValueUtil.extractKeyValue(vStruct, keyIndices);
   }
 

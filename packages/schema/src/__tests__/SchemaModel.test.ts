@@ -9,7 +9,8 @@ import { RefKey, RefPrimary, RefUniq, RefList } from '../RefKey';
 import { StructSchema } from '../StructSchema';
 import { TableSchema } from '../TableSchema';
 import { InterfaceSchema } from '../InterfaceSchema';
-import { Metadata_of } from '../Metadata';
+import { Metadata_of, Metadata } from '../Metadata';
+import { CommentData } from '../CommentData';
 
 function makeField(name: string, type: FieldType = Primitive.INT, fmt: FieldFormat = AutoOrPack.AUTO): FieldSchema {
   return new FieldSchema(name, type, fmt, Metadata_of());
@@ -226,3 +227,59 @@ describe('InterfaceSchema', () => {
 function isSepFmt(fmt: FieldFormat): boolean {
   return fmt instanceof Sep;
 }
+
+// ===========================================================================
+// comment() and isJson() — driven by Metadata
+// ===========================================================================
+
+describe('comment() and isJson() via Metadata', () => {
+  it('StructSchema.comment() returns encoded comment from meta', () => {
+    const meta = Metadata_of();
+    meta.putComment(new CommentData('hello world', '', null));
+    const s = new StructSchema('Foo', AutoOrPack.AUTO, meta, [], []);
+    expect(s.comment()).toBe('hello world\n');
+  });
+
+  it('StructSchema.comment() returns empty string when no comment', () => {
+    const s = new StructSchema('Foo', AutoOrPack.AUTO, Metadata_of(), [], []);
+    expect(s.comment()).toBe('');
+  });
+
+  it('TableSchema.comment() returns encoded comment from meta', () => {
+    const meta = Metadata_of();
+    meta.putComment(new CommentData('table comment', '', null));
+    const t = new TableSchema('Bar', new KeySchema(['id']), ENo.NO, false, meta, [], [], []);
+    expect(t.comment()).toBe('table comment\n');
+  });
+
+  it('TableSchema.isJson() returns true when meta has json tag', () => {
+    const meta = Metadata_of();
+    meta.data().set('json', 'TAG');
+    const t = new TableSchema('Bar', new KeySchema(['id']), ENo.NO, false, meta, [], [], []);
+    expect(t.isJson()).toBe(true);
+  });
+
+  it('TableSchema.isJson() returns false when meta has no json tag', () => {
+    const t = new TableSchema('Bar', new KeySchema(['id']), ENo.NO, false, Metadata_of(), [], [], []);
+    expect(t.isJson()).toBe(false);
+  });
+
+  it('InterfaceSchema.comment() returns encoded comment from meta', () => {
+    const meta = Metadata_of();
+    meta.putComment(new CommentData('iface comment', '', null));
+    const iface = new InterfaceSchema('IFoo', '', '', AutoOrPack.AUTO, meta, []);
+    expect(iface.comment()).toBe('iface comment\n');
+  });
+
+  it('FieldSchema.comment() returns encoded comment from meta', () => {
+    const meta = Metadata_of();
+    meta.putComment(new CommentData('field comment', '', null));
+    const f = new FieldSchema('myField', Primitive.INT, AutoOrPack.AUTO, meta);
+    expect(f.comment()).toBe('field comment\n');
+  });
+
+  it('FieldSchema.comment() returns empty string when no comment', () => {
+    const f = new FieldSchema('myField', Primitive.INT, AutoOrPack.AUTO, Metadata_of());
+    expect(f.comment()).toBe('');
+  });
+});

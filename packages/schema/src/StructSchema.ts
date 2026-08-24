@@ -95,8 +95,8 @@ export class StructSchema implements Fieldable, Structural {
   }
 
   comment(): string {
-    // Will be implemented when Metadata is fully done in T2.10
-    return '';
+    const cd = this._meta.getComment();
+    return cd !== null ? cd.encode() : '';
   }
 
   copy(): StructSchema {

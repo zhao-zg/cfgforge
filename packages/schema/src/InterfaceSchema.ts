@@ -88,7 +88,10 @@ export class InterfaceSchema implements Fieldable {
   namespace(): string { return defaultNamespace(this._name); }
   lastName(): string { return defaultLastName(this._name); }
   fullName(): string { return this._name; }
-  comment(): string { return ''; }
+  comment(): string {
+    const cd = this._meta.getComment();
+    return cd !== null ? cd.encode() : '';
+  }
 
   copy(): InterfaceSchema {
     return new InterfaceSchema(

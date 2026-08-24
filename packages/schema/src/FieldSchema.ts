@@ -34,6 +34,26 @@ export class FieldSchema {
     }
   }
 
+  /**
+   * Encoded comment string, or empty string if no comment.
+   */
+  comment(): string {
+    const cd = this.meta.getComment();
+    return cd !== null ? cd.encode() : '';
+  }
+
+  isLowercase(): boolean {
+    return this.meta.isLowercase();
+  }
+
+  isMustFill(): boolean {
+    return this.meta.isMustFill();
+  }
+
+  isSeq(): boolean {
+    return this.meta.isSeq();
+  }
+
   copy(): FieldSchema {
     return new FieldSchema(
       this.name,

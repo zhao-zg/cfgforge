@@ -95,7 +95,10 @@ export class TableSchema implements Structural {
   namespace(): string { return defaultNamespace(this.name); }
   lastName(): string { return defaultLastName(this.name); }
   fullName(): string { return this.name; }
-  comment(): string { return ''; }
+  comment(): string {
+    const cd = this._meta.getComment();
+    return cd !== null ? cd.encode() : '';
+  }
 
   copy(): TableSchema {
     return new TableSchema(
@@ -111,8 +114,7 @@ export class TableSchema implements Structural {
   }
 
   isJson(): boolean {
-    // Will be implemented when Metadata is fully done in T2.10
-    return false;
+    return this._meta.isJson();
   }
 
   equals(other: unknown): boolean {

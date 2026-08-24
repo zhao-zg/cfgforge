@@ -7,8 +7,37 @@ export * from './CommentData';
 export { Fieldable } from './Fieldable';
 export { Structural } from './Structural';
 export { Nameable, makeName, defaultNamespace, defaultLastName } from './Nameable';
-export type { Metadata, MetaValue, MetaInt, MetaFloat, MetaStr, MetaComment, MetaEnumValues, MetaEnumValuesOfEmpty, MetaEnumValuesOfAssigned, EnumValueEmpty, EnumValueAssigned, MetaTag } from './Metadata';
-export { Metadata_of } from './Metadata';
+export {
+  Metadata,
+  Metadata_of,
+  MetaTag,
+  TAG,
+  metaInt,
+  metaFloat,
+  metaStr,
+  metaComment,
+  metaEnumValuesOfEmpty,
+  metaEnumValuesOfAssigned,
+  isMetaTag,
+  isMetaInt,
+  isMetaFloat,
+  isMetaStr,
+  isMetaComment,
+  isMetaEnumValues,
+} from './Metadata';
+export type {
+  MetaValue,
+  MetaInt,
+  MetaFloat,
+  MetaStr,
+  MetaComment,
+  MetaEnumValues,
+  MetaEnumValuesOfEmpty,
+  MetaEnumValuesOfAssigned,
+  EnumValueEmpty,
+  EnumValueAssigned,
+  MetaTag,
+} from './Metadata';
 export { KeySchema } from './KeySchema';
 export { FieldSchema } from './FieldSchema';
 export { ForeignKeySchema } from './ForeignKeySchema';

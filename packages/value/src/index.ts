@@ -4,3 +4,4 @@ export * from './ValueUtil';
 export * from './ValuePack';
 export * from './ValueParser';
 export * from './VTableCreator';
+export * from './VTableBlockParser';

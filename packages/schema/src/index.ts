@@ -50,3 +50,4 @@ export { CfgSchema } from './CfgSchema';
 export { CfgReader } from './cfg/CfgReader';
 export { decodeComment } from './cfg/CfgReader';
 export { CfgWriter } from './cfg/CfgWriter';
+export { CfgSchemaErrs, CfgSchemaException } from './CfgSchemaErrs';

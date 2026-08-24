@@ -702,7 +702,7 @@ export class CfgValueStat {
 // Helper: value equality
 // ---------------------------------------------------------------------------
 
-function valueEquals(a: Value, b: Value): boolean {
+export function valueEquals(a: Value, b: Value): boolean {
   if (a === b) return true;
   if (a instanceof VBool && b instanceof VBool) return a.equals(b);
   if (a instanceof VInt && b instanceof VInt) return a.equals(b);

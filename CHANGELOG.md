@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '61d115e4-87f6-40fb-8895-f6b08ed49389'
+  PropagateID: '61d115e4-87f6-40fb-8895-f6b08ed49389'
+  ReservedCode1: 'f2ad99fc-1612-4867-a081-3f24ac7d12c1'
+  ReservedCode2: 'f2ad99fc-1612-4867-a081-3f24ac7d12c1'
+---
+
 # 更新日志
 
 本项目采用 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.1.0/) 标准，
@@ -6,8 +17,18 @@
 
 ### [Unreleased]
 
+### [v1.5.0] - 2026-08-24
+
+新增 Schema 文本编辑器与发布脚本，修复 bat 脚本解析 bug。
+
 #### Added
 - Java 生成器新增 `beautifulName` 参数：开启后由 snake_case schema 名派生的标识符统一美化——类名/getter/all 函数名转 PascalCase（`factory_animation_type` -> `FactoryAnimationType`），enum/entry 常量转 SCREAMING_SNAKE_CASE（`ResetDuration`、`Reset_Duration` 都得到 `RESET_DURATION`）；生成器自带的后缀 `_Entry`/`_Detail` 原样保留以区隔包装类/详情类（`equip_config` 的 entry 类为 `EquipConfig_Entry`）；默认关闭保持原 `upper1`/`toUpperCase` 行为。
+- SchemaTextEditor 组件：支持 CFG 文本编辑，后端新增 schema 文本读取与写入端点（`EditorServer`/`SchemaWriteService`/`TableCreateService`）。
+- `release.bat`：交互式 tag-and-push 发布脚本，触发 GitHub Actions release 工作流。
+
+#### Fixed
+- 修复 `release.bat` 中 if 块 echo 行尾多余点号导致 cmd 解析错误的问题。
+- 修复 `release.bat` 中 master 同步检查 `for /f` 多 token 解析 bug，简化判断逻辑。
 
 ### [v1.4.0] - 2026-07-20
 
@@ -112,3 +133,5 @@
 - 优化缓存机制
 - 支持多级外键引用
 - 支持配置过滤和标签
+
+> AI生成

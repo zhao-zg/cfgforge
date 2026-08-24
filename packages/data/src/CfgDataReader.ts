@@ -22,6 +22,7 @@ import type { HeadRow } from './HeadRows';
 import { HeadRows } from './HeadRows';
 import type { ReadResult } from './ReadResult';
 import { FileFmt, getTableNameIndex } from './DataUtil';
+import { CfgSchemaErrs } from '@cfggen/schema';
 import type { CfgSchema } from '@cfggen/schema';
 
 // Minimal CfgSchemaErrs interface to avoid tight coupling
@@ -150,10 +151,7 @@ export class CfgDataReader {
     // Phase 2: parse head & data cell
     for (const table of data.tables.values()) {
       const tStat = new CfgDataStat();
-      const tErrs: CfgSchemaErrsLike = {
-        addErr(err: unknown): void { /* collect */ },
-        merge(_other: CfgSchemaErrsLike): void { /* no-op for mock */ },
-      };
+      const tErrs = CfgSchemaErrs.of();
       const cm = isColumnMode(nullableCfgSchema, table.tableName);
       try {
         HeadParser.parse(table, tStat, this.headRow, cm, tErrs);

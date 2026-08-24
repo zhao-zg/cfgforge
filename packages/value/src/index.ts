@@ -15,3 +15,4 @@ export * from './ForeachValue';
 export * from './LangTextFinder';
 export * from './ValueEnv';
 export * from './TextValue';
+export * from './CfgValueParser';

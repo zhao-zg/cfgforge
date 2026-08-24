@@ -6,7 +6,7 @@ export { readExcel } from './ExcelReader';
 export { readCsv } from './CsvReader';
 export { JsonFileInfo } from './JsonFileInfo';
 export { type JsonTableFiles } from './JsonTableFiles';
-export { DFile } from './Source';
+export { DFile, DCellList, type Source } from './Source';
 export { DRowId } from './DRowId';
 export { DField } from './DField';
 export { DCell } from './DCell';

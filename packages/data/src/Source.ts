@@ -6,9 +6,44 @@
  *   - DCell / DCellList: from Excel or CSV (a cell at row, col)
  *   - DFile: from a JSON file (file path + field access path)
  *
- * This file defines DFile. DCell and DCellList are defined separately in
- * the CellParser module (Phase 3, T3.5).
+ * This file defines DFile, DCellList, and the Source type alias.
+ * DCell is defined separately in DCell.ts.
  */
+
+import type { DCell } from './DCell';
+
+/**
+ * Union type representing the source of a value.
+ * (Java sealed interface Source permits DCell, DCellList, DFile.)
+ */
+export type Source = DCell | DCellList | DFile;
+
+/**
+ * DCellList — a list of DCells that together form a composite source.
+ * (Java record `Source.DCellList(List<DCell> cells)`.)
+ */
+export class DCellList {
+  readonly cells: DCell[];
+
+  constructor(cells: DCell[]) {
+    this.cells = cells;
+  }
+
+  static of(): DCellList {
+    return new DCellList([]);
+  }
+
+  /**
+   * Factory: returns a DCell if the list has exactly one element,
+   * otherwise wraps in a DCellList. Matches Java `Source.of(List<DCell>)`.
+   */
+  static fromCells(cells: DCell[]): Source {
+    if (cells.length === 1) {
+      return cells[0];
+    }
+    return new DCellList(cells);
+  }
+}
 
 export class DFile {
   readonly fileName: string;

@@ -91,19 +91,19 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path src-tauri/resources | Out-Null
           Copy-Item ../app/build/libs/cfggen.jar src-tauri/resources/cfggen.jar -Force
-          $jmodsPath = Join-Path $env:JAVA_HOME "jmods"
-          if (-not (Test-Path $jmodsPath)) {
-            Write-Output "jmods not found in JAVA_HOME, downloading Temurin JDK for jmods..."
-            $url = "https://api.adoptium.net/v3/binary/latest/25/ga/windows/x64/jdk/hotspot/normal/eclipse"
-            Invoke-WebRequest -Uri $url -OutFile jdk-temp.zip
-            Expand-Archive -Path jdk-temp.zip -DestinationPath jdk-temp -Force
-            $jdkDir = (Get-ChildItem jdk-temp -Directory | Select-Object -First 1).FullName
-            $jmodsPath = Join-Path $jdkDir "jmods"
-            Remove-Item jdk-temp.zip -Force
-          }
+          # Always download full JDK to get working jlink + jmods
+          $url = "https://api.adoptium.net/v3/binary/latest/25/ga/windows/x64/jdk/hotspot/normal/eclipse"
+          Write-Output "Downloading Temurin JDK 25 for jlink + jmods..."
+          Invoke-WebRequest -Uri $url -OutFile jdk-temp.zip
+          Expand-Archive -Path jdk-temp.zip -DestinationPath jdk-temp -Force
+          $jdkDir = (Get-ChildItem jdk-temp -Directory | Select-Object -First 1).FullName
+          $jmodsPath = Join-Path $jdkDir "jmods"
+          $jlinkExe = Join-Path $jdkDir "bin/jlink.exe"
           Write-Output "Using jmods from: $jmodsPath"
-          & "$env:JAVA_HOME/bin/jlink" --module-path $jmodsPath --add-modules java.base,java.logging,java.xml,jdk.httpserver,jdk.unsupported,java.compiler --bind-services --strip-debug --no-header-files --no-man-pages --output src-tauri/resources/jre
+          Write-Output "Using jlink from: $jlinkExe"
+          & $jlinkExe --module-path $jmodsPath --add-modules java.base,java.logging,java.xml,jdk.httpserver,jdk.unsupported,java.compiler --bind-services --strip-debug --no-header-files --no-man-pages --output src-tauri/resources/jre
           if (-not $?) { throw "jlink failed" }
+          Remove-Item jdk-temp -Recurse -Force -ErrorAction SilentlyContinue
           Write-Output "cfggen.jar and JRE placed in src-tauri/resources/"
 
       - name: Install dependencies
@@ -177,17 +177,19 @@ jobs:
         run: |
           mkdir -p src-tauri/resources
           cp ../app/build/libs/cfggen.jar src-tauri/resources/cfggen.jar
-          JMODS_PATH="$JAVA_HOME/jmods"
-          if [ ! -d "$JMODS_PATH" ]; then
-            echo "jmods not found in JAVA_HOME, downloading Temurin JDK for jmods..."
-            curl -sL -o /tmp/jdk-temp.tar.gz "https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse"
-            mkdir -p /tmp/jdk-temp
-            tar -xzf /tmp/jdk-temp.tar.gz -C /tmp/jdk-temp
-            JMODS_PATH=$(find /tmp/jdk-temp -maxdepth 1 -type d | tail -1)/jmods
-          fi
+          # Always download full JDK to get working jlink + jmods
+          echo "Downloading Temurin JDK 25 for jlink + jmods..."
+          curl -sL -o /tmp/jdk-temp.tar.gz "https://api.adoptium.net/v3/binary/latest/25/ga/linux/x64/jdk/hotspot/normal/eclipse"
+          mkdir -p /tmp/jdk-temp
+          tar -xzf /tmp/jdk-temp.tar.gz -C /tmp/jdk-temp
+          JDK_DIR=$(find /tmp/jdk-temp -maxdepth 1 -type d | tail -1)
+          JMODS_PATH="$JDK_DIR/jmods"
+          JLINK_EXE="$JDK_DIR/bin/jlink"
           echo "Using jmods from: $JMODS_PATH"
-          "$JAVA_HOME/bin/jlink" --module-path "$JMODS_PATH" --add-modules java.base,java.logging,java.xml,jdk.httpserver,jdk.unsupported,java.compiler --bind-services --strip-debug --no-header-files --no-man-pages --output src-tauri/resources/jre
+          echo "Using jlink from: $JLINK_EXE"
+          "$JLINK_EXE" --module-path "$JMODS_PATH" --add-modules java.base,java.logging,java.xml,jdk.httpserver,jdk.unsupported,java.compiler --bind-services --strip-debug --no-header-files --no-man-pages --output src-tauri/resources/jre
           if [ $? -ne 0 ]; then echo "jlink failed"; exit 1; fi
+          rm -rf /tmp/jdk-temp /tmp/jdk-temp.tar.gz
           echo "cfggen.jar and JRE placed in src-tauri/resources/"
 
       - name: Install dependencies
@@ -269,17 +271,19 @@ jobs:
         run: |
           mkdir -p src-tauri/resources
           cp ../app/build/libs/cfggen.jar src-tauri/resources/cfggen.jar
-          JMODS_PATH="$JAVA_HOME/jmods"
-          if [ ! -d "$JMODS_PATH" ]; then
-            echo "jmods not found in JAVA_HOME, downloading Temurin JDK for jmods..."
-            curl -sL -o /tmp/jdk-temp.tar.gz "https://api.adoptium.net/v3/binary/latest/25/ga/mac/aarch64/jdk/hotspot/normal/eclipse"
-            mkdir -p /tmp/jdk-temp
-            tar -xzf /tmp/jdk-temp.tar.gz -C /tmp/jdk-temp
-            JMODS_PATH=$(find /tmp/jdk-temp -maxdepth 1 -type d | tail -1)/jmods
-          fi
+          # Always download full JDK to get working jlink + jmods
+          echo "Downloading Temurin JDK 25 for jlink + jmods..."
+          curl -sL -o /tmp/jdk-temp.tar.gz "https://api.adoptium.net/v3/binary/latest/25/ga/mac/aarch64/jdk/hotspot/normal/eclipse"
+          mkdir -p /tmp/jdk-temp
+          tar -xzf /tmp/jdk-temp.tar.gz -C /tmp/jdk-temp
+          JDK_DIR=$(find /tmp/jdk-temp -maxdepth 1 -type d | tail -1)
+          JMODS_PATH="$JDK_DIR/jmods"
+          JLINK_EXE="$JDK_DIR/bin/jlink"
           echo "Using jmods from: $JMODS_PATH"
-          "$JAVA_HOME/bin/jlink" --module-path "$JMODS_PATH" --add-modules java.base,java.logging,java.xml,jdk.httpserver,jdk.unsupported,java.compiler --bind-services --strip-debug --no-header-files --no-man-pages --output src-tauri/resources/jre
+          echo "Using jlink from: $JLINK_EXE"
+          "$JLINK_EXE" --module-path "$JMODS_PATH" --add-modules java.base,java.logging,java.xml,jdk.httpserver,jdk.unsupported,java.compiler --bind-services --strip-debug --no-header-files --no-man-pages --output src-tauri/resources/jre
           if [ $? -ne 0 ]; then echo "jlink failed"; exit 1; fi
+          rm -rf /tmp/jdk-temp /tmp/jdk-temp.tar.gz
           echo "cfggen.jar and JRE placed in src-tauri/resources/"
 
       - name: Install dependencies

@@ -49,3 +49,4 @@ export { InterfaceSchema } from './InterfaceSchema';
 export { CfgSchema } from './CfgSchema';
 export { CfgReader } from './cfg/CfgReader';
 export { decodeComment } from './cfg/CfgReader';
+export { CfgWriter } from './cfg/CfgWriter';

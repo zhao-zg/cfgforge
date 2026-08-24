@@ -12,8 +12,14 @@ import {
   VBool, VInt, VLong, VFloat, VString, VText, VStruct, VInterface, VList, VMap,
   type Value,
 } from '../CfgValue';
+import { CfgValueErrs } from '../CfgValueErrs';
 import { DCell, DCellList } from '@cfggen/data';
 import type { Structural, InterfaceSchema } from '@cfggen/schema';
+import {
+  Primitive, FList, FMap, StructRef,
+  FieldSchema, StructSchema, TableSchema, KeySchema,
+  AutoOrPack, Metadata_of, ENo,
+} from '@cfggen/schema';
 
 function makeCell(value: string): DCell {
   return DCell.of(value, 'test');
@@ -163,5 +169,96 @@ describe('ValuePack', () => {
       // List gets parentheses: name,(1,2)
       expect(ValuePack.pack(vs)).toBe('name,(1,2)');
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// unpack tests
+// ---------------------------------------------------------------------------
+
+describe('ValuePack.unpack', () => {
+  it('unpacks int string', () => {
+    const errs = CfgValueErrs.of();
+    const result = ValuePack.unpack('42', Primitive.INT, errs);
+    expect(result).toBeInstanceOf(VInt);
+    expect((result as VInt).value).toBe(42);
+    expect(errs.errs.length).toBe(0);
+  });
+
+  it('unpacks string', () => {
+    const errs = CfgValueErrs.of();
+    const result = ValuePack.unpack('hello', Primitive.STRING, errs);
+    expect(result).toBeInstanceOf(VString);
+    expect((result as VString).value).toBe('hello');
+  });
+
+  it('unpacks bool', () => {
+    const errs = CfgValueErrs.of();
+    const result = ValuePack.unpack('true', Primitive.BOOL, errs);
+    expect(result).toBeInstanceOf(VBool);
+    expect((result as VBool).value).toBe(true);
+  });
+
+  it('unpacks pack list of ints', () => {
+    const errs = CfgValueErrs.of();
+    const result = ValuePack.unpack('1,2,3', new FList(Primitive.INT), errs);
+    expect(result).toBeInstanceOf(VList);
+    expect((result as VList).valueList.length).toBe(3);
+    expect(((result as VList).valueList[0] as VInt).value).toBe(1);
+    expect(((result as VList).valueList[1] as VInt).value).toBe(2);
+    expect(((result as VList).valueList[2] as VInt).value).toBe(3);
+  });
+
+  it('unpacks pack struct', () => {
+    const errs = CfgValueErrs.of();
+    const f1 = new FieldSchema('id', Primitive.INT, AutoOrPack.AUTO, Metadata_of());
+    const f2 = new FieldSchema('name', Primitive.STRING, AutoOrPack.AUTO, Metadata_of());
+    const struct = new StructSchema('MyStruct', AutoOrPack.PACK, Metadata_of(), [f1, f2], []);
+    const ref = new StructRef('MyStruct');
+    ref.obj = struct;
+    const result = ValuePack.unpack('42,hello', ref, errs);
+    expect(result).toBeInstanceOf(VStruct);
+    expect((result as VStruct).values.length).toBe(2);
+    expect(((result as VStruct).values[0] as VInt).value).toBe(42);
+    expect(((result as VStruct).values[1] as VString).value).toBe('hello');
+  });
+});
+
+describe('ValuePack.unpackTablePrimaryKey', () => {
+  it('unpacks single primary key (int)', () => {
+    const errs = CfgValueErrs.of();
+    const pkField = new FieldSchema('id', Primitive.INT, AutoOrPack.AUTO, Metadata_of());
+    const pk = new KeySchema(['id']);
+    pk.setFieldSchemas([pkField]);
+    const table = new TableSchema('MyTable', pk, ENo.NO, false, Metadata_of(), [pkField], [], []);
+    const result = ValuePack.unpackTablePrimaryKey('42', table, errs);
+    expect(result).toBeInstanceOf(VInt);
+    expect((result as VInt).value).toBe(42);
+  });
+
+  it('unpacks single primary key (string)', () => {
+    const errs = CfgValueErrs.of();
+    const pkField = new FieldSchema('name', Primitive.STRING, AutoOrPack.AUTO, Metadata_of());
+    const pk = new KeySchema(['name']);
+    pk.setFieldSchemas([pkField]);
+    const table = new TableSchema('MyTable', pk, ENo.NO, false, Metadata_of(), [pkField], [], []);
+    const result = ValuePack.unpackTablePrimaryKey('hello', table, errs);
+    expect(result).toBeInstanceOf(VString);
+    expect((result as VString).value).toBe('hello');
+  });
+
+  it('unpacks multi primary key as VList', () => {
+    const errs = CfgValueErrs.of();
+    const pkField1 = new FieldSchema('id', Primitive.INT, AutoOrPack.AUTO, Metadata_of());
+    const pkField2 = new FieldSchema('name', Primitive.STRING, AutoOrPack.AUTO, Metadata_of());
+    const pk = new KeySchema(['id', 'name']);
+    pk.setFieldSchemas([pkField1, pkField2]);
+    const table = new TableSchema('MyTable', pk, ENo.NO, false, Metadata_of(), [pkField1, pkField2], [], []);
+    // Multi-key: packStr for struct is "42,hello"
+    const result = ValuePack.unpackTablePrimaryKey('42,hello', table, errs);
+    expect(result).toBeInstanceOf(VList);
+    expect((result as VList).valueList.length).toBe(2);
+    expect(((result as VList).valueList[0] as VInt).value).toBe(42);
+    expect(((result as VList).valueList[1] as VString).value).toBe('hello');
   });
 });

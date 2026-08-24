@@ -9,6 +9,7 @@
 
 import {
   type Value,
+  type SimpleValue,
   VList,
   VMap,
   VStruct,
@@ -20,6 +21,19 @@ import {
   VString,
   VText,
 } from './CfgValue';
+import type { CfgValueErrs } from './CfgValueErrs';
+import type { FieldType } from '@cfggen/schema';
+import { AutoOrPack } from '@cfggen/schema';
+import { FieldSchema } from '@cfggen/schema';
+import { StructSchema } from '@cfggen/schema';
+import { StructRef } from '@cfggen/schema';
+import { Metadata_of } from '@cfggen/schema';
+import type { TableSchema } from '@cfggen/schema';
+import { findFieldIndices } from '@cfggen/schema';
+import { DCell } from '@cfggen/data';
+import { HeadRows } from '@cfggen/data';
+import { ValueParser, ParseContext, dummyBlockParser } from './ValueParser';
+import { ValueUtil } from './ValueUtil';
 
 export class ValuePack {
   /**
@@ -85,6 +99,75 @@ export class ValuePack {
     return hasParenthesesAround ? '(' + joined + ')' : joined;
   }
 
-  // unpack() and unpackTablePrimaryKey() will be implemented in T4.2d
-  // after ValueParser is available.
+  // unpack() and unpackTablePrimaryKey() implemented below.
+
+  /**
+   * Unpacks a string into a Value using the given FieldType.
+   * Delegates to ValueParser with pack=true, canBeEmpty=true.
+   */
+  static unpack(content: string, type: FieldType, errs: CfgValueErrs): Value | null {
+    return ValuePack.unpackWithFileName(content, type, '<file>', errs);
+  }
+
+  private static unpackWithFileName(
+    content: string,
+    type: FieldType,
+    fileName: string,
+    errs: CfgValueErrs,
+  ): Value | null {
+    const field = new FieldSchema('<field>', type, AutoOrPack.AUTO, Metadata_of());
+    const parser = new ValueParser(errs, HeadRows.A2_Default, dummyBlockParser);
+    const dCell = DCell.of(content, fileName);
+    return parser.parseField(field, [dCell], field,
+      new ParseContext(fileName, true, true, 0));
+  }
+
+  /**
+   * Unpacks a primary key string into a Value matching the table's primary key schema.
+   * For single-key tables: returns the unpacked primitive value.
+   * For multi-key tables: returns a VList of the struct's field values.
+   */
+  static unpackTablePrimaryKey(id: string, tableSchema: TableSchema, errs: CfgValueErrs): Value | null {
+    const keyFields = tableSchema.primaryKey.fieldSchemas();
+    if (keyFields === null) {
+      throw new Error('primaryKey fieldSchemas not resolved');
+    }
+    const fileName = `<${tableSchema.name()}>`;
+
+    if (keyFields.length === 1) {
+      const pkFieldType = keyFields[0].type;
+      return ValuePack.unpackWithFileName(id, pkFieldType, fileName, errs);
+    }
+
+    // Multi-key: build a temporary struct schema for the key fields
+    const obj = new StructSchema('key', AutoOrPack.AUTO, Metadata_of(), keyFields, []);
+    const ref = new StructRef('key');
+    ref.obj = obj;
+    const unpacked = ValuePack.unpackWithFileName(id, ref, fileName, errs);
+    if (unpacked === null) {
+      return null;
+    }
+
+    const vStruct = unpacked as VStruct;
+    const values: SimpleValue[] = [];
+    for (const value of vStruct.values) {
+      if (ValuePack.isSimpleValue(value)) {
+        values.push(value);
+      } else {
+        throw new Error('multi primary key not simple type, should not happen!');
+      }
+    }
+    return ValueUtil.createList(values);
+  }
+
+  private static isSimpleValue(value: Value): value is SimpleValue {
+    return value instanceof VBool
+      || value instanceof VInt
+      || value instanceof VLong
+      || value instanceof VFloat
+      || value instanceof VString
+      || value instanceof VText
+      || value instanceof VStruct
+      || value instanceof VInterface;
+  }
 }

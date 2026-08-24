@@ -34,6 +34,19 @@ i18n.use(LanguageDetector)
                     connect: 'link',
                     reconnectCurServer: 'reconnect',
 
+                    backendMode: 'Backend mode',
+                    localBackend: 'Local (built-in)',
+                    remoteBackend: 'Remote server',
+                    dataDir: 'Data directory',
+                    selectDataDir: 'Select data directory',
+                    selectDataDirHint: 'Click Browse to select a directory containing config.cfg',
+                    selectDataDirFirst: 'Please select a data directory first',
+                    browse: 'Browse',
+                    startLocalBackend: 'Start backend',
+                    localBackendStarted: 'Local backend started',
+                    localBackendStartFailed: 'Failed to start local backend',
+                    localBackendTip: 'The built-in Java backend will start automatically with the selected data directory. No Java installation required.',
+
                     deleteCurRecord: 'delete cur record',
                     toPng: 'save relation png',
 
@@ -204,7 +217,49 @@ i18n.use(LanguageDetector)
                     structPaste: "Paste",
 
                     lastAccessed: "Access history",
-                    lastModified: "Modify history"
+                    lastModified: "Modify history",
+
+                    // 空数据引导
+                    emptySchemaTitle: 'No configuration tables found',
+                    emptySchemaDesc: 'The data directory has no config.cfg file or it is empty. You can create tables to get started.',
+                    emptySchemaServer: 'Current server',
+                    selectTableHint: 'Please select a table from the dropdown above',
+                    noServerTitle: 'No backend connected',
+                    noServerDesc: 'Go to Settings → Connection to select local deployment or enter a remote server address.',
+
+                    // CFG 文本编辑器
+                    cfgEditor: 'CFG Editor',
+                    cfgEditorTitle: 'Edit Schema (config.cfg)',
+                    cfgEditorLoadFail: 'Failed to load schema text',
+                    cfgEditorSaveSuccess: 'Schema saved successfully',
+                    cfgEditorSaveFail: 'Failed to save schema',
+                    cfgEditorSaving: 'Saving...',
+                    cfgEditorSave: 'Save',
+                    cfgEditorErrors: 'Errors',
+                    cfgEditorConfirmClose: 'There are unsaved changes. Are you sure you want to close?',
+
+                    // 建表
+                    createTableTitle: 'Create Table',
+                    createTableType: 'Type',
+                    createTableTypeTable: 'Table',
+                    createTableTypeStruct: 'Struct',
+                    createTableTypeEnum: 'Enum',
+                    createTableName: 'Name',
+                    createTableNamePlaceholder: 'lowercase name (e.g. item, monster)',
+                    createStructNamePlaceholder: 'name (e.g. Reward, ItemDrop)',
+                    createTableFields: 'Fields',
+                    createTableAddField: 'Add Field',
+                    createTableFieldName: 'field name',
+                    createTableFieldComment: 'comment (optional)',
+                    createTablePrimaryKey: 'Primary Key',
+                    createTablePrimaryKeyHint: 'Select field(s)',
+                    createTableWithDataFile: 'Create data file',
+                    createTableWithDataFileHint: 'Create an empty CSV file with headers',
+                    createTableEnumValues: 'Enum Values',
+                    createTableAddEnumValue: 'Add Value',
+                    createTableEnumValueName: 'enum name',
+                    createTableEnumValueComment: 'comment (optional)',
+                    create: 'Create'
                 }
             },
             zh: {
@@ -230,6 +285,19 @@ i18n.use(LanguageDetector)
                     connectNewServer: '连接新服',
                     connect: '连接',
                     reconnectCurServer: '重连当前服务器',
+
+                    backendMode: '后端模式',
+                    localBackend: '本机部署（内置）',
+                    remoteBackend: '远程服务器',
+                    dataDir: '数据目录',
+                    selectDataDir: '选择数据目录',
+                    selectDataDirHint: '点击浏览选择包含 config.cfg 的目录',
+                    selectDataDirFirst: '请先选择数据目录',
+                    browse: '浏览',
+                    startLocalBackend: '启动后端',
+                    localBackendStarted: '本机后端已启动',
+                    localBackendStartFailed: '本机后端启动失败',
+                    localBackendTip: '内置 Java 后端将使用所选数据目录自动启动，无需安装 Java。',
 
                     recordShowSetting: '显示',
                     behavior: '行为',
@@ -355,6 +423,48 @@ i18n.use(LanguageDetector)
 
                     lastAccessed: '访问历史',
                     lastModified: '修改历史',
+
+                    // 空数据引导
+                    emptySchemaTitle: '当前数据目录没有配置表',
+                    emptySchemaDesc: '数据目录中没有 config.cfg 文件或文件为空。你可以创建配置表来开始使用。',
+                    emptySchemaServer: '当前服务器',
+                    selectTableHint: '请从上方下拉列表中选择一张表',
+                    noServerTitle: '未连接后端',
+                    noServerDesc: '请前往 设置 → 连接 选择本机部署或输入远程服务器地址。',
+
+                    // CFG 文本编辑器
+                    cfgEditor: 'CFG编辑器',
+                    cfgEditorTitle: '编辑 Schema (config.cfg)',
+                    cfgEditorLoadFail: '加载 Schema 文本失败',
+                    cfgEditorSaveSuccess: 'Schema 保存成功',
+                    cfgEditorSaveFail: 'Schema 保存失败',
+                    cfgEditorSaving: '保存中...',
+                    cfgEditorSave: '保存',
+                    cfgEditorErrors: '错误信息',
+                    cfgEditorConfirmClose: '有未保存的修改，确定要关闭吗？',
+
+                    // 建表
+                    createTableTitle: '新建表',
+                    createTableType: '类型',
+                    createTableTypeTable: '表 (table)',
+                    createTableTypeStruct: '结构体 (struct)',
+                    createTableTypeEnum: '枚举 (enum)',
+                    createTableName: '名称',
+                    createTableNamePlaceholder: '全小写名称（如 item、monster）',
+                    createStructNamePlaceholder: '名称（如 Reward、ItemDrop）',
+                    createTableFields: '字段',
+                    createTableAddField: '添加字段',
+                    createTableFieldName: '字段名',
+                    createTableFieldComment: '注释（可选）',
+                    createTablePrimaryKey: '主键',
+                    createTablePrimaryKeyHint: '选择字段',
+                    createTableWithDataFile: '创建数据文件',
+                    createTableWithDataFileHint: '创建仅含表头的空 CSV 文件',
+                    createTableEnumValues: '枚举值',
+                    createTableAddEnumValue: '添加枚举值',
+                    createTableEnumValueName: '枚举名',
+                    createTableEnumValueComment: '注释（可选）',
+                    create: '创建',
 
                     themeSetting: '主题',
                     themeFile: '主题文件',

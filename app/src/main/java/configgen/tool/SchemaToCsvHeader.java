@@ -5,14 +5,14 @@ import configgen.schema.*;
 import java.util.ArrayList;
 import java.util.List;
 
-class SchemaToCsvHeader {
+public class SchemaToCsvHeader {
     private final List<String> commentRow = new ArrayList<>();
     private final List<String> nameRow = new ArrayList<>();
     private boolean isFirstOfField = true;
     private String topLevelName = "";
     private String topLevelComment = "";
 
-    void flattenFields(List<FieldSchema> fields) {
+    public void flattenFields(List<FieldSchema> fields) {
         for (FieldSchema field : fields) {
             isFirstOfField = true;
             topLevelName = field.name();
@@ -120,6 +120,6 @@ class SchemaToCsvHeader {
         isFirstOfField = false;
     }
 
-    List<String> getCommentRow() { return commentRow; }
-    List<String> getNameRow() { return nameRow; }
+    public List<String> getCommentRow() { return commentRow; }
+    public List<String> getNameRow() { return nameRow; }
 }

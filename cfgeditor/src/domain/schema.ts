@@ -25,6 +25,10 @@ export class Schema {
     constructor(public rawSchema: RawSchema) {
         this.isEditable = rawSchema.isEditable;
         this.lastModifiedMap = obj2map(rawSchema.lastModifiedMap);
+        // 防御性 guard：后端异常或网络问题时 items 可能为 null/undefined
+        if (!rawSchema.items) {
+            (this.rawSchema as RawSchema).items = [];
+        }
         this.buildItemMaps();
         this.buildMapEntryTypes();
         this.buildTableIdMaps();

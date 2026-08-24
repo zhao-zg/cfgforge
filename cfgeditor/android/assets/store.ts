@@ -26,12 +26,8 @@ export * from './navigation.ts';
 export const pageEnums = ['table', 'tableRef', 'record', 'recordRef', 'recordUnref'] as const;
 export type PageType = typeof pageEnums[number];
 
-export type BackendMode = 'local' | 'remote';
-
 export type StoreState = {
     server: string;
-    backendMode: BackendMode;
-    localDataDir: string;
     aiConf: AIConf;
     themeConfig: ThemeConfig;
 
@@ -82,8 +78,6 @@ export type StoreState = {
 // → cfgeditor.yml（团队共享）
 const sharedPrefState = {
     server: '',
-    backendMode: 'remote' as BackendMode,
-    localDataDir: '',
     themeConfig: {
         themeFile: '',
     },
@@ -331,18 +325,6 @@ export function setServer(value: string) {
     // 所有 queryKey 都不含 server（queryFn 直接闭包捕获 store.server），不清的话换库后旧库数据
     // 会赖在缓存里直到 staleTime（schema 5min / record 30s）过期才刷新——期间显示错库数据。
     removeAllQueryCache();
-}
-
-export function setBackendMode(value: BackendMode) {
-    store.backendMode = value;
-    setPref('backendMode', value);
-    // 切换模式时清缓存，确保数据从新后端重新加载
-    removeAllQueryCache();
-}
-
-export function setLocalDataDir(value: string) {
-    store.localDataDir = value;
-    setPref('localDataDir', value);
 }
 
 export function setNodeShow(nodeShow: NodeShowType) {

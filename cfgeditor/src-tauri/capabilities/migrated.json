@@ -65,6 +65,7 @@
       ]
     },
     "shell:allow-open",
-    "shell:default"
+    "shell:default",
+    "dialog:default"
   ]
 }

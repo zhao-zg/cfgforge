@@ -6,6 +6,7 @@ import {
     LeftOutlined,
     RightOutlined,
     FileAddOutlined,
+    FileTextOutlined,
     SettingOutlined, BarsOutlined
 } from "@ant-design/icons";
 import {TableList} from "./TableList.tsx";
@@ -28,6 +29,9 @@ import {STable} from "@/api/schemaModel.ts";
 import {useTranslation} from "react-i18next";
 import {memo, useCallback, useMemo} from "react";
 import {toggleFullScreen} from "@/services/windowUtils.ts";
+import {SchemaTextEditor} from "@/features/schema/SchemaTextEditor.tsx";
+import {CreateTableForm} from "@/features/schema/CreateTableForm.tsx";
+import {useState} from "react";
 
 const {Text} = Typography;
 const prevIcon = <LeftOutlined/>;
@@ -47,6 +51,8 @@ export const HeaderBar = memo(function ({schema, curTable}: {
     const {editingCurTable, editingCurId, editingIsEdited} = useMyStore();
     const navigate = useNavigate();
     const {t} = useTranslation();
+    const [cfgEditorOpen, setCfgEditorOpen] = useState(false);
+    const [createTableOpen, setCreateTableOpen] = useState(false);
     useHotkeys('alt+1', () => navigate(navTo('table', curTableId, curId)));
     useHotkeys('alt+2', () => navigate(navTo('tableRef', curTableId, curId)));
     useHotkeys('alt+3', () => navigate(navTo('record', curTableId, curId, isEditMode)));
@@ -126,8 +132,14 @@ export const HeaderBar = memo(function ({schema, curTable}: {
                 {nextId}
             </Space>
 
-            {/* 右段：未引用入口 + 历史导航 */}
+            {/* 右段：新建表 + CFG编辑器 + 未引用入口 + 历史导航 */}
             <Space size="small" align="center">
+                <Tooltip title={t('createTableTitle')}>
+                    <Button size="small" icon={<FileAddOutlined/>} onClick={() => setCreateTableOpen(true)}/>
+                </Tooltip>
+                <Tooltip title={t('cfgEditor')}>
+                    <Button size="small" icon={<FileTextOutlined/>} onClick={() => setCfgEditorOpen(true)}/>
+                </Tooltip>
                 {curTable ? <UnreferencedButton curTable={curTable}/> : null}
                 <Space.Compact>
                     <Button size="small" icon={prevIcon} onClick={prev} title="alt+c"
@@ -136,5 +148,8 @@ export const HeaderBar = memo(function ({schema, curTable}: {
                 </Space.Compact>
             </Space>
         </Flex>
+
+        <SchemaTextEditor open={cfgEditorOpen} onClose={() => setCfgEditorOpen(false)}/>
+        <CreateTableForm open={createTableOpen} onClose={() => setCreateTableOpen(false)}/>
     </div>;
 });

@@ -1,5 +1,5 @@
-import {CSSProperties, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef} from "react";
-import {Alert, Flex, Form, Input, Modal, Splitter,} from "antd";
+import {CSSProperties, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import {Alert, Button, Empty, Flex, Form, Input, Modal, Splitter, Spin, Typography,} from "antd";
 import {useTranslation} from "react-i18next";
 import {Schema} from "@/domain/schema";
 import {
@@ -22,6 +22,7 @@ import {useQuery} from "@tanstack/react-query";
 import {useHotkeys} from "react-hotkeys-hook";
 import {queryKeys} from "@/services/queryKeys.ts";
 import {HeaderBar} from "@/features/headerbar/HeaderBar";
+import {CreateTableForm} from "@/features/schema/CreateTableForm";
 import {FlowGraph} from "@/flow/FlowGraph";
 import {FlowStyleManager} from "@/flow/FlowStyleManager";
 import {Finder} from "@/features/finder/Finder";
@@ -99,6 +100,7 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
 
     const {t} = useTranslation();
     const ref = useRef<HTMLDivElement>(null)
+    const [createTableOpen, setCreateTableOpen] = useState(false);
 
     // alt+s「提交」全局命令：单实例根注册唯一监听，直达当前编辑会话的 submit()。
     // funcSubmit 字段（仅根 STable 追加）唯一逻辑即 session.submit()（见 recordEditEntityCreator.ts），
@@ -114,6 +116,8 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
         queryFn: ({signal}) => fetchSchema(server, signal),
         staleTime: 1000 * 60 * 5,
         select: schemaSelector,
+        // server 为空（桌面端首次启动、未配置连接）时跳过查询，避免请求落到 tauri://localhost 返回 HTML
+        enabled: !!server,
     })
 
     const {data: notes} = useQuery({
@@ -121,6 +125,7 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
         queryFn: ({signal}) => fetchNotes(server, signal),
         staleTime: 1000 * 60 * 5,
         select: notesToMap,
+        enabled: !!server,
     })
 
 
@@ -151,10 +156,35 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
     }, [server]);
 
     let content;
-    if ((!schema) || curTable == null) {
-        // console.log("empty content");
-        content = <></>
-    } else {
+    if (!server) {
+        // 桌面端首次启动 / 未配置连接：引导用户去设置页选择本机部署或远程服务器
+        content = <Flex justify="center" align="center" vertical gap="middle" style={fullDivStyle}>
+            <Empty description={false}/>
+            <Typography.Title level={4}>{t('noServerTitle')}</Typography.Title>
+            <Typography.Text type="secondary">{t('noServerDesc')}</Typography.Text>
+        </Flex>;
+    } else if (isLoading && !schema) {
+        // 加载中：居中 Spin
+        content = <Flex justify="center" align="center" style={fullDivStyle}>
+            <Spin size="large"/>
+        </Flex>;
+    } else if (schema && schema.itemMap.size === 0) {
+        // 空 schema：数据目录无 config.cfg 或文件为空，显示引导提示
+        content = <Flex justify="center" align="center" vertical gap="middle" style={fullDivStyle}>
+            <Empty description={false}/>
+            <Typography.Title level={4}>{t('emptySchemaTitle')}</Typography.Title>
+            <Typography.Text type="secondary">{t('emptySchemaDesc')}</Typography.Text>
+            <Button type="primary" onClick={() => setCreateTableOpen(true)}>
+                {t('createTableTitle')}
+            </Button>
+            <Typography.Text type="secondary">{t('emptySchemaServer')}: {server}</Typography.Text>
+        </Flex>;
+    } else if (schema && curTable == null) {
+        // 有表但未选中：提示从下拉列表选择
+        content = <Flex justify="center" align="center" style={fullDivStyle}>
+            <Typography.Text type="secondary">{t('selectTableHint')}</Typography.Text>
+        </Flex>;
+    } else if (schema && curTable != null) {
         let dragPage = null;
         if (dragPanel == 'recordRef') {
             dragPage = <RefPageInFlow schema={schema} notes={notes} curTable={curTable} curTableId={curTableId}
@@ -239,6 +269,7 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
             </Flex>
         </Modal>
 
+        <CreateTableForm open={createTableOpen} onClose={() => setCreateTableOpen(false)}/>
 
     </div>
         ;

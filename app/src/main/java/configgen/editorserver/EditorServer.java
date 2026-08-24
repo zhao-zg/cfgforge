@@ -1,14 +1,19 @@
 package configgen.editorserver;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONObject;
 import com.sun.net.httpserver.*;
 import configgen.ctx.*;
 import configgen.gen.GeneratorWithTag;
 import configgen.gen.WatchAndPostRun;
 import configgen.gen.Parameter;
+import configgen.schema.CfgFileInfo;
 import configgen.schema.TableSchemaRefGraph;
 import configgen.value.SearchService;
 import configgen.value.CfgValue;
+
+import static configgen.editorserver.SchemaWriteService.*;
+import static configgen.editorserver.TableCreateService.*;
 
 import java.io.*;
 import java.net.InetAddress;
@@ -96,6 +101,12 @@ public class EditorServer extends GeneratorWithTag {
         handle("/record", this::handleRecord);
         handle("/recordAddOrUpdate", this::handleRecordAddOrUpdate);
         handle("/recordDelete", this::handleRecordDelete);
+
+        handle("/schemaText", this::handleSchemaText);
+        handle("/schemaWrite", this::handleSchemaWrite);
+
+        handle("/createTable", this::handleCreateTable);
+        handle("/createDataFile", this::handleCreateDataFile);
 
         server.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
         server.start();
@@ -290,6 +301,97 @@ public class EditorServer extends GeneratorWithTag {
         String raw = new String(bytes, StandardCharsets.UTF_8);
 
         CheckJsonResult result = CheckJsonService.checkJson(state.cfgValue(), table, raw);
+        sendResponse(exchange, result);
+    }
+
+    private void handleSchemaText(HttpExchange exchange) throws IOException {
+        State st = state;
+        java.util.Collection<CfgFileInfo> cfgFiles = st.context().sourceStructure().getCfgFiles();
+        SchemaText result = SchemaWriteService.readSchemaText(st.context().rootDir(), new java.util.ArrayList<>(cfgFiles));
+        sendResponse(exchange, result);
+    }
+
+    private void handleSchemaWrite(HttpExchange exchange) throws IOException {
+        if (!checkPostMethod(exchange)) {
+            return;
+        }
+        String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
+        if (contentType == null || !contentType.toLowerCase(Locale.ROOT).contains("text/plain")) {
+            sendError(exchange, 415, "Content-Type must be text/plain");
+            return;
+        }
+
+        byte[] bytes = exchange.getRequestBody().readAllBytes();
+        String cfgText = new String(bytes, StandardCharsets.UTF_8);
+
+        SchemaWriteResult result;
+        synchronized (this) {
+            State st = state;
+            result = SchemaWriteService.writeSchemaText(st.context().rootDir(), cfgText);
+            if (result.ok()) {
+                // 写回成功后重新加载上下文，重建 State
+                initFromCtx(new Context(st.context().contextCfg()));
+            }
+        }
+        sendResponse(exchange, result);
+    }
+
+    private void handleCreateTable(HttpExchange exchange) throws IOException {
+        if (!checkPostMethod(exchange)) {
+            return;
+        }
+        String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
+        if (contentType == null || !contentType.toLowerCase(Locale.ROOT).contains("application/json")) {
+            sendError(exchange, 415, "Content-Type must be application/json");
+            return;
+        }
+
+        byte[] bytes = exchange.getRequestBody().readAllBytes();
+        String jsonStr = new String(bytes, StandardCharsets.UTF_8);
+        JSONObject request;
+        try {
+            request = JSON.parseObject(jsonStr);
+        } catch (Exception e) {
+            sendError(exchange, 400, "Invalid JSON body: " + e.getMessage());
+            return;
+        }
+        if (request == null) {
+            sendError(exchange, 400, "Invalid JSON body");
+            return;
+        }
+
+        CreateResult result;
+        synchronized (this) {
+            State st = state;
+            // 读取当前 schema 文本
+            java.util.Collection<CfgFileInfo> cfgFiles = st.context().sourceStructure().getCfgFiles();
+            SchemaText schemaText = SchemaWriteService.readSchemaText(st.context().rootDir(), new java.util.ArrayList<>(cfgFiles));
+            // 调用建表服务
+            result = TableCreateService.createTable(st.context().rootDir(), schemaText.text(), request);
+            if (result.ok()) {
+                // 重建上下文
+                initFromCtx(new Context(st.context().contextCfg()));
+            }
+        }
+        sendResponse(exchange, result);
+    }
+
+    private void handleCreateDataFile(HttpExchange exchange) throws IOException {
+        if (!checkPostMethod(exchange)) {
+            return;
+        }
+        Map<String, String> query = queryToMap(exchange.getRequestURI().getQuery());
+        String tableName = query.get("table");
+
+        CreateResult result;
+        synchronized (this) {
+            State st = state;
+            result = TableCreateService.createDataFile(st.context().rootDir(), tableName);
+            if (result.ok()) {
+                // 重建上下文
+                initFromCtx(new Context(st.context().contextCfg()));
+            }
+        }
         sendResponse(exchange, result);
     }
 

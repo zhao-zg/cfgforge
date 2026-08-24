@@ -6,3 +6,4 @@ export * from './ValueParser';
 export * from './VTableCreator';
 export * from './VTableBlockParser';
 export * from './VTableParser';
+export * from './ValueDefault';

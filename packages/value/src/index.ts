@@ -11,3 +11,7 @@ export * from './ValueJsonParser';
 export * from './VTableJsonParser';
 export * from './ForeachVStruct';
 export * from './RefValidator';
+export * from './ForeachValue';
+export * from './LangTextFinder';
+export * from './ValueEnv';
+export * from './TextValue';

@@ -19,3 +19,6 @@ export * from './CfgValueParser';
 export * from './ValueRefCollector';
 export * from './ValueToJson';
 export * from './ValueToCsv';
+export * from './ValueRefInCollector';
+export * from './EntryRecordCollector';
+export * from './UnreferencedRecordCollector';

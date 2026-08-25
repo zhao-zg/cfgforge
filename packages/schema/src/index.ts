@@ -72,3 +72,5 @@ export type { CfgFileInfo } from './CfgSchemas';
 export { XmlReader } from './cfg/XmlReader';
 export type { XmlElement } from './cfg/XmlReader';
 export { CfgUtil } from './cfg/CfgUtil';
+export { TableSchemaRefGraph } from './TableSchemaRefGraph';
+export type { Refs } from './TableSchemaRefGraph';

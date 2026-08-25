@@ -25,7 +25,7 @@ const unknownChecker: Checker = () => CheckResult.Unknown;
 
 export function findAllIncludedStructs(nameable: Nameable): Map<string, Nameable> {
   const result = new Map<string, Nameable>();
-  checkAnyOk(nameable, unknownChecker, result);
+  checkAnyOkInternal(nameable, unknownChecker, result);
   return result;
 }
 

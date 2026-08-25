@@ -27,3 +27,4 @@ export { PromptGen } from './PromptGen';
 export type { Prompt } from './PromptGen';
 export { ByAIGenerator } from './ByAIGenerator';
 export { TsSchemaGenerator } from './TsSchemaGenerator';
+export { GenPipeline } from './GenPipeline';

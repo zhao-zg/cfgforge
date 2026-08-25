@@ -9,9 +9,21 @@
  *   test the extension-based dispatch logic)
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
+import * as fs from 'fs';
+import * as path from 'path';
 import { TableFileLocator } from '../TableFileLocator';
+import { CsvTableFile } from '../storages/CsvTableFile';
+import { ExcelTableFile } from '../storages/ExcelTableFile';
 import { DCell, DRowId, DRawSheet, DCellList, DTable } from '@cfggen/data';
+
+const TEMP_DIR = path.join(__dirname, '..', '..', '..', '..', '.temp', 'write-locator-tests');
+
+function ensureTempDir(): void {
+  if (!fs.existsSync(TEMP_DIR)) {
+    fs.mkdirSync(TEMP_DIR, { recursive: true });
+  }
+}
 
 describe('TableFileLocator', () => {
   describe('getLocFromRecord', () => {
@@ -76,6 +88,53 @@ describe('TableFileLocator', () => {
     it('throws when rawSheets is empty', () => {
       const table = new DTable('test', [], [], [], null);
       expect(() => TableFileLocator.getSheetFromDTable(table)).toThrow();
+    });
+  });
+
+  describe('createTableFile', () => {
+    beforeEach(() => { ensureTempDir(); });
+    afterEach(() => {
+      if (fs.existsSync(TEMP_DIR)) {
+        const files = fs.readdirSync(TEMP_DIR);
+        for (const f of files) {
+          if (f.startsWith('tf-')) {
+            fs.unlinkSync(path.join(TEMP_DIR, f));
+          }
+        }
+      }
+    });
+
+    it('creates a CsvTableFile for .csv files', async () => {
+      const csvPath = path.join(TEMP_DIR, 'tf-test.csv');
+      fs.writeFileSync(csvPath, 'comment\nname,age\nAlice,30\n', 'utf-8');
+
+      const tf = await TableFileLocator.createTableFile(
+        'tf-test.csv', '', TEMP_DIR, 2, 'UTF-8', false,
+      );
+      expect(tf).toBeInstanceOf(CsvTableFile);
+    });
+
+    it('creates an ExcelTableFile for .xlsx files', async () => {
+      // Create a minimal xlsx using ExcelJS
+      const ExcelJS = (await import('exceljs')).default;
+      const xlsxPath = path.join(TEMP_DIR, 'tf-test.xlsx');
+      const wb = new ExcelJS.Workbook();
+      const ws = wb.addWorksheet('Sheet1');
+      ws.getRow(1).getCell(1).value = 'comment';
+      ws.getRow(2).getCell(1).value = 'name';
+      ws.getRow(3).getCell(1).value = 'Alice';
+      await wb.xlsx.writeFile(xlsxPath);
+
+      const tf = await TableFileLocator.createTableFile(
+        'tf-test.xlsx', 'Sheet1', TEMP_DIR, 2, 'UTF-8', false,
+      );
+      expect(tf).toBeInstanceOf(ExcelTableFile);
+    });
+
+    it('throws for unsupported file types', async () => {
+      await expect(
+        TableFileLocator.createTableFile('test.json', '', TEMP_DIR, 2, 'UTF-8', false),
+      ).rejects.toThrow('Unsupported file type');
     });
   });
 });

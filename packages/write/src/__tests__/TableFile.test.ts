@@ -24,7 +24,7 @@ class MockTableFile implements TableFile {
     this.insertCalls.push({ startRow, emptyRowCount, content });
   }
 
-  saveAndClose(): void {
+  async saveAndClose(): Promise<void> {
     this.saved = true;
   }
 }
@@ -55,10 +55,10 @@ describe('TableFile interface (mock)', () => {
     expect(f.insertCalls[0].emptyRowCount).toBe(0);
   });
 
-  it('saveAndClose marks saved', () => {
+  it('saveAndClose marks saved', async () => {
     const f = new MockTableFile();
     expect(f.saved).toBe(false);
-    f.saveAndClose();
+    await f.saveAndClose();
     expect(f.saved).toBe(true);
   });
 });

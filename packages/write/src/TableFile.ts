@@ -29,6 +29,7 @@ export interface TableFile {
 
   /**
    * Save the file and close resources.
+   * Returns a Promise because ExcelJS writes are async.
    */
-  saveAndClose(): void;
+  saveAndClose(): Promise<void>;
 }

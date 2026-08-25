@@ -9,8 +9,13 @@
   },
   "dependencies": {
     "@cfggen/context": "workspace:*",
+    "@cfggen/editor-core": "workspace:*",
+    "@cfggen/gen": "workspace:*",
     "@cfggen/shared": "workspace:*",
-    "@cfggen/editor-core": "workspace:*"
+    "@cfggen/value": "workspace:*",
+    "@cfggen/write": "workspace:*",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
   },
   "main": "./src/index.ts",
   "private": true

@@ -14,6 +14,20 @@
 
 import type { Generator } from '@cfggen/gen';
 import { Generators } from '@cfggen/gen';
+import {
+  JavaCodeGenerator,
+  CsCodeGenerator,
+  BytesGenerator,
+  LuaCodeGenerator,
+  TsCodeGenerator,
+  GoCodeGenerator,
+  GdCodeGenerator,
+  TsSchemaGenerator,
+  JsonGenerator,
+  I18nByValueGenerator,
+  I18nByIdGenerator,
+  ByAIGenerator,
+} from '@cfggen/gen';
 import { Context, ContextCfg, ExplicitDir } from '@cfggen/context';
 import { HeadRows } from '@cfggen/data';
 import type { HeadRow } from '@cfggen/data';
@@ -42,88 +56,27 @@ interface NamedGenerator {
 }
 
 /**
- * Register all generator providers.
- * Tools are not registered here — they are registered by the caller
- * (or by registerAllProviders if tools are available).
- *
- * Note: In the current TS port, only generators that have been migrated
- * are registered. verify/search (ValueVerifyTool/ValueInspectTool) are
- * not yet ported, so they're skipped. server/mcpserver are also skipped
- * (they belong to editor-core/mcp packages, not CLI).
- */
-export function registerGeneratorProviders(): void {
-  // Import generator implementations lazily to avoid circular deps
-  import('@cfggen/gen').then((gen) => {
-    Generators.addProvider('java', (p) => new gen.JavaCodeGenerator(p));
-    Generators.addProvider('cs', (p) => new gen.CsCodeGenerator(p));
-    Generators.addProvider('bytes', (p) => new gen.BytesGenerator(p));
-    Generators.addProvider('lua', (p) => new gen.LuaCodeGenerator(p));
-    Generators.addProvider('ts', (p) => new gen.TsCodeGenerator(p));
-    Generators.addProvider('go', (p) => new gen.GoCodeGenerator(p));
-    Generators.addProvider('gd', (p) => new gen.GdCodeGenerator(p));
-    Generators.addProvider('tsschema', (p) => new gen.TsSchemaGenerator(p));
-    Generators.addProvider('json', (p) => new gen.JsonGenerator(p));
-    Generators.addProvider('i18n', (p) => new gen.I18nByValueGenerator(p));
-    Generators.addProvider('i18nbyid', (p) => new gen.I18nByIdGenerator(p));
-    Generators.addProvider('byai', (p) => new gen.ByAIGenerator(p));
-  });
-}
-
-/**
  * Register all providers (generators only in current TS port).
  * Tools need to be registered separately when their TS implementations
  * become available.
+ *
+ * Note: verify/search (ValueVerifyTool/ValueInspectTool) are not yet
+ * ported, so they're skipped. server/mcpserver belong to editor-core/mcp
+ * packages and are also skipped.
  */
 export function registerAllProviders(): void {
-  // Generators
-  Generators.addProvider('java', (p) => {
-    const { JavaCodeGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new JavaCodeGenerator(p);
-  });
-  Generators.addProvider('cs', (p) => {
-    const { CsCodeGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new CsCodeGenerator(p);
-  });
-  Generators.addProvider('bytes', (p) => {
-    const { BytesGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new BytesGenerator(p);
-  });
-  Generators.addProvider('lua', (p) => {
-    const { LuaCodeGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new LuaCodeGenerator(p);
-  });
-  Generators.addProvider('ts', (p) => {
-    const { TsCodeGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new TsCodeGenerator(p);
-  });
-  Generators.addProvider('go', (p) => {
-    const { GoCodeGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new GoCodeGenerator(p);
-  });
-  Generators.addProvider('gd', (p) => {
-    const { GdCodeGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new GdCodeGenerator(p);
-  });
-  Generators.addProvider('tsschema', (p) => {
-    const { TsSchemaGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new TsSchemaGenerator(p);
-  });
-  Generators.addProvider('json', (p) => {
-    const { JsonGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new JsonGenerator(p);
-  });
-  Generators.addProvider('i18n', (p) => {
-    const { I18nByValueGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new I18nByValueGenerator(p);
-  });
-  Generators.addProvider('i18nbyid', (p) => {
-    const { I18nByIdGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new I18nByIdGenerator(p);
-  });
-  Generators.addProvider('byai', (p) => {
-    const { ByAIGenerator } = require('@cfggen/gen') as typeof import('@cfggen/gen');
-    return new ByAIGenerator(p);
-  });
+  Generators.addProvider('java', (p) => new JavaCodeGenerator(p));
+  Generators.addProvider('cs', (p) => new CsCodeGenerator(p));
+  Generators.addProvider('bytes', (p) => new BytesGenerator(p));
+  Generators.addProvider('lua', (p) => new LuaCodeGenerator(p));
+  Generators.addProvider('ts', (p) => new TsCodeGenerator(p));
+  Generators.addProvider('go', (p) => new GoCodeGenerator(p));
+  Generators.addProvider('gd', (p) => new GdCodeGenerator(p));
+  Generators.addProvider('tsschema', (p) => new TsSchemaGenerator(p));
+  Generators.addProvider('json', (p) => new JsonGenerator(p));
+  Generators.addProvider('i18n', (p) => new I18nByValueGenerator(p));
+  Generators.addProvider('i18nbyid', (p) => new I18nByIdGenerator(p));
+  Generators.addProvider('byai', (p) => new ByAIGenerator(p));
 }
 
 function formatException(t: unknown): string {

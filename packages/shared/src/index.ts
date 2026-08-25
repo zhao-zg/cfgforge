@@ -1,6 +1,8 @@
 // @cfggen/shared - Shared utilities for cfggen
 // All exports from this package
 
+export * from './CfgFileSystem';
+export * from './NodeFileSystem';
 export * from './FileNameUtil';
 export * from './StringUtil';
 export * from './ListParser';

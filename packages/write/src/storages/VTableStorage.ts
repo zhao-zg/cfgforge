@@ -17,7 +17,7 @@
  */
 
 import type { Context } from '@cfggen/context';
-import { VTable, VStruct, VInterface, VList, VMap, type Value } from '@cfggen/value';
+import { VTable, VStruct, VInterface, VList, VMap, type Value, valueEquals } from '@cfggen/value';
 import type { DTable, DRawSheet, DRowId, Source } from '@cfggen/data';
 import { DCell, DCellList } from '@cfggen/data';
 import { TableFileLocator } from '../TableFileLocator';
@@ -59,7 +59,14 @@ export class VTableStorage {
   ): Promise<DRawSheet> {
     const block = VTableStorage.mapToBlockFn(newRecord);
 
-    const oldRecord = vTable.primaryKeyMap.get(pkValue);
+    // Find old record using valueEquals (TS Map.get uses ===, Java Map.get uses Value.equals)
+    let oldRecord: VStruct | undefined;
+    for (const [k, v] of vTable.primaryKeyMap) {
+      if (valueEquals(k, pkValue)) {
+        oldRecord = v;
+        break;
+      }
+    }
 
     let tableFile: TableFile;
     let startRow: number;

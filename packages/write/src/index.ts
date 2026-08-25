@@ -8,3 +8,5 @@ export { VTableJsonStorage } from './storages/VTableJsonStorage';
 export { RecordBlockMapper } from './RecordBlockMapper';
 export { ValueToSepStr } from './ValueToSepStr';
 export { ValueUpdater } from './ValueUpdater';
+export { AddOrUpdateService, AddOrUpdateErrorCode, AddOrUpdateRecordResult } from './AddOrUpdateService';
+export { DeleteService, DeleteErrorCode, DeleteRecordResult } from './DeleteService';

@@ -5,3 +5,4 @@ export { GeneratorWithTag } from './GeneratorWithTag';
 export { Generators } from './Generators';
 export type { GeneratorProvider } from './Generators';
 export { JsonGenerator } from './JsonGenerator';
+export { TsCodeGenerator } from './TsCodeGenerator';

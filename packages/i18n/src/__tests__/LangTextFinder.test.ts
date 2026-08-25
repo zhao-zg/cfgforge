@@ -74,12 +74,25 @@ describe('LangTextFinder', () => {
       expect(actorFinder!.findText('1', ['desc'], 'desc')).toBe('描述');
     });
 
-    it('throws for directory path (byId not yet implemented)', () => {
-      // Create a directory (simulate byId path)
-      const dirPath = path.join(tmpDir, 'langdir');
-      fs.mkdirSync(dirPath);
+    it('reads directory path → byId strategy (TextByIdFinder)', () => {
+      // Create a language directory with an xlsx file
+      const langDir = path.join(tmpDir, 'zh_cn');
+      fs.mkdirSync(langDir);
+      const xlsxPath = path.join(langDir, 'actor.xlsx');
+      const XLSX = require('xlsx');
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([
+        ['id', 'hello', 't(name)'],
+        ['1', 'hello', '你好'],
+      ]);
+      XLSX.utils.book_append_sheet(wb, ws, 'sheet1');
+      XLSX.writeFile(wb, xlsxPath);
 
-      expect(() => LangTextFinder.read(dirPath)).toThrow('not yet implemented');
+      const ltf = LangTextFinder.read(langDir);
+
+      const actorFinder = ltf.getTextFinder('actor.sheet1');
+      expect(actorFinder).not.toBeNull();
+      expect(actorFinder!.findText('1', ['name'], 'hello')).toBe('你好');
     });
 
     it('throws for non-existent path', () => {

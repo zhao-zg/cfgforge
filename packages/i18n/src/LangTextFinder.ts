@@ -9,6 +9,7 @@
 
 import * as fs from 'fs';
 import { TextByValueFinder } from './TextByValueFinder';
+import { TextByIdFinder } from './TextByIdFinder';
 
 // ---------------------------------------------------------------------------
 // TextVisitor — visit (original, translated) pairs
@@ -56,16 +57,14 @@ export class LangTextFinder {
 
   /**
    * Read a LangTextFinder from a path.
-   * If path is a directory → byId strategy (TextByIdFinder, not yet ported).
+   * If path is a directory → byId strategy (TextByIdFinder, xlsx).
    * If path is a file → byValue strategy (TextByValueFinder, CSV).
    */
   static read(filePath: string): LangTextFinder {
     const stat = fs.statSync(filePath);
     if (stat.isDirectory()) {
       // byId strategy: directory of xlsx files per language
-      // TextByIdFinder not yet ported to TS — will be implemented when
-      // xlsx reading library is integrated.
-      throw new Error('TextByIdFinder (byId strategy) not yet implemented');
+      return TextByIdFinder.loadOneLang(filePath);
     } else {
       // byValue strategy: single CSV file
       return TextByValueFinder.loadOneLang(filePath);

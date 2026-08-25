@@ -11,6 +11,7 @@
 import * as fs from 'fs';
 import { LangTextFinder } from './LangTextFinder';
 import { TextByValueFinder } from './TextByValueFinder';
+import { TextByIdFinder } from './TextByIdFinder';
 
 export class LangSwitchable {
   readonly langMap: Map<string, LangTextFinder>;
@@ -49,12 +50,12 @@ export class LangSwitchable {
   /**
    * Read a LangSwitchable from a directory.
    * - If any entry in the directory is itself a directory → byId strategy
-   *   (TextByIdFinder, not yet ported → throws).
+   *   (TextByIdFinder, xlsx files).
    * - Otherwise → byValue strategy (CSV files).
    */
   static read(dir: string, defaultLang: string): LangSwitchable {
     const langMap = LangSwitchable.isById(dir)
-      ? throwByIdNotImplemented()
+      ? TextByIdFinder.loadMultiLang(dir)
       : TextByValueFinder.loadMultiLang(dir);
     return new LangSwitchable(langMap, defaultLang);
   }
@@ -66,8 +67,4 @@ export class LangSwitchable {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     return entries.some((e) => e.isDirectory());
   }
-}
-
-function throwByIdNotImplemented(): Map<string, LangTextFinder> {
-  throw new Error('TextByIdFinder (byId strategy) not yet implemented');
 }

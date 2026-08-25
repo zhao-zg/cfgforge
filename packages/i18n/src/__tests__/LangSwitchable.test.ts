@@ -101,12 +101,27 @@ describe('LangSwitchable', () => {
       expect(enFinder.getTextFinder('actor')!.findText('1', ['name'], 'name')).toBe('Name');
     });
 
-    it('throws for byId strategy (directory with subdirectory)', () => {
-      // Create a subdirectory → triggers byId detection
-      const subDir = path.join(tmpDir, 'en_us');
-      fs.mkdirSync(subDir);
+    it('reads byId strategy (directory with subdirectory)', () => {
+      // Create a language directory with xlsx files
+      const zhDir = path.join(tmpDir, 'zh_cn');
+      fs.mkdirSync(zhDir);
+      const xlsxPath = path.join(zhDir, 'actor.xlsx');
+      const XLSX = require('xlsx');
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.aoa_to_sheet([
+        ['id', 'hello', 't(name)'],
+        ['1', 'hello', '你好'],
+      ]);
+      XLSX.utils.book_append_sheet(wb, ws, 'sheet1');
+      XLSX.writeFile(wb, xlsxPath);
 
-      expect(() => LangSwitchable.read(tmpDir, 'zh_cn')).toThrow('not yet implemented');
+      const ls = LangSwitchable.read(tmpDir, 'zh_cn');
+
+      expect(ls.defaultLang).toBe('zh_cn');
+      expect(ls.languageCount()).toBe(2); // zh_cn(default) + zh_cn
+
+      const zhFinder = ls.langMap.get('zh_cn')!;
+      expect(zhFinder.getTextFinder('actor.sheet1')!.findText('1', ['name'], 'hello')).toBe('你好');
     });
   });
 });

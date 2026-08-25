@@ -8,8 +8,10 @@
     "build": "tsc"
   },
   "dependencies": {
+    "@cfggen/schema": "workspace:*",
     "@cfggen/shared": "workspace:*",
-    "@cfggen/schema": "workspace:*"
+    "exceljs": "^4.4.0",
+    "xlsx": "^0.18.5"
   },
   "main": "./src/index.ts",
   "private": true

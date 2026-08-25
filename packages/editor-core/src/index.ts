@@ -55,3 +55,10 @@ export type {
   PromptResult,
   PromptResultCode,
 } from './PromptService';
+export { NoteEditService } from './NoteEditService';
+export type {
+  Note,
+  Notes,
+  NoteEditResult,
+  NoteResultCode,
+} from './NoteEditService';

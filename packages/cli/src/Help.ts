@@ -1,0 +1,76 @@
+/**
+ * Help — TypeScript port of Java `configgen.gen.Help`.
+ *
+ * Prints CLI usage information including all registered tools and generators
+ * with their parameter contracts (collected via ParameterInfoCollector).
+ */
+
+import { Generators } from '@cfggen/gen';
+import { Logger, LocaleUtil } from '@cfggen/shared';
+import { Tools } from './Tools';
+import { ParameterInfoCollector } from './ParameterInfoCollector';
+
+export function printHelp(reason?: string | null): void {
+  if (reason !== null && reason !== undefined && reason.trim().length > 0) {
+    Logger.log(reason);
+  }
+
+  Logger.log('Usage: cfggen [options] [-tool toolName[,param=value...]] -datadir <dir> [-gen genName[,param=value...]]');
+  Logger.log('');
+  Logger.log('   or: cfggen [-h] (print help)');
+  Logger.log('');
+  Logger.log('Parameters can be in any order, but -datadir is required when using generators.');
+  Logger.log(LocaleUtil.getLocaleString('Usage.ToolGenStart',
+    'parameters in tool/gen are separated by , and the parameter name and parameter value are separated = or :.'));
+
+  Logger.log('');
+  Logger.log('-----language & logging options');
+  Logger.log('    -locale           ' + LocaleUtil.getLocaleString('Usage.Locale', 'locale, default system locale'));
+  Logger.log('    -v                ' + LocaleUtil.getLocaleString('Usage.V', 'verbose level 1, print statistic & warning'));
+  Logger.log('    -vv               ' + LocaleUtil.getLocaleString('Usage.VV', 'verbose level 2, print extra info'));
+  Logger.log('    -p                ' + LocaleUtil.getLocaleString('Usage.P', 'profiler, print memory usage & time elapsed'));
+  Logger.log('    -pp               ' + LocaleUtil.getLocaleString('Usage.PP', 'profiler, gc before print memory usage'));
+  Logger.log('    -nowarn           ' + LocaleUtil.getLocaleString('Usage.NOWARN', 'do not print warning'));
+  Logger.log('    -weakwarn         ' + LocaleUtil.getLocaleString('Usage.WEAKWARN', 'print weak warning'));
+
+  Logger.log('');
+  Logger.log('-----tools');
+  for (const [k, v] of Tools.getAllProviders()) {
+    const info = new ParameterInfoCollector('tool', k);
+    v(info);
+    info.print();
+  }
+
+  Logger.log('');
+  Logger.log('-----schema & data');
+  Logger.log('    -datadir          ' + LocaleUtil.getLocaleString('Usage.DataDir',
+    'configuration data directory, must contains file:config.cfg'));
+  Logger.log('    -headrow          ' + LocaleUtil.getLocaleString('Usage.HeadRow',
+    'csv/txt/excel file head row type, default 2'));
+  Logger.log('    -encoding         ' + LocaleUtil.getLocaleString('Usage.Encoding',
+    'csv/txt encoding, default GBK, if csv file has BOM head, use that encoding'));
+  Logger.log('    -asroot           ' + LocaleUtil.getLocaleString('Usage.AsRoot',
+    'ExplicitDir.txtAsTsvFileInThisDirAsInRoot_To_AddTag_Map, default null'));
+  Logger.log('    -exceldirs        ' + LocaleUtil.getLocaleString('Usage.ExcelDirs',
+    'ExplicitDir.excelFileDirs, default null'));
+  Logger.log('    -jsondirs         ' + LocaleUtil.getLocaleString('Usage.JsonDirs',
+    'ExplicitDir.jsonFileDirs, default null'));
+
+  Logger.log('');
+  Logger.log('-----i18n support');
+  Logger.log('    -i18nfile         ' + LocaleUtil.getLocaleString('Usage.I18nFile',
+    'two choices: 1,csv file use original str as Id per table. 2,directory,has multiply xlsx file and use pk&fieldChain as Id per table. default null'));
+  Logger.log('    -langswitchdir    ' + LocaleUtil.getLocaleString('Usage.LangSwitchDir',
+    'language switch support'));
+  Logger.log('    -defaultlang      ' + LocaleUtil.getLocaleString('Usage.DefaultLang',
+    'the default language when use lang switch'));
+
+  Logger.log('');
+  Logger.log('');
+  Logger.log('-----generators');
+  for (const [k, v] of Generators.getAllProviders()) {
+    const info = new ParameterInfoCollector('gen', k);
+    v(info);
+    info.print();
+  }
+}

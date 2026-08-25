@@ -12,3 +12,6 @@ export { JavaCodeGenerator } from './JavaCodeGenerator';
 export { LuaCodeGenerator } from './LuaCodeGenerator';
 export { GdCodeGenerator } from './GdCodeGenerator';
 export { BytesGenerator } from './BytesGenerator';
+export { I18nByValueGenerator } from './I18nByValueGenerator';
+export { I18nByIdGenerator } from './I18nByIdGenerator';
+export { LangText } from './LangText';

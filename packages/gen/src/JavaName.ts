@@ -29,6 +29,7 @@ import {
   Primitive,
   isPrimitive,
   isStructRef,
+  isSimpleType,
   isFList,
   isFMap,
   isRefPrimary,
@@ -132,7 +133,9 @@ export function refTypeFromFK(fk: ForeignKeySchema): string {
   // RefSimple (RefPrimary or RefUniq)
   const firstLocal = fk.key.fieldSchemas()![0];
   const firstType = firstLocal.type;
-  if (isPrimitive(firstType)) {
+  // Java's switch matches SimpleType (which includes both Primitive and StructRef).
+  // TS must check both since a foreign key field can be a struct ref (e.g. LevelRank).
+  if (isSimpleType(firstType)) {
     return refType(refTable);
   }
   if (isFList(firstType)) {

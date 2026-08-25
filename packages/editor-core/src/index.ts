@@ -23,3 +23,8 @@ export type {
   UnreferencedRecordsResult,
   RecordResponse,
 } from './RecordService';
+export { RecordEditService } from './RecordEditService';
+export type {
+  EditResultCode,
+  RecordEditResult,
+} from './RecordEditService';

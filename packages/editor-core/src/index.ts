@@ -33,3 +33,8 @@ export type {
   RecordRefId,
   RecordRefIdsResult,
 } from './RecordRefIdsService';
+export { SchemaWriteService } from './SchemaWriteService';
+export type {
+  SchemaTextResult,
+  SchemaWriteResult,
+} from './SchemaWriteService';

@@ -64,6 +64,16 @@ export class CfgWriter {
     return writer.destination.join('');
   }
 
+  /**
+   * Stringify a single Nameable (struct/interface/table) to CFG text.
+   * Used by genbyai TableRelatedInfoFinder.findRelatedCfgStr.
+   */
+  static stringifyNamable(item: Nameable): string {
+    const writer = new CfgWriter(false, false);
+    writer.writeNamable(item, '');
+    return writer.destination.join('');
+  }
+
   private constructor(useLastName: boolean, includeMetaStartWith_: boolean) {
     this.useLastName = useLastName;
     this.includeMetaStartWith_ = includeMetaStartWith_;

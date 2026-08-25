@@ -22,3 +22,4 @@ export * from './ValueToCsv';
 export * from './ValueRefInCollector';
 export * from './EntryRecordCollector';
 export * from './UnreferencedRecordCollector';
+export * from './SearchService';

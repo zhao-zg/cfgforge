@@ -62,3 +62,9 @@ export type {
   NoteEditResult,
   NoteResultCode,
 } from './NoteEditService';
+export { SearchService } from './SearchService';
+export type {
+  SearchResult,
+  SearchResultItem,
+  SearchResultCode,
+} from './SearchService';

@@ -86,6 +86,9 @@ importers:
       '@cfggen/data':
         specifier: workspace:*
         version: link:../data
+      '@cfggen/gen':
+        specifier: workspace:*
+        version: link:../gen
       '@cfggen/i18n':
         specifier: workspace:*
         version: link:../i18n

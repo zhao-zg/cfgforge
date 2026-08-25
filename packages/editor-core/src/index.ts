@@ -1,1 +1,1 @@
-
+export { EditorService } from './EditorService';

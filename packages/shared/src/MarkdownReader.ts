@@ -1,10 +1,13 @@
 /**
  * Markdown 文件读取器，支持解析 frontmatter 和正文。
  * 原 Java: configgen.util.MarkdownReader
+ *
+ * T12.0b: 新增 readMarkdownAsync（异步版，走 CfgFileSystem 抽象）。
  */
 
 import * as fs from 'fs';
 import { readFromBuffer } from './UnicodeReader';
+import { getDefaultFileSystem } from './CfgFileSystem';
 
 export interface MarkdownDocument {
   frontmatter: Map<string, string>;
@@ -13,6 +16,15 @@ export interface MarkdownDocument {
 
 export function readMarkdown(filePath: string, encoding: string): MarkdownDocument {
   const buf = fs.readFileSync(filePath);
+  const text = readFromBuffer(buf, encoding);
+  return parseMarkdown(text);
+}
+
+/**
+ * 异步读取 Markdown 文件（Tauri/WebView 环境可用），走 CfgFileSystem 抽象。
+ */
+export async function readMarkdownAsync(filePath: string, encoding: string): Promise<MarkdownDocument> {
+  const buf = await getDefaultFileSystem().readFile(filePath);
   const text = readFromBuffer(buf, encoding);
   return parseMarkdown(text);
 }

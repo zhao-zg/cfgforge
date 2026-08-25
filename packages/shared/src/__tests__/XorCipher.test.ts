@@ -8,12 +8,12 @@ describe('XorCipher', () => {
 
     const encrypted = cipher.process(data);
     // Encrypted should be different from original
-    expect(encrypted.equals(data)).toBe(false);
+    expect(Buffer.from(encrypted).equals(data)).toBe(false);
 
     // Decrypt with a fresh cipher (same key, reset index)
     const decipher = new XorCipher('secret');
     const decrypted = decipher.process(encrypted);
-    expect(decrypted.equals(data)).toBe(true);
+    expect(Buffer.from(decrypted).equals(data)).toBe(true);
   });
 
   it('handles empty cipher key throws', () => {
@@ -28,7 +28,7 @@ describe('XorCipher', () => {
 
     const encrypted = cipher1.process(data);
     const decrypted = cipher2.process(encrypted);
-    expect(decrypted.equals(data)).toBe(true);
+    expect(Buffer.from(decrypted).equals(data)).toBe(true);
   });
 
   it('cipher key shorter than data wraps around', () => {
@@ -39,7 +39,7 @@ describe('XorCipher', () => {
 
     const encrypted = cipher1.process(data);
     const decrypted = cipher2.process(encrypted);
-    expect(decrypted.equals(data)).toBe(true);
+    expect(Buffer.from(decrypted).equals(data)).toBe(true);
   });
 
   it('different keys produce different output', () => {
@@ -49,6 +49,6 @@ describe('XorCipher', () => {
 
     const enc1 = cipher1.process(data);
     const enc2 = cipher2.process(Buffer.from('same data', 'utf8'));
-    expect(enc1.equals(enc2)).toBe(false);
+    expect(Buffer.from(enc1).equals(Buffer.from(enc2))).toBe(false);
   });
 });

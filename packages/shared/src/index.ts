@@ -19,3 +19,9 @@ export * from './XorCipher';
 export * from './FileUtil';
 export * from './DOMUtil';
 export * from './LocaleUtil';
+
+// 在 Node 环境（CLI/MCP/测试）下自动初始化默认文件系统为 NodeFileSystem，
+// 使 readCSVAsync / CachedFiles.writeFileAsync 等异步 fs 工具开箱即用。
+// Tauri WebView 环境由入口显式调用 setDefaultFileSystem(TauriFileSystem)。
+import { ensureDefaultFileSystem } from './CfgFileSystem';
+ensureDefaultFileSystem();

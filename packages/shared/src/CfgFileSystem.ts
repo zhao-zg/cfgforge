@@ -115,23 +115,18 @@ export function hasDefaultFileSystem(): boolean {
 /**
  * 确保默认文件系统已初始化。
  * 在 Node 环境（CLI/MCP/测试）下调用，将默认文件系统设为 NodeFileSystem；
- * 在 Tauri WebView 环境（存在 window 且无 require）下跳过（由 Tauri 入口显式设置）。
+ * 在 Tauri WebView 环境下会跳过（由 Tauri 入口显式 setDefaultFileSystem）。
+ *
+ * 注意：这里静态导入 NodeFileSystem，Node 构建（tsc / vitest）可正常解析；
+ * 打包浏览器 bundle 时，构建工具按打包目标 tree-shake 或忽略 node:fs 导入
+ * （Tauri 前端不应把 shared 包打进浏览器 bundle，而是由 Tauri 侧运行）。
  */
+import { NodeFileSystem } from './NodeFileSystem';
+
 export function ensureDefaultFileSystem(): void {
   if (defaultFileSystem !== null) return;
-  // 浏览器环境（Tauri WebView）没有全局 require，这里动态探测：
-  // 有 require（CJS/Node）则用 NodeFileSystem；否则留空，等待 Tauri 入口注入。
   try {
-    // 通过 Function 构造绕开 ESM 静态分析，避免打包器把 node:fs 打进浏览器 bundle
-    const nodeRequire = (0 as any).constructor === Function
-      ? (Function('return typeof require !== "undefined" ? require : null')() as
-          | ((id: string) => any)
-          | null)
-      : null;
-    if (nodeRequire) {
-      const { NodeFileSystem } = nodeRequire('./NodeFileSystem.js');
-      defaultFileSystem = new NodeFileSystem();
-    }
+    defaultFileSystem = new NodeFileSystem();
   } catch {
     // 非 Node 环境：保持未初始化，由 Tauri 入口 setDefaultFileSystem
   }

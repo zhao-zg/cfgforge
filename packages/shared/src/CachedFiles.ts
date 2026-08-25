@@ -4,10 +4,14 @@
  *
  * 写入时：内容相同则跳过（减少磁盘写入），不同则覆盖。
  * 清理时：保留 keep 集合中的文件，删除其余。
+ *
+ * T12.0b: 同步方法保留（CLI/测试用）；新增异步版方法（writeFileAsync/deleteAsync/
+ * finalExitAsync），底层走 CfgFileSystem 抽象，供 Tauri/WebView 环境使用。
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { getDefaultFileSystem } from './CfgFileSystem';
 import { Logger } from './Logger';
 
 const META_SUFFIXES = ['.meta', '.uid'];
@@ -33,6 +37,25 @@ class CachedFilesImpl {
     }
     for (const dir of this.deleteKeepMetaWithSuffixFiles) {
       this.doRemoveFile(dir, true);
+    }
+    this.deleteFiles = [];
+    this.deleteKeepMetaWithSuffixFiles = [];
+    this.filenameSet.clear();
+  }
+
+  /**
+   * 异步版 finalExit（Tauri/WebView 环境可用），走 CfgFileSystem 抽象。
+   * 与同步版语义一致：删除未 keep 的旧文件，然后清空状态。
+   */
+  async finalExitAsync(): Promise<void> {
+    const dfs = getDefaultFileSystem();
+    for (const f of this.deleteFiles) {
+      if (await dfs.exists(f)) {
+        await this.doRemoveFileAsync(f, false);
+      }
+    }
+    for (const dir of this.deleteKeepMetaWithSuffixFiles) {
+      await this.doRemoveFileAsync(dir, true);
     }
     this.deleteFiles = [];
     this.deleteKeepMetaWithSuffixFiles = [];
@@ -65,6 +88,39 @@ class CachedFilesImpl {
     }
   }
 
+  /**
+   * 异步增量写入（Tauri/WebView 环境可用），走 CfgFileSystem 抽象。
+   * 与 writeFile 语义一致：内容相同跳过，不同则覆盖。
+   * @param filePath 文件路径
+   * @param data 字节内容（Buffer 或 Uint8Array）
+   */
+  async writeFileAsync(filePath: string, data: Uint8Array): Promise<void> {
+    this.keepFile(filePath);
+    const d = Buffer.isBuffer(data) ? data : Buffer.from(data);
+    const dsize = d.length;
+    const dfs = getDefaultFileSystem();
+
+    if (!(await dfs.exists(filePath))) {
+      Logger.log('create file: ' + filePath);
+      await dfs.mkdirs(path.dirname(filePath));
+      await dfs.writeFile(filePath, d);
+      return;
+    }
+
+    const existingSize = await dfs.fileSize(filePath);
+    if (existingSize !== dsize) {
+      Logger.log('modify file: ' + filePath);
+      await dfs.writeFile(filePath, d);
+      return;
+    }
+
+    const existing = await dfs.readFile(filePath);
+    if (Buffer.compare(Buffer.from(existing), d) !== 0) {
+      Logger.log('modify file: ' + filePath);
+      await dfs.writeFile(filePath, d);
+    }
+  }
+
   keepFile(filePath: string): void {
     this.filenameSet.add(this.fileKey(filePath));
   }
@@ -75,6 +131,29 @@ class CachedFilesImpl {
     const status = deleteOk ? '' : ' fail';
     Logger.log(`delete ${isDir ? 'dir' : 'file'}${status}: ${file}`);
     return deleteOk;
+  }
+
+  /**
+   * 异步删除文件或目录（Tauri/WebView 环境可用），走 CfgFileSystem 抽象。
+   * @param file 文件或目录路径
+   * @returns 是否删除成功（不存在时返回 false，与同步 delete 一致）
+   */
+  async deleteAsync(file: string): Promise<boolean> {
+    const d = getDefaultFileSystem();
+    const isDir = await d.isDirectory(file);
+    const existed = isDir || (await d.isFile(file));
+    if (!existed) {
+      Logger.log(`delete ${isDir ? 'dir' : 'file'} fail: ${file}`);
+      return false;
+    }
+    try {
+      await d.remove(file);
+      Logger.log(`delete ${isDir ? 'dir' : 'file'}: ${file}`);
+      return true;
+    } catch {
+      Logger.log(`delete ${isDir ? 'dir' : 'file'} fail: ${file}`);
+      return false;
+    }
   }
 
   private mkdirs(dir: string): void {
@@ -122,6 +201,45 @@ class CachedFilesImpl {
       }
     } else {
       this.delete(file);
+    }
+  }
+
+  private async doRemoveFileAsync(file: string, keepMeta: boolean): Promise<void> {
+    const d = getDefaultFileSystem();
+    const key = this.fileKey(file);
+    let keep = this.filenameSet.has(key);
+
+    if (keep) return;
+
+    if (keepMeta) {
+      const noMetaKey = this.findNoMetaKey(key);
+      if (noMetaKey !== null) {
+        keep = this.filenameSet.has(noMetaKey);
+        if (!keep && (await d.isDirectory(noMetaKey))) {
+          for (const f of this.filenameSet) {
+            if (f.startsWith(noMetaKey)) {
+              keep = true;
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    if (keep) return;
+
+    if (await d.isDirectory(file)) {
+      const files = await d.readDir(file);
+      for (const f of files) {
+        await this.doRemoveFileAsync(path.join(file, f), keepMeta);
+      }
+      // Remove dir if empty
+      const remaining = await d.readDir(file);
+      if (remaining.length === 0) {
+        await this.deleteAsync(file);
+      }
+    } else {
+      await this.deleteAsync(file);
     }
   }
 

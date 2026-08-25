@@ -78,7 +78,7 @@ export class NodeFileSystem implements CfgFileSystem {
   async listFilesRecursive(dir: string): Promise<string[]> {
     const result: string[] = [];
     const walk = async (d: string): Promise<void> => {
-      let entries: string[];
+      let entries: fs.Dirent[];
       try {
         entries = await fs.promises.readdir(d, { withFileTypes: true });
       } catch {

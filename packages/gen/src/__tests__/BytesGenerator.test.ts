@@ -793,7 +793,7 @@ table apple[id] {
     const { XorCipher } = await import('@cfggen/shared');
     const cipher = new XorCipher('secret');
     const decrypted = cipher.process(encBuf);
-    expect(decrypted.equals(plainBuf)).toBe(true);
+    expect(Buffer.from(decrypted).equals(plainBuf)).toBe(true);
   });
 
   it('extends GeneratorWithTag (own parameter)', () => {

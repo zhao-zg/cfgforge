@@ -3,9 +3,13 @@
  * 原 Java: configgen.util.UnicodeReader (extends Reader)
  *
  * Node.js 版：用 Buffer 预读 4 字节检测 BOM，返回解码后的字符串。
+ *
+ * T12.0b: 新增 readTextFileAsync（异步版，走 CfgFileSystem 抽象）。
+ * readFromBuffer 参数改为 Uint8Array（Buffer 是其子类，向后兼容）。
  */
 
 import * as fs from 'fs';
+import { getDefaultFileSystem } from './CfgFileSystem';
 
 const BOM_SIZE = 4;
 
@@ -14,7 +18,7 @@ export interface ReadResult {
   text: string;
 }
 
-function detectEncoding(bom: Buffer, n: number): { encoding: string | null; skipBytes: number } {
+function detectEncoding(bom: Uint8Array, n: number): { encoding: string | null; skipBytes: number } {
   if (n > 3 && bom[0] === 0x00 && bom[1] === 0x00 && bom[2] === 0xfe && bom[3] === 0xff) {
     return { encoding: 'UTF-32BE', skipBytes: 4 };
   }
@@ -59,12 +63,24 @@ export function readTextFile(filePath: string, defaultEnc: string): string {
 }
 
 /**
- * 从 Buffer 读取并检测 BOM，返回解码后的文本。
- * @param buf 包含文本数据的 Buffer
+ * 异步读取文件并自动检测 BOM 编码（Tauri/WebView 环境可用）。
+ * 底层走 CfgFileSystem 抽象（getDefaultFileSystem().readFile）。
+ * @param filePath 文件路径
+ * @param defaultEnc 无 BOM 时使用的默认编码（如 'GBK'）
+ * @returns 解码后的文本内容
+ */
+export async function readTextFileAsync(filePath: string, defaultEnc: string): Promise<string> {
+  const buf = await getDefaultFileSystem().readFile(filePath);
+  return readFromBuffer(buf, defaultEnc);
+}
+
+/**
+ * 从字节缓冲读取并检测 BOM，返回解码后的文本。
+ * @param buf 包含文本数据的字节缓冲（Buffer 或 Uint8Array）
  * @param defaultEnc 无 BOM 时使用的默认编码
  * @returns 解码后的文本内容
  */
-export function readFromBuffer(buf: Buffer, defaultEnc: string): string {
+export function readFromBuffer(buf: Uint8Array, defaultEnc: string): string {
   const n = Math.min(buf.length, BOM_SIZE);
   const bom = buf.subarray(0, n);
   const { encoding, skipBytes } = detectEncoding(bom, n);

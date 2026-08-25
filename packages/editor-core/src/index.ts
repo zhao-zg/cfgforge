@@ -45,3 +45,13 @@ export type {
   FieldRequest,
   EnumValueRequest,
 } from './TableCreateService';
+export { CheckJsonService } from './CheckJsonService';
+export type {
+  CheckJsonResult,
+  CheckJsonResultCode,
+} from './CheckJsonService';
+export { PromptService } from './PromptService';
+export type {
+  PromptResult,
+  PromptResultCode,
+} from './PromptService';

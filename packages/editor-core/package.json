@@ -14,7 +14,8 @@
     "@cfggen/data": "workspace:*",
     "@cfggen/i18n": "workspace:*",
     "@cfggen/schema": "workspace:*",
-    "@cfggen/context": "workspace:*"
+    "@cfggen/context": "workspace:*",
+    "@cfggen/gen": "workspace:*"
   },
   "main": "./src/index.ts",
   "private": true

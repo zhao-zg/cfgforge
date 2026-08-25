@@ -28,3 +28,8 @@ export type {
   EditResultCode,
   RecordEditResult,
 } from './RecordEditService';
+export { RecordRefIdsService } from './RecordRefIdsService';
+export type {
+  RecordRefId,
+  RecordRefIdsResult,
+} from './RecordRefIdsService';

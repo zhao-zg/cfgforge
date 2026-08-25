@@ -9,3 +9,4 @@ export { TsCodeGenerator } from './TsCodeGenerator';
 export { CsCodeGenerator } from './CsCodeGenerator';
 export { GoCodeGenerator } from './GoCodeGenerator';
 export { JavaCodeGenerator } from './JavaCodeGenerator';
+export { LuaCodeGenerator } from './LuaCodeGenerator';

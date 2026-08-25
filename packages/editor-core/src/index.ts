@@ -12,3 +12,14 @@ export type {
   SNameable,
   RawSchema,
 } from './SchemaService';
+export { RecordService } from './RecordService';
+export type {
+  ResultCode,
+  RequestType,
+  BriefDescription,
+  BriefRecord,
+  RecordResult,
+  RecordRefsResult,
+  UnreferencedRecordsResult,
+  RecordResponse,
+} from './RecordService';

@@ -58,6 +58,16 @@ export class ParameterParser implements Parameter {
     );
   }
 
+  getOrNull(key: string, _messageId?: string): string | null {
+    const lowered = key.toLowerCase();
+    const v = this.params.get(lowered);
+    if (v === undefined) {
+      return null;
+    }
+    this.params.delete(lowered);
+    return v;
+  }
+
   id(): string {
     return this.idValue;
   }

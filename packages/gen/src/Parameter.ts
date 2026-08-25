@@ -15,6 +15,13 @@ export interface Parameter {
   /** Whether a flag/value exists; also consumes the key. */
   has(key: string, messageId?: string): boolean;
 
+  /**
+   * Get a parameter value, or null if absent (like Java's `get(key, null)`).
+   * Also consumes the key. Unlike `has`, this does NOT parse the value as
+   * a boolean — it returns the raw string or null.
+   */
+  getOrNull(key: string, messageId?: string): string | null;
+
   /** Optional UI title (no-op for CLI parsing). */
   title?(title: string): void;
 

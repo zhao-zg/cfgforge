@@ -122,6 +122,9 @@ importers:
       '@cfggen/value':
         specifier: workspace:*
         version: link:../value
+      '@cfggen/write':
+        specifier: workspace:*
+        version: link:../write
 
   packages/i18n:
     dependencies:

@@ -4,3 +4,4 @@ export { Generator } from './Generator';
 export { GeneratorWithTag } from './GeneratorWithTag';
 export { Generators } from './Generators';
 export type { GeneratorProvider } from './Generators';
+export { JsonGenerator } from './JsonGenerator';

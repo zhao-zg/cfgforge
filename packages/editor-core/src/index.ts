@@ -38,3 +38,10 @@ export type {
   SchemaTextResult,
   SchemaWriteResult,
 } from './SchemaWriteService';
+export { TableCreateService } from './TableCreateService';
+export type {
+  CreateResult,
+  TableCreateRequest,
+  FieldRequest,
+  EnumValueRequest,
+} from './TableCreateService';

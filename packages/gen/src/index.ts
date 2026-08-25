@@ -7,3 +7,4 @@ export type { GeneratorProvider } from './Generators';
 export { JsonGenerator } from './JsonGenerator';
 export { TsCodeGenerator } from './TsCodeGenerator';
 export { CsCodeGenerator } from './CsCodeGenerator';
+export { GoCodeGenerator } from './GoCodeGenerator';

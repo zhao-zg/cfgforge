@@ -352,4 +352,79 @@ int,str
       expect(userTable!.valueList.length).toBe(1);
     });
   });
+
+  // -- T6.4: makeValue cache rule detailed verification --
+
+  describe('makeValue cache rules (T6.4)', () => {
+    /*
+     * Cache hit condition: tag matches AND allowErr direction is safe.
+     *   - strict (allowErr=false) value can serve any request (strict or lenient)
+     *   - lenient (allowErr=true) value can only serve lenient requests
+     *   - lenient → strict must miss (bug regression gate)
+     *   - strict → lenient is a hit (strict value is guaranteed error-free)
+     */
+
+    it('null tag strict → null tag strict: cache hit', async () => {
+      writeFile(tempDir, 'config.cfg', USER_CFG);
+      writeFile(tempDir, 'user.csv', USER_CSV);
+
+      const ctx = await Context.create(tempDir);
+
+      const v1 = ctx.makeValueWithTagAndAllowErr(null, false);
+      const v2 = ctx.makeValueWithTagAndAllowErr(null, false);
+      expect(v2).toBe(v1);
+    });
+
+    it('null tag strict → null tag lenient: cache hit', async () => {
+      writeFile(tempDir, 'config.cfg', USER_CFG);
+      writeFile(tempDir, 'user.csv', USER_CSV);
+
+      const ctx = await Context.create(tempDir);
+
+      const strict = ctx.makeValueWithTagAndAllowErr(null, false);
+      const lenient = ctx.makeValueWithTagAndAllowErr(null, true);
+      expect(lenient).toBe(strict);
+    });
+
+    it('null tag lenient → null tag strict: cache miss', async () => {
+      writeFile(tempDir, 'config.cfg', USER_CFG);
+      writeFile(tempDir, 'user.csv', USER_CSV);
+
+      const ctx = await Context.create(tempDir);
+
+      const lenient = ctx.makeValueWithTagAndAllowErr(null, true);
+      const strict = ctx.makeValueWithTagAndAllowErr(null, false);
+      expect(strict).not.toBe(lenient);
+    });
+
+    it('tag switch invalidates cache regardless of allowErr', async () => {
+      writeFile(tempDir, 'config.cfg', USER_CFG);
+      writeFile(tempDir, 'user.csv', USER_CSV);
+
+      const ctx = await Context.create(tempDir);
+
+      // tag1 strict → tag2 strict: different tag = miss
+      const v1 = ctx.makeValueWithTagAndAllowErr('tag1', false);
+      const v2 = ctx.makeValueWithTagAndAllowErr('tag2', false);
+      expect(v2).not.toBe(v1);
+
+      // tag2 strict → tag2 lenient: same tag, strict→lenient = hit
+      const v3 = ctx.makeValueWithTagAndAllowErr('tag2', true);
+      expect(v3).toBe(v2);
+    });
+
+    it('updateDataAndValue resets cache', async () => {
+      writeFile(tempDir, 'config.cfg', USER_CFG);
+      writeFile(tempDir, 'user.csv', USER_CSV);
+
+      const ctx = await Context.create(tempDir);
+
+      const v1 = ctx.makeValueWithTag('editor');
+      // After updateDataAndValue, cache is cleared (tag reset to null, allowErr=false)
+      ctx.updateDataAndValue(ctx.cfgData(), v1);
+      const v2 = ctx.makeValueWithTag('editor');
+      // tag was null in cache, now requesting 'editor' → miss → new object
+      expect(v2).not.toBe(v1);
+    });
+  });
 });

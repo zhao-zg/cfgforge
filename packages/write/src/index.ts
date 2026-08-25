@@ -5,3 +5,6 @@ export { CsvTableFile } from './storages/CsvTableFile';
 export { ExcelTableFile } from './storages/ExcelTableFile';
 export { VTableStorage, type MapToBlockFn } from './storages/VTableStorage';
 export { VTableJsonStorage } from './storages/VTableJsonStorage';
+export { RecordBlockMapper } from './RecordBlockMapper';
+export { ValueToSepStr } from './ValueToSepStr';
+export { ValueUpdater } from './ValueUpdater';

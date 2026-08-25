@@ -199,6 +199,11 @@ export class Context {
   cfgData(): CfgData { return this._cfgData; }
   lastLoadDidAutoFix(): boolean { return this._lastLoadDidAutoFix; }
 
+  /** Returns the CSV reader function (can read any CSV file). */
+  csvReader(): CsvReaderFn { return this._csvReader; }
+  /** Returns the Excel reader function (cached from initial load; for re-reading modified files, use readExcel directly). */
+  excelReader(): ExcelReaderFn { return this._excelReader; }
+
   nullableLangTextFinder(): LangTextFinder | null { return this._nullableLangTextFinder; }
   nullableLangSwitch(): LangSwitchable | null { return this._nullableLangSwitch; }
 

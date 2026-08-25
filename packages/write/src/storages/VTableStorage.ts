@@ -23,6 +23,7 @@ import { DCell, DCellList } from '@cfggen/data';
 import { TableFileLocator } from '../TableFileLocator';
 import type { TableFile } from '../TableFile';
 import { RecordBlock, RecordBlockTransformed } from '../RecordBlock';
+import { RecordBlockMapper } from '../RecordBlockMapper';
 
 /**
  * Function type for mapping a VStruct to a RecordBlock.
@@ -226,3 +227,7 @@ class RecordLoc {
     readonly rowCount: number,
   ) {}
 }
+
+// Wire up the mapper function — T7.6 completion.
+// This replaces the default throwing stub with the real implementation.
+VTableStorage.mapToBlockFn = RecordBlockMapper.mapToBlock;

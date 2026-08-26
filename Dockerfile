@@ -1,67 +1,40 @@
 # ============================================================
-# Stage 1: 构建 Java fatJar
+# Stage 1: Build monorepo packages + cfgeditor frontend
 # ============================================================
-FROM eclipse-temurin:25-jdk AS builder-jar
+FROM node:24-alpine AS builder
 
 WORKDIR /build
 
-# 先复制 Gradle wrapper 和构建脚本，利用缓存层
-COPY app/gradlew app/gradlew.bat ./
-COPY app/gradle ./gradle
-COPY app/build.gradle app/settings.gradle ./
+# Copy monorepo config files
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY packages ./packages
+COPY cfgeditor/package.json cfgeditor/pnpm-lock.yaml cfgeditor/pnpm-workspace.yaml cfgeditor/tsconfig.json cfgeditor/tsconfig.node.json cfgeditor/vite.config.ts cfgeditor/index.html ./cfgeditor/
+COPY cfgeditor/src ./cfgeditor/src
+COPY cfgeditor/public ./cfgeditor/public
 
-# 复制源码
-COPY app/src ./src
-
-# 构建 fatJar
-RUN chmod +x gradlew && ./gradlew fatJar --no-daemon
-
-# ============================================================
-# Stage 2: 构建前端静态文件
-# ============================================================
-FROM node:24-alpine AS builder-web
-
-WORKDIR /build
-
-# 先复制依赖文件利用缓存层
-COPY cfgeditor/package.json cfgeditor/pnpm-lock.yaml cfgeditor/pnpm-workspace.yaml ./
-
-# 安装 pnpm 并装依赖
+# Install pnpm and build all packages
 RUN npm install -g pnpm@9 && pnpm install --frozen-lockfile
+RUN pnpm -r run build
 
-# 复制源码并构建（tsconfig.json 引用了 tsconfig.node.json，须一起 COPY）
-COPY cfgeditor/tsconfig.json cfgeditor/tsconfig.node.json cfgeditor/vite.config.ts ./
-COPY cfgeditor/index.html ./
-COPY cfgeditor/src ./src
-COPY cfgeditor/public ./public
-
-RUN pnpm build
+# Build cfgeditor frontend
+RUN cd cfgeditor && pnpm build
 
 # ============================================================
-# Stage 3: 运行时镜像（Nginx + JRE）
+# Stage 2: Runtime image (Nginx only — serves static files)
 # ============================================================
-FROM eclipse-temurin:25-jre
+FROM nginx:alpine
 
-# 安装 Nginx
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends nginx wget && \
-    rm -rf /var/lib/apt/lists/*
+# Remove default nginx config
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Copy custom nginx config
+COPY .docker/nginx.conf /etc/nginx/nginx.conf
+
+# Copy built frontend
+COPY --from=builder /build/cfgeditor/dist /app/web
 
 WORKDIR /app
 
-# 复制构建产物
-COPY --from=builder-jar /build/build/libs/cfggen.jar /app/cfggen.jar
-COPY --from=builder-web /build/dist /app/web
-
-# 复制配置文件
-COPY .docker/nginx.conf /etc/nginx/nginx.conf
-COPY .docker/entrypoint.sh /app/entrypoint.sh
-RUN chmod +x /app/entrypoint.sh
-
-# 数据目录（配置文件挂载点）
-VOLUME /data
-
-# Nginx 对外暴露 80 端口
 EXPOSE 80
 
-ENTRYPOINT ["/app/entrypoint.sh"]
+CMD ["nginx", "-g", "daemon off;"]

@@ -10,8 +10,8 @@
  * Java source: configgen.i18n.TodoFile.java (181 lines)
  */
 
-import * as fs from 'fs';
 import * as XLSX from 'xlsx';
+import { getDefaultFileSystem } from '@cfggen/shared';
 import type { LangTextFinder } from './LangTextFinder';
 import { TextByIdFinder, OneText } from './TextByIdFinder';
 import { normalize } from './I18nUtils';
@@ -79,6 +79,30 @@ export class TodoFile {
     return new TodoFile(todo, done);
   }
 
+  /**
+   * Read a _todo_[lang].xlsx file (async, via CfgFileSystem).
+   */
+  static async readAsync(todoFilePath: string): Promise<TodoFile> {
+    const dfs = getDefaultFileSystem();
+    const bytes = await dfs.readFile(todoFilePath);
+    const wb = XLSX.read(bytes);
+
+    let todo: TodoFileLine[] = [];
+    let done: TodoFileLine[] = [];
+
+    const todoSheet = wb.Sheets[TodoFile.TODO_SHEET_NAME];
+    if (todoSheet) {
+      todo = TodoFile.readSheetToLines(todoSheet);
+    }
+
+    const doneSheet = wb.Sheets[TodoFile.DONE_SHEET_NAME];
+    if (doneSheet) {
+      done = TodoFile.readSheetToLines(doneSheet);
+    }
+
+    return new TodoFile(todo, done);
+  }
+
   static readSheetToLines(sheet: XLSX.WorkSheet): TodoFileLine[] {
     const rows: any[][] = XLSX.utils.sheet_to_json(sheet, {
       header: 1,
@@ -118,12 +142,90 @@ export class TodoFile {
   }
 
   /**
+   * Save the TodoFile to an .xlsx file (async, via CfgFileSystem).
+   */
+  static async saveAsync(todoFilePath: string, todoFile: TodoFile): Promise<void> {
+    const dfs = getDefaultFileSystem();
+
+    const wb = XLSX.utils.book_new();
+
+    const todoAoA = todoFile.todo.map((line) => [line.table, line.id, line.fieldChain, line.original, line.translated]);
+    const todoWs = XLSX.utils.aoa_to_sheet(todoAoA);
+    XLSX.utils.book_append_sheet(wb, todoWs, TodoFile.TODO_SHEET_NAME);
+
+    const doneAoA = todoFile.done.map((line) => [line.table, line.id, line.fieldChain, line.original, line.translated]);
+    const doneWs = XLSX.utils.aoa_to_sheet(doneAoA);
+    XLSX.utils.book_append_sheet(wb, doneWs, TodoFile.DONE_SHEET_NAME);
+
+    const buffer = XLSX.write(wb, { type: 'array', bookType: 'xlsx' }) as ArrayBuffer;
+    await dfs.writeFile(todoFilePath, new Uint8Array(buffer));
+  }
+
+  /**
    * Read a _todo_[lang].xlsx and merge translations into the LangTextFinder.
    * Only the "todo" sheet is processed; "done" is already in other files.
    * Skips lines where translated is empty (keeps existing translation).
    */
   static readAndMergeToFinder(todoFilePath: string, langFinder: LangTextFinder): void {
     const wb = XLSX.readFile(todoFilePath);
+
+    const todoSheet = wb.Sheets[TodoFile.TODO_SHEET_NAME];
+    if (!todoSheet) {
+      return;
+    }
+
+    const lines = TodoFile.readSheetToLines(todoSheet);
+
+    // Skip header (index 0)
+    for (let i = 1; i < lines.length; i++) {
+      const line = lines[i];
+      const table = line.table;
+      const pk = line.id;
+      const fieldChain = line.fieldChain;
+      const original = line.original;
+      const translated = line.translated;
+
+      if (translated.length === 0) {
+        // Keep existing translation from xlsx
+        continue;
+      }
+
+      const finder = langFinder.getTextFinder(table) as TextByIdFinder | null;
+      if (finder === null) {
+        // Table not found, skip
+        continue;
+      }
+
+      const record = finder.getPkToTexts().get(pk);
+      if (record === undefined) {
+        // Record not found, skip
+        continue;
+      }
+
+      const fieldIndex = finder.getFieldChainToIndex().get(fieldChain);
+      if (fieldIndex === undefined || fieldIndex >= record.texts.length) {
+        // Field chain not found, skip
+        continue;
+      }
+
+      const oldText = record.texts[fieldIndex];
+      if (oldText === null || oldText.original !== original) {
+        // Original mismatch, skip
+        continue;
+      }
+
+      const newText = new OneText(original, translated);
+      record.texts[fieldIndex] = newText;
+    }
+  }
+
+  /**
+   * Read a _todo_[lang].xlsx and merge translations into the LangTextFinder (async).
+   */
+  static async readAndMergeToFinderAsync(todoFilePath: string, langFinder: LangTextFinder): Promise<void> {
+    const dfs = getDefaultFileSystem();
+    const bytes = await dfs.readFile(todoFilePath);
+    const wb = XLSX.read(bytes);
 
     const todoSheet = wb.Sheets[TodoFile.TODO_SHEET_NAME];
     if (!todoSheet) {

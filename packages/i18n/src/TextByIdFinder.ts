@@ -17,6 +17,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
+import { getDefaultFileSystem } from '@cfggen/shared';
 import type { TextFinder, TextVisitor } from './LangTextFinder';
 import { LangTextFinder } from './LangTextFinder';
 import { normalize, fieldChainStr } from './I18nUtils';
@@ -197,6 +198,104 @@ export class TextByIdFinder implements TextFinder {
     }
 
     return langFinder;
+  }
+
+  /**
+   * Load all languages from a directory (async, via CfgFileSystem).
+   */
+  static async loadMultiLangAsync(dirPath: string): Promise<Map<string, LangTextFinder>> {
+    const dfs = getDefaultFileSystem();
+    const lang2i18n = new Map<string, LangTextFinder>();
+    const entries = await dfs.readDir(dirPath);
+
+    for (const name of entries) {
+      const fullPath = path.join(dirPath, name);
+      if (await dfs.isDirectory(fullPath)) {
+        lang2i18n.set(name, await TextByIdFinder.loadOneLangAsync(fullPath));
+      }
+    }
+
+    return lang2i18n;
+  }
+
+  /**
+   * Load one language from its directory (async, via CfgFileSystem).
+   */
+  static async loadOneLangAsync(langDir: string): Promise<LangTextFinder> {
+    const dfs = getDefaultFileSystem();
+    const langName = path.basename(langDir);
+    const todoFilename = TextByIdFinder.getTodoFileName(langName);
+
+    const langFinder = new LangTextFinder();
+
+    const entries = await dfs.readDir(langDir);
+    const xlsxFiles: string[] = [];
+    for (const name of entries) {
+      const lower = name.toLowerCase();
+      if (lower.endsWith('.xlsx') && lower !== todoFilename.toLowerCase()) {
+        const fullPath = path.join(langDir, name);
+        if (await dfs.isFile(fullPath)) {
+          xlsxFiles.push(fullPath);
+        }
+      }
+    }
+
+    for (const filePath of xlsxFiles) {
+      const map = await TextByIdFinder.loadOneFileAsync(filePath);
+      for (const [tableName, finder] of map) {
+        langFinder.setTextFinder(tableName, finder);
+      }
+    }
+
+    // Merge _todo_[lang].xlsx if it exists at parent level
+    const parentDir = path.dirname(langDir);
+    const todoFilePath = path.join(parentDir, todoFilename);
+    if (await dfs.exists(todoFilePath)) {
+      await TodoFile.readAndMergeToFinderAsync(todoFilePath, langFinder);
+    }
+
+    return langFinder;
+  }
+
+  /**
+   * Load one .xlsx file → Map<tableName, TextByIdFinder> (async, via CfgFileSystem).
+   */
+  static async loadOneFileAsync(filePath: string): Promise<Map<string, TextByIdFinder>> {
+    const dfs = getDefaultFileSystem();
+    const fileName = path.basename(filePath).toLowerCase();
+    if (!fileName.endsWith('.xlsx')) {
+      throw new Error(`file ${filePath} is not .xlsx`);
+    }
+    const moduleName = fileName.substring(0, fileName.length - 5);
+
+    const map = new Map<string, TextByIdFinder>();
+    const bytes = await dfs.readFile(filePath);
+    const wb = XLSX.read(bytes);
+
+    for (const sheetName of wb.SheetNames) {
+      const sheet = wb.Sheets[sheetName];
+      const trimmedSheetName = sheetName.trim();
+      const tableName = TextByIdFinder.getTableName(moduleName, trimmedSheetName);
+
+      const rawRows: any[][] = XLSX.utils.sheet_to_json(sheet, {
+        header: 1,
+        blankrows: true,
+        defval: null,
+      });
+
+      if (rawRows.length <= 1) {
+        continue;
+      }
+
+      try {
+        const textFinder = TextByIdFinder.loadOneSheet(rawRows);
+        map.set(tableName, textFinder);
+      } catch (e) {
+        throw new Error(`${tableName} in ${filePath} read error: ${(e as Error).message}`);
+      }
+    }
+
+    return map;
   }
 
   /**

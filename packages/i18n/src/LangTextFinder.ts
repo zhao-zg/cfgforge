@@ -7,7 +7,7 @@
  * Java source: configgen.i18n.LangTextFinder.java (50 lines)
  */
 
-import * as fs from 'fs';
+import { getDefaultFileSystem } from '@cfggen/shared';
 import { TextByValueFinder } from './TextByValueFinder';
 import { TextByIdFinder } from './TextByIdFinder';
 
@@ -61,13 +61,28 @@ export class LangTextFinder {
    * If path is a file → byValue strategy (TextByValueFinder, CSV).
    */
   static read(filePath: string): LangTextFinder {
-    const stat = fs.statSync(filePath);
-    if (stat.isDirectory()) {
+    const dfs = getDefaultFileSystem();
+    if (dfs.isDirectorySync(filePath)) {
       // byId strategy: directory of xlsx files per language
       return TextByIdFinder.loadOneLang(filePath);
     } else {
       // byValue strategy: single CSV file
       return TextByValueFinder.loadOneLang(filePath);
+    }
+  }
+
+  /**
+   * Read a LangTextFinder from a path (async, via CfgFileSystem).
+   * If path is a directory → byId strategy (TextByIdFinder, xlsx).
+   * If path is a file → byValue strategy (CSV).
+   */
+  static async readAsync(filePath: string): Promise<LangTextFinder> {
+    const dfs = getDefaultFileSystem();
+    const isDir = await dfs.isDirectory(filePath);
+    if (isDir) {
+      return TextByIdFinder.loadOneLangAsync(filePath);
+    } else {
+      return TextByValueFinder.loadOneLangAsync(filePath);
     }
   }
 }

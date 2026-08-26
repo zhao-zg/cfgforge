@@ -9,6 +9,8 @@
  */
 
 import * as fs from 'fs';
+import * as path from 'path';
+import { getDefaultFileSystem } from '@cfggen/shared';
 import { LangTextFinder } from './LangTextFinder';
 import { TextByValueFinder } from './TextByValueFinder';
 import { TextByIdFinder } from './TextByIdFinder';
@@ -66,5 +68,30 @@ export class LangSwitchable {
   private static isById(dir: string): boolean {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
     return entries.some((e) => e.isDirectory());
+  }
+
+  /**
+   * Read a LangSwitchable from a directory (async, via CfgFileSystem).
+   */
+  static async readAsync(dir: string, defaultLang: string): Promise<LangSwitchable> {
+    const byId = await LangSwitchable.isByIdAsync(dir);
+    const langMap = byId
+      ? await TextByIdFinder.loadMultiLangAsync(dir)
+      : await TextByValueFinder.loadMultiLangAsync(dir);
+    return new LangSwitchable(langMap, defaultLang);
+  }
+
+  /**
+   * byId if any entry in the directory is itself a directory (async).
+   */
+  private static async isByIdAsync(dir: string): Promise<boolean> {
+    const dfs = getDefaultFileSystem();
+    const entries = await dfs.readDir(dir);
+    for (const name of entries) {
+      if (await dfs.isDirectory(path.join(dir, name))) {
+        return true;
+      }
+    }
+    return false;
   }
 }

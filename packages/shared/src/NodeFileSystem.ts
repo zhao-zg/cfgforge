@@ -97,6 +97,14 @@ export class NodeFileSystem implements CfgFileSystem {
     return result;
   }
 
+  async lastModified(filePath: string): Promise<number> {
+    try {
+      return (await fs.promises.stat(filePath)).mtimeMs;
+    } catch {
+      return 0;
+    }
+  }
+
   // ---- 同步方法 ----
 
   readTextFileSync(filePath: string, encoding: string): string {
@@ -153,6 +161,14 @@ export class NodeFileSystem implements CfgFileSystem {
   fileSizeSync(filePath: string): number {
     try {
       return fs.statSync(filePath).size;
+    } catch {
+      return 0;
+    }
+  }
+
+  lastModifiedSync(filePath: string): number {
+    try {
+      return fs.statSync(filePath).mtimeMs;
     } catch {
       return 0;
     }

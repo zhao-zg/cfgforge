@@ -20,7 +20,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CfgSchema } from '../CfgSchema';
 import type { Nameable } from '../Nameable';
-import { getCodeName } from '@cfggen/shared';
+import { getCodeName, getDefaultFileSystem } from '@cfggen/shared';
 import type { CfgFileInfo } from '../CfgSchemas';
 
 export class CfgUtil {
@@ -198,6 +198,77 @@ export class CfgUtil {
 
       // Recurse with null whiteListSubDirs (only first level uses filter)
       CfgUtil.findConfigFilesRecursively(
+        subSource, null, ext, subPkgNameDot,
+        rootDir, cfgFiles,
+      );
+    }
+  }
+
+  // -------------------------------------------------------------------------
+  // findConfigFilesRecursivelyAsync — async variant via CfgFileSystem
+  // -------------------------------------------------------------------------
+
+  /**
+   * Async version of findConfigFilesRecursively, using CfgFileSystem abstraction.
+   * Used in Tauri WebView environment where fs is async-only.
+   */
+  static async findConfigFilesRecursivelyAsync(
+    source: string,
+    nullableWhiteListSubDirs: Set<string> | null,
+    ext: string,
+    pkgNameDot: string,
+    rootDir: string,
+    cfgFiles: Map<string, CfgFileInfo>,
+  ): Promise<void> {
+    const dfs = getDefaultFileSystem();
+
+    // Step 1: If source file exists, add it
+    if (await dfs.isFile(source)) {
+      const relativizedSource = path.relative(rootDir, source);
+      const content = await dfs.readFile(source);
+      const lastModified = await dfs.lastModified(source);
+      cfgFiles.set(relativizedSource, {
+        lastModified,
+        path: source,
+        relativePath: relativizedSource,
+        pkgNameDot: pkgNameDot,
+        content: new TextDecoder().decode(content),
+      });
+    }
+
+    // Step 2: List parent directory and find subdirectories
+    const parentDir = path.dirname(source);
+    if (!(await dfs.isDirectory(parentDir))) {
+      return;
+    }
+
+    const entries = await dfs.readDir(parentDir);
+    for (const fn of entries) {
+      const fullPath = path.join(parentDir, fn);
+
+      if (!(await dfs.isDirectory(fullPath))) {
+        continue;
+      }
+
+      // WhiteListSubDirs filter (only for first level)
+      if (nullableWhiteListSubDirs !== null &&
+          !nullableWhiteListSubDirs.has(fn)) {
+        continue;
+      }
+
+      // Get code name from directory name
+      const lastDir = fn.toLowerCase();
+      const subPkgName = getCodeName(lastDir);
+      if (subPkgName === null) {
+        continue;
+      }
+
+      // Look for {subPkgName}.{ext} inside the subdirectory
+      const subSource = path.join(fullPath, subPkgName + '.' + ext);
+      const subPkgNameDot = pkgNameDot + subPkgName + '.';
+
+      // Recurse with null whiteListSubDirs (only first level uses filter)
+      await CfgUtil.findConfigFilesRecursivelyAsync(
         subSource, null, ext, subPkgNameDot,
         rootDir, cfgFiles,
       );

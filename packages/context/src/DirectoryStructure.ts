@@ -27,7 +27,7 @@ import {
   getTableNameIfTableDirForJson,
   getSubTableNameIfJsonSubDir,
 } from '@cfggen/data';
-import { getCodeName } from '@cfggen/shared';
+import { getCodeName, getDefaultFileSystem } from '@cfggen/shared';
 import type { ExplicitDir } from './ExplicitDir';
 
 // ---------------------------------------------------------------------------
@@ -78,13 +78,15 @@ export class DirectoryStructure implements JsonTableFiles {
 
   private readonly rootDir: string;
   private readonly explicitDir: ExplicitDir | null;
-  private readonly cfgFiles: Map<string, CfgFileInfo> = new Map();
+  private cfgFiles: Map<string, CfgFileInfo> = new Map();
   private excelFiles: Map<string, ExcelFileInfo> = new Map();
   private jsonFiles: Map<string, JsonFileList> = new Map();
 
-  constructor(rootDir: string, explicitDir: ExplicitDir | null = null) {
+  constructor(rootDir: string, explicitDir: ExplicitDir | null = null, _skipScan = false) {
     this.rootDir = rootDir;
     this.explicitDir = explicitDir;
+
+    if (_skipScan) return;
 
     // Phase 1: Discover config files
     CfgUtil.findConfigFilesRecursively(
@@ -126,6 +128,83 @@ export class DirectoryStructure implements JsonTableFiles {
 
   reload(): DirectoryStructure {
     return new DirectoryStructure(this.rootDir, this.explicitDir);
+  }
+
+  // -------------------------------------------------------------------------
+  // Async variants (via CfgFileSystem abstraction, for Tauri WebView)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Async factory: scans the directory tree via CfgFileSystem abstraction.
+   * Produces the same result as `new DirectoryStructure()` but without
+   * direct fs calls — suitable for Tauri WebView environment.
+   */
+  static async createAsync(rootDir: string, explicitDir: ExplicitDir | null = null): Promise<DirectoryStructure> {
+    const ds = new DirectoryStructure(rootDir, explicitDir, true);
+
+    // Phase 1: Discover config files (async)
+    await CfgUtil.findConfigFilesRecursivelyAsync(
+      path.join(rootDir, DirectoryStructure.ROOT_CONFIG_FILENAME),
+      explicitDir !== null ? explicitDir.excelFileDirs : null,
+      DirectoryStructure.CONFIG_EXT,
+      '',
+      rootDir,
+      ds.cfgFiles,
+    );
+
+    // Phase 2: Discover excel/csv files (async)
+    if (explicitDir === null) {
+      await ds.findExcelFilesRecursivelyAsync(rootDir);
+    } else {
+      for (const [dirName, addTag] of explicitDir.txtAsTsvFileInThisDirAsInRoot_To_AddTag_Map) {
+        const dir = path.join(rootDir, dirName);
+        if (await ds.isDirectory(dir)) {
+          await ds.findTxtAsTsvFilesAsync(dir, addTag);
+        }
+      }
+      for (const p of explicitDir.excelFileDirs) {
+        const dir = path.join(rootDir, p);
+        if (await ds.isDirectory(dir)) {
+          await ds.findExcelFilesRecursivelyAsync(dir);
+        }
+      }
+    }
+
+    // Phase 3: Discover JSON table files (async)
+    if (explicitDir === null) {
+      await ds.findTableToJsonFilesAsync();
+    } else {
+      for (const p of explicitDir.jsonFileDirs) {
+        await ds.findOneTableJsonFilesInDirAsync(path.join(rootDir, p));
+      }
+    }
+
+    return ds;
+  }
+
+  /** Async reload — same as reload() but uses CfgFileSystem abstraction. */
+  async reloadAsync(): Promise<DirectoryStructure> {
+    return DirectoryStructure.createAsync(this.rootDir, this.explicitDir);
+  }
+
+  /** Async updateExcelFileLastModified — uses CfgFileSystem.lastModified. */
+  async updateExcelFileLastModifiedAsync(relativeExcelPath: string): Promise<void> {
+    const key = relativeExcelPath;
+    const oldInfo = this.excelFiles.get(key);
+    if (oldInfo === undefined) {
+      return;
+    }
+    const lastModified = await getDefaultFileSystem().lastModified(oldInfo.path);
+    const newInfo: ExcelFileInfo = {
+      lastModified,
+      path: oldInfo.path,
+      relativePath: relativeExcelPath,
+      fmt: oldInfo.fmt,
+      nullableAddTag: oldInfo.nullableAddTag,
+    };
+    const tmp = new Map(this.excelFiles);
+    tmp.set(key, newInfo);
+    this.excelFiles = tmp;
   }
 
   getRootDir(): string {
@@ -394,7 +473,229 @@ export class DirectoryStructure implements JsonTableFiles {
     list.sort();
   }
 
-  // ---- Runtime mutation methods (copy-on-write) ----
+  // ---- Async file scanning methods (via CfgFileSystem) ----
+
+  private async isDirectory(dirPath: string): Promise<boolean> {
+    return getDefaultFileSystem().isDirectory(dirPath);
+  }
+
+  private async findExcelFilesRecursivelyAsync(dir: string): Promise<void> {
+    const dfs = getDefaultFileSystem();
+    const entries = await dfs.readDir(dir);
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      if (isFileIgnored(fullPath)) {
+        continue;
+      }
+
+      if (await dfs.isDirectory(fullPath)) {
+        const codeName = getCodeName(entry);
+        if (codeName === null) {
+          continue;
+        }
+        await this.findExcelFilesRecursivelyAsync(fullPath);
+      } else if (await dfs.isFile(fullPath)) {
+        const fmt = getFileFormat(fullPath);
+        if (fmt === null) {
+          continue;
+        }
+        const relativePath = path.relative(this.rootDir, fullPath);
+        const lastModified = await dfs.lastModified(fullPath);
+        switch (fmt) {
+          case FileFmt.CSV: {
+            const codeName = getCodeName(entry);
+            if (codeName === null) {
+              continue;
+            }
+            this.excelFiles.set(relativePath, {
+              lastModified,
+              path: fullPath,
+              relativePath,
+              fmt: FileFmt.CSV,
+              nullableAddTag: null,
+            });
+            break;
+          }
+          case FileFmt.EXCEL: {
+            this.excelFiles.set(relativePath, {
+              lastModified,
+              path: fullPath,
+              relativePath,
+              fmt: FileFmt.EXCEL,
+              nullableAddTag: null,
+            });
+            break;
+          }
+          default:
+            break;
+        }
+      }
+    }
+  }
+
+  private async findTxtAsTsvFilesAsync(dir: string, nullableAddTag: string | null): Promise<void> {
+    const dfs = getDefaultFileSystem();
+    const entries = await dfs.readDir(dir);
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      if (isFileIgnored(fullPath)) {
+        continue;
+      }
+      if (!(await dfs.isFile(fullPath))) {
+        continue;
+      }
+      const fmt = getFileFormat(fullPath);
+      if (fmt !== FileFmt.TXT_AS_TSV) {
+        continue;
+      }
+      const relativePath = entry;
+      const codeName = getCodeName(relativePath);
+      if (codeName === null) {
+        continue;
+      }
+      this.excelFiles.set(relativePath, {
+        lastModified: await dfs.lastModified(fullPath),
+        path: fullPath,
+        relativePath,
+        fmt: FileFmt.TXT_AS_TSV,
+        nullableAddTag,
+      });
+    }
+  }
+
+  private async findTableToJsonFilesAsync(): Promise<void> {
+    const dfs = getDefaultFileSystem();
+    const discovered: Map<string, string> = new Map();
+
+    const entries = await dfs.readDir(this.rootDir);
+    for (const entry of entries) {
+      const fullPath = path.join(this.rootDir, entry);
+      if (isFileIgnored(fullPath)) {
+        continue;
+      }
+      if (!(await dfs.isDirectory(fullPath))) {
+        continue;
+      }
+
+      const dirName = entry;
+
+      // 1. Old format: root-level _xxx directory
+      const tableName = getTableNameIfTableDirForJson(dirName);
+      if (tableName !== null) {
+        const existing = discovered.get(tableName);
+        if (existing !== undefined) {
+          throw new Error(
+            `JSON table directory conflict for table '${tableName}': both '${existing}' and '${fullPath}' exist`,
+          );
+        }
+        discovered.set(tableName, fullPath);
+        let list = this.jsonFiles.get(tableName);
+        if (list === undefined) {
+          list = new JsonFileList();
+          this.jsonFiles.set(tableName, list);
+        }
+        await this.findOneTableJsonFilesAsync(fullPath, list);
+        continue;
+      }
+
+      // 2. New format: module directory with _sub directories
+      const codeName = getCodeName(dirName);
+      if (codeName !== null) {
+        await this.findNestedJsonTableFilesAsync(fullPath, codeName, discovered);
+      }
+    }
+  }
+
+  private async findNestedJsonTableFilesAsync(
+    moduleDir: string,
+    pkgNameDot: string,
+    discovered: Map<string, string>,
+  ): Promise<void> {
+    const dfs = getDefaultFileSystem();
+    const entries = await dfs.readDir(moduleDir);
+    for (const entry of entries) {
+      const subPath = path.join(moduleDir, entry);
+      if (isFileIgnored(subPath)) {
+        continue;
+      }
+      if (!(await dfs.isDirectory(subPath))) {
+        continue;
+      }
+
+      const subDirName = entry;
+
+      const subTableName = getSubTableNameIfJsonSubDir(subDirName);
+      if (subTableName !== null) {
+        const fullTableName = pkgNameDot + '.' + subTableName;
+        const existing = discovered.get(fullTableName);
+        if (existing !== undefined) {
+          throw new Error(
+            `JSON table directory conflict for table '${fullTableName}': both '${existing}' and '${subPath}' exist`,
+          );
+        }
+        discovered.set(fullTableName, subPath);
+        let list = this.jsonFiles.get(fullTableName);
+        if (list === undefined) {
+          list = new JsonFileList();
+          this.jsonFiles.set(fullTableName, list);
+        }
+        await this.findOneTableJsonFilesAsync(subPath, list);
+        continue;
+      }
+
+      const subCodeName = getCodeName(subDirName);
+      if (subCodeName !== null) {
+        await this.findNestedJsonTableFilesAsync(subPath, pkgNameDot + '.' + subCodeName, discovered);
+      }
+    }
+  }
+
+  private async findOneTableJsonFilesInDirAsync(dirPath: string): Promise<void> {
+    const dfs = getDefaultFileSystem();
+    if (isFileIgnored(dirPath)) {
+      return;
+    }
+    if (!(await dfs.isDirectory(dirPath))) {
+      return;
+    }
+
+    const dirName = path.basename(dirPath);
+    const tableName = getTableNameIfTableDirForJson(dirName);
+    if (tableName === null) {
+      return;
+    }
+
+    let list = this.jsonFiles.get(tableName);
+    if (list === undefined) {
+      list = new JsonFileList();
+      this.jsonFiles.set(tableName, list);
+    }
+    await this.findOneTableJsonFilesAsync(dirPath, list);
+  }
+
+  private async findOneTableJsonFilesAsync(tableDir: string, list: JsonFileList): Promise<void> {
+    const dfs = getDefaultFileSystem();
+    list.tableDirRelativePath = path.relative(this.rootDir, tableDir);
+    const entries = await dfs.readDir(tableDir);
+    for (const entry of entries) {
+      const fullPath = path.join(tableDir, entry);
+      if (isFileIgnored(fullPath)) {
+        continue;
+      }
+      if (!(await dfs.isFile(fullPath))) {
+        continue;
+      }
+
+      if (!entry.endsWith('.json')) {
+        continue;
+      }
+
+      const relativePath = path.relative(this.rootDir, fullPath);
+      const absPath = path.resolve(fullPath);
+      list.addFile(await JsonFileInfo.ofAsync(absPath, relativePath));
+    }
+    list.sort();
+  }
 
   addJsonFile(tableName: string, relativeJsonPath: string): JsonFileInfo {
     const tmp = this.copyJsonFiles(tableName);

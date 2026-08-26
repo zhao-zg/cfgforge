@@ -13,6 +13,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { getDefaultFileSystem } from '@cfggen/shared';
 
 export class JsonFileInfo {
   readonly lastModified: number;
@@ -60,6 +61,27 @@ export class JsonFileInfo {
     } catch {
       // File may not exist in test scenarios
     }
+
+    return new JsonFileInfo(lastModified, absPath, relativePath, isIntegerId, id);
+  }
+
+  /**
+   * Async factory: creates JsonFileInfo from absolute and relative paths.
+   * Reads lastModified via CfgFileSystem abstraction (async).
+   * If the file does not exist, lastModified is 0.
+   */
+  static async ofAsync(absPath: string, relativePath: string): Promise<JsonFileInfo> {
+    const fileName = path.basename(relativePath);
+    let id = -1;
+    let isIntegerId = false;
+    const nameWithoutExt = fileName.substring(0, fileName.length - 5);
+    const parsed = parseInt(nameWithoutExt, 10);
+    if (!isNaN(parsed)) {
+      id = parsed;
+      isIntegerId = true;
+    }
+
+    const lastModified = await getDefaultFileSystem().lastModified(absPath);
 
     return new JsonFileInfo(lastModified, absPath, relativePath, isIntegerId, id);
   }

@@ -53,6 +53,9 @@ export interface CfgFileSystem {
   /** 递归列出目录下所有文件的绝对路径。目录不存在时返回空数组。 */
   listFilesRecursive(dir: string): Promise<string[]>;
 
+  /** 获取文件最后修改时间（毫秒 epoch）。文件不存在时返回 0。 */
+  lastModified(path: string): Promise<number>;
+
   // ---- 同步方法（仅 Node 环境可用；浏览器实现抛错） ----
 
   /** 读取整个文件为文本（使用指定编码，不做 BOM 检测）。 */
@@ -87,6 +90,9 @@ export interface CfgFileSystem {
 
   /** 同步获取文件大小。 */
   fileSizeSync(path: string): number;
+
+  /** 同步获取文件最后修改时间（毫秒 epoch）。文件不存在时返回 0。 */
+  lastModifiedSync(path: string): number;
 }
 
 /** 全局默认文件系统实例。 */

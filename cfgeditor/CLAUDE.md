@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '7e7c777c-b757-4f39-b568-b3d9a7796196'
+  PropagateID: '7e7c777c-b757-4f39-b568-b3d9a7796196'
+  ReservedCode1: '7b7e77f0-b548-42da-acc3-2f4516d50449'
+  ReservedCode2: '7b7e77f0-b548-42da-acc3-2f4516d50449'
+---
+
 # CLAUDE.md
 
 配置编辑器 (cfgeditor)，可视化浏览与编辑表结构和记录。React 19 + TypeScript + Vite + Tauri 桌面应用，UI 用 Ant Design，图形用 React Flow (XYFlow)，状态用 Resso + React Query。
@@ -13,14 +24,6 @@ pnpm tauri build             # 构建 Tauri 桌面应用（exe 在 src-tauri/tar
 pnpm run lint                # 代码检查（oxlint）
 pnpm test                    # 单元测试 watch
 pnpm test:run                # 单元测试单次跑（CI 用）
-```
-
-## 后端依赖
-
-需启动 Java 后端提供 API（`localhost:3456`）：
-
-```bash
-java -jar ../cfggen.jar -datadir ../example/config -gen server
 ```
 
 ## 文档索引（详情见 docs/）
@@ -47,3 +50,5 @@ java -jar ../cfggen.jar -datadir ../example/config -gen server
 - **`*.test.ts` 被 `.ignore` 排除**：Grep 工具搜不到测试内容，需用 `Glob src/**/*.test.ts` 定位再 Read（LSP `findReferences` 不受影响）。
 - **测试只覆盖纯逻辑**：vitest，jsdom 环境，不 mock、不碰 UI/网络/Tauri IPC；喂 fixture 断言输出。
 - **国际化**：翻译内联在 `src/app/i18n.ts`（en/zh 两段，无独立 locales 目录），用 i18next。
+
+> AI生成

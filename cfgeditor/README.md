@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: 'dfcc14b3-a236-4f21-8060-5ebf77236c58'
+  PropagateID: 'dfcc14b3-a236-4f21-8060-5ebf77236c58'
+  ReservedCode1: 'f0af2119-ff62-409f-8cc7-be5576e00664'
+  ReservedCode2: 'f0af2119-ff62-409f-8cc7-be5576e00664'
+---
+
 [(English Documents Available)](README_EN.md)
 
 # 🎨 编辑器 cfgeditor
@@ -14,12 +25,6 @@
 
 
 ## 开发期间
-
-- 准备工作：启动对象数据服务器
-
-    ```bash
-    java -jar ../cfggen.jar -datadir ../example/config  -gen server,watch=1
-    ```
 
 - 启动调试
 
@@ -45,3 +50,5 @@ jwebserver
 
 来启动服务器进行测试，然后使用浏览器查看 http://localhost:8000/
 实际部署请选择更成熟的web服务器。
+
+> AI生成

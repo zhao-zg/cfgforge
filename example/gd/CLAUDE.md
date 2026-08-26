@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '95e04ab5-4dbd-4014-91ed-1b7c61973cd2'
+  PropagateID: '95e04ab5-4dbd-4014-91ed-1b7c61973cd2'
+  ReservedCode1: '240335f3-d1ef-4a24-b558-063aa04701ec'
+  ReservedCode2: '240335f3-d1ef-4a24-b558-063aa04701ec'
+---
+
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -33,7 +44,7 @@ gengd.bat
 ### 生成命令详解
 
 ```bash
-java -jar ../cfggen.jar -datadir config -gen gd,own:-nogd,dir:gd/config,encoding:UTF-8 -gen bytes,own:-nogd,file=gd/config.bytes,stringpool
+npx cfggen -datadir config -gen gd,own:-nogd,dir:gd/config,encoding:UTF-8 -gen bytes,own:-nogd,file=gd/config.bytes,stringpool
 ```
 
 - `-datadir config` - 配置数据源目录
@@ -124,7 +135,7 @@ print(jewelry.RefKeyAbility.name)
 
 1. **config/ 目录完全由 cfggen 生成，不要手工修改**
 2. 如需修改配置结构，应修改 `../config/` 中的 `.cfg` schema 文件
-3. 如需修改生成逻辑，应修改 `../../app/` 中的 cfggen 代码生成器
+3. 如需修改生成逻辑，应修改 `../../packages/` 中的 cfggen TypeScript 代码
 4. `config.bytes` 必须与生成的代码版本匹配
 
 ## 配置数据源
@@ -134,3 +145,5 @@ print(jewelry.RefKeyAbility.name)
 - `equip.cfg` - 装备相关配置
 - `other.cfg` - 其他配置（怪物、掉落等）
 - `task.cfg` - 任务相关配置
+
+> AI生成

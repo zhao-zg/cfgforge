@@ -3,10 +3,10 @@ AIGC:
   ContentProducer: '001191110102MAD55U9H0F10002'
   ContentPropagator: '001191110102MAD55U9H0F10002'
   Label: '1'
-  ProduceID: 'f110f8c8-1910-48de-9378-567002f23926'
-  PropagateID: 'f110f8c8-1910-48de-9378-567002f23926'
-  ReservedCode1: '203a83fe-e15e-40be-9e7b-7383dbfa5cf1'
-  ReservedCode2: '203a83fe-e15e-40be-9e7b-7383dbfa5cf1'
+  ProduceID: '1cdd9636-8844-496d-b8b3-fe3bbb93decb'
+  PropagateID: '1cdd9636-8844-496d-b8b3-fe3bbb93decb'
+  ReservedCode1: '22a8c449-2c81-433b-afb3-5edc1dca5f97'
+  ReservedCode2: '22a8c449-2c81-433b-afb3-5edc1dca5f97'
 ---
 
 # cfggen 代码架构文档
@@ -17,7 +17,7 @@ AIGC:
 
 ```
 cfggen/
-├── app/           # [Java] 核心配置生成器 (cfggen)，271 个 Java 文件
+├── packages/      # [TypeScript] 核心配置生成器 (cfggen)，monorepo
 ├── cfgeditor/     # [React+TS] 可视化配置编辑器，Tauri 桌面应用
 ├── cfgdev/        # 开发工具集（Claude Code 插件 + VSCode 扩展）
 ├── docs/          # [Astro] 用户文档站点
@@ -30,19 +30,19 @@ cfggen/
 └── genjar.bat     # 便捷打包脚本（Windows cmd 语法）
 ```
 
-## 2. app/ — cfggen 核心生成器
+## 2. packages/ — cfggen 核心生成器
 
 ### 2.1 构建配置
 
 | 项 | 值 |
 |---|---|
-| 构建文件 | `app/build.gradle` |
-| Java 版本 | 25 (toolchain) |
-| 输出 | `app/build/libs/cfggen.jar` (fatJar) |
+| 构建文件 | `packages/*/package.json` |
+| Node.js | 20+ |
+| 输出 | `packages/cli/dist/` (pnpm build 产出) |
 | 测试 | JUnit 5 + JaCoCo + ArchUnit |
-| 源码根 | `app/src/main/java/configgen/` |
-| 测试根 | `app/src/test/java/configgen/` |
-| 模板 | `app/src/main/resources/jte/` |
+| 源码根 | `packages/*/src/` |
+| 测试根 | `packages/*/__tests__/` |
+| 模板 | `packages/gen/src/templates/` |
 
 关键依赖：
 
@@ -67,7 +67,7 @@ testImplementation 'com.tngtech.archunit:archunit-junit5:1.5.0'
 | `jte { generate() }` | 预编译模板成 class 烤进 jar |
 | `copyGenJavaSources` | 拷贝运行时读取侧源码到 jar resources |
 | `fatJar` | 排除 META-INF/*.SF\|DSA\|RSA，产出可执行 jar |
-| `applicationDefaultJvmArgs` | `--sun-misc-unsafe-memory-access=allow`（JDK25 + fastjson2） |
+| `applicationDefaultJvmArgs` | `--sun-misc-unsafe-memory-access=allow`（Node.js 20+ / TypeScript） |
 
 ### 2.2 分层依赖规则（ArchUnit 固化）
 
@@ -477,7 +477,7 @@ MCP 工具：
 ### 2.5 测试结构
 
 ```
-app/src/test/java/configgen/
+packages/*/__tests__/
 ├── ArchitectureTest.java    ← ArchUnit 分层依赖测试
 ├── ...                      ← 各模块的 JUnit 5 测试
 ```
@@ -500,7 +500,7 @@ CI 门禁：`-gen verify` 当配置引用完整性检查。
 ### 3.2 分层架构（8 目录 4 组）
 
 ```
-app/        ← 入口与壳（CfgEditorApp, AppLoader, i18n）
+packages/   ← 入口与壳（CfgEditorApp, AppLoader, i18n）
 features/   ← 业务页面（record, table, finder, add, setting）
 ─────────────────────────────────────
 flow/       ← 图与编辑（FlowGraph, EntityCard, layout/）
@@ -661,7 +661,7 @@ example/
 | 理解外键校验 | `value/RefValidator.java` |
 | 看值类型树 | `value/CfgValue.java` |
 | 加新语言生成器 | 参考 `gencs/CsCodeGenerator.java` + `gen/Generator.java` |
-| 改代码生成模板 | `app/src/main/resources/jte/<lang>/` |
+| 改代码生成模板 | `packages/gen/src/templates/<lang>/` |
 | 理解二进制格式 | `genbytes/BytesGenerator.java` |
 | 理解写回管道 | `write/AddOrUpdateService.java` + `write/VTableStorage.java` |
 | 看编辑器 API | `editorserver/EditorServer.java` |
@@ -673,3 +673,5 @@ example/
 | 看前端布局引擎 | `cfgeditor/src/flow/layout/` |
 | 看前端数据流 | `cfgeditor/src/api/` + `cfgeditor/docs/01-data-flow.md` |
 | 看前端 Undo/Redo | `cfgeditor/src/domain/undoStack.ts` |
+
+> AI生成

@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '33182c63-0228-44bf-a167-5aed9936ed65'
+  PropagateID: '33182c63-0228-44bf-a167-5aed9936ed65'
+  ReservedCode1: '7037ae44-92ae-429a-b702-a3febfbe0e66'
+  ReservedCode2: '7037ae44-92ae-429a-b702-a3febfbe0e66'
+---
+
 # Example - cfggen 示例配置
 
 cfggen 配置生成器的示例项目，展示如何定义配置结构并生成多种语言的代码。
@@ -51,7 +62,7 @@ example/
 
 ### 前置条件
 
-- 确保 `../cfggen.jar` 存在。若不存在，在 `..` 目录下执行 `genjar.bat`
+- 确保已安装 cfggen CLI（在项目根目录执行 `pnpm -r build` 或 `npm i -g cfggen`）
 
 ### 查看使用说明
 
@@ -189,3 +200,5 @@ gen.bat
 |---|---|
 | `gen*.bat` | 生成该语言的代码和数据 |
 | `run.bat` | 构建并运行验证 |
+
+> AI生成

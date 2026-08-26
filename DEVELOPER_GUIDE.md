@@ -3,10 +3,10 @@ AIGC:
   ContentProducer: '001191110102MAD55U9H0F10002'
   ContentPropagator: '001191110102MAD55U9H0F10002'
   Label: '1'
-  ProduceID: '81a563db-9870-4e49-b11b-9f0b8bceef04'
-  PropagateID: '81a563db-9870-4e49-b11b-9f0b8bceef04'
-  ReservedCode1: 'df515b63-165e-4269-83e1-887199955da7'
-  ReservedCode2: 'df515b63-165e-4269-83e1-887199955da7'
+  ProduceID: '4e3d4893-51f9-48fd-8f7d-0d9988694484'
+  PropagateID: '4e3d4893-51f9-48fd-8f7d-0d9988694484'
+  ReservedCode1: '22b7b07d-cf69-4caa-a641-57573a74ca07'
+  ReservedCode2: '22b7b07d-cf69-4caa-a641-57573a74ca07'
 ---
 
 # cfggen 开发者入门指南
@@ -19,10 +19,9 @@ AIGC:
 
 | 工具 | 版本要求 | 用途 | 验证 |
 |---|---|---|---|
-| JDK | 25+ | cfggen 核心编译运行 | `java -version` |
-| Git | 任意，需在 PATH | 版本控制 + ANTLR 需要 | `git --version` |
-| Node.js | 18+ | cfgeditor 前端 | `node --version` |
-| pnpm | 9+ | cfgeditor 包管理 | `pnpm --version` |
+| Node.js | 20+ | cfggen 核心编译运行 | `node --version` |
+| Git | 任意，需在 PATH | 版本控制 | `git --version` |
+| pnpm | 9+ | monorepo 包管理 | `pnpm --version` |
 | Rust | stable | Tauri 桌面应用打包（可选） | `rustc --version` |
 
 ### 1.2 克隆与初次构建
@@ -32,19 +31,15 @@ AIGC:
 git clone <repo-url> cfggen
 cd cfggen
 
-# 构建 cfggen.jar（在 app 目录下）
-cd app
-./gradlew.bat fatJar
-# 产出：app/build/libs/cfggen.jar
-
-# 复制 jar 到项目根目录（方便运行示例）
-cp build/libs/cfggen.jar ../cfggen.jar
+# 构建所有包
+pnpm install
+pnpm -r build
 
 # 验证构建成功
-java -jar ../cfggen.jar -h
+npx cfggen -h
 ```
 
-> **Windows 注意**：`genjar.bat` 是便捷封装，但使用 Windows cmd 语法，在 Git Bash 下不工作。Git Bash 下用 `./gradlew.bat fatJar` 代替。
+> **Windows 注意**：构建使用 `pnpm -r build`，跨平台兼容，无需特殊处理。
 
 ### 1.3 构建编辑器（可选）
 
@@ -62,11 +57,11 @@ pnpm run dev
 # 浏览器打开 http://localhost:1420/
 ```
 
-编辑器需要后端 API 支持：
+编辑器内置 editor-core 服务，无需独立后端。如需独立启动服务模式：
 
 ```bash
-# 另开终端，启动编辑器后端
-java -jar ../cfggen.jar -datadir ../example/config -gen server,watch=1
+# 启动服务模式
+npx cfggen -datadir ../example/config -gen server,watch=1
 ```
 
 ### 1.4 构建 Tauri 桌面应用（可选）
@@ -80,11 +75,8 @@ pnpm tauri build
 ### 1.5 运行测试
 
 ```bash
-# Java 测试
-cd app
-./gradlew.bat test                        # 全部测试
-./gradlew.bat test --tests "configgen.*"  # 按类名过滤
-./gradlew.bat jacocoTestReport            # 覆盖率报告
+# 全部测试
+pnpm --filter "!@cfggen/schema" -r test   # 全部测试
 
 # 前端测试
 cd cfgeditor
@@ -105,12 +97,12 @@ Schema → Data → Value → Generate
 
 | 层 | 做什么 | 关键类 | 文件位置 |
 |---|---|---|---|
-| **Schema** | 定义有哪些表、字段、外键。独立于数据存在 | `CfgSchema`, `CfgSchemaResolver` | `app/src/.../schema/` |
-| **Data** | 从 Excel/CSV/JSON 读出原始单元格。只搬运不解释 | `CfgDataReader`, `CfgData`, `DTable` | `app/src/.../data/` |
-| **Value** | 把原始单元格和类型系统组合，产出类型化值。外键校验在此 | `CfgValueParser`, `RefValidator`, `VTable` | `app/src/.../value/` |
-| **Generate** | 消费值，用模板渲染各语言代码 | `Generator`, `CsCodeGenerator`... | `app/src/.../gen*/` |
+| **Schema** | 定义有哪些表、字段、外键。独立于数据存在 | `CfgSchema`, `CfgSchemaResolver` | `packages/schema/` |
+| **Data** | 从 Excel/CSV/JSON 读出原始单元格。只搬运不解释 | `CfgDataReader`, `CfgData`, `DTable` | `packages/data/` |
+| **Value** | 把原始单元格和类型系统组合，产出类型化值。外键校验在此 | `CfgValueParser`, `RefValidator`, `VTable` | `packages/value/` |
+| **Generate** | 消费值，用模板渲染各语言代码 | `Generator`, `CsCodeGenerator`... | `packages/gen/` |
 
-`Context`（`app/src/.../ctx/Context.java`）是协调者：它持有 schema、data 和缓存值，所有生成器从 Context 取数据。
+`Context`（`packages/context/`）是协调者：它持有 schema、data 和缓存值，所有生成器从 Context 取数据。
 
 ### 2.2 CFG Schema 语法
 
@@ -160,13 +152,13 @@ Tools.addProvider("xmltocfg", XmlToCfgTool::new);
 
 命令行使用：
 ```bash
-java -jar cfggen.jar -datadir <dir> -gen <name>[,key=value...]
-java -jar cfggen.jar -datadir <dir> -tool <name>[,key=value...]
+npx cfggen -datadir <dir> -gen <name>[,key=value...]
+npx cfggen -datadir <dir> -tool <name>[,key=value...]
 ```
 
 ### 2.4 分层依赖规则
 
-**cfggen (Java)** 层次（ArchUnit 强制）：
+**cfggen (TypeScript monorepo)** 层次（eslint 强制）：
 
 ```
 gen(含 gen*/write/editorserver/mcpserver/tool)
@@ -181,20 +173,20 @@ app/features → flow/res → store/services → domain → api
 
 反向 import 会被测试/lint 直接拦下。
 
-### 2.5 JTE 模板引擎
+### 2.5 模板引擎
 
-代码生成用 JTE 模板（`app/src/main/resources/jte/`）：
+代码生成用模板引擎（`packages/gen/templates/`）：
 
-- **构建期** `jte{generate()}` 把模板预编译成 class 烤进 jar，运行时零编译（省 ~1.6s 启动时间）
-- **开发期** `./gradlew.bat run` 回退动态编译到临时目录，改模板立即见效
-- **改模板后必须重新 `fatJar`** 才能让预编译 class 进 jar
+- **构建期** `pnpm -r build` 预编译模板，运行时零编译
+- **开发期** `npx cfggen` 改模板立即见效
+- **改模板后必须重新 `pnpm -r build`** 才能让预编译生效
 
 ## 3. 代码导航地图
 
-### 3.1 cfggen (Java) 代码地图
+### 3.1 cfggen (TypeScript) 代码地图
 
 ```
-app/src/main/java/configgen/
+packages/
 │
 ├── gen/                    ← 命令行入口
 │   ├── Main.java           ← main()，注册所有插件，解析参数
@@ -340,17 +332,17 @@ cfgeditor/src/
 
 | 想了解 | 从哪开始读 |
 |---|---|
-| cfggen 整体架构 | `app/docs/01-architecture-overview.md` |
+| cfggen 整体架构 | `docs/01-architecture-overview.md` |
 | CFG schema 语法 | `docs/src/content/docs/core/schema.mdx` |
-| Schema 解析器内部 | `app/docs/02-schema-and-cfg.md` |
-| 数据读取 | `app/docs/03-data-reading.md` |
-| 值模型和外键 | `app/docs/04-value-model.md` |
-| 代码生成和扩展 | `app/docs/05-codegen-and-extension.md` |
-| 二进制格式 | `app/docs/06-bytes-format.md` |
-| 写回管道 | `app/docs/07-write-back-and-servers.md` |
-| 错误和校验 | `app/docs/08-errors-and-validation.md` |
-| 国际化 | `app/docs/09-i18n.md` |
-| 开发调试流程 | `app/docs/10-dev-workflow.md` |
+| Schema 解析器内部 | `docs/02-schema-and-cfg.md` |
+| 数据读取 | `docs/03-data-reading.md` |
+| 值模型和外键 | `docs/04-value-model.md` |
+| 代码生成和扩展 | `docs/05-codegen-and-extension.md` |
+| 二进制格式 | `docs/06-bytes-format.md` |
+| 写回管道 | `docs/07-write-back-and-servers.md` |
+| 错误和校验 | `docs/08-errors-and-validation.md` |
+| 国际化 | `docs/09-i18n.md` |
+| 开发调试流程 | `docs/10-dev-workflow.md` |
 | cfgeditor 源码 | `cfgeditor/docs/README.md` |
 
 ## 4. 常见开发任务
@@ -363,7 +355,7 @@ cfgeditor/src/
 cd example/java
 genjava.bat         # Windows
 # 或
-java -jar ../../cfggen.jar -datadir ../config -gen java,dir:.
+npx cfggen -datadir ../config -gen java,dir:.
 
 # 3. 验证
 run.bat
@@ -374,9 +366,9 @@ run.bat
 1. 新建 `gen<lang>` 包，写 `XxxCodeGenerator extends Generator`
 2. 构造函数里声明参数：`dir = parameter.get("dir", ".")`
 3. 实现 `generate(ctx)`：`ctx.makeValue(tag)` → 建 Model → `JteEngine.render("lang/Xxx.jte", model, ps)`
-4. 模板放 `src/main/resources/jte/lang/`
+4. 模板放 `packages/gen/templates/lang/`
 5. 在 `Main.registerAllProviders` 加一行 `Generators.addProvider("lang", XxxCodeGenerator::new)`
-6. 重新 `fatJar`
+6. 重新 `pnpm -r build`
 
 > 参考 `gencs/CsCodeGenerator.java` 作为代表性实现。
 
@@ -384,14 +376,13 @@ run.bat
 
 ```bash
 # 模板位置
-app/src/main/resources/jte/
+packages/gen/templates/
 
 # 开发期动态编译（改完立即见效）
-cd app
-./gradlew.bat run --args="-datadir ../example/config -gen cs,dir:../example/cs"
+npx cfggen -datadir ../example/config -gen cs,dir:../example/cs
 
-# 发布前必须重新 fatJar
-./gradlew.bat fatJar
+# 发布前必须重新构建
+pnpm -r build
 ```
 
 ### 4.4 修改前端编辑器
@@ -399,8 +390,8 @@ cd app
 ```bash
 cd cfgeditor
 
-# 启动后端
-java -jar ../cfggen.jar -datadir ../example/config -gen server,watch=1
+# 启动服务模式
+npx cfggen -datadir ../example/config -gen server,watch=1
 
 # 启动前端开发服务器
 pnpm run dev
@@ -426,7 +417,7 @@ genjava.bat && run.bat
 
 ```bash
 # 启动 MCP 服务（端口 3457）
-java -jar cfggen.jar -datadir example/config -gen mcpserver
+npx cfggen -datadir example/config -gen mcpserver
 
 # AI 工具可调用：SchemaTool, ReadRecordTool, WriteRecordTool, SearchTool
 ```
@@ -437,14 +428,14 @@ java -jar cfggen.jar -datadir example/config -gen mcpserver
 
 ```bash
 # 打印每步耗时和内存
-java -jar cfggen.jar -datadir config -gen java -p
+npx cfggen -datadir config -gen java -p
 
 # 更稳定的内存数（先 gc）
-java -jar cfggen.jar -datadir config -gen java -pp
+npx cfggen -datadir config -gen java -pp
 
 # 详细统计
-java -jar cfggen.jar -datadir config -gen java -v    # verbose
-java -jar cfggen.jar -datadir config -gen java -vv   # very verbose
+npx cfggen -datadir config -gen java -v    # verbose
+npx cfggen -datadir config -gen java -vv   # very verbose
 ```
 
 > 关键原则：看 `-p` 的工作秒/分配量，不要看墙上时间（server 场景噪声 ±50%）。
@@ -453,16 +444,16 @@ java -jar cfggen.jar -datadir config -gen java -vv   # very verbose
 
 ```bash
 # 校验配置引用完整性
-java -jar cfggen.jar -datadir config -gen verify
+npx cfggen -datadir config -gen verify
 
 # 搜索配置
-java -jar cfggen.jar -datadir config -gen search
+npx cfggen -datadir config -gen search
 
 # 关闭警告
-java -jar cfggen.jar -datadir config -gen java -nowarn
+npx cfggen -datadir config -gen java -nowarn
 
 # 显示弱警告
-java -jar cfggen.jar -datadir config -gen java -weakwarn
+npx cfggen -datadir config -gen java -weakwarn
 ```
 
 错误分三级：
@@ -483,8 +474,8 @@ Context 构造时比较 schema 与 alignedSchema：
 ### 5.4 调试编辑器 API
 
 ```bash
-# 启动后端服务
-java -jar cfggen.jar -datadir example/config -gen server,watch=1
+# 启动服务模式
+npx cfggen -datadir example/config -gen server,watch=1
 
 # 直接调用 API
 curl http://localhost:3456/schemas
@@ -496,12 +487,12 @@ curl "http://localhost:3456/search?q=武器"
 
 | 问题 | 原因 | 解决 |
 |---|---|---|
-| jar 里模板不生效 | 改模板后没重新 fatJar | `./gradlew.bat fatJar` |
+| 模板不生效 | 改模板后没重新构建 | `pnpm -r build` |
 | GDScript 属性看起来像无限递归 | Godot 4.x 标准语法 | 不要改，引擎自动处理 |
 | ts 生成器不清理旧文件 | 刻意行为（dstDir 是用户项目根） | 不要照搬 cs/lua 的清理 |
-| Java25 Unsafe 警告 | fastjson2 用了 sun.misc.Unsafe | 已用 JVM arg 抑制，看到正常 |
+| Node.js 兼容性警告 | 某些依赖用了实验性 API | 已配置，看到正常 |
 | 同名 json 跨目录冲突 | 如 `_skill_buff` 和 `skill/_buff` | 不能同时存在 |
-| `genjar.bat` 在 Git Bash 失败 | Windows cmd 语法 | 用 `./gradlew.bat fatJar` |
+| pnpm 版本不匹配 | monorepo 需要 pnpm 9+ | 用 `npm i -g pnpm@9` 升级 |
 | `storageJson.ts` 不能手改 | quicktype 自动生成 | 改 `json.ts` 后跑 `genJsonParser.bat` |
 
 ## 6. 项目约定
@@ -519,7 +510,7 @@ curl "http://localhost:3456/search?q=武器"
 
 - 各子目录的 `CLAUDE.md` 是 AI 速查硬事实
 - 各子目录的 `README.md` 是构建和使用说明
-- `app/docs/` 是开发者向源码设计文档
+- `docs/` 是开发者向源码设计文档
 - `cfgeditor/docs/` 是前端源码设计文档
 - `docs/src/content/docs/` 是用户向文档
 
@@ -545,3 +536,5 @@ curl "http://localhost:3456/search?q=武器"
 - v1.1.0 (2025-04)：MCP 服务器、AI 聊天、AI 翻译、可视化节点
 - v1.3.0 (2026-02)：GenVerifier、Claude Code 插件、未引用记录查看
 - v1.4.0 (2026-07)：GDScript、并发化优化、undo/redo、Schema 级 Enum
+
+> AI生成

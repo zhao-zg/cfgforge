@@ -3,10 +3,10 @@ AIGC:
   ContentProducer: '001191110102MAD55U9H0F10002'
   ContentPropagator: '001191110102MAD55U9H0F10002'
   Label: '1'
-  ProduceID: '26be18f0-128f-4757-aa75-f6e5eb4e9660'
-  PropagateID: '26be18f0-128f-4757-aa75-f6e5eb4e9660'
-  ReservedCode1: 'bdface68-3c6a-41e3-aa15-dd4729863b49'
-  ReservedCode2: 'bdface68-3c6a-41e3-aa15-dd4729863b49'
+  ProduceID: '21da6a05-e9da-44b1-9423-7ec74ad90d7b'
+  PropagateID: '21da6a05-e9da-44b1-9423-7ec74ad90d7b'
+  ReservedCode1: 'b3f2acf5-2e97-4d7f-a88f-6eefecdd3f04'
+  ReservedCode2: 'b3f2acf5-2e97-4d7f-a88f-6eefecdd3f04'
 ---
 
 # cfggen 策划配表系统 — 项目总览架构文档
@@ -36,13 +36,13 @@ cfggen 是一个**配置定义驱动**的多语言代码生成器，面向游戏
 │                        cfggen 策划配表系统                         │
 │                                                                    │
 │  ┌─────────────┐   ┌──────────────┐   ┌───────────┐   ┌─────────┐ │
-│  │   app/      │   │  cfgeditor/  │   │  cfgdev/  │   │  docs/  │ │
+│  │  packages/  │   │  cfgeditor/  │   │  cfgdev/  │   │  docs/  │ │
 │  │  (cfggen)   │   │  (编辑器)     │   │ (开发工具) │   │ (文档站) │ │
 │  │             │   │              │   │           │   │         │ │
-│  │ Java 25     │   │ React 19+TS  │   │ Claude插件 │   │ Astro+  │ │
-│  │ Gradle      │   │ Tauri桌面    │   │ VSCode扩展 │   │ Starlight│ │
+│  │ TypeScript  │   │ React 19+TS  │   │ Claude插件 │   │ Astro+  │ │
+│  │ pnpm        │   │ Tauri桌面    │   │ VSCode扩展 │   │ Starlight│ │
 │  │             │   │              │   │           │   │         │ │
-│  │ 271个Java文件 │   │ 8层目录架构   │   │ 2个子项目  │   │ 在线文档 │ │
+│  │ TS monorepo │   │ 8层目录架构   │   │ 2个子项目  │   │ 在线文档 │ │
 │  └──────┬──────┘   └──────┬───────┘   └───────────┘   └─────────┘ │
 │         │                   │                                        │
 │         │    HTTP :3456     │                                        │
@@ -53,7 +53,7 @@ cfggen 是一个**配置定义驱动**的多语言代码生成器，面向游戏
 
 | 组件 | 目录 | 技术栈 | 职责 | 规模 |
 |---|---|---|---|---|
-| **cfggen** | `app/` | Java 25, Gradle | 核心生成器：从 .cfg schema + Excel/CSV/JSON → 6+ 语言代码/数据 | 271 个 Java 文件, 21 个包 |
+| **cfggen** | `packages/` | TypeScript, pnpm | 核心生成器：从 .cfg schema + Excel/CSV/JSON → 6+ 语言代码/数据 | TypeScript monorepo |
 | **cfgeditor** | `cfgeditor/` | React 19 + TypeScript + Tauri | 可视化浏览器/编辑器：浏览+编辑表结构和记录 | 8 目录分层架构 |
 | **cfgdev** | `cfgdev/` | Claude Code 插件 + VSCode 扩展 | 开发工具集：自然语言生成 schema + .cfg 语法高亮 | 2 个子项目 |
 | **docs** | `docs/` | Astro + Starlight | 用户文档站点（在线部署） | 含语法/CLI/编辑器/AI 文档 |
@@ -70,7 +70,7 @@ flowchart TB
     end
 
     subgraph 程序工作流
-        CFG[".cfg schema 定义"] --> CFGGEN["cfggen.jar<br/>命令行生成器"]
+        CFG[".cfg schema 定义"] --> CFGGEN["npx cfggen<br/>命令行生成器"]
         EXCEL --> CFGGEN
         CFGGEN -->|"生成"| CODE["Java/C#/TS/Go/Lua/GD<br/>读表代码"]
         CFGGEN -->|"生成"| BYTES["config.bytes<br/>二进制数据"]
@@ -131,19 +131,19 @@ flowchart TB
 
 ## 3. 核心组件详解
 
-### 3.1 app/ — cfggen 核心生成器
+### 3.1 packages/ — cfggen 核心生成器
 
 #### 技术栈
 
 | 项 | 值 |
 |---|---|
-| 语言 | Java 25 |
-| 构建 | Gradle (fatJar 产出 cfggen.jar) |
+| 语言 | TypeScript |
+| 构建 | pnpm -r build |
 | 主要依赖 | FastExcel 0.19, POI 5.5, FastJSON2 2.0, JTE 3.2, ANTLR 4.13, Simple-OpenAI 3.21, MCP SDK 0.9 |
 | 测试 | JUnit 5 + JaCoCo + ArchUnit |
 | 模板引擎 | JTE (构建期预编译进 jar) |
 
-#### 包结构（21 个包，271 个 Java 文件）
+#### 包结构（monorepo 多包）
 
 ```
 configgen/
@@ -197,7 +197,7 @@ gen(含 gen*/write/editorserver/mcpserver/tool)
 1. 新建 `gen<lang>` 包，写 `XxxCodeGenerator extends Generator`
 2. 构造函数里声明参数（`parameter.get("dir", "...")`）
 3. `generate(ctx)`：`ctx.makeValue(tag)` → 建 Model → `JteEngine.render()`
-4. 模板放 `src/main/resources/jte/lang/`
+4. 模板放 `packages/gen/src/templates/lang/`
 5. 在 `Main.registerAllProviders` 加一行 `Generators.addProvider("lang", XxxCodeGenerator::new)`
 
 当前注册的生成器：
@@ -258,7 +258,7 @@ flowchart TD
 #### 分层架构（8 目录 4 组，依赖只能向下）
 
 ```
-app/        入口与壳：CfgEditorApp, AppLoader, i18n
+packages/   入口与壳：CfgEditorApp, AppLoader, i18n
 features/   业务页面：record, table, finder, headerbar, add(Chat), setting
 ─────────────────────────────────────────────────
 flow/       图与编辑：FlowGraph, EntityCard, useEntityToGraph, layout/
@@ -282,7 +282,7 @@ schema (类型)  ┘    (recordEditEntityCreator /          (FlowGraph)
                       entityToNodeAndEdge)
 ```
 
-cfgeditor 是**瘦前端**，所有数据来自 Java 后端（`cfggen -gen server`，默认 `localhost:3456`）。编辑就是反着走：在 node 表单里改值 → 写回 record 数据对象 → POST 回后端。
+cfgeditor 是**瘦前端**，所有数据来自 TypeScript editor-core（直接 import）。编辑就是反着走：在 node 表单里改值 → 写回 record 数据对象 → POST 回后端。
 
 ### 3.3 cfgdev/ — 开发工具集
 
@@ -345,23 +345,23 @@ cfgeditor 是**瘦前端**，所有数据来自 Java 后端（`cfggen -gen serve
 ### 场景 1：生成 Java 读表代码
 
 ```bash
-java -jar cfggen.jar -datadir example/config -gen java,dir:example/java
+npx cfggen -datadir example/config -gen java,dir:example/java
 ```
 
 ### 场景 2：生成多语言客户端 + 服务端
 
 ```bash
 # C# 服务端（包含所有语言文本）
-java -jar cfggen.jar -datadir example/config -langswitchdir i18n -gen cs,dir:example/cs_ls
+npx cfggen -datadir example/config -langswitchdir i18n -gen cs,dir:example/cs_ls
 
 # C# 客户端（运行时切换语言）
-java -jar cfggen.jar -datadir example/config -langswitchdir i18n -gen cs,dir:example/cs_ls_client
+npx cfggen -datadir example/config -langswitchdir i18n -gen cs,dir:example/cs_ls_client
 ```
 
 ### 场景 3：CI 校验配置完整性
 
 ```bash
-java -jar cfggen.jar -datadir config -gen verify
+npx cfggen -datadir config -gen verify
 # 有引用错误则非零退出码，CI 失败
 ```
 
@@ -369,7 +369,7 @@ java -jar cfggen.jar -datadir config -gen verify
 
 ```bash
 # 终端 1：启动后端
-java -jar cfggen.jar -datadir example/config -gen server,watch=1
+npx cfggen -datadir example/config -gen server,watch=1
 
 # 终端 2：启动前端
 cd cfgeditor && pnpm run dev
@@ -379,7 +379,7 @@ cd cfgeditor && pnpm run dev
 ### 场景 5：生成二进制发布数据
 
 ```bash
-java -jar cfggen.jar -datadir config -gen bytes,schema -gen java,dir:src
+npx cfggen -datadir config -gen bytes,schema -gen java,dir:src
 # 产出 config.bytes（含 schema 自描述）+ Java 读取代码
 ```
 
@@ -387,7 +387,7 @@ java -jar cfggen.jar -datadir config -gen bytes,schema -gen java,dir:src
 
 | 层面 | 技术 |
 |---|---|
-| 核心生成器 | Java 25, Gradle, JTE 模板, ANTLR 4, FastExcel, POI, FastJSON2 |
+| 核心生成器 | Node.js 20+, pnpm, JTE 模板, ANTLR 4, FastExcel, POI, FastJSON2 |
 | 可视化编辑器 | React 19, TypeScript, Tauri, Ant Design, React Flow, Resso |
 | AI 集成 | Simple-OpenAI, MCP SDK, Claude Code 插件 |
 | 开发工具 | VSCode 扩展 (LSP), oxlint (分层强制) |
@@ -402,7 +402,9 @@ java -jar cfggen.jar -datadir config -gen bytes,schema -gen java,dir:src
 | 本文档（项目总览） | `PROJECT_OVERVIEW.md` | 所有人 |
 | 开发者入门指南 | `DEVELOPER_GUIDE.md` | 新开发者 |
 | 代码架构文档 | `CODE_ARCHITECTURE.md` | 开发者（代码导航） |
-| cfggen 源码设计系列 | `app/docs/01-10` | cfggen Java 开发者 |
+| cfggen 源码设计系列 | `packages/ 对应文档` | cfggen TypeScript 开发者 |
 | cfgeditor 源码设计系列 | `cfgeditor/docs/01-09` | cfgeditor 前端开发者 |
 | 用户文档站 | `docs/src/content/docs/` | 最终用户（策划/程序） |
 | CLAUDE.md | 各子目录根 | AI 辅助开发速查 |
+
+> AI生成

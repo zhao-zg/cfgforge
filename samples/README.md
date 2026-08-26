@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '2ece5416-ae14-45c8-aaba-b96af722f6aa'
+  PropagateID: '2ece5416-ae14-45c8-aaba-b96af722f6aa'
+  ReservedCode1: '96ed0b12-d81c-43af-bb53-56dd768d5d8e'
+  ReservedCode2: '96ed0b12-d81c-43af-bb53-56dd768d5d8e'
+---
+
 # Samples - cfggen 配置示例
 
 cfggen 配置系统的实际应用示例，展示各种游戏系统的配置设计模式。
@@ -6,7 +17,7 @@ cfggen 配置系统的实际应用示例，展示各种游戏系统的配置设�
 
 ### 0. 前置条件
 
-- 确保 `../cfggen.jar` 存在。若不存在，在 `..` 目录下执行 `genjar.bat`
+- 确保已安装 cfggen CLI（在 `..` 目录执行 `pnpm -r build` 或 `npm i -g cfggen`）
 
 - 确保 `cfgeditor.exe` 存在。若不存在，在 `../cfgeditor` 目录下执行 `genexe.bat`，然后拷贝 `cfgeditor.exe` 到当前目录
 
@@ -80,3 +91,5 @@ cfggen 配置系统的实际应用示例，展示各种游戏系统的配置设�
 - **[主项目文档](../)** - cfggen 完整介绍
 - **[结构定义规范](../docs/docs/cfggen/03.schema.md)** - CFG 语法说明
 - **[example 生成示例](../example/README.md)** - 生成代码示例
+
+> AI生成

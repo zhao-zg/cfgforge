@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '073e4c37-b3a4-4bed-b928-89b4337fba5d'
+  PropagateID: '073e4c37-b3a4-4bed-b928-89b4337fba5d'
+  ReservedCode1: '22c8ac9e-08ba-498a-937b-b8dc15b17175'
+  ReservedCode2: '22c8ac9e-08ba-498a-937b-b8dc15b17175'
+---
+
 # cfgeditor 源码阅读与设计
 
 > 这套文档帮你**读懂源码、理解设计**——不是 API 手册，不是用户指南。读完你应该能回答：一条记录从后端到屏幕、再被编辑回后端，代码走了哪条路？每一步为什么这么设计？
@@ -8,17 +19,17 @@
 
 cfgeditor 是 [cfggen](../) 配表体系的**可视化前端**：策划在图形界面里浏览 / 编辑配表（游戏配置数据），编辑完的数据由 cfggen 生成多语言程序代码。
 
-React 19 + TypeScript + Vite + Tauri 桌面应用，图形用 React Flow（`@xyflow/react`），UI 用 Ant Design v6，状态用 Resso + React Query。**自己不存配表数据**——所有数据来自一个 Java 后端：
+React 19 + TypeScript + Vite + Tauri 桌面应用，图形用 React Flow（`@xyflow/react`），UI 用 Ant Design v6，状态用 Resso + React Query。**自己不存配表数据**——所有数据通过 editor-core（TypeScript）直接读写本地文件：
 
 ```
 cfgeditor (React 前端，本仓库)
-      ↕  HTTP（默认 localhost:3456）
-cfggen.jar -gen server (Java 后端，../app)
-      ↕  读写
+      ↕  直接 import
+editor-core (TypeScript 服务层，packages/editor-core)
+      ↕  读写（通过 @tauri-apps/plugin-fs）
 Excel / CSV / JSON 配表文件（磁盘）
 ```
 
-> cfgeditor 是瘦前端，数据在后端。后端端点 / 缓存策略见 [01 数据流](01-data-flow.md)。
+> cfgeditor 直接调用 editor-core 服务层，数据在本地读写，无需独立后端。数据流见 [01 数据流](01-data-flow.md)。
 
 ## 二、核心概念词汇表
 
@@ -149,3 +160,5 @@ api/        HTTP：apiClient, recordModel, schemaModel, noteModel, searchModel, 
 - cfgeditor = **瘦前端**，数据在后端（cfggen `-gen server`）。
 - record + schema → entity → node + edge → 画布；编辑反着走（表单改值 → 写回 record → 提交后端）。
 - 八目录四组分层，依赖**只能向下**，oxlint `no-restricted-imports` 守门。
+
+> AI生成

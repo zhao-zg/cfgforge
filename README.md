@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '842e9734-884a-4fd8-b050-fff8595dc362'
+  PropagateID: '842e9734-884a-4fd8-b050-fff8595dc362'
+  ReservedCode1: 'dba99046-b7a0-4336-8847-a03acc7fd495'
+  ReservedCode2: 'dba99046-b7a0-4336-8847-a03acc7fd495'
+---
+
 [(English Documents Available)](README_EN.md)
 
 
@@ -28,7 +39,7 @@
 
 ### 🗂️ 配表系统 cfggen
 
-请参考 [配置系统 文档](app/README.md)。
+请参考 [配置系统文档](packages/cli/README.md)。
 
 ### 🎨 编辑器 cfgeditor.exe
 
@@ -40,3 +51,4 @@
 
 请参考 [CFG claudecode插件和vscode插件](cfgdev/README.md)。
 
+> AI生成

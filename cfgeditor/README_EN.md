@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: 'dabecaf2-6cfd-41f7-bacc-22671d87412d'
+  PropagateID: 'dabecaf2-6cfd-41f7-bacc-22671d87412d'
+  ReservedCode1: '6725fae2-a1b0-4127-b86d-607bae144c23'
+  ReservedCode2: '6725fae2-a1b0-4127-b86d-607bae144c23'
+---
+
 # cfgeditor
 
 ## features
@@ -10,12 +21,6 @@
 1. nodejs, pnpm
 2. `pnpm install`
 
-
-## prepare: start backend object data server
-
-```bash
-java -jar ../cfggen.jar -datadir ../example/config  -gen server
-```
 
 ## build
 
@@ -53,3 +58,5 @@ pnpm tauri build
 ```
 
 the generated cfgeditor.exe is in `src-tauri\target\release\` directory.
+
+> AI生成

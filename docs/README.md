@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '71d3b100-074c-4b9f-b380-20da535e64b6'
+  PropagateID: '71d3b100-074c-4b9f-b380-20da535e64b6'
+  ReservedCode1: 'cf279b67-1d63-4018-b280-1053f2cebf1f'
+  ReservedCode2: 'cf279b67-1d63-4018-b280-1053f2cebf1f'
+---
+
 # 📚 策划配表系统文档
 
 [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
@@ -104,7 +115,7 @@ sidebar:
 ## 🔗 相关链接
 
 - [主项目 README](../README.md)
-- [配表系统 (cfggen)](../app/)
+- [配表系统 (cfggen)](../packages/)
 - [配置编辑器 (cfgeditor)](../cfgeditor/)
 - [开发工具 (cfgdev)](../cfgdev/)
 - [在线文档](https://stallboy.github.io/cfggen)
@@ -114,3 +125,5 @@ sidebar:
 - [Starlight 文档](https://starlight.astro.build/)
 - [Astro 文档](https://docs.astro.build)
 - [Astro Discord](https://astro.build/chat)
+
+> AI生成

@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '3ee0feec-2a6c-4c90-81a4-31737b1c0dba'
+  PropagateID: '3ee0feec-2a6c-4c90-81a4-31737b1c0dba'
+  ReservedCode1: '629e99e0-590d-4f3a-ade0-cc598a7aa1de'
+  ReservedCode2: '629e99e0-590d-4f3a-ade0-cc598a7aa1de'
+---
+
 # CLAUDE.md - Example 示例项目
 
 本文件为 Claude Code 提供 example 目录的开发指导。
@@ -74,7 +85,7 @@ config/
 ### 基本格式
 
 ```bash
-java -jar ../../cfggen.jar -datadir ../config -gen <目标类型>[,选项...] [-gen <目标类型2>...]
+npx cfggen -datadir ../config -gen <目标类型>[,选项...] [-gen <目标类型2>...]
 ```
 
 ### 常用目标类型
@@ -120,7 +131,7 @@ java -jar ../../cfggen.jar -datadir ../config -gen <目标类型>[,选项...] [-
 
 每个语言目录下都有 `run.bat` 用于验证生成的代码：
 
-- **Java**: `gradle run` 或直接运行 Java
+- **Java**: 直接运行生成的 Java 代码
 - **C#**: `dotnet run`
 - **TypeScript**: `npx tsx main.ts`
 - **Lua**: `lua.exe test.lua`
@@ -150,8 +161,10 @@ java -jar ../../cfggen.jar -datadir ../config -gen <目标类型>[,选项...] [-
 
 ## 注意事项
 
-1. 确保 `cfggen.jar` 存在于项目根目录
+1. 确保已安装 cfggen CLI（`pnpm -r build` 或 `npm i -g cfggen`）
 2. 生成前会清理旧的生成代码（各 gen*.bat 开头的 rm 命令）
 3. 多语言版本需要配置语言表（i18n 目录）
 4. GDScript 项目使用 Godot 4.x
 5. Windows 环境下执行 .bat 文件使用 `./` 前缀
+
+> AI生成

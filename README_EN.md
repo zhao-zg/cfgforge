@@ -1,3 +1,14 @@
+---
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: '24ec0ffb-6efb-4ceb-8653-0020c813c233'
+  PropagateID: '24ec0ffb-6efb-4ceb-8653-0020c813c233'
+  ReservedCode1: '77919b75-c5b3-489f-a816-1515225f6c8b'
+  ReservedCode2: '77919b75-c5b3-489f-a816-1515225f6c8b'
+---
+
 # Configuration Table Generation System
 
 ![intro](docs/src/content/docs/intro.png)
@@ -25,7 +36,7 @@ Please read the [detailed documentation](https://stallboy.github.io/cfggen)
 
 ### Configuration System cfggen
 
-Please refer to [Configuration System Documentation](app/README.md).
+Please refer to [Configuration System Documentation](packages/cli/README.md).
 
 ### Editor cfgeditor.exe
 
@@ -39,3 +50,5 @@ We provide a specialized VSCode extension for `.cfg` configuration files with th
 - **Go to Definition**: Ctrl+click on type names or foreign key references to jump to definition locations
 
 For detailed features and usage instructions, please refer to [VSCode CFG Extension Documentation](cfgdev/vscode-cfg-extension/README.md).
+
+> AI生成

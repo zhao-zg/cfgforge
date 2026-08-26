@@ -14,12 +14,11 @@
  * - No concurrency (TS single-threaded; Java used LongAdder for counters)
  */
 
-import type { Structural, FieldSchema } from '@cfggen/schema';
-import { StructSchema, TableSchema, InterfaceSchema } from '@cfggen/schema';
-import { Primitive, FList, FMap, StructRef } from '@cfggen/schema';
-import type { VTable, Value, SimpleValue, CompositeValue } from '@cfggen/value';
+import type { Structural } from '@cfggen/schema';
+import { FList, FMap, StructRef } from '@cfggen/schema';
+import type { VTable, Value, CompositeValue } from '@cfggen/value';
 import {
-  VStruct, VInterface, VList, VMap, VBool,
+  VStruct, VInterface, VList, VMap,
 } from '@cfggen/value';
 import { TextValue } from '@cfggen/value';
 import type { LuaAContext } from './LuaAContext';
@@ -80,7 +79,7 @@ export class CompositeValueStr {
 
   setValueStr(value: string): void { this.valueStr = value; }
   getName(): string { return this.name; }
-  getValueStr(): string { return this.valueStr; }
+  getValueStr(): string | null { return this.valueStr; }
 }
 
 // ---------------------------------------------------------------------------
@@ -227,13 +226,7 @@ export class LuaCtxShared {
   private mapTableUseCount = 0;
   private readonly sharedCompositeValues = new Map<CompositeValue, CompositeValueStr>();
 
-  private ctx: LuaCtx | null = null;
-  private aCtx: LuaAContext | null = null;
-
   parseShared(ctx: LuaCtx, aCtx: LuaAContext): void {
-    this.ctx = ctx;
-    this.aCtx = aCtx;
-
     const shared = new ValueShared(ctx.vTable());
     shared.iterateShared(aCtx);
 

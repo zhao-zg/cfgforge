@@ -14,33 +14,25 @@
  */
 
 import {
-  Primitive,
-  isPrimitive,
   isStructRef,
   isFList,
   isFMap,
-  isSimpleType,
   isEEntry,
   isEEnum,
   isRefPrimary,
-  isRefUniq,
   isRefList,
-  type FieldType,
   type StructRef,
   type FList as FListType,
   type FMap as FMapType,
 } from '@cfggen/schema';
 import type {
-  FieldSchema,
   ForeignKeySchema,
   KeySchema,
   TableSchema,
   Structural,
-  StructSchema,
-  InterfaceSchema,
 } from '@cfggen/schema';
 import { upper1, lower1, removeLineSep } from '@cfggen/shared';
-import type { VTable, CfgValue } from '@cfggen/value';
+import type { VTable } from '@cfggen/value';
 
 import { GoName } from './GoName';
 import { GoStructModel } from './GoStructModel';
@@ -427,7 +419,6 @@ export function genCfgMgr(model: GoCfgMgrModel): string {
     const name = new GoName(vTable.schema);
     const className = lower1(name.className);
     const ClassName = upper1(className);
-    const ClassReadName = name.pkgName;
 
     lines.push(`var ${className}Mgr *${ClassName}Mgr`);
     lines.push('');

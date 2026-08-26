@@ -124,7 +124,6 @@ export class LuaLangSwitchSupport {
 export class LuaAContext {
   private pkgPrefixStr = '';
   private nullableLangSwitchSupport: LuaLangSwitchSupport | null = null;
-  private sharedEmptyTable = false;
   private shared = false;
   private packBool = false;
   private noStr = false;
@@ -152,7 +151,6 @@ export class LuaAContext {
     rForOldShared: boolean,
   ): void {
     this.nullableLangSwitchSupport = ls !== null ? new LuaLangSwitchSupport(ls) : null;
-    this.sharedEmptyTable = shareEmptyTable;
     this.shared = share;
     this.packBool = packBool;
     this.noStr = noStr;

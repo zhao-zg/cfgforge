@@ -5,7 +5,6 @@
  */
 
 import type { Nameable } from '@cfggen/schema';
-import { CommentData } from '@cfggen/schema';
 
 export function sourceCommentOf(nameable: Nameable, rawSheetIds: string[] | null): string {
   const lines: string[] = [];

@@ -16,10 +16,7 @@ import {
   isFMap,
   isSimpleType,
   type FieldType,
-  type SimpleType,
   type StructRef,
-  type FList,
-  type FMap,
 } from '@cfggen/schema';
 import type {
   Structural,
@@ -29,9 +26,8 @@ import type {
   KeySchema,
   TableSchema,
   StructSchema,
-  InterfaceSchema,
 } from '@cfggen/schema';
-import { isRefPrimary, isRefUniq, isRefList, type RefSimple } from '@cfggen/schema';
+import { isRefList, RefPrimary, RefUniq, type RefSimple } from '@cfggen/schema';
 import { upper1, lower1 } from '@cfggen/shared';
 import type { VTable } from '@cfggen/value';
 import type { TsCodeGenerator } from './TsCodeGenerator';
@@ -150,8 +146,8 @@ export class StructModel {
   }
 
   isNullableRef(fk: ForeignKeySchema): boolean {
-    return isRefPrimary(fk.refKey) && fk.refKey.nullable
-      || isRefUniq(fk.refKey) && fk.refKey.nullable;
+    return (fk.refKey instanceof RefPrimary && fk.refKey.nullable)
+      || (fk.refKey instanceof RefUniq && fk.refKey.nullable);
   }
 
   fieldDeclaration(field: FieldSchema): string {
@@ -251,12 +247,10 @@ export class StructModel {
   }
 
   tableGet(refTable: TableSchema, refSimple: RefSimple, actualParam: string): string {
-    if (isRefPrimary(refSimple)) {
+    if (refSimple instanceof RefPrimary) {
       return this.className(refTable) + '.Get(' + actualParam + ')';
     }
-    if (isRefUniq(refSimple)) {
-      return this.className(refTable) + '.GetBy' + refSimple.keyNames().map(upper1).join('') + '(' + actualParam + ')';
-    }
-    throw new Error('unreachable: tableGet expects RefSimple');
+    // RefUniq
+    return this.className(refTable) + '.GetBy' + refSimple.keyNames().map(upper1).join('') + '(' + actualParam + ')';
   }
 }

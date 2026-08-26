@@ -23,7 +23,6 @@ import {
   isFMap,
   isSimpleType,
   type FieldType,
-  type SimpleType,
   type FList as FListType,
   type FMap as FMapType,
   type StructRef,
@@ -36,9 +35,8 @@ import type {
   FieldSchema,
   ForeignKeySchema,
   KeySchema,
-  Fieldable,
 } from '@cfggen/schema';
-import { isRefPrimary, isRefUniq, isRefList, type RefSimple } from '@cfggen/schema';
+import { isRefList, type RefSimple } from '@cfggen/schema';
 import { upper1, lower1 } from '@cfggen/shared';
 import type { VTable } from '@cfggen/value';
 import type { GoCodeGenerator } from './GoCodeGenerator';

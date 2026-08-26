@@ -13,12 +13,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 import type { Context } from '@cfggen/context';
 import type { CfgValue, VTable } from '@cfggen/value';
-import type { TableSchema } from '@cfggen/schema';
 import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfggen/shared';
 import { SchemaToTs } from './SchemaToTs';
 import { TableRelatedInfoFinder } from './TableRelatedInfoFinder';
 import type { ModuleRule, TableRule } from './TableRelatedInfoFinder';
-import { PromptModel, type Example } from './PromptModel';
+import { PromptModel } from './PromptModel';
 import { DEFAULT_INIT } from './PromptDefault';
 
 // ---------------------------------------------------------------------------
@@ -204,7 +203,7 @@ export class PromptGen {
    * Supports: ${model.table()}, ${model.structInfo()}, ${model.rule()},
    *           ${model.examples()}, @if/@endif, @for/@endfor blocks.
    */
-  static renderTemplate(template: string, model: PromptModel): string {
+  static renderTemplate(_template: string, model: PromptModel): string {
     // Simple approach: use the default template renderer.
     // Custom JTE templates would require a full JTE parser, which is not
     // practical in TS. We fall back to the default template if the custom

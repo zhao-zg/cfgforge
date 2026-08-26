@@ -39,7 +39,7 @@ export class ParameterParser implements Parameter {
     if (!this.params.has(lowered)) {
       return false;
     }
-    const v = this.params.get(lowered);
+    const v = this.params.get(lowered)!;
     this.params.delete(lowered);
     // Valueless flag (e.g. `-gen java,beautifulName`) is stored as null → true
     if (v === null || v.length === 0) {

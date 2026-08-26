@@ -19,9 +19,8 @@ import type { Structural, FieldSchema, KeySchema, TableSchema } from '@cfggen/sc
 import {
   Primitive, FList, FMap, StructRef,
 } from '@cfggen/schema';
-import { ForeignKeySchema } from '@cfggen/schema';
 import { RefList, RefPrimary, RefUniq } from '@cfggen/schema';
-import { ENo, isENo, isEEntry } from '@cfggen/schema';
+import { isEEntry } from '@cfggen/schema';
 import { CfgWriter } from '@cfggen/schema';
 import { lower1 } from '@cfggen/shared';
 import type { VTable } from '@cfggen/value';
@@ -156,9 +155,6 @@ function getLuaOneUniqKeyString(
 export function getLuaEnumString(ctx: LuaCtx, aCtx: LuaAContext): string {
   const table = ctx.vTable().schema;
   const entry = table.entry;
-  if (isENo(entry)) {
-    return 'nil';
-  }
   if (isEEntry(entry)) {
     if (entry.fieldSchema !== null) {
       return getColumnStrOrIndex(entry.fieldSchema, table, aCtx);

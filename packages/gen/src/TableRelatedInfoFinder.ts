@@ -9,12 +9,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import type { Context } from '@cfggen/context';
-import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
+import type { CfgValue, VTable, VStruct } from '@cfggen/value';
 import { ValuePack } from '@cfggen/value';
 import { ValueToJson } from '@cfggen/value';
 import { ValueToCsv } from '@cfggen/value';
 import { CfgValueErrs } from '@cfggen/value';
-import type { TableSchema, Nameable, StructSchema } from '@cfggen/schema';
+import type { TableSchema } from '@cfggen/schema';
 import { StructSchema as StructSchemaCls } from '@cfggen/schema';
 import { findAllIncludedStructs } from '@cfggen/schema';
 import { TableSchemaRefGraph } from '@cfggen/schema';

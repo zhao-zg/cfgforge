@@ -28,10 +28,9 @@ import { CachedFiles, CachedIndentPrinter } from '@cfggen/shared';
 import { isMetaInt } from '@cfggen/schema';
 import { hasText as schemaHasText } from '@cfggen/schema';
 import { StructSchema, InterfaceSchema } from '@cfggen/schema';
-import type { CfgSchema, Fieldable, TableSchema } from '@cfggen/schema';
+import type { CfgSchema } from '@cfggen/schema';
 import type { Context } from '@cfggen/context';
-import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
-import { TextValue } from '@cfggen/value';
+import type { CfgValue, VTable, Value } from '@cfggen/value';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 import { LuaAContext } from './LuaAContext';
@@ -489,7 +488,7 @@ export class LuaCodeGenerator extends GeneratorWithTag {
   private generate_sharedLocalNamesAndER(
     ps: CachedIndentPrinter,
     ctx: LuaCtx,
-    aCtx: LuaAContext,
+    _aCtx: LuaAContext,
   ): void {
     const localNameMap = ctx.ctxName().getLocalNameMap();
     if (localNameMap.size > 0) {

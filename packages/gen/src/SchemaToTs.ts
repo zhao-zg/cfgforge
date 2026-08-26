@@ -6,13 +6,12 @@
  * and optionally generates union types from actual enum/ref table data values.
  */
 
-import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
+import type { CfgValue } from '@cfggen/value';
 import { VString, VText, VInt, VLong, VFloat } from '@cfggen/value';
 import { ValueUtil } from '@cfggen/value';
-import type { TableSchema, Nameable, Structural, FieldSchema, FieldType, Fieldable } from '@cfggen/schema';
+import type { TableSchema, Nameable, Structural, FieldSchema, FieldType } from '@cfggen/schema';
 import { StructSchema, InterfaceSchema, TableSchema as TableSchemaCls } from '@cfggen/schema';
 import { findAllIncludedStructs } from '@cfggen/schema';
-import { ForeignKeySchema } from '@cfggen/schema';
 import { RefPrimary, RefUniq } from '@cfggen/schema';
 import { Primitive, FList, StructRef, isPrimitive, isStructRef, isFList, isFMap } from '@cfggen/schema';
 import { isEEnum } from '@cfggen/schema';

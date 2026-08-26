@@ -12,14 +12,13 @@
  * Java templates: app/src/main/resources/jte/gd/*.jte
  */
 
-import { upper1, lower1, removeLineSep } from '@cfggen/shared';
-import type { FieldSchema, ForeignKeySchema, KeySchema, TableSchema, Structural, SimpleType, FieldType } from '@cfggen/schema';
-import { Primitive, StructRef, FList, FMap, isPrimitive, isStructRef, isFList, isFMap, isSimpleType } from '@cfggen/schema';
+import { upper1, removeLineSep } from '@cfggen/shared';
+import type { TableSchema, Structural } from '@cfggen/schema';
+import { FList, FMap, isStructRef, isFList, isFMap, isSimpleType } from '@cfggen/schema';
 import { hasRef, hasRefFieldType } from '@cfggen/schema';
 import { isEEntry, isEEnum } from '@cfggen/schema';
 import { RefPrimary, RefUniq, RefList, isRefPrimary, isRefUniq, isRefList } from '@cfggen/schema';
 import type { VTable } from '@cfggen/value';
-import { GdName } from './GdName';
 import type { GdStructModel } from './GdStructModel';
 import type { GdInterfaceModel } from './GdInterfaceModel';
 import type { GdProcessorModel } from './GdProcessorModel';
@@ -261,7 +260,7 @@ export function genStruct(model: GdStructModel): string {
         if (isSimpleType(ft)) {
           // SimpleType
           hasResolveBody = true;
-          const tableGet = model.tableGet(fk.refTableSchema(), refSimple, model.actualParams(fk.key));
+          const tableGet = model.tableGet(fk.refTableSchema()!, refSimple, model.actualParams(fk.key));
           lines.push(`\t${refName} = ${tableGet}`);
           if (!refSimple.nullable) {
             lines.push(`\tif ${refName} == null:`);
@@ -271,7 +270,7 @@ export function genStruct(model: GdStructModel): string {
           // FList
           hasResolveBody = true;
           lines.push(`\tfor item in ${model.fieldName(firstField)}:`);
-          const tableGet = model.tableGet(fk.refTableSchema(), refSimple, 'item');
+          const tableGet = model.tableGet(fk.refTableSchema()!, refSimple, 'item');
           lines.push(`\t\tvar r = ${tableGet}`);
           lines.push(`\t\tif r == null:`);
           lines.push(`\t\t\terrors.ref_null("${structural.name()}", ${fkStr})`);
@@ -280,7 +279,7 @@ export function genStruct(model: GdStructModel): string {
           // FMap
           hasResolveBody = true;
           lines.push(`\tfor k in ${model.fieldName(firstField)}.keys():`);
-          const tableGet = model.tableGet(fk.refTableSchema(), refSimple, `${model.fieldName(firstField)}[k]`);
+          const tableGet = model.tableGet(fk.refTableSchema()!, refSimple, `${model.fieldName(firstField)}[k]`);
           lines.push(`\t\tvar v = ${tableGet}`);
           lines.push(`\t\tif v == null:`);
           lines.push(`\t\t\terrors.ref_null("${structural.name()}", ${fkStr})`);
@@ -294,7 +293,7 @@ export function genStruct(model: GdStructModel): string {
       if (isRefList(fk.refKey)) {
         const refList = fk.refKey as RefList;
         const refName = model.refName(fk);
-        const refTable = model.fullName(fk.refTableSchema());
+        const refTable = model.fullName(fk.refTableSchema()!);
         const keyNames = refList.keyNames();
         const localFields = fk.key.fields();
         hasResolveBody = true;

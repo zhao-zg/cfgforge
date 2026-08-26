@@ -19,9 +19,9 @@ import * as path from 'path';
 import { CachedFiles, Logger, upper1, lower1 } from '@cfggen/shared';
 import type { Context } from '@cfggen/context';
 import type { CfgValue } from '@cfggen/value';
-import type { CfgSchema, Fieldable } from '@cfggen/schema';
+import type { CfgSchema } from '@cfggen/schema';
 import { StructSchema, InterfaceSchema } from '@cfggen/schema';
-import type { Structural, TableSchema } from '@cfggen/schema';
+import type { Structural } from '@cfggen/schema';
 import type { VTable } from '@cfggen/value';
 import type { LangSwitchable } from '@cfggen/i18n';
 import type { Parameter } from './Parameter';
@@ -74,12 +74,12 @@ export class GoCodeGenerator extends GeneratorWithTag {
     // Generate struct/interface/table files (sequential, no concurrency needed)
     for (const fieldable of cfgSchema.sortedFieldables()) {
       if (fieldable instanceof StructSchema) {
-        this.generateStruct(fieldable);
+        this.generateStruct(fieldable, null);
       } else if (fieldable instanceof InterfaceSchema) {
         const iface = fieldable as InterfaceSchema;
         this.generateInterface(iface);
         for (const impl of iface.impls()) {
-          this.generateStruct(impl);
+          this.generateStruct(impl, null);
         }
       }
     }

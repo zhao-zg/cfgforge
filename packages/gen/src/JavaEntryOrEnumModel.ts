@@ -4,7 +4,7 @@
  * Model for GenEntryOrEnumClass.jte template.
  */
 
-import type { TableSchema, EntryType } from '@cfggen/schema';
+import type { TableSchema } from '@cfggen/schema';
 import { isEEnum, EEntry, EEnum } from '@cfggen/schema';
 import type { VTable } from '@cfggen/value';
 

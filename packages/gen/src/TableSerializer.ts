@@ -21,7 +21,6 @@
 import type { LangSwitchableRuntime } from '@cfggen/i18n';
 import {
   type Value,
-  type SimpleValue,
   type PrimitiveValue,
   VBool,
   VInt,

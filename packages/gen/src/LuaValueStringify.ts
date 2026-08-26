@@ -15,9 +15,7 @@
  * - No BitSet (use manual bit operations)
  */
 
-import type { FieldSchema } from '@cfggen/schema';
-import { Primitive } from '@cfggen/schema';
-import type { Value, SimpleValue, CompositeValue } from '@cfggen/value';
+import type { Value, CompositeValue } from '@cfggen/value';
 import {
   VBool, VInt, VLong, VFloat, VString, VText,
   VStruct, VInterface, VList, VMap,

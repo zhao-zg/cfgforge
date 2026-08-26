@@ -16,7 +16,7 @@ import { hasMap } from '@cfggen/schema';
 import type { Context } from '@cfggen/context';
 import { VTableJsonStorage } from '@cfggen/write';
 import type { CfgValue } from '@cfggen/value';
-import type { Parameter } from '../Parameter';
+import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 
 export class JsonGenerator extends GeneratorWithTag {

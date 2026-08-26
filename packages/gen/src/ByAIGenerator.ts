@@ -16,7 +16,7 @@ import type { Context } from '@cfggen/context';
 import { getDefaultFileSystem } from '@cfggen/shared';
 import type { Parameter } from './Parameter';
 import { Generator } from './Generator';
-import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
+import type { VTable } from '@cfggen/value';
 import { ValueJsonParser } from '@cfggen/value';
 import { CfgValueErrs } from '@cfggen/value';
 import { ValueUtil } from '@cfggen/value';
@@ -149,7 +149,7 @@ export class ByAIGenerator extends Generator {
                 context.rootDir(), context.sourceStructure(),
               );
             } else {
-              const dTable = context.cfgData().getDTable(this.table);
+              const dTable = context.cfgData().getDTable(this.table)!;
               await VTableStorage.addOrUpdateRecord(context, vTable, dTable, pkValue, record);
             }
           } catch (e) {

@@ -25,8 +25,6 @@ import {
   isSimpleType,
   isContainerType,
   type FieldType,
-  type SimpleType,
-  type FList as FListType,
   type FMap as FMapType,
 } from '@cfggen/schema';
 import type {
@@ -36,12 +34,9 @@ import type {
   ForeignKeySchema,
   KeySchema,
   TableSchema,
-  StructSchema,
-  InterfaceSchema,
-  EntryType,
 } from '@cfggen/schema';
 import { isEEnum, isEEntry, isRefPrimary, isRefUniq, isRefList, type RefSimple, type RefUniq } from '@cfggen/schema';
-import { upper1, lower1, removeLineSep } from '@cfggen/shared';
+import { upper1, lower1 } from '@cfggen/shared';
 import type { VTable } from '@cfggen/value';
 import type { CsCodeGenerator } from './CsCodeGenerator';
 import { CsName } from './CsName';

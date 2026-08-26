@@ -20,7 +20,6 @@
  */
 
 import {
-  Primitive,
   isPrimitive,
   isStructRef,
   isFList,
@@ -29,17 +28,11 @@ import {
   isRefPrimary,
   isRefUniq,
   isRefList,
-  hasRef,
   hasRefFieldType,
-  type FieldType,
-  type FieldSchema,
-  type ForeignKeySchema,
   type KeySchema,
   type TableSchema,
   type Structural,
-  type StructSchema,
 } from '@cfggen/schema';
-import { EEnum, EEntry } from '@cfggen/schema';
 import { upper1, lower1 } from '@cfggen/shared';
 
 import {
@@ -51,7 +44,6 @@ import {
   readValue,
   defaultValue,
   isJavaPrimitive,
-  refType,
   refTypeFromFK,
   refName,
   refType as refTypeOf,
@@ -59,7 +51,6 @@ import {
   GetByKeyFunctionNameInConfigMgr,
   GetByKeyFunctionName,
   uniqueKeyMapName,
-  fullName,
   tableDataFullName,
   isEnumAndHasOnlyPrimaryKeyAndEnumStr,
   formalParams,
@@ -71,7 +62,6 @@ import {
   equalsExpr,
   equal,
   tableGet,
-  getCodeTopPkg,
 } from './JavaName';
 import type { JavaStructuralClassModel } from './JavaStructuralClassModel';
 import type { JavaInterfaceModel } from './JavaInterfaceModel';

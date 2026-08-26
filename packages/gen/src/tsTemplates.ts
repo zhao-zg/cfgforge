@@ -19,36 +19,19 @@ import {
   isStructRef,
   isFList,
   isFMap,
-  Primitive,
-  type FieldType,
-  type FList as FListType,
-  type FMap as FMapType,
 } from '@cfggen/schema';
 import {
   hasRef,
   hasRefFieldType,
-  isENo,
   isEEntry,
   isEEnum,
   isRefList,
-  isRefPrimary,
-  isRefUniq,
-  type EntryType,
-  type RefKey,
   type RefSimple,
-  type TableSchema,
-  type StructSchema,
   type InterfaceSchema,
-  type FieldSchema,
-  type ForeignKeySchema,
   type KeySchema,
-  type Nameable,
-  type Fieldable,
 } from '@cfggen/schema';
 import { StructSchema as StructSchemaClass } from '@cfggen/schema';
 import { removeLineSep, upper1 } from '@cfggen/shared';
-import type { VTable, CfgValue } from '@cfggen/value';
-import type { LangSwitchable } from '@cfggen/i18n';
 import { StructModel } from './StructModel';
 import type { TsCodeGenerator } from './TsCodeGenerator';
 
@@ -412,7 +395,7 @@ export function genInterface(
 // 4. genServerText (ServerText.jte)
 // ---------------------------------------------------------------------------
 
-export function genServerText(pkg: string, languages: string[]): string {
+export function genServerText(_pkg: string, languages: string[]): string {
   const lines: string[] = [];
   lines.push(`export class Text`);
   lines.push(`{`);
@@ -443,7 +426,7 @@ export function genServerText(pkg: string, languages: string[]): string {
 // 5. genClientText (ClientText.jte)
 // ---------------------------------------------------------------------------
 
-export function genClientText(pkg: string, languages: string[]): string {
+export function genClientText(_pkg: string, _languages: string[]): string {
   const lines: string[] = [];
   lines.push(`export class Text`);
   lines.push(`{`);

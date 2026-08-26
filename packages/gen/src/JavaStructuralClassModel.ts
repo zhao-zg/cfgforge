@@ -5,14 +5,13 @@
  * foreign key info, interface/enum-ref metadata, and helper method strings.
  */
 
-import type { Structural, InterfaceSchema, FieldSchema } from '@cfggen/schema';
+import type { Structural, InterfaceSchema } from '@cfggen/schema';
 import { TableSchema, StructSchema, hasRef } from '@cfggen/schema';
 import { lower1 } from '@cfggen/shared';
 
 import {
   NameableName,
   type,
-  refType,
   refTypeFromFK,
   refName,
   getCodeTopPkg,

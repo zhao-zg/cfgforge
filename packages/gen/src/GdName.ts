@@ -10,7 +10,7 @@
 
 import { upper1 } from '@cfggen/shared';
 import type { Nameable } from '@cfggen/schema';
-import { InterfaceSchema, StructSchema } from '@cfggen/schema';
+import { StructSchema } from '@cfggen/schema';
 
 export class GdName {
   readonly className: string;

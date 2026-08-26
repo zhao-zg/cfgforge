@@ -150,7 +150,7 @@ export class BytesGenerator extends GeneratorWithTag {
     let finalData = data;
     if (this.cipher.length > 0) {
       const xor = new XorCipher(this.cipher);
-      finalData = xor.process(data);
+      finalData = xor.process(data) as Buffer;
     }
 
     CachedFiles.writeFile(path.resolve(filePath), finalData);

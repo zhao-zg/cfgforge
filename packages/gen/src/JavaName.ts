@@ -17,7 +17,6 @@
 
 import type {
   Nameable,
-  Structural,
   TableSchema,
   ForeignKeySchema,
   KeySchema,
@@ -27,14 +26,15 @@ import type {
 import { StructSchema, InterfaceSchema, isEEnum } from '@cfggen/schema';
 import {
   Primitive,
-  isPrimitive,
   isStructRef,
   isSimpleType,
   isFList,
   isFMap,
   isRefPrimary,
-  isRefUniq,
   isRefList,
+  RefList,
+  RefPrimary,
+  RefUniq,
   type FMap as FMapType,
   type StructRef,
 } from '@cfggen/schema';
@@ -149,17 +149,11 @@ export function refTypeFromFK(fk: ForeignKeySchema): string {
 
 export function refName(fk: ForeignKeySchema): string {
   let prefix: string;
-  if (isRefList(fk.refKey)) {
+  if (fk.refKey instanceof RefList) {
     prefix = 'ListRef';
   } else {
-    // RefSimple
-    if (isRefPrimary(fk.refKey)) {
-      prefix = fk.refKey.nullable ? 'NullableRef' : 'Ref';
-    } else if (isRefUniq(fk.refKey)) {
-      prefix = fk.refKey.nullable ? 'NullableRef' : 'Ref';
-    } else {
-      throw new Error('unexpected refKey');
-    }
+    // RefSimple (RefPrimary | RefUniq)
+    prefix = (fk.refKey as RefPrimary | RefUniq).nullable ? 'NullableRef' : 'Ref';
   }
   return prefix + upper1(fk.name);
 }

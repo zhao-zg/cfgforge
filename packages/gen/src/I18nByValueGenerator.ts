@@ -25,7 +25,12 @@ import { GeneratorWithTag } from './GeneratorWithTag';
 
 export class I18nByValueGenerator extends GeneratorWithTag {
   private readonly file: string;
-  private data: CSVRow[] = [];
+  protected data: CSVRow[] = [];
+
+  /** Getter for ByValueVisitor (not a subclass) to append rows. */
+  addRow(row: CSVRow): void {
+    this.data.push(row);
+  }
 
   constructor(parameter: Parameter) {
     super(parameter);
@@ -64,7 +69,7 @@ class ByValueVisitor implements ValueVisitorForSearch {
       const original = pv.original.trim();
       const translated = pv.translated;
       if (original.length > 0 || translated.length > 0) {
-        this.gen.data.push([table, original, translated]);
+        this.gen.addRow([table, original, translated]);
       }
     }
   }

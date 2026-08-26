@@ -17,9 +17,9 @@
 import { upper1 } from '@cfggen/shared';
 import type { Nameable } from '@cfggen/schema';
 import { InterfaceSchema, StructSchema, TableSchema } from '@cfggen/schema';
-import type { ForeignKeySchema, KeySchema, Structural } from '@cfggen/schema';
+import type { ForeignKeySchema, KeySchema } from '@cfggen/schema';
 import type { RefKey } from '@cfggen/schema';
-import { RefList, RefPrimary, RefUniq, isRefList } from '@cfggen/schema';
+import { RefList, RefPrimary, RefUniq } from '@cfggen/schema';
 
 // ---------------------------------------------------------------------------
 // Constants (match Java Name.java)

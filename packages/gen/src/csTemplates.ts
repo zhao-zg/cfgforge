@@ -16,41 +16,30 @@
  */
 
 import {
-  Primitive,
-  isPrimitive,
   isStructRef,
   isFList,
   isFMap,
   isSimpleType,
-  type FieldType,
   type FList as FListType,
   type FMap as FMapType,
 } from '@cfggen/schema';
 import {
   hasRef,
   hasRefFieldType,
-  isEEnum,
   isEEntry,
   isRefList,
   isRefPrimary,
   isRefUniq,
   type RefSimple,
-  type TableSchema,
-  type StructSchema,
   type InterfaceSchema,
-  type FieldSchema,
-  type ForeignKeySchema,
   type KeySchema,
-  type Nameable,
 } from '@cfggen/schema';
 import { StructSchema as StructSchemaClass, EEntry, EEnum } from '@cfggen/schema';
 import { removeLineSep, upper1, lower1 } from '@cfggen/shared';
-import type { CsCodeGenerator } from './CsCodeGenerator';
 import { CsStructModel } from './CsStructModel';
 import { CsInterfaceModel } from './CsInterfaceModel';
-import { CsModuleModel, NamespaceGroup } from './CsModuleModel';
+import { CsModuleModel } from './CsModuleModel';
 import { CsProcessorModel } from './CsProcessorModel';
-import { CsName } from './CsName';
 
 // ---------------------------------------------------------------------------
 // 1. genMapGetBy (GenMapGetBy.jte)
@@ -806,7 +795,7 @@ function genStructLoaderPart(
 
 function genInterfaceLoaderPart(
   lines: string[],
-  model: CsModuleModel,
+  _model: CsModuleModel,
   im: CsInterfaceModel,
 ): void {
   const className = im.name.className;

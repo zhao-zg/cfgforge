@@ -5,7 +5,6 @@
  */
 
 import type { Nameable, InterfaceSchema } from '@cfggen/schema';
-import { upper1 } from '@cfggen/shared';
 import type { CsCodeGenerator } from './CsCodeGenerator';
 import { CsName } from './CsName';
 

@@ -12,7 +12,7 @@
 
 import { upper1, lower1 } from '@cfggen/shared';
 import type { Nameable, FieldType, FieldSchema, ForeignKeySchema, KeySchema, Structural } from '@cfggen/schema';
-import { Primitive, StructRef, FList, FMap, isFList, isFMap } from '@cfggen/schema';
+import { Primitive, StructRef, FList, FMap, isFList } from '@cfggen/schema';
 import { RefPrimary, RefUniq, RefList } from '@cfggen/schema';
 import { TableSchema } from '@cfggen/schema';
 import type { VTable } from '@cfggen/value';
@@ -80,19 +80,19 @@ export class GdStructModel {
   refType(fk: ForeignKeySchema): string {
     const refKey = fk.refKey;
     if (refKey instanceof RefList) {
-      return 'Array[' + this.fullName(fk.refTableSchema()) + ']';
+      return 'Array[' + this.fullName(fk.refTableSchema()!) + ']';
     }
     // RefSimple = RefPrimary | RefUniq
     const firstLocal = fk.key.fieldSchemas()![0];
     const ft = firstLocal.type;
     if (isFList(ft)) {
-      return 'Array[' + this.fullName(fk.refTableSchema()) + ']';
+      return 'Array[' + this.fullName(fk.refTableSchema()!) + ']';
     }
     if (ft instanceof FMap) {
-      return 'Dictionary[' + this.type(ft.key) + ', ' + this.fullName(fk.refTableSchema()) + ']';
+      return 'Dictionary[' + this.type(ft.key) + ', ' + this.fullName(fk.refTableSchema()!) + ']';
     }
     // SimpleType
-    return this.fullName(fk.refTableSchema());
+    return this.fullName(fk.refTableSchema()!);
   }
 
   refName(fk: ForeignKeySchema): string {

@@ -22,9 +22,7 @@ import {
   type CfgValue,
   type Value,
   type PrimitiveValue,
-  type VTable,
   VText,
-  VStruct,
 } from '@cfggen/value';
 import { ForeachValue, ValueVisitorForPrimitive } from '@cfggen/value';
 import { ValueUtil } from '@cfggen/value';
@@ -90,7 +88,7 @@ export class LangText {
       if (thisTop.tables.size !== otherTop.tables.size) return false;
       for (const [table, wroteTable] of thisTop.tables) {
         const extractedTable = otherTop.tables.get(table);
-        if (!extractedTable || !wroteTable.equals(extractedTable)) {
+        if (!extractedTable || !(wroteTable as any).equals?.(extractedTable)) {
           Logger.log('%s NOT match', table);
           return false;
         }
@@ -138,7 +136,7 @@ export class LangText {
       }
 
       const finder = new TextByIdFinder();
-      finder.setNullableDescriptionName(vTable.schema.meta().getStr('lang', null));
+      finder.setNullableDescriptionName(vTable.schema.meta().getStr('lang', null as unknown as string));
 
       for (const [pk, vStruct] of vTable.primaryKeyMap) {
         const pkStr = pk.packStr();
@@ -205,7 +203,6 @@ export class ModuleText {
 
   private static saveSheet(finder: TextByIdFinder, table: string, stat: LangStat): XLSX.WorkSheet {
     const hasDescriptionColumn = finder.getNullableDescriptionName() !== null;
-    const offset = hasDescriptionColumn ? 2 : 1;
 
     // Build header row
     const header: string[] = ['id'];

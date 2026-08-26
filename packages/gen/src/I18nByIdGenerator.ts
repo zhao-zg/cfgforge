@@ -22,15 +22,11 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { hasText } from '@cfggen/schema';
-import type { Nameable } from '@cfggen/schema';
 import type { Context } from '@cfggen/context';
-import type { CfgValue, Value } from '@cfggen/value';
+import type { CfgValue } from '@cfggen/value';
 import { TextValue } from '@cfggen/value';
 import {
   TextByIdFinder,
-  OneText,
-  OneRecord,
   TodoFile,
   TodoFileLine,
 } from '@cfggen/i18n';
@@ -41,14 +37,10 @@ import { LangText, LangStat } from './LangText';
 
 export class I18nByIdGenerator extends Generator {
   private readonly outputDir: string;
-  private readonly backupDir: string;
-  private readonly checkWrite: boolean;
 
   constructor(parameter: Parameter) {
     super(parameter);
     this.outputDir = parameter.get('dir', '../i18n/en');
-    this.backupDir = parameter.get('backup', '../backup');
-    this.checkWrite = parameter.has('checkWrite');
   }
 
   async generate(ctx: Context): Promise<void> {

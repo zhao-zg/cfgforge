@@ -20,7 +20,6 @@ import { CachedFiles, Logger, upper1 } from '@cfggen/shared';
 import type { Context } from '@cfggen/context';
 import type { CfgValue } from '@cfggen/value';
 import type { CfgSchema } from '@cfggen/schema';
-import type { Fieldable } from '@cfggen/schema';
 import { StructSchema, InterfaceSchema } from '@cfggen/schema';
 import type { TableSchema } from '@cfggen/schema';
 import type { VTable } from '@cfggen/value';

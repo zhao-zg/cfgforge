@@ -16,7 +16,7 @@ import type { VStruct } from '@cfggen/value';
 import { ValueToJson } from '@cfggen/value';
 import type { DirectoryStructure } from '@cfggen/context';
 import { getJsonTableDirName } from '@cfggen/data';
-import { getCodeName, CachedFiles } from '@cfggen/shared';
+import { getCodeName, CachedFiles, getDefaultFileSystem } from '@cfggen/shared';
 
 export class VTableJsonStorage {
   /**
@@ -51,6 +51,38 @@ export class VTableJsonStorage {
   }
 
   /**
+   * Async variant of addOrUpdateRecord.
+   * Uses CfgFileSystem abstraction for file I/O (Tauri/WebView compatible).
+   *
+   * @returns the relative path (from dataDir) of the record file.
+   */
+  static async addOrUpdateRecordAsync(
+    record: VStruct,
+    table: string,
+    id: string,
+    dataDir: string,
+    directoryStructure: DirectoryStructure | null,
+  ): Promise<string> {
+    VTableJsonStorage.validateId(id);
+
+    let jsonDirRelPath: string | null = null;
+    if (directoryStructure !== null) {
+      jsonDirRelPath = directoryStructure.getJsonTableDir(table);
+    }
+    if (jsonDirRelPath === null) {
+      jsonDirRelPath = await VTableJsonStorage.resolveJsonDirRelativePathAsync(table, dataDir);
+    }
+
+    const relativePath = path.join(jsonDirRelPath, id + '.json');
+    const recordPath = path.join(dataDir, relativePath);
+
+    const jsonString = ValueToJson.toJsonStr(record);
+    await CachedFiles.writeFileAsync(recordPath, Buffer.from(jsonString, 'utf8'));
+
+    return relativePath;
+  }
+
+  /**
    * Delete a JSON record file.
    *
    * @returns the relative path (from dataDir) of the deleted record file.
@@ -75,6 +107,36 @@ export class VTableJsonStorage {
     const recordPath = path.join(dataDir, relativePath);
 
     fs.unlinkSync(recordPath);
+
+    return relativePath;
+  }
+
+  /**
+   * Async variant of deleteRecord.
+   * Uses CfgFileSystem abstraction for file I/O (Tauri/WebView compatible).
+   *
+   * @returns the relative path (from dataDir) of the deleted record file.
+   */
+  static async deleteRecordAsync(
+    table: string,
+    id: string,
+    dataDir: string,
+    directoryStructure: DirectoryStructure | null,
+  ): Promise<string> {
+    VTableJsonStorage.validateId(id);
+
+    let jsonDirRelPath: string | null = null;
+    if (directoryStructure !== null) {
+      jsonDirRelPath = directoryStructure.getJsonTableDir(table);
+    }
+    if (jsonDirRelPath === null) {
+      jsonDirRelPath = await VTableJsonStorage.resolveJsonDirRelativePathAsync(table, dataDir);
+    }
+
+    const relativePath = path.join(jsonDirRelPath, id + '.json');
+    const recordPath = path.join(dataDir, relativePath);
+
+    await getDefaultFileSystem().remove(recordPath);
 
     return relativePath;
   }
@@ -128,6 +190,39 @@ export class VTableJsonStorage {
   }
 
   /**
+   * Async variant of resolveJsonDirRelativePath.
+   * Uses CfgFileSystem abstraction for directory I/O (Tauri/WebView compatible).
+   */
+  static async resolveJsonDirRelativePathAsync(table: string, dataDir: string): Promise<string> {
+    const lastDotIdx = table.lastIndexOf('.');
+    if (lastDotIdx >= 0) {
+      const moduleParts = table.substring(0, lastDotIdx).split('.');
+      const subPart = table.substring(lastDotIdx + 1);
+
+      let currentDir = dataDir;
+      let relativePath = '';
+      let found = true;
+
+      for (const modulePart of moduleParts) {
+        const matchedDirName = await VTableJsonStorage.findModuleDirNameAsync(currentDir, modulePart);
+        if (matchedDirName === null) {
+          found = false;
+          break;
+        }
+        relativePath = path.join(relativePath, matchedDirName);
+        currentDir = path.join(dataDir, relativePath);
+      }
+
+      if (found) {
+        return path.join(relativePath, '_' + subPart);
+      }
+    }
+
+    // Fallback: old flat format _module_sub
+    return getJsonTableDirName(table);
+  }
+
+  /**
    * Find a subdirectory whose codeName matches `modulePart`.
    * Returns the actual directory name (may have Chinese suffix), or null.
    */
@@ -143,6 +238,30 @@ export class VTableJsonStorage {
           continue;
         }
         if (!stat.isDirectory()) {
+          continue;
+        }
+        const codeName = getCodeName(entry);
+        if (modulePart === codeName) {
+          return entry;
+        }
+      }
+    } catch {
+      // ignore — directory not accessible
+    }
+    return null;
+  }
+
+  /**
+   * Async variant of findModuleDirName.
+   * Uses CfgFileSystem abstraction (Tauri/WebView compatible).
+   */
+  private static async findModuleDirNameAsync(dir: string, modulePart: string): Promise<string | null> {
+    const dfs = getDefaultFileSystem();
+    try {
+      const entries = await dfs.readDir(dir);
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry);
+        if (!(await dfs.isDirectory(fullPath))) {
           continue;
         }
         const codeName = getCodeName(entry);

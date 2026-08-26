@@ -26,6 +26,7 @@ import type { Context } from '@cfggen/context';
 import { DataUpdater } from '@cfggen/context';
 import type { CfgData } from '@cfggen/data';
 import { DFile } from '@cfggen/data';
+import { getDefaultFileSystem } from '@cfggen/shared';
 import {
   CfgValue,
   type VTable,
@@ -128,6 +129,45 @@ export class ValueUpdater {
       vTable.name(),
       id,
       BigInt(Math.floor(fs.statSync(fullPath).mtimeMs)),
+    );
+
+    return ValueUpdater.updateByNewRecords(context, cfgValue, vTable, newRecordList, newCfgValueStat);
+  }
+
+  /**
+   * Async variant of updateByJsonFileAddOrUpdate.
+   * Uses CfgFileSystem abstraction for file I/O (Tauri/WebView compatible).
+   */
+  static async updateByJsonFileAddOrUpdateAsync(
+    context: Context,
+    cfgValue: CfgValue,
+    vTable: VTable,
+    relativeJsonPath: string,
+  ): Promise<ValueUpdater> {
+    const schema = cfgValue.schema;
+    if (schema.isPartial()) {
+      throw new Error('update only supports full value');
+    }
+
+    const fullPath = path.resolve(context.rootDir(), relativeJsonPath);
+    const dfs = getDefaultFileSystem();
+    const bytes = await dfs.readFile(fullPath);
+    const jsonStr = Buffer.from(bytes).toString('utf8');
+
+    const parseErrs = CfgValueErrs.of();
+    const source = DFile.of(relativeJsonPath, vTable.name());
+    const vStruct = new ValueJsonParser(vTable.schema, parseErrs).fromJson(jsonStr, source);
+    const pkValue = ValueUtil.extractPrimaryKeyValue(vStruct, vTable.schema);
+    const id = pkValue.packStr();
+
+    const newPrimaryKeyMap = new Map(vTable.primaryKeyMap);
+    newPrimaryKeyMap.set(pkValue, vStruct);
+    const newRecordList = Array.from(newPrimaryKeyMap.values());
+
+    const newCfgValueStat = cfgValue.valueStat.newAddLastModified(
+      vTable.name(),
+      id,
+      BigInt(Math.floor(await dfs.lastModified(fullPath))),
     );
 
     return ValueUpdater.updateByNewRecords(context, cfgValue, vTable, newRecordList, newCfgValueStat);

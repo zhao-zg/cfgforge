@@ -25,6 +25,7 @@ import * as path from 'path';
 import ExcelJS from 'exceljs';
 import type { RecordBlockTransformed } from '../RecordBlock';
 import type { TableFile } from '../TableFile';
+import { getDefaultFileSystem } from '@cfggen/shared';
 
 export class ExcelTableFile implements TableFile {
   private readonly _filePath: string;
@@ -57,7 +58,8 @@ export class ExcelTableFile implements TableFile {
     headRow: number,
     isColumnMode: boolean,
   ): Promise<ExcelTableFile> {
-    if (!fs.existsSync(filePath)) {
+    const dfs = getDefaultFileSystem();
+    if (!(await dfs.exists(filePath))) {
       throw new Error('Excel file does not exist: ' + filePath);
     }
 
@@ -125,6 +127,7 @@ export class ExcelTableFile implements TableFile {
   }
 
   async saveAndClose(): Promise<void> {
+    const dfs = getDefaultFileSystem();
     const tempPath = this._filePath + '.tmp';
     try {
       await this._workbook.xlsx.writeFile(tempPath);
@@ -134,12 +137,12 @@ export class ExcelTableFile implements TableFile {
 
     // Atomic move (or fallback to regular move on Windows)
     try {
-      fs.renameSync(tempPath, this._filePath);
+      await dfs.rename(tempPath, this._filePath);
     } catch (e) {
-      // fs.renameSync may fail across drives; fallback to copy+delete
-      const data = fs.readFileSync(tempPath);
-      fs.writeFileSync(this._filePath, data);
-      fs.unlinkSync(tempPath);
+      // rename may fail across drives; fallback to copy+delete
+      const data = await dfs.readFile(tempPath);
+      await dfs.writeFile(this._filePath, data);
+      await dfs.remove(tempPath);
     }
   }
 

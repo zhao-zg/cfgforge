@@ -69,6 +69,7 @@ i18n.use(LanguageDetector)
                     pleaseSetThemeFile: 'Please set theme file first',
                     testTheme: 'Test Theme',
                     save: 'Save',
+                    goToSetting: 'Go to Settings',
 
                     // Flow Visualization Settings
                     nodeDimensions: 'Node Dimensions',
@@ -217,7 +218,7 @@ i18n.use(LanguageDetector)
                     emptySchemaServer: 'Current data directory',
                     selectTableHint: 'Please select a table from the dropdown above',
                     noDataDirTitle: 'No data directory selected',
-                    noDataDirDesc: 'Go to Settings → Data directory to select a directory containing config.cfg.',
+                    noDataDirDesc: 'Click the button below to select a directory containing config.cfg.',
 
                     // CFG 文本编辑器
                     cfgEditor: 'CFG Editor',
@@ -415,7 +416,7 @@ i18n.use(LanguageDetector)
                     emptySchemaServer: '当前数据目录',
                     selectTableHint: '请从上方下拉列表中选择一张表',
                     noDataDirTitle: '未选择数据目录',
-                    noDataDirDesc: '请前往 设置 → 数据目录 选择包含 config.cfg 的目录。',
+                    noDataDirDesc: '点击下方按钮选择包含 config.cfg 的目录。',
 
                     // CFG 文本编辑器
                     cfgEditor: 'CFG编辑器',
@@ -467,6 +468,7 @@ i18n.use(LanguageDetector)
                     pleaseSetThemeFile: '请先设置主题文件',
                     testTheme: '测试主题',
                     save: '保存',
+                    goToSetting: '前往设置',
 
                     // Flow Visualization Settings
                     nodeDimensions: '节点尺寸',

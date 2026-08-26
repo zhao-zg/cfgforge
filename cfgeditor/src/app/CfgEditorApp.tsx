@@ -28,6 +28,8 @@ import {FlowStyleManager} from "@/flow/FlowStyleManager";
 import {Finder} from "@/features/finder/Finder";
 import {SidePanelShell} from "./SidePanelShell";
 import {getCurrentEditingSession} from "@/services/editingSession";
+import {isTauri} from "@tauri-apps/api/core";
+import {open as openDialog} from "@tauri-apps/plugin-dialog";
 
 // Chat / Setting 仅在 dragPanel 切换到对应面板时才渲染，懒加载以推迟
 // @ant-design/x* + openai + marked + dompurify 等重依赖的解析（不进首屏）
@@ -155,13 +157,39 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
         onSetDataDir(dataDir);
     }, [dataDir]);
 
+    // 桌面端空 dataDir：直接打开系统目录选择器
+    const handleSelectDir = useCallback(async () => {
+        try {
+            const selected = await openDialog({
+                directory: true,
+                multiple: false,
+                title: t('selectDataDir'),
+            });
+            if (selected && typeof selected === 'string') {
+                await setDataDir(selected);
+            }
+        } catch (e) {
+            console.error('Directory selection failed:', e);
+        }
+    }, [t]);
+
+    // Web 端空 dataDir：切到设置面板
+    const handleGoToSetting = useCallback(() => {
+        setDragPanel('setting');
+    }, []);
+
     let content;
     if (!dataDir) {
-        // 桌面端首次启动 / 未配置数据目录：引导用户去设置页选择
+        // 桌面端首次启动 / 未配置数据目录：引导用户选择目录
+        const isDesktop = isTauri();
         content = <Flex justify="center" align="center" vertical gap="middle" style={fullDivStyle}>
             <Empty description={false}/>
             <Typography.Title level={4}>{t('noDataDirTitle')}</Typography.Title>
             <Typography.Text type="secondary">{t('noDataDirDesc')}</Typography.Text>
+            {isDesktop
+                ? <Button type="primary" onClick={handleSelectDir}>{t('selectDataDir')}</Button>
+                : <Button type="primary" onClick={handleGoToSetting}>{t('goToSetting')}</Button>
+            }
         </Flex>;
     } else if (isLoading && !schema) {
         // 加载中：居中 Spin

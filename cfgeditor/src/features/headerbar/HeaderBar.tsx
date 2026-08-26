@@ -47,7 +47,7 @@ export const HeaderBar = memo(function ({schema, curTable}: {
 }) {
     const {curPage} = useCurPageRecordOrRecordRef();
     const {curTableId, curId} = useLocationData();
-    const {dragPanel, pageConf, history, isNextIdShow, isEditMode} = useMyStore();
+    const {dragPanel, pageConf, history, isNextIdShow, isEditMode, dataDir} = useMyStore();
     const {editingCurTable, editingCurId, editingIsEdited} = useMyStore();
     const navigate = useNavigate();
     const {t} = useTranslation();
@@ -112,7 +112,9 @@ export const HeaderBar = memo(function ({schema, curTable}: {
             <TableList schema={schema}/>
             {curTable ? <IdList curTable={curTable}/> : <Skeleton.Input/>}
         </Space.Compact>
-        : <Select id='table' loading={true}/>;
+        : <Select id='table' disabled size="small"
+                 style={{minWidth: 200}}
+                 placeholder={dataDir ? t('selectTableHint') : t('selectDataDirFirst')}/>;
 
     return <div style={HEADER_STYLE}>
         <Flex align="center" justify="space-between" gap="small" style={SPACE_STYLE}>

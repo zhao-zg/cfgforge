@@ -12,14 +12,14 @@
  * - Java Files.list → fs.readdirSync
  * - Java Files.exists → fs.existsSync
  * - Java Files.isDirectory → fs.statSync().isDirectory()
- * - Java getCodeName → @cfggen/shared FileNameUtil.getCodeName
+ * - Java getCodeName → @cfgforge/shared FileNameUtil.getCodeName
  * - Java reads file from disk → TS reads content into CfgFileInfo for in-memory processing
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { CfgSchema } from '../CfgSchema';
-import { getCodeName, getDefaultFileSystem } from '@cfggen/shared';
+import { getCodeName, getDefaultFileSystem } from '@cfgforge/shared';
 import type { CfgFileInfo } from '../CfgSchemas';
 
 export class CfgUtil {

@@ -1,8 +1,8 @@
-@startuml cfggen
+@startuml cfgforge
 ' hide the spot
 hide circle
 
-package "cfggen" {
+package "cfgforge" {
   component "ctx" as ctx #lightblue
   component "data" as data
   component "i18n" as i18n

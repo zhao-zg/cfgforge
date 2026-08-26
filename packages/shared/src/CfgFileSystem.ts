@@ -1,7 +1,7 @@
 /**
  * CfgFileSystem — 文件系统抽象层。
  *
- * 目的：让 cfggen 的 TS 包（shared/context/data/write/gen/editor-core）
+ * 目的：让 cfgforge 的 TS 包（shared/context/data/write/gen/editor-core）
  * 不直接依赖 Node.js `fs`，从而可以同时运行在：
  *   - Node.js 环境（CLI / MCP / sidecar）：NodeFileSystem（基于 fs）
  *   - Tauri WebView 浏览器环境：TauriFileSystem（基于 @tauri-apps/plugin-fs）

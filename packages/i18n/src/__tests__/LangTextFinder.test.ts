@@ -18,7 +18,7 @@ describe('LangTextFinder', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-ltf-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-ltf-test-'));
   });
 
   afterEach(() => {

@@ -18,14 +18,14 @@ MCP（Model Context Protocol）服务器为配置系统提供了与AI助手交�
 cd /path/to/your/config
 
 # 启动MCP服务器（默认端口3457）
-node <cfggen>/packages/cli/dist/index.js -datadir . -gen mcpserver
+node <cfgforge>/packages/cli/dist/index.js -datadir . -gen mcpserver
 ```
 
 ### 2️⃣ 配置Claude Code
 
 ```bash
 # 添加MCP服务器到Claude Code
-claude mcp add --transport http cfggen http://localhost:3457/mcp
+claude mcp add --transport http cfgforge http://localhost:3457/mcp
 
 # 验证配置是否成功
 claude mcp list
@@ -72,10 +72,10 @@ claude mcp list
 **示例：**
 ```bash
 # 指定端口
-node <cfggen>/packages/cli/dist/index.js -datadir . -gen mcpserver,port=8080
+node <cfgforge>/packages/cli/dist/index.js -datadir . -gen mcpserver,port=8080
 
 # 启用文件监视和自动重载（5秒延迟）
-node <cfggen>/packages/cli/dist/index.js -datadir . -gen mcpserver,watch=5,postrun=reload.bat
+node <cfgforge>/packages/cli/dist/index.js -datadir . -gen mcpserver,watch=5,postrun=reload.bat
 ```
 
 ---
@@ -238,7 +238,7 @@ MCP服务器提供了以下工具来查询和操作配置数据：
 
 **删除MCP服务器：**
 ```bash
-claude mcp remove cfggen
+claude mcp remove cfgforge
 ```
 
 **手动监测MCP连接状态：**

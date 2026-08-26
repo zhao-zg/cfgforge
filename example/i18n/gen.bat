@@ -1,2 +1,2 @@
-call %~dp0..\cfggen_common.bat
-%CFGGEN% -langswitchdir langs  -gen i18nbyid,dir=langs,backup=backup
+call %~dp0..\cfgforge_common.bat
+%CFGFORGE% -langswitchdir langs  -gen i18nbyid,dir=langs,backup=backup

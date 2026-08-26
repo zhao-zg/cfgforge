@@ -4,7 +4,7 @@
  * Model used by genInterface template to generate GDScript interface .gd files.
  */
 
-import type { Nameable, InterfaceSchema } from '@cfggen/schema';
+import type { Nameable, InterfaceSchema } from '@cfgforge/schema';
 import { GdName } from './GdName';
 import type { GdCodeGenerator } from './GdCodeGenerator';
 

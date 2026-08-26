@@ -1,14 +1,14 @@
 /**
  * T10.2 ParameterParser — CLI-layer tests.
  *
- * ParameterParser itself is already implemented in @cfggen/gen and well-tested
+ * ParameterParser itself is already implemented in @cfgforge/gen and well-tested
  * there. These tests verify the CLI-layer usage patterns: how the parser
  * is used within Tools/Generators.create() and how assureNoExtra works.
  */
 
 import { describe, it, expect } from 'vitest';
-import { ParameterParser } from '@cfggen/gen';
-import { Generators } from '@cfggen/gen';
+import { ParameterParser } from '@cfgforge/gen';
+import { Generators } from '@cfgforge/gen';
 import { Tools } from '../Tools';
 
 describe('ParameterParser (CLI layer)', () => {

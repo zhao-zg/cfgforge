@@ -7,9 +7,9 @@
 
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { printHelp } from '../Help';
-import { Generators } from '@cfggen/gen';
+import { Generators } from '@cfgforge/gen';
 import { Tools } from '../Tools';
-import { Logger } from '@cfggen/shared';
+import { Logger } from '@cfgforge/shared';
 
 describe('Help', () => {
   let output: string[];
@@ -64,7 +64,7 @@ describe('Help', () => {
     it('prints usage line', () => {
       printHelp();
       const text = output.join('');
-      expect(text).toContain('Usage: cfggen');
+      expect(text).toContain('Usage: cfgforge');
       expect(text).toContain('-datadir');
       expect(text).toContain('-gen');
       expect(text).toContain('-tool');
@@ -161,13 +161,13 @@ describe('Help', () => {
       // The help text itself contains "null" (e.g. "default null"),
       // so we just verify the first line is the Usage line, not a reason
       const firstLine = output[0];
-      expect(firstLine).toContain('Usage: cfggen');
+      expect(firstLine).toContain('Usage: cfgforge');
     });
 
     it('does not print reason when empty string', () => {
       printHelp('');
       const text = output.join('');
-      expect(text).toContain('Usage: cfggen');
+      expect(text).toContain('Usage: cfgforge');
     });
   });
 

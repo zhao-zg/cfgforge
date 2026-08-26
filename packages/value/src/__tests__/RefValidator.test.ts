@@ -30,8 +30,8 @@ import {
 } from '../CfgValue';
 import { CfgValueErrs } from '../CfgValueErrs';
 import { RefValidator } from '../RefValidator';
-import { DCellList, DFile, DCell } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
+import { DCellList, DFile, DCell } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
 import {
   TableSchema,
   KeySchema,
@@ -48,7 +48,7 @@ import {
   RefPrimary,
   RefUniq,
   type Structural,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

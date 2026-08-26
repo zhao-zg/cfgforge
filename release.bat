@@ -22,7 +22,7 @@ set "VERSION="
 
 echo.
 echo ============================================
-echo   cfggen release - tag and push
+echo   cfgforge release - tag and push
 echo ============================================
 echo.
 
@@ -163,8 +163,8 @@ echo.
 echo ============================================
 echo   Tag %VERSION% pushed to %REMOTE%!
 echo   GitHub Actions triggered.
-echo   Progress: https://github.com/zhao-zg/cfggen/actions
-echo   Release:  https://github.com/zhao-zg/cfggen/releases
+echo   Progress: https://github.com/zhao-zg/cfgforge/actions
+echo   Release:  https://github.com/zhao-zg/cfgforge/releases
 echo ============================================
 echo.
 pause

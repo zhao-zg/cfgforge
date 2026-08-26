@@ -8,8 +8,8 @@
  * Java source: configgen.gencs.ModuleModel.java (73 lines)
  */
 
-import type { Nameable } from '@cfggen/schema';
-import { upper1 } from '@cfggen/shared';
+import type { Nameable } from '@cfgforge/schema';
+import { upper1 } from '@cfgforge/shared';
 import type { CsCodeGenerator } from './CsCodeGenerator';
 import type { CsStructModel } from './CsStructModel';
 import type { CsInterfaceModel } from './CsInterfaceModel';

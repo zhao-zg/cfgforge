@@ -7,8 +7,8 @@
  * Java source: configgen.editorserver.PromptService.java (43 lines)
  */
 
-import { PromptGen } from '@cfggen/gen';
-import type { Prompt } from '@cfggen/gen';
+import { PromptGen } from '@cfgforge/gen';
+import type { Prompt } from '@cfgforge/gen';
 import type { EditorService } from './EditorService';
 
 // ---------------------------------------------------------------------------

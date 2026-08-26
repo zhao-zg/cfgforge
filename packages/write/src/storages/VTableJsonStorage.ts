@@ -12,11 +12,11 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { VStruct } from '@cfggen/value';
-import { ValueToJson } from '@cfggen/value';
-import type { DirectoryStructure } from '@cfggen/context';
-import { getJsonTableDirName } from '@cfggen/data';
-import { getCodeName, CachedFiles, getDefaultFileSystem } from '@cfggen/shared';
+import type { VStruct } from '@cfgforge/value';
+import { ValueToJson } from '@cfgforge/value';
+import type { DirectoryStructure } from '@cfgforge/context';
+import { getJsonTableDirName } from '@cfgforge/data';
+import { getCodeName, CachedFiles, getDefaultFileSystem } from '@cfgforge/shared';
 
 export class VTableJsonStorage {
   /**

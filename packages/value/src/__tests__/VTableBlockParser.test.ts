@@ -21,7 +21,7 @@ import {
   findColumnIndex,
 } from '../VTableBlockParser';
 import { CellsWithRowIndex } from '../ValueParser';
-import { DCell, DRowId, DTable } from '@cfggen/data';
+import { DCell, DRowId, DTable } from '@cfgforge/data';
 import {
   TableSchema,
   KeySchema,
@@ -38,7 +38,7 @@ import {
   fieldSpan,
   type FieldType,
   type FieldFormat,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

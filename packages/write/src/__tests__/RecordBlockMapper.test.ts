@@ -19,13 +19,13 @@ import { RecordBlockTransformed } from '../RecordBlock';
 import {
   VBool, VInt, VLong, VFloat, VString, VText,
   VStruct, VInterface, VList, VMap,
-} from '@cfggen/value';
+} from '@cfgforge/value';
 import {
   AutoOrPack, Sep, Fix, Block, FList, FMap, StructRef,
   Primitive, FieldSchema, StructSchema, TableSchema, InterfaceSchema,
   Metadata, Metadata_of, KeySchema, ENo, span, simpleTypeSpan,
-} from '@cfggen/schema';
-import { DFile } from '@cfggen/data';
+} from '@cfgforge/schema';
+import { DFile } from '@cfgforge/data';
 
 // -------------------------------------------------------------------------
 // Helpers: build schema objects for tests

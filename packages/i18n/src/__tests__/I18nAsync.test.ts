@@ -14,7 +14,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import * as XLSX from 'xlsx';
-import { setDefaultFileSystem, NodeFileSystem } from '@cfggen/shared';
+import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 import { TextByIdFinder } from '../TextByIdFinder';
 import { TextByValueFinder } from '../TextByValueFinder';
 import { LangTextFinder } from '../LangTextFinder';
@@ -38,7 +38,7 @@ describe('I18nAsync (T12.0g)', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-i18n-async-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-i18n-async-'));
     setDefaultFileSystem(new NodeFileSystem());
   });
 

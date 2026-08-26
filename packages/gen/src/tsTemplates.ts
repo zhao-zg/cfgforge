@@ -19,7 +19,7 @@ import {
   isStructRef,
   isFList,
   isFMap,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import {
   hasRef,
   hasRefFieldType,
@@ -29,9 +29,9 @@ import {
   type RefSimple,
   type InterfaceSchema,
   type KeySchema,
-} from '@cfggen/schema';
-import { StructSchema as StructSchemaClass } from '@cfggen/schema';
-import { removeLineSep, upper1 } from '@cfggen/shared';
+} from '@cfgforge/schema';
+import { StructSchema as StructSchemaClass } from '@cfgforge/schema';
+import { removeLineSep, upper1 } from '@cfgforge/shared';
 import { StructModel } from './StructModel';
 import type { TsCodeGenerator } from './TsCodeGenerator';
 

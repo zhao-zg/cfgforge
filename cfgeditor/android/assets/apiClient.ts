@@ -17,7 +17,7 @@ const DEFAULT_TIMEOUT_MS = 15000;
 /**
  * 规范化 server：用户可能填入 `http://host:port`、`https://host:port`、`host:port` 或带尾随斜杠，
  * 统一剥成 `host[:port]`，避免拼出 `http://https://host` 这种非法 URL。
- * 注意：cfggen 的 `-gen server` 后端只支持 http，故这里固定用 http。
+ * 注意：cfgforge 的 `-gen server` 后端只支持 http，故这里固定用 http。
  */
 function normalizeServer(server: string): string {
     return server.trim().replace(/^https?:\/\//i, '').replace(/\/+$/, '');

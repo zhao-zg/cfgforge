@@ -138,7 +138,7 @@ describe('E2E: example/config', () => {
     cfg.resolve();
 
     // Write back
-    const tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cfggen-e2e-'));
+    const tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cfgforge-e2e-'));
     try {
       const cfgPath = path.join(tempDir, 'config.cfg');
       CfgSchemas.writeToDir(cfgPath, cfg);

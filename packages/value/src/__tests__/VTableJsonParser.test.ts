@@ -16,7 +16,7 @@ import { VTableJsonParser } from '../VTableJsonParser';
 import { CfgValueErrs, jsonFileReadErr } from '../CfgValueErrs';
 import { CfgValueStat, VTable, VStruct, VInt, VString } from '../CfgValue';
 import { ValueUtil } from '../ValueUtil';
-import { DFile, JsonFileInfo, type JsonTableFiles } from '@cfggen/data';
+import { DFile, JsonFileInfo, type JsonTableFiles } from '@cfgforge/data';
 import {
   Primitive,
   TableSchema,
@@ -26,7 +26,7 @@ import {
   Metadata_of,
   AutoOrPack,
   FieldSchema,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';

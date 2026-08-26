@@ -15,11 +15,11 @@
  * - No BitSet (use manual bit operations)
  */
 
-import type { Value, CompositeValue } from '@cfggen/value';
+import type { Value, CompositeValue } from '@cfgforge/value';
 import {
   VBool, VInt, VLong, VFloat, VString, VText,
   VStruct, VInterface, VList, VMap,
-} from '@cfggen/value';
+} from '@cfgforge/value';
 import type { LuaAContext } from './LuaAContext';
 import type { LuaCtx } from './LuaCtx';
 import { isDoPackBool } from './LuaTypeStr';

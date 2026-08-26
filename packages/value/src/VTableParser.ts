@@ -9,9 +9,9 @@
  * Java source: configgen.value.VTableParser.java (119 lines)
  */
 
-import type { DTable, HeadRow } from '@cfggen/data';
-import { TableSchema } from '@cfggen/schema';
-import { hasBlock } from '@cfggen/schema';
+import type { DTable, HeadRow } from '@cfgforge/data';
+import { TableSchema } from '@cfgforge/schema';
+import { hasBlock } from '@cfgforge/schema';
 
 import { CfgValueErrs } from './CfgValueErrs';
 import { ValueParser } from './ValueParser';

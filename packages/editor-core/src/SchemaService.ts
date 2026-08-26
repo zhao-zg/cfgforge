@@ -19,8 +19,8 @@
  * Java source: configgen.editorserver.SchemaService.java (214 lines)
  */
 
-import type { CfgValue, VTable, VStruct } from '@cfggen/value';
-import { ValueUtil, VString } from '@cfggen/value';
+import type { CfgValue, VTable, VStruct } from '@cfgforge/value';
+import { ValueUtil, VString } from '@cfgforge/value';
 import {
   CfgSchema,
   CfgWriter,
@@ -36,7 +36,7 @@ import {
   isENo,
   isEEntry,
   isEEnum,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Types (mirror cfgeditor/src/api/schemaModel.ts)

@@ -17,7 +17,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { AddOrUpdateService, AddOrUpdateErrorCode } from '../AddOrUpdateService';
 
 function writeFile(dir: string, filename: string, content: string): void {
@@ -47,7 +47,7 @@ describe('AddOrUpdateService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-addupd-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-addupd-'));
   });
 
   afterEach(() => {

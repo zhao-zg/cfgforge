@@ -16,7 +16,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { CfgMcpServer } from '../CfgMcpServer';
-import { EditorService } from '@cfggen/editor-core';
+import { EditorService } from '@cfgforge/editor-core';
 
 // ---------------------------------------------------------------------------
 // Fixture helpers
@@ -56,7 +56,7 @@ describe('CfgMcpServer E2E', () => {
   let client: Client;
 
   beforeEach(async () => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-mcp-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-mcp-'));
     writeFile(tempDir, 'config.cfg', CFG);
     writeFile(tempDir, 'item.csv', CSV);
 

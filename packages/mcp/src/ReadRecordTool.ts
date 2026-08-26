@@ -10,9 +10,9 @@
 
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { EditorService } from '@cfggen/editor-core';
-import { TableRelatedInfoFinder } from '@cfggen/gen';
-import { CfgValueErrs, ValuePack, ValueToJson, valueEquals } from '@cfggen/value';
+import type { EditorService } from '@cfgforge/editor-core';
+import { TableRelatedInfoFinder } from '@cfgforge/gen';
+import { CfgValueErrs, ValuePack, ValueToJson, valueEquals } from '@cfgforge/value';
 
 // ---------------------------------------------------------------------------
 // ReadRecordTool

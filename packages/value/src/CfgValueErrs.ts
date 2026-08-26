@@ -8,8 +8,8 @@
  * Java source: configgen.value.CfgValueErrs.java (239 lines)
  */
 
-import { DFile, type Source } from '@cfggen/data';
-import type { FieldType } from '@cfggen/schema';
+import { DFile, type Source } from '@cfgforge/data';
+import type { FieldType } from '@cfgforge/schema';
 import type { Value } from './CfgValue';
 
 // ---------------------------------------------------------------------------

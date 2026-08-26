@@ -18,9 +18,9 @@
  * Java source: configgen.gengo.GoName.java (44 lines)
  */
 
-import type { Nameable } from '@cfggen/schema';
-import { StructSchema } from '@cfggen/schema';
-import { upper1 } from '@cfggen/shared';
+import type { Nameable } from '@cfgforge/schema';
+import { StructSchema } from '@cfgforge/schema';
+import { upper1 } from '@cfgforge/shared';
 
 export class GoName {
   /** Static modName — set from parameter "mod". */

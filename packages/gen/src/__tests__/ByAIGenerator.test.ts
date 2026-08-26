@@ -16,7 +16,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { SchemaToTs } from '../SchemaToTs';
 import { PromptModel, example, exampleToPrompt } from '../PromptModel';
 import { DEFAULT_INIT, FIX_ERROR } from '../PromptDefault';
@@ -114,7 +114,7 @@ describe('SchemaToTs', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-schemats-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-schemats-'));
   });
 
   afterEach(() => {
@@ -238,7 +238,7 @@ describe('AICfg', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-aicfg-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-aicfg-'));
   });
 
   afterEach(() => {
@@ -277,7 +277,7 @@ describe('PromptGen', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-promptgen-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-promptgen-'));
   });
 
   afterEach(() => {
@@ -422,7 +422,7 @@ describe('TsSchemaGenerator', () => {
   let outDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-tsschema-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-tsschema-'));
     outDir = path.join(tempDir, 'out');
     fs.mkdirSync(outDir, { recursive: true });
   });
@@ -524,7 +524,7 @@ describe('TableRelatedInfoFinder', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-trif-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-trif-'));
   });
 
   afterEach(() => {

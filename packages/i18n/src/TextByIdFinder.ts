@@ -17,7 +17,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import type { TextFinder, TextVisitor } from './LangTextFinder';
 import { LangTextFinder } from './LangTextFinder';
 import { normalize, fieldChainStr } from './I18nUtils';

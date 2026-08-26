@@ -9,15 +9,15 @@ AIGC:
   ReservedCode2: '96ed0b12-d81c-43af-bb53-56dd768d5d8e'
 ---
 
-# Samples - cfggen 配置示例
+# Samples - cfgforge 配置示例
 
-cfggen 配置系统的实际应用示例，展示各种游戏系统的配置设计模式。
+cfgforge 配置系统的实际应用示例，展示各种游戏系统的配置设计模式。
 
 ## 快速开始
 
 ### 0. 前置条件
 
-- 确保已安装 cfggen CLI（在 `..` 目录执行 `pnpm -r build` 或 `npm i -g cfggen`）
+- 确保已安装 cfgforge CLI（在 `..` 目录执行 `pnpm -r build` 或 `npm i -g cfgforge`）
 
 - 确保 `cfgeditor.exe` 存在。若不存在，在 `../cfgeditor` 目录下执行 `genexe.bat`，然后拷贝 `cfgeditor.exe` 到当前目录
 
@@ -88,8 +88,8 @@ cfggen 配置系统的实际应用示例，展示各种游戏系统的配置设�
 
 ## 相关文档
 
-- **[主项目文档](../)** - cfggen 完整介绍
-- **[结构定义规范](../docs/docs/cfggen/03.schema.md)** - CFG 语法说明
+- **[主项目文档](../)** - cfgforge 完整介绍
+- **[结构定义规范](../docs/docs/cfgforge/03.schema.md)** - CFG 语法说明
 - **[example 生成示例](../example/README.md)** - 生成代码示例
 
 > AI生成

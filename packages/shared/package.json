@@ -1,5 +1,5 @@
 {
-  "name": "@cfggen/shared",
+  "name": "@cfgforge/shared",
   "type": "module",
   "version": "0.1.0",
   "scripts": {

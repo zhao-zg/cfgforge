@@ -16,8 +16,8 @@ import { CfgValueParser } from '../CfgValueParser';
 import { CfgValueErrs } from '../CfgValueErrs';
 import { ValueEnv } from '../ValueEnv';
 import { LangTextFinder } from '../LangTextFinder';
-import { DCell, DRowId, DTable, CfgData, CfgDataStat, HeadRows } from '@cfggen/data';
-import type { JsonTableFiles } from '@cfggen/data';
+import { DCell, DRowId, DTable, CfgData, CfgDataStat, HeadRows } from '@cfgforge/data';
+import type { JsonTableFiles } from '@cfgforge/data';
 import {
   CfgSchema,
   TableSchema,
@@ -30,7 +30,7 @@ import {
   ForeignKeySchema,
   RefPrimary,
   fieldSpan,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

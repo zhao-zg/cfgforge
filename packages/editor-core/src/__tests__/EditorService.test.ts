@@ -18,7 +18,7 @@ import * as os from 'os';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { EditorService } from '../EditorService';
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 
 function writeFile(dir: string, filename: string, content: string): void {
   fs.writeFileSync(path.join(dir, filename), content, 'utf8');
@@ -47,7 +47,7 @@ describe('EditorService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-editor-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-editor-'));
     writeFile(tempDir, 'config.cfg', USER_CFG);
     writeFile(tempDir, 'user.csv', USER_CSV);
   });
@@ -69,7 +69,7 @@ describe('EditorService', () => {
     expect(svc1.context()).toBe(svc2.context());
 
     // Different dataDir → different context
-    const tempDir2 = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-editor2-'));
+    const tempDir2 = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-editor2-'));
     try {
       writeFile(tempDir2, 'config.cfg', USER_CFG);
       writeFile(tempDir2, 'user.csv', USER_CSV);

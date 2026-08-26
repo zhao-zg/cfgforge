@@ -7,7 +7,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as os from 'os';
 import { JsonFileInfo } from '../JsonFileInfo';
-import { setDefaultFileSystem, NodeFileSystem } from '@cfggen/shared';
+import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 
 describe('JsonFileInfo.ofAsync', () => {
   beforeEach(() => {
@@ -15,7 +15,7 @@ describe('JsonFileInfo.ofAsync', () => {
   });
 
   it('creates JsonFileInfo with lastModified from real file', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-jfi-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-jfi-'));
     const filePath = path.join(tmpDir, '42.json');
     fs.writeFileSync(filePath, '{"id": 42}');
 
@@ -43,7 +43,7 @@ describe('JsonFileInfo.ofAsync', () => {
   });
 
   it('matches of() result for same real file', async () => {
-    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-jfi-'));
+    const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-jfi-'));
     const filePath = path.join(tmpDir, '7.json');
     fs.writeFileSync(filePath, '{"id": 7}');
 

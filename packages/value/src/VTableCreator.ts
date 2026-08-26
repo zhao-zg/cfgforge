@@ -29,7 +29,7 @@ import {
   seqValueNotContinuous,
 } from './CfgValueErrs';
 import { ValueUtil } from './ValueUtil';
-import { DCellList, type Source } from '@cfggen/data';
+import { DCellList, type Source } from '@cfgforge/data';
 import {
   type TableSchema,
   type KeySchema,
@@ -40,7 +40,7 @@ import {
   isEEnum,
   findFieldIndices,
   findFieldIndex,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 export class VTableCreator {
   private readonly tableSchema: TableSchema;

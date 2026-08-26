@@ -12,8 +12,8 @@
  * - `WatchAndPostRun` is handled by Context package, not Main
  */
 
-import type { Generator } from '@cfggen/gen';
-import { Generators } from '@cfggen/gen';
+import type { Generator } from '@cfgforge/gen';
+import { Generators } from '@cfgforge/gen';
 import {
   JavaCodeGenerator,
   CsCodeGenerator,
@@ -27,11 +27,11 @@ import {
   I18nByValueGenerator,
   I18nByIdGenerator,
   ByAIGenerator,
-} from '@cfggen/gen';
-import { Context, ContextCfg, ExplicitDir } from '@cfggen/context';
-import { HeadRows } from '@cfggen/data';
-import type { HeadRow } from '@cfggen/data';
-import { Logger, LocaleUtil, CachedFiles } from '@cfggen/shared';
+} from '@cfgforge/gen';
+import { Context, ContextCfg, ExplicitDir } from '@cfgforge/context';
+import { HeadRows } from '@cfgforge/data';
+import type { HeadRow } from '@cfgforge/data';
+import { Logger, LocaleUtil, CachedFiles } from '@cfgforge/shared';
 import { printHelp } from './Help';
 import { Tools } from './Tools';
 import type { Tool } from './Tool';

@@ -24,12 +24,12 @@ import {
 import { ForeachVStruct, type ForeachContext, type VStructVisitor } from './ForeachVStruct';
 import { ValueUtil } from './ValueUtil';
 import { RefId } from './ValueRefCollector';
-import type { TableSchemaRefGraph } from '@cfggen/schema';
-import { TableSchema } from '@cfggen/schema';
-import type { ForeignKeySchema, Structural } from '@cfggen/schema';
-import { RefPrimary, RefUniq, RefList } from '@cfggen/schema';
-import { findFieldIndices } from '@cfggen/schema';
-import { isSimpleType, isFList, isFMap, type FieldType } from '@cfggen/schema';
+import type { TableSchemaRefGraph } from '@cfgforge/schema';
+import { TableSchema } from '@cfgforge/schema';
+import type { ForeignKeySchema, Structural } from '@cfgforge/schema';
+import { RefPrimary, RefUniq, RefList } from '@cfgforge/schema';
+import { findFieldIndices } from '@cfgforge/schema';
+import { isSimpleType, isFList, isFMap, type FieldType } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // SearchParams

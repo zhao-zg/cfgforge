@@ -8,9 +8,9 @@
  * Java source: configgen.editorserver.CheckJsonService.java (62 lines)
  */
 
-import { CfgValueErrs, ValueJsonParser, ValueToJson } from '@cfggen/value';
-import type { VStruct, VTable } from '@cfggen/value';
-import { ByAIGenerator, FIX_ERROR } from '@cfggen/gen';
+import { CfgValueErrs, ValueJsonParser, ValueToJson } from '@cfgforge/value';
+import type { VStruct, VTable } from '@cfgforge/value';
+import { ByAIGenerator, FIX_ERROR } from '@cfgforge/gen';
 import type { EditorService } from './EditorService';
 
 // ---------------------------------------------------------------------------

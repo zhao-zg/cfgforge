@@ -26,7 +26,7 @@ import {
   isContainerType,
   type FieldType,
   type FMap as FMapType,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import type {
   Structural,
   Nameable,
@@ -34,10 +34,10 @@ import type {
   ForeignKeySchema,
   KeySchema,
   TableSchema,
-} from '@cfggen/schema';
-import { isEEnum, isEEntry, isRefPrimary, isRefUniq, isRefList, type RefSimple, type RefUniq } from '@cfggen/schema';
-import { upper1, lower1 } from '@cfggen/shared';
-import type { VTable } from '@cfggen/value';
+} from '@cfgforge/schema';
+import { isEEnum, isEEntry, isRefPrimary, isRefUniq, isRefList, type RefSimple, type RefUniq } from '@cfgforge/schema';
+import { upper1, lower1 } from '@cfgforge/shared';
+import type { VTable } from '@cfgforge/value';
 import type { CsCodeGenerator } from './CsCodeGenerator';
 import { CsName } from './CsName';
 

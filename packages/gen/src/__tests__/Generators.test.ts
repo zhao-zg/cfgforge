@@ -14,7 +14,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-import type { Context } from '@cfggen/context';
+import type { Context } from '@cfgforge/context';
 import { Generators } from '../Generators';
 import { Generator } from '../Generator';
 import { GeneratorWithTag } from '../GeneratorWithTag';
@@ -63,7 +63,7 @@ describe('Generators', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-gen-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-gen-'));
   });
 
   afterEach(() => {

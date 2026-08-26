@@ -13,7 +13,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { readCSV, readCSVAsync, getDefaultFileSystem } from '@cfggen/shared';
+import { readCSV, readCSVAsync, getDefaultFileSystem } from '@cfgforge/shared';
 import { normalize } from './I18nUtils';
 import type { TextFinder, TextVisitor } from './LangTextFinder';
 import { LangTextFinder } from './LangTextFinder';

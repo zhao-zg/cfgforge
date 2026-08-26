@@ -13,10 +13,10 @@
 
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { EditorService } from '@cfggen/editor-core';
-import { SearchService as ValueSearchService } from '@cfggen/value';
-import type { SearchResultItem } from '@cfggen/value';
-import { writeCSV } from '@cfggen/shared';
+import type { EditorService } from '@cfgforge/editor-core';
+import { SearchService as ValueSearchService } from '@cfgforge/value';
+import type { SearchResultItem } from '@cfgforge/value';
+import { writeCSV } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------
 // SearchTool

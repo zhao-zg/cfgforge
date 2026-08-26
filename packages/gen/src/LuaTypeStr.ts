@@ -15,15 +15,15 @@
  * - Java switch expressions replaced with if/else chains
  */
 
-import type { Structural, FieldSchema, KeySchema, TableSchema } from '@cfggen/schema';
+import type { Structural, FieldSchema, KeySchema, TableSchema } from '@cfgforge/schema';
 import {
   Primitive, FList, FMap, StructRef,
-} from '@cfggen/schema';
-import { RefList, RefPrimary, RefUniq } from '@cfggen/schema';
-import { isEEntry } from '@cfggen/schema';
-import { CfgWriter } from '@cfggen/schema';
-import { lower1 } from '@cfggen/shared';
-import type { VTable } from '@cfggen/value';
+} from '@cfgforge/schema';
+import { RefList, RefPrimary, RefUniq } from '@cfgforge/schema';
+import { isEEntry } from '@cfgforge/schema';
+import { CfgWriter } from '@cfgforge/schema';
+import { lower1 } from '@cfgforge/shared';
+import type { VTable } from '@cfgforge/value';
 import type { LuaAContext } from './LuaAContext';
 import type { LuaCtx } from './LuaCtx';
 import {

@@ -1,5 +1,5 @@
 {
-  "name": "@cfggen/data",
+  "name": "@cfgforge/data",
   "type": "module",
   "version": "0.1.0",
   "scripts": {
@@ -8,8 +8,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@cfggen/shared": "workspace:*",
-    "@cfggen/schema": "workspace:*",
+    "@cfgforge/shared": "workspace:*",
+    "@cfgforge/schema": "workspace:*",
     "exceljs": "^4.4.0"
   },
   "main": "./src/index.ts",

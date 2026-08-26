@@ -2,7 +2,7 @@
 
 一个专为 `.cfg` 配置文件设计的 VSCode 扩展，提供语法高亮、跳转到定义、大纲视图、查找引用功能。
 
-> **项目背景**: 本扩展是 [cfggen 策划配置系统](https://github.com/stallboy/cfggen) 的配套工具，为 cfggen 的配置文件提供完整的 IDE 支持。
+> **项目背景**: 本扩展是 [cfgforge 策划配置系统](https://github.com/stallboy/cfgforge) 的配套工具，为 cfgforge 的配置文件提供完整的 IDE 支持。
 
 ## ✨ 功能特性
 
@@ -93,19 +93,19 @@ complex: Item ->item.item[id];   // 带键的外键
 ## 🤝 问题反馈
 
 如果您在使用过程中遇到任何问题或有功能建议，请通过以下方式联系我们：
-- **扩展相关问题**: 在 [本扩展仓库](https://github.com/stallboy/cfggen) 提交 Issue
-- **配置系统问题**: 在 [cfggen 主仓库](https://github.com/stallboy/cfggen) 提交 Issue
+- **扩展相关问题**: 在 [本扩展仓库](https://github.com/stallboy/cfgforge) 提交 Issue
+- **配置系统问题**: 在 [cfgforge 主仓库](https://github.com/stallboy/cfgforge) 提交 Issue
 - **功能建议**: 在扩展商店页面提交评价
 
-## 🌟 cfggen 生态系统
+## 🌟 cfgforge 生态系统
 
-本扩展是 cfggen 配置系统生态的一部分，与以下组件协同工作：
+本扩展是 cfgforge 配置系统生态的一部分，与以下组件协同工作：
 
-- **[cfggen 核心工具](https://github.com/stallboy/cfggen)**: 配置系统生成器和运行时
+- **[cfgforge 核心工具](https://github.com/stallboy/cfgforge)**: 配置系统生成器和运行时
 - **cfgeditor**: 基于节点的编辑器和查看器
 - **本 VSCode 扩展**: 提供 IDE 支持和开发体验
 
-完整的 cfggen 生态系统提供从配置定义到数据读取、数据编辑和浏览、再到代码生成的全链路解决方案。
+完整的 cfgforge 生态系统提供从配置定义到数据读取、数据编辑和浏览、再到代码生成的全链路解决方案。
 
 ## 📄 许可证
 

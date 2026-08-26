@@ -39,7 +39,7 @@ import {
   type Nameable,
   type EntryType,
   type FieldType,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import type { HeadRow } from './HeadRows';
 
 // Error factory imports (functions from CfgSchemaErrs)
@@ -49,7 +49,7 @@ import {
   fieldHeaderSpanNotEnough,
   jsonTableNotSupportExcel,
   suggestTypeUnknown,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // Data model imports
 import type { DTable } from './DTable';

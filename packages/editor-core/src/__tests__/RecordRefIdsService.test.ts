@@ -131,7 +131,7 @@ describe('RecordRefIdsService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-refids-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-refids-'));
   });
 
   afterEach(() => {

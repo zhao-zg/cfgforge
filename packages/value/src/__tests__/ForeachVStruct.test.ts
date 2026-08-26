@@ -32,8 +32,8 @@ import {
   type VStructVisitor,
   ForeachContext,
 } from '../ForeachVStruct';
-import { DCellList, DFile } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
+import { DCellList, DFile } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
 import {
   TableSchema,
   StructSchema,
@@ -47,7 +47,7 @@ import {
   ENo,
   StructRef,
   type Structural,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

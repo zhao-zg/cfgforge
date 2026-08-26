@@ -22,8 +22,8 @@ import type {
   KeySchema,
   FieldSchema,
   FieldType,
-} from '@cfggen/schema';
-import { StructSchema, InterfaceSchema, isEEnum } from '@cfggen/schema';
+} from '@cfgforge/schema';
+import { StructSchema, InterfaceSchema, isEEnum } from '@cfgforge/schema';
 import {
   Primitive,
   isStructRef,
@@ -37,8 +37,8 @@ import {
   RefUniq,
   type FMap as FMapType,
   type StructRef,
-} from '@cfggen/schema';
-import { upper1, underscoreToPascalCase, toScreamingSnakeCase } from '@cfggen/shared';
+} from '@cfgforge/schema';
+import { upper1, underscoreToPascalCase, toScreamingSnakeCase } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------
 // Static state — set by JavaCodeGenerator.generate() before rendering
@@ -235,7 +235,7 @@ function isEnumAsPrimaryKey(tableSchema: TableSchema): boolean {
 // MethodStr helpers (from MethodStr.java)
 // ---------------------------------------------------------------------------
 
-import { lower1 } from '@cfggen/shared';
+import { lower1 } from '@cfgforge/shared';
 
 export function formalParams(fs: FieldSchema[]): string {
   return fs.map((f) => type(f.type) + ' ' + lower1(f.name)).join(', ');
@@ -304,7 +304,7 @@ export function tableGet(
 }
 
 // Re-export for convenience
-export type RefSimpleType = import('@cfggen/schema').RefSimple;
+export type RefSimpleType = import('@cfgforge/schema').RefSimple;
 
 // ---------------------------------------------------------------------------
 // NameableName (from NameableName.java)

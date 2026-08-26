@@ -4,7 +4,7 @@
  * Model for Text.jte template.
  */
 
-import { lower1 } from '@cfggen/shared';
+import { lower1 } from '@cfgforge/shared';
 
 export class JavaTextModel {
   readonly pkg: string;

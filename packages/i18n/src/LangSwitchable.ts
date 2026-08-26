@@ -10,7 +10,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import { LangTextFinder } from './LangTextFinder';
 import { TextByValueFinder } from './TextByValueFinder';
 import { TextByIdFinder } from './TextByIdFinder';

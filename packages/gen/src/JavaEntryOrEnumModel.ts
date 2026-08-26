@@ -4,9 +4,9 @@
  * Model for GenEntryOrEnumClass.jte template.
  */
 
-import type { TableSchema } from '@cfggen/schema';
-import { isEEnum, EEntry, EEnum } from '@cfggen/schema';
-import type { VTable } from '@cfggen/value';
+import type { TableSchema } from '@cfgforge/schema';
+import { isEEnum, EEntry, EEnum } from '@cfgforge/schema';
+import type { VTable } from '@cfgforge/value';
 
 import { NameableName, getCodeTopPkg } from './JavaName';
 

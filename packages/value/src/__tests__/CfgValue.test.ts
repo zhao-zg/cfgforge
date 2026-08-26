@@ -22,9 +22,9 @@ import {
   CfgValue, CfgValueStat, VTable,
   type Value, type SimpleValue, type PrimitiveValue, type ContainerValue,
 } from '../CfgValue';
-import { DCell } from '@cfggen/data';
-import { DFile } from '@cfggen/data';
-import type { Structural, InterfaceSchema, TableSchema, CfgSchema } from '@cfggen/schema';
+import { DCell } from '@cfgforge/data';
+import { DFile } from '@cfgforge/data';
+import type { Structural, InterfaceSchema, TableSchema, CfgSchema } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers: create minimal schema mocks for testing

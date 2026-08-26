@@ -16,10 +16,10 @@
  * Java source: configgen.write.VTableStorage.java (162 lines)
  */
 
-import type { Context } from '@cfggen/context';
-import { VTable, VStruct, VInterface, VList, VMap, type Value, valueEquals } from '@cfggen/value';
-import type { DTable, DRawSheet, DRowId, Source } from '@cfggen/data';
-import { DCell, DCellList } from '@cfggen/data';
+import type { Context } from '@cfgforge/context';
+import { VTable, VStruct, VInterface, VList, VMap, type Value, valueEquals } from '@cfgforge/value';
+import type { DTable, DRawSheet, DRowId, Source } from '@cfgforge/data';
+import { DCell, DCellList } from '@cfgforge/data';
 import { TableFileLocator } from '../TableFileLocator';
 import type { TableFile } from '../TableFile';
 import { RecordBlock, RecordBlockTransformed } from '../RecordBlock';

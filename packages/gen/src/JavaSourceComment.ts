@@ -4,7 +4,7 @@
  * Generates source comment lines for generated class headers.
  */
 
-import type { Nameable } from '@cfggen/schema';
+import type { Nameable } from '@cfgforge/schema';
 
 export function sourceCommentOf(nameable: Nameable, rawSheetIds: string[] | null): string {
   const lines: string[] = [];

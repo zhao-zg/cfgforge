@@ -3,7 +3,7 @@
  *
  * A per-language text finder that holds translation data for multiple tables.
  * Full implementation (reading from disk, TextByIdFinder, TextByValueFinder)
- * is in @cfggen/i18n (Phase 5).
+ * is in @cfgforge/i18n (Phase 5).
  *
  * This module defines the interfaces that the value layer can depend on
  * without waiting for Phase 5. The i18n package's LangTextFinder class

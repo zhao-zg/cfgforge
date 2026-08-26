@@ -8,13 +8,13 @@ import * as path from 'path';
 import * as os from 'os';
 import { CfgUtil } from '../cfg/CfgUtil';
 import type { CfgFileInfo } from '../CfgSchemas';
-import { setDefaultFileSystem, NodeFileSystem } from '@cfggen/shared';
+import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 
 describe('CfgUtil.findConfigFilesRecursivelyAsync', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-cfu-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-cfu-'));
     setDefaultFileSystem(new NodeFileSystem());
   });
 

@@ -12,7 +12,7 @@ permissions:
   packages: write
 
 env:
-  IMAGE_NAME: cfggen
+  IMAGE_NAME: cfgforge
 
 jobs:
   build-and-push:

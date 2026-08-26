@@ -15,7 +15,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { VTableStorage } from '../storages/VTableStorage';
 import { RecordBlock } from '../RecordBlock';
-import { DCell, DRowId, DRawSheet, DTable, DCellList } from '@cfggen/data';
+import { DCell, DRowId, DRawSheet, DTable, DCellList } from '@cfgforge/data';
 
 const TEMP_DIR = path.join(__dirname, '..', '..', '..', '..', '.temp', 'write-vtablestorage-tests');
 

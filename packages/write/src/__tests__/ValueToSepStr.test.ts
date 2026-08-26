@@ -11,12 +11,12 @@ import { describe, it, expect } from 'vitest';
 import { ValueToSepStr } from '../ValueToSepStr';
 import {
   VInt, VString, VStruct, VList, VInterface,
-} from '@cfggen/value';
+} from '@cfgforge/value';
 import {
   AutoOrPack, Sep, Fix, FList, Primitive, FieldSchema, StructSchema, StructRef,
   Metadata, Metadata_of,
-} from '@cfggen/schema';
-import { DFile } from '@cfggen/data';
+} from '@cfgforge/schema';
+import { DFile } from '@cfgforge/data';
 
 const dummySource = DFile.of('test.json', 'test');
 

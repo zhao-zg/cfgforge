@@ -22,7 +22,7 @@ import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js'
 import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 
-import type { EditorService } from '@cfggen/editor-core';
+import type { EditorService } from '@cfgforge/editor-core';
 import { SchemaTool } from './SchemaTool';
 import { ReadRecordTool } from './ReadRecordTool';
 import { WriteRecordTool } from './WriteRecordTool';
@@ -55,7 +55,7 @@ export class CfgMcpServer {
    * Internally creates an EditorService (Context cached by dataDir).
    */
   static async create(dataDir: string): Promise<CfgMcpServer> {
-    const { EditorService } = await import('@cfggen/editor-core');
+    const { EditorService } = await import('@cfgforge/editor-core');
     const editor = await EditorService.create(dataDir);
     return new CfgMcpServer(editor);
   }

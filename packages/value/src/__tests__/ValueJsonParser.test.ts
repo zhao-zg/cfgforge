@@ -18,15 +18,15 @@ import {
   VBool, VInt, VLong, VFloat, VString, VText,
   VStruct, VInterface, VList, VMap,
 } from '../CfgValue';
-import { DFile } from '@cfggen/data';
+import { DFile } from '@cfgforge/data';
 import {
   Primitive, FList, FMap, StructRef,
   StructSchema, TableSchema, InterfaceSchema,
   Metadata_of, AutoOrPack,
   ENo, KeySchema,
   type Structural,
-} from '@cfggen/schema';
-import { FieldSchema } from '@cfggen/schema';
+} from '@cfgforge/schema';
+import { FieldSchema } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

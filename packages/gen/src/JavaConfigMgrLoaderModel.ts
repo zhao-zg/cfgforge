@@ -4,7 +4,7 @@
  * Model for ConfigMgrLoader.jte template.
  */
 
-import type { CfgValue } from '@cfggen/value';
+import type { CfgValue } from '@cfgforge/value';
 import { getCodeTopPkg, tableDataFullName, isEnumAndHasOnlyPrimaryKeyAndEnumStr } from './JavaName';
 
 export interface TableInfo {

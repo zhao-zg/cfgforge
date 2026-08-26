@@ -8,14 +8,14 @@ import * as path from 'path';
 import * as os from 'os';
 import { DirectoryStructure } from '../DirectoryStructure';
 import { ExplicitDir } from '../ExplicitDir';
-import { FileFmt } from '@cfggen/data';
-import { setDefaultFileSystem, NodeFileSystem } from '@cfggen/shared';
+import { FileFmt } from '@cfgforge/data';
+import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 
 describe('DirectoryStructure async', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-dsa-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-dsa-'));
     setDefaultFileSystem(new NodeFileSystem());
   });
 

@@ -103,7 +103,7 @@ describe('Editor API end-to-end regression', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-e2e-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-e2e-'));
     writeFile(tempDir, 'config.cfg', CFG);
     writeFile(tempDir, 'item.csv', ITEM_CSV);
     writeFile(tempDir, 'weapon.csv', WEAPON_CSV);

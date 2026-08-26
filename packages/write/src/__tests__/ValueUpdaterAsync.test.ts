@@ -11,10 +11,10 @@ import * as path from 'path';
 import * as os from 'os';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { ValueUpdater } from '../ValueUpdater';
-import { VInt, valueEquals, type Value } from '@cfggen/value';
-import { setDefaultFileSystem, NodeFileSystem } from '@cfggen/shared';
+import { VInt, valueEquals, type Value } from '@cfgforge/value';
+import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 
 function writeFile(dir: string, filename: string, content: string): void {
   fs.writeFileSync(path.join(dir, filename), content, 'utf8');
@@ -43,7 +43,7 @@ describe('ValueUpdater async', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-valupd-async-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-valupd-async-'));
     setDefaultFileSystem(new NodeFileSystem());
   });
 

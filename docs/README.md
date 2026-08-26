@@ -13,13 +13,13 @@ AIGC:
 
 [![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
 
-这是策划配表系统（cfggen）的官方文档站点，基于 [Astro](https://astro.build) 和 [Starlight](https://starlight.astro.build) 构建。
+这是策划配表系统（cfgforge）的官方文档站点，基于 [Astro](https://astro.build) 和 [Starlight](https://starlight.astro.build) 构建。
 
 ## 📖 文档内容
 
 文档站点包含以下主要部分：
 
-- **[配表系统 (cfggen)](src/content/docs/cfggen/)** - 核心配置生成器文档
+- **[配表系统 (cfgforge)](src/content/docs/cfgforge/)** - 核心配置生成器文档
   - 快速开始指南
   - Schema 定义语法
   - 主键、枚举、外键配置
@@ -115,10 +115,10 @@ sidebar:
 ## 🔗 相关链接
 
 - [主项目 README](../README.md)
-- [配表系统 (cfggen)](../packages/)
+- [配表系统 (cfgforge)](../packages/)
 - [配置编辑器 (cfgeditor)](../cfgeditor/)
 - [开发工具 (cfgdev)](../cfgdev/)
-- [在线文档](https://stallboy.github.io/cfggen)
+- [在线文档](https://stallboy.github.io/cfgforge)
 
 ## 📚 更多资源
 

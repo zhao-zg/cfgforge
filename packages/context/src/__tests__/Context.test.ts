@@ -20,9 +20,9 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { Context } from '../Context';
 import { ContextCfg } from '../ContextCfg';
-import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
-import { valueEquals } from '@cfggen/value';
-import { HeadRows } from '@cfggen/data';
+import type { CfgValue, VTable, VStruct, Value } from '@cfgforge/value';
+import { valueEquals } from '@cfgforge/value';
+import { HeadRows } from '@cfgforge/data';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -82,7 +82,7 @@ describe('Context', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-ctx-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-ctx-'));
   });
 
   afterEach(() => {

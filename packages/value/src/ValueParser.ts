@@ -12,13 +12,13 @@
  * Java source: configgen.value.ValueParser.java (538 lines)
  */
 
-import { DCell, DCellList, type HeadRow } from '@cfggen/data';
-import { ParseBoolResult } from '@cfggen/data';
+import { DCell, DCellList, type HeadRow } from '@cfgforge/data';
+import { ParseBoolResult } from '@cfgforge/data';
 import type {
   Structural,
   FieldSchema,
   SimpleType,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import {
   Primitive,
   StructRef,
@@ -29,10 +29,10 @@ import {
   isFList,
   isFMap,
   isSimpleType,
-} from '@cfggen/schema';
-import { InterfaceSchema, StructSchema } from '@cfggen/schema';
-import { AutoOrPack, Sep, isSep, isBlock } from '@cfggen/schema';
-import { span, fieldSpan, simpleTypeSpan } from '@cfggen/schema';
+} from '@cfgforge/schema';
+import { InterfaceSchema, StructSchema } from '@cfgforge/schema';
+import { AutoOrPack, Sep, isSep, isBlock } from '@cfgforge/schema';
+import { span, fieldSpan, simpleTypeSpan } from '@cfgforge/schema';
 import type { Value, SimpleValue } from './CfgValue';
 import {
   VBool,

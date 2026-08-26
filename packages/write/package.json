@@ -1,5 +1,5 @@
 {
-  "name": "@cfggen/write",
+  "name": "@cfgforge/write",
   "type": "module",
   "version": "0.1.0",
   "scripts": {
@@ -8,11 +8,11 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@cfggen/context": "workspace:*",
-    "@cfggen/data": "workspace:*",
-    "@cfggen/value": "workspace:*",
-    "@cfggen/shared": "workspace:*",
-    "@cfggen/schema": "workspace:*",
+    "@cfgforge/context": "workspace:*",
+    "@cfgforge/data": "workspace:*",
+    "@cfgforge/value": "workspace:*",
+    "@cfgforge/shared": "workspace:*",
+    "@cfgforge/schema": "workspace:*",
     "exceljs": "^4.4.0"
   },
   "main": "./src/index.ts",

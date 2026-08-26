@@ -15,18 +15,18 @@
 
 import * as path from 'path';
 import type { Context } from './Context';
-import { DTable, FileFmt, getFileFormat, getTableNameIndex, HeadParser, CellParser, CfgDataStat, readExcel } from '@cfggen/data';
-import { CfgSchemaErrs } from '@cfggen/schema';
+import { DTable, FileFmt, getFileFormat, getTableNameIndex, HeadParser, CellParser, CfgDataStat, readExcel } from '@cfgforge/data';
+import { CfgSchemaErrs } from '@cfgforge/schema';
 
 export class DataUpdater {
   /**
    * Result of reloading a table: new CfgData (with the updated table merged in)
    * and a list of error strings.
    */
-  readonly newCfgData: import('@cfggen/data').CfgData;
+  readonly newCfgData: import('@cfgforge/data').CfgData;
   readonly errStrList: string[];
 
-  private constructor(newCfgData: import('@cfggen/data').CfgData, errStrList: string[]) {
+  private constructor(newCfgData: import('@cfgforge/data').CfgData, errStrList: string[]) {
     this.newCfgData = newCfgData;
     this.errStrList = errStrList;
   }
@@ -38,7 +38,7 @@ export class DataUpdater {
    * and returns a new CfgData with the updated table replacing the old one.
    */
   static async updateByReloadTable(context: Context, dTable: DTable): Promise<DataUpdater> {
-    const newRawSheets: import('@cfggen/data').DRawSheet[] = [];
+    const newRawSheets: import('@cfgforge/data').DRawSheet[] = [];
     const rootDir = context.rootDir();
 
     for (const sheet of dTable.rawSheets) {

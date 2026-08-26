@@ -24,8 +24,8 @@ import { HeadRows } from '../HeadRows';
 import { readExcel } from '../ExcelReader';
 import { readCsv } from '../CsvReader';
 import { FileFmt, getFileFormat, isFileIgnored } from '../DataUtil';
-import { getCodeName } from '@cfggen/shared';
-import { CfgSchemaErrs } from '@cfggen/schema';
+import { getCodeName } from '@cfgforge/shared';
+import { CfgSchemaErrs } from '@cfgforge/schema';
 import type { ReadResult } from '../ReadResult';
 
 // ---------------------------------------------------------------------------

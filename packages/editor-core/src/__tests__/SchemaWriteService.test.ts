@@ -72,7 +72,7 @@ describe('SchemaWriteService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-schemawrite-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-schemawrite-'));
   });
 
   afterEach(() => {

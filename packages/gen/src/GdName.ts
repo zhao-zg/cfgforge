@@ -4,13 +4,13 @@
  * Computes className and file path for a Nameable (struct/interface/table).
  *
  * Differences from Java:
- * - Uses upper1 from @cfggen/shared instead of StringUtil.upper1
+ * - Uses upper1 from @cfgforge/shared instead of StringUtil.upper1
  * - String.split('.') directly (no regex escaping needed in TS)
  */
 
-import { upper1 } from '@cfggen/shared';
-import type { Nameable } from '@cfggen/schema';
-import { StructSchema } from '@cfggen/schema';
+import { upper1 } from '@cfgforge/shared';
+import type { Nameable } from '@cfgforge/schema';
+import { StructSchema } from '@cfgforge/schema';
 
 export class GdName {
   readonly className: string;

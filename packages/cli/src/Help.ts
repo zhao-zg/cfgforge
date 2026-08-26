@@ -5,8 +5,8 @@
  * with their parameter contracts (collected via ParameterInfoCollector).
  */
 
-import { Generators } from '@cfggen/gen';
-import { Logger, LocaleUtil } from '@cfggen/shared';
+import { Generators } from '@cfgforge/gen';
+import { Logger, LocaleUtil } from '@cfgforge/shared';
 import { Tools } from './Tools';
 import { ParameterInfoCollector } from './ParameterInfoCollector';
 
@@ -15,9 +15,9 @@ export function printHelp(reason?: string | null): void {
     Logger.log(reason);
   }
 
-  Logger.log('Usage: cfggen [options] [-tool toolName[,param=value...]] -datadir <dir> [-gen genName[,param=value...]]');
+  Logger.log('Usage: cfgforge [options] [-tool toolName[,param=value...]] -datadir <dir> [-gen genName[,param=value...]]');
   Logger.log('');
-  Logger.log('   or: cfggen [-h] (print help)');
+  Logger.log('   or: cfgforge [-h] (print help)');
   Logger.log('');
   Logger.log('Parameters can be in any order, but -datadir is required when using generators.');
   Logger.log(LocaleUtil.getLocaleString('Usage.ToolGenStart',

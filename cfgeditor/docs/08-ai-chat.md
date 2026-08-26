@@ -2,7 +2,7 @@
 
 AI Chat 用 LLM 按当前表 schema 生成配置 JSON，写回编辑会话。**前端直连 OpenAI 兼容端点，后端只产系统提示词 + 校验**。
 
-> **不讲**：x-sdk 内部协议解析（黑盒）；后端 `/prompt` / `/checkJson` 的服务端实现（cfggen 后端，标注接口契约即可）。本文讲 Chat 架构 + 与 EditingSession / 后端的关系。
+> **不讲**：x-sdk 内部协议解析（黑盒）；后端 `/prompt` / `/checkJson` 的服务端实现（cfgforge 后端，标注接口契约即可）。本文讲 Chat 架构 + 与 EditingSession / 后端的关系。
 >
 > 【承前】03 的 `replaceEditingObject`（回写）+ 01 后端契约 + 02 `aiConf`。　【启后】—（扩展篇，最后看 [09](09-cross-cutting.md)）。
 
@@ -117,7 +117,7 @@ AddJson 的「loadIntoForm」按钮也调 `replaceEditingObject`，但**跳过 `
 
 **接自己的 LLM**：设置面板写 `aiConf`（baseUrl + apiKey + model）→ 存个人 pref 文件。OpenAI 兼容端点即可（deepseek / glm / 自部署）。
 
-**改系统提示词**：在后端 `/prompt`（cfggen `-gen server`）改，不在前端——前端只消费 `{prompt, init}`。
+**改系统提示词**：在后端 `/prompt`（cfgforge `-gen server`）改，不在前端——前端只消费 `{prompt, init}`。
 
 **回写不走值类 patch**：Chat 生成整条 JSON，用 `replaceEditingObject`（整体替换 + FitFull + undo），不走 `updateFormValues`。
 

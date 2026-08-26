@@ -10,7 +10,7 @@
  *   trigger `assureNoExtra()` failure.
  */
 
-import { parseToIdAndMap } from '@cfggen/shared';
+import { parseToIdAndMap } from '@cfgforge/shared';
 import type { Parameter } from './Parameter';
 
 export class ParameterParser implements Parameter {

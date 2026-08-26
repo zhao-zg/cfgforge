@@ -5,7 +5,7 @@
  */
 
 import * as fs from 'fs';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 
 export interface AICfg {
   readonly baseUrl: string;

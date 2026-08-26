@@ -1,5 +1,5 @@
 /**
- * apiClient — 直接调用 @cfggen/editor-core 的服务层。
+ * apiClient — 直接调用 @cfgforge/editor-core 的服务层。
  *
  * 改造前：通过 axios HTTP 调用 Java 后端（-gen server）。
  * 改造后：直接 import 并调用 editor-core 的 TypeScript 服务类。
@@ -25,7 +25,7 @@ import {
     PromptService,
     NoteEditService,
     SearchService,
-} from '@cfggen/editor-core';
+} from '@cfgforge/editor-core';
 
 import type {
     RawSchema,
@@ -41,7 +41,7 @@ import type {
     CheckJsonResult,
     PromptResult,
     SearchResult,
-} from '@cfggen/editor-core';
+} from '@cfgforge/editor-core';
 
 // Re-export types needed by UI components ( CreateTableForm 等)
 export type {
@@ -49,7 +49,7 @@ export type {
     FieldRequest,
     EnumValueRequest,
     CreateResult,
-} from '@cfggen/editor-core';
+} from '@cfgforge/editor-core';
 
 import type {Notes, NoteEditResult as LocalNoteEditResult} from './noteModel';
 import type {JSONObject} from './recordModel';

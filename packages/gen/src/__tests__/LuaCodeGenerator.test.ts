@@ -20,8 +20,8 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
-import { CachedFiles } from '@cfggen/shared';
+import { Context } from '@cfgforge/context';
+import { CachedFiles } from '@cfgforge/shared';
 import { LuaCodeGenerator } from '../LuaCodeGenerator';
 import { GeneratorWithTag } from '../GeneratorWithTag';
 import type { Parameter } from '../Parameter';
@@ -64,7 +64,7 @@ describe('LuaCodeGenerator', () => {
   let dstDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-lua-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-lua-'));
     dstDir = path.join(tempDir, 'out');
     fs.mkdirSync(dstDir, { recursive: true });
   });

@@ -12,13 +12,13 @@
  * Java templates: app/src/main/resources/jte/gd/*.jte
  */
 
-import { upper1, removeLineSep } from '@cfggen/shared';
-import type { TableSchema, Structural } from '@cfggen/schema';
-import { FList, FMap, isStructRef, isFList, isFMap, isSimpleType } from '@cfggen/schema';
-import { hasRef, hasRefFieldType } from '@cfggen/schema';
-import { isEEntry, isEEnum } from '@cfggen/schema';
-import { RefPrimary, RefUniq, RefList, isRefPrimary, isRefUniq, isRefList } from '@cfggen/schema';
-import type { VTable } from '@cfggen/value';
+import { upper1, removeLineSep } from '@cfgforge/shared';
+import type { TableSchema, Structural } from '@cfgforge/schema';
+import { FList, FMap, isStructRef, isFList, isFMap, isSimpleType } from '@cfgforge/schema';
+import { hasRef, hasRefFieldType } from '@cfgforge/schema';
+import { isEEntry, isEEnum } from '@cfgforge/schema';
+import { RefPrimary, RefUniq, RefList, isRefPrimary, isRefUniq, isRefList } from '@cfgforge/schema';
+import type { VTable } from '@cfgforge/value';
 import type { GdStructModel } from './GdStructModel';
 import type { GdInterfaceModel } from './GdInterfaceModel';
 import type { GdProcessorModel } from './GdProcessorModel';

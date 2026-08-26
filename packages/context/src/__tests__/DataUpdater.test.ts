@@ -16,7 +16,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
 import { Context } from '../Context';
 import { DataUpdater } from '../DataUpdater';
-import { HeadRow } from '@cfggen/data';
+import { HeadRow } from '@cfgforge/data';
 
 function writeFile(dir: string, filename: string, content: string): void {
   fs.writeFileSync(path.join(dir, filename), content, 'utf8');
@@ -52,7 +52,7 @@ describe('DataUpdater', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-dataupd-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-dataupd-'));
   });
 
   afterEach(() => {

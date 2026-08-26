@@ -37,8 +37,8 @@ import {
 } from '../CfgValue';
 import { TextValue } from '../TextValue';
 import { LangTextFinder, type TextFinder, type TextVisitor } from '../LangTextFinder';
-import { DCellList, DFile } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
+import { DCellList, DFile } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
 import {
   TableSchema,
   StructSchema,
@@ -52,7 +52,7 @@ import {
   ENo,
   hasText,
   type Structural,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

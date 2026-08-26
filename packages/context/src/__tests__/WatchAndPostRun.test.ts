@@ -31,7 +31,7 @@ describe('WatchAndPostRun', () => {
   let activeWpr: WatchAndPostRun | null = null;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-wpr-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-wpr-'));
     activeWpr = null;
   });
 

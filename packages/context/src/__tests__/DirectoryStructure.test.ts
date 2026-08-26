@@ -11,13 +11,13 @@ import * as os from 'os';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { DirectoryStructure } from '../DirectoryStructure';
 import { ExplicitDir } from '../ExplicitDir';
-import { FileFmt } from '@cfggen/data';
+import { FileFmt } from '@cfgforge/data';
 
 describe('DirectoryStructure', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-ds-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-ds-'));
   });
 
   afterEach(() => {

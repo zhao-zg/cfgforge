@@ -10,12 +10,12 @@
  * - Java streams → TS array methods
  */
 
-import { upper1, lower1 } from '@cfggen/shared';
-import type { Nameable, FieldType, FieldSchema, ForeignKeySchema, KeySchema, Structural } from '@cfggen/schema';
-import { Primitive, StructRef, FList, FMap, isFList } from '@cfggen/schema';
-import { RefPrimary, RefUniq, RefList } from '@cfggen/schema';
-import { TableSchema } from '@cfggen/schema';
-import type { VTable } from '@cfggen/value';
+import { upper1, lower1 } from '@cfgforge/shared';
+import type { Nameable, FieldType, FieldSchema, ForeignKeySchema, KeySchema, Structural } from '@cfgforge/schema';
+import { Primitive, StructRef, FList, FMap, isFList } from '@cfgforge/schema';
+import { RefPrimary, RefUniq, RefList } from '@cfgforge/schema';
+import { TableSchema } from '@cfgforge/schema';
+import type { VTable } from '@cfgforge/value';
 import { GdName } from './GdName';
 import type { GdCodeGenerator } from './GdCodeGenerator';
 

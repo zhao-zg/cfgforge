@@ -11,14 +11,14 @@
  * (e.g. ComparingBlockParser) for old/new algorithm comparison.
  */
 
-import type { DCell } from '@cfggen/data';
-import { DTable } from '@cfggen/data';
-import type { TableSchema } from '@cfggen/schema';
-import type { Structural } from '@cfggen/schema';
-import { walkBlockAncestors } from '@cfggen/schema';
-import type { BlockFieldVisitor } from '@cfggen/schema';
-import { fieldSpan } from '@cfggen/schema';
-import type { FieldSchema } from '@cfggen/schema';
+import type { DCell } from '@cfgforge/data';
+import { DTable } from '@cfgforge/data';
+import type { TableSchema } from '@cfgforge/schema';
+import type { Structural } from '@cfgforge/schema';
+import { walkBlockAncestors } from '@cfgforge/schema';
+import type { BlockFieldVisitor } from '@cfgforge/schema';
+import { fieldSpan } from '@cfgforge/schema';
+import type { FieldSchema } from '@cfgforge/schema';
 
 import type { BlockParser } from './ValueParser';
 import { CellsWithRowIndex } from './ValueParser';

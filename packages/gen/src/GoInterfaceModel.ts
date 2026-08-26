@@ -6,7 +6,7 @@
  * Java source: configgen.gengo.InterfaceModel.java (8 lines)
  */
 
-import type { InterfaceSchema } from '@cfggen/schema';
+import type { InterfaceSchema } from '@cfgforge/schema';
 import type { GoName } from './GoName';
 
 export class GoInterfaceModel {

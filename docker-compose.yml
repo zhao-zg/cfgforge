@@ -1,9 +1,9 @@
 services:
-  cfggen:
+  cfgforge:
     # 纯静态前端只读预览（TS 重写架构）。
     # 注意：新架构下编辑功能由本地 Tauri 桌面应用直接读写本机文件系统完成，
     # 浏览器/Docker 环境无法读写配表，仅作只读预览部署。
-    image: ghcr.io/zhao-zg/cfggen:latest
+    image: ghcr.io/zhao-zg/cfgforge:latest
     ports:
       - "8181:80"
     restart: unless-stopped

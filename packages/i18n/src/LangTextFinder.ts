@@ -7,7 +7,7 @@
  * Java source: configgen.i18n.LangTextFinder.java (50 lines)
  */
 
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import { TextByValueFinder } from './TextByValueFinder';
 import { TextByIdFinder } from './TextByIdFinder';
 

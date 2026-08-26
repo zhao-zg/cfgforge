@@ -22,7 +22,7 @@ describe('LangSwitchable', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-langsw-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-langsw-test-'));
   });
 
   afterEach(() => {

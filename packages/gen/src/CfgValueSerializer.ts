@@ -11,9 +11,9 @@
  * Java source: configgen.genbytes.CfgValueSerializer.java (58 lines)
  */
 
-import type { LangSwitchableRuntime } from '@cfggen/i18n';
-import { CfgValue, VTable } from '@cfggen/value';
-import { Logger } from '@cfggen/shared';
+import type { LangSwitchableRuntime } from '@cfgforge/i18n';
+import { CfgValue, VTable } from '@cfgforge/value';
+import { Logger } from '@cfgforge/shared';
 
 import { ConfigOutput } from './ConfigOutput';
 import { StringPool } from './StringPool';

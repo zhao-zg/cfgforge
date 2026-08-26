@@ -563,7 +563,7 @@ AIGC:
 ## Phase 10: packages/cli ✅
 
 ### T10.1 Main (入口 + 插件注册)
-- 测试：`npx cfggen -h` 打印帮助
+- 测试：`npx cfgforge -h` 打印帮助
 - 实现：注册所有 generators/tools + 参数解析 + 构造 Context + 调度
 - commit
 
@@ -578,8 +578,8 @@ AIGC:
 - commit
 
 ### T10.4 端到端回归测试
-- `npx cfggen -datadir example/config -gen java,dir:./test-output`
-- `npx cfggen -datadir example/config -gen verify`
+- `npx cfgforge -datadir example/config -gen java,dir:./test-output`
+- `npx cfgforge -datadir example/config -gen verify`
 - commit
 
 ---
@@ -622,7 +622,7 @@ AIGC:
 
 ### T12.5 tauri.conf.json 改造
 - 测试：bundle resources 为空
-- 实现：去掉 cfggen.jar 和 jre/
+- 实现：去掉 cfgforge.jar 和 jre/
 - commit
 
 ### T12.6 端到端验证
@@ -638,8 +638,8 @@ AIGC:
 - 删除 `app/` 整个目录
 - commit
 
-### T13.2 删除 cfggen.jar 和 JRE
-- 删除 `cfgeditor/src-tauri/resources/cfggen.jar`
+### T13.2 删除 cfgforge.jar 和 JRE
+- 删除 `cfgeditor/src-tauri/resources/cfgforge.jar`
 - 删除 `cfgeditor/src-tauri/resources/jre/`
 - commit
 
@@ -653,7 +653,7 @@ AIGC:
 - commit
 
 ### T13.5 最终回归测试
-- CLI: `npx cfggen -datadir example/config -gen java,bytes,verify`
+- CLI: `npx cfgforge -datadir example/config -gen java,bytes,verify`
 - 编辑器: 全功能测试
 - MCP: AI 工具调用测试
 - commit

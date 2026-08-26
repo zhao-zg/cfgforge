@@ -13,8 +13,8 @@ import {
   DFile,
   type JsonTableFiles,
   type JsonFileInfo,
-} from '@cfggen/data';
-import type { TableSchema } from '@cfggen/schema';
+} from '@cfgforge/data';
+import type { TableSchema } from '@cfgforge/schema';
 import {
   type CfgValueErrs,
   jsonFileReadErr,

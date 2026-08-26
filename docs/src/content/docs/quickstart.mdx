@@ -5,21 +5,21 @@ sidebar:
   order: 0
 ---
 
-欢迎使用 cfggen 配表系统!本指南将帮助您在 **5 分钟内**完成第一个配置示例。
+欢迎使用 cfgforge 配表系统!本指南将帮助您在 **5 分钟内**完成第一个配置示例。
 
 
 ## 前置准备
 
 ### 1. 环境要求
 
-- **Node.js 20+**（运行 cfggen CLI）
+- **Node.js 20+**（运行 cfgforge CLI）
 - **pnpm**（Monorepo 构建，可选）
 - **Excel** (编辑数据,可选)
 - **任意文本编辑器** (VS Code 推荐配合 CFG 插件)
 
-### 2. 获取 cfggen
+### 2. 获取 cfgforge
 
-cfggen 已重写为 TypeScript Monorepo。从源码构建 CLI：
+cfgforge 已重写为 TypeScript Monorepo。从源码构建 CLI：
 
 ```bash
 # 克隆仓库后安装依赖并构建
@@ -116,8 +116,8 @@ table item[id] {
 
 ```bash
 # 从项目根目录执行
-node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen verify
-node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen bytes,dir:.
+node <cfgforge路径>/packages/cli/dist/index.js -datadir config -gen verify
+node <cfgforge路径>/packages/cli/dist/index.js -datadir config -gen bytes,dir:.
 ```
 
 **说明**:
@@ -139,13 +139,13 @@ pnpm tauri dev    # 开发模式
 
 ### 步骤 5: 生成访问代码
 
-cfggen 支持生成多种语言的类型化访问代码：
+cfgforge 支持生成多种语言的类型化访问代码：
 
 ```bash
-node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen ts,dir:../ts -gen bytes
-node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen cs,dir:../cs
-node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen go,dir:../go
-node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen lua,dir:../lua
+node <cfgforge路径>/packages/cli/dist/index.js -datadir config -gen ts,dir:../ts -gen bytes
+node <cfgforge路径>/packages/cli/dist/index.js -datadir config -gen cs,dir:../cs
+node <cfgforge路径>/packages/cli/dist/index.js -datadir config -gen go,dir:../go
+node <cfgforge路径>/packages/cli/dist/index.js -datadir config -gen lua,dir:../lua
 ```
 
 生成的代码提供类型化的数据访问、外键引用解析、entry/enum（消除程序中的魔数）。
@@ -163,11 +163,11 @@ cd cfgeditor
 pnpm tauri dev
 ```
 
-或使用 [GitHub Releases](https://github.com/stallboy/cfggen/releases) 下载预编译的 `cfgeditor.exe`。
+或使用 [GitHub Releases](https://github.com/stallboy/cfgforge/releases) 下载预编译的 `cfgeditor.exe`。
 
 ## AI 生成配置
 
-cfggen 系统提供两种 AI 辅助方式：
+cfgforge 系统提供两种 AI 辅助方式：
 
 ### 1. 设置 AI
 
@@ -221,4 +221,4 @@ model: deepseek-chat
 
 - `example/config/` - 配置定义和数据文件
 - `example/cs/`、`example/ts/`、`example/go/`、`example/lua/` - 各语言生成示例
-- `example/cfggen_common.bat` - 生成命令公共脚本
+- `example/cfgforge_common.bat` - 生成命令公共脚本

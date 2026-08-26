@@ -17,7 +17,7 @@ import {
   isSimpleType,
   type FieldType,
   type StructRef,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import type {
   Structural,
   Nameable,
@@ -26,10 +26,10 @@ import type {
   KeySchema,
   TableSchema,
   StructSchema,
-} from '@cfggen/schema';
-import { isRefList, RefPrimary, RefUniq, type RefSimple } from '@cfggen/schema';
-import { upper1, lower1 } from '@cfggen/shared';
-import type { VTable } from '@cfggen/value';
+} from '@cfgforge/schema';
+import { isRefList, RefPrimary, RefUniq, type RefSimple } from '@cfgforge/schema';
+import { upper1, lower1 } from '@cfgforge/shared';
+import type { VTable } from '@cfgforge/value';
 import type { TsCodeGenerator } from './TsCodeGenerator';
 
 export class StructModel {

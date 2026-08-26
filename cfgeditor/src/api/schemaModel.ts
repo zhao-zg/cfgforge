@@ -13,11 +13,11 @@ export interface SField {
 
 // ---------------------------------------------------------------------------
 // 字段类型分类：原始类型 / 数字类型
-// 这是后端 cfggen 类型系统的一部分（SField.type 的字面量分类），集中在此为单一权威，
+// 这是后端 cfgforge 类型系统的一部分（SField.type 的字面量分类），集中在此为单一权威，
 // 供 domain / flow / routes 各层复用，消除散落的重复集合。
 // ---------------------------------------------------------------------------
 
-/** 原始字段类型（cfggen 后端基础类型字面量） */
+/** 原始字段类型（cfgforge 后端基础类型字面量） */
 export type PrimitiveType = 'bool' | 'int' | 'long' | 'float' | 'str' | 'text';
 
 /** 原始类型集合（与 PrimitiveType 字面量一致） */
@@ -49,7 +49,7 @@ export type FieldTypeId =
     | { kind: 'map'; key: string; value: string }
     | { kind: 'ref'; name: string };
 
-/** 解析 SField.type 字面量。map<K,V> 按逗号切分 key/value（cfggen 约束 map 的 key/value 必为
+/** 解析 SField.type 字面量。map<K,V> 按逗号切分 key/value（cfgforge 约束 map 的 key/value 必为
  *  SimpleType、禁止嵌套容器，故合法 schema 内只含一个逗号，全逗号切分等价于首个逗号切分）；非容器归 'ref'。 */
 export function parseFieldTypeId(type: string): FieldTypeId {
     if (isPrimitiveType(type)) return {kind: 'primitive', name: type};

@@ -16,7 +16,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { JsonGenerator } from '../JsonGenerator';
 import type { Parameter } from '../Parameter';
 
@@ -57,7 +57,7 @@ describe('JsonGenerator', () => {
   let dstDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-json-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-json-'));
     dstDir = path.join(tempDir, 'out');
   });
 

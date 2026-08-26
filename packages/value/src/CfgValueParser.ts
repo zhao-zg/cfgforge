@@ -15,8 +15,8 @@
  * Java source: configgen.value.CfgValueParser.java (106 lines)
  */
 
-import type { CfgSchema, TableSchema } from '@cfggen/schema';
-import type { DTable } from '@cfggen/data';
+import type { CfgSchema, TableSchema } from '@cfgforge/schema';
+import type { DTable } from '@cfgforge/data';
 import { CfgValue, CfgValueStat, VTable } from './CfgValue';
 import { CfgValueErrs } from './CfgValueErrs';
 import { ValueEnv } from './ValueEnv';

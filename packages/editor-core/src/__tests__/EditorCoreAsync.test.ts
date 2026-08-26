@@ -6,7 +6,7 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
-import { setDefaultFileSystem, NodeFileSystem } from '@cfggen/shared';
+import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 import { EditorService } from '../EditorService';
 import { SchemaWriteService } from '../SchemaWriteService';
 import { TableCreateService } from '../TableCreateService';
@@ -55,7 +55,7 @@ id,name
 
 describe('editor-core async (T12.0e)', () => {
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-ec-async-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-ec-async-'));
     setDefaultFileSystem(new NodeFileSystem());
   });
 

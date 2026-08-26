@@ -17,14 +17,14 @@
 
 import * as path from 'path';
 
-import type { CfgSchema } from '@cfggen/schema';
-import { CfgSchemas, CfgSchemaErrs, CfgSchemaResolver, CfgSchemaFilterByTag } from '@cfggen/schema';
-import type { CfgData, ReadResult } from '@cfggen/data';
-import { CfgDataReader, CfgSchemaAlignToData, FileFmt, readExcel, readCsv } from '@cfggen/data';
-import type { CfgValue } from '@cfggen/value';
-import { CfgValueParser, CfgValueErrs, ValueEnv } from '@cfggen/value';
-import type { LangTextFinder, LangSwitchable } from '@cfggen/i18n';
-import { LangTextFinder as I18nLangTextFinder, LangSwitchable as I18nLangSwitchable } from '@cfggen/i18n';
+import type { CfgSchema } from '@cfgforge/schema';
+import { CfgSchemas, CfgSchemaErrs, CfgSchemaResolver, CfgSchemaFilterByTag } from '@cfgforge/schema';
+import type { CfgData, ReadResult } from '@cfgforge/data';
+import { CfgDataReader, CfgSchemaAlignToData, FileFmt, readExcel, readCsv } from '@cfgforge/data';
+import type { CfgValue } from '@cfgforge/value';
+import { CfgValueParser, CfgValueErrs, ValueEnv } from '@cfgforge/value';
+import type { LangTextFinder, LangSwitchable } from '@cfgforge/i18n';
+import { LangTextFinder as I18nLangTextFinder, LangSwitchable as I18nLangSwitchable } from '@cfgforge/i18n';
 
 import { ContextCfg } from './ContextCfg';
 import { DirectoryStructure } from './DirectoryStructure';

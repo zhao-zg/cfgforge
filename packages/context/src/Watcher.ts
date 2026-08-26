@@ -18,7 +18,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { getFileFormat, isFileIgnored, FileFmt, getTableNameIfTableDirForJson } from '@cfggen/data';
+import { getFileFormat, isFileIgnored, FileFmt, getTableNameIfTableDirForJson } from '@cfgforge/data';
 import type { ExplicitDir } from './ExplicitDir';
 
 export class Watcher {

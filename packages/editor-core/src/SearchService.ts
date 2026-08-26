@@ -1,14 +1,14 @@
 /**
  * SearchService — editor-core wrapper for value/SearchService.
  *
- * Delegates to @cfggen/value's SearchService.search(), passing the
+ * Delegates to @cfgforge/value's SearchService.search(), passing the
  * EditorService's current CfgValue snapshot.
  *
  * Java source: EditorServer.handleSearch (lines 159-167).
  */
 
-import { SearchService as ValueSearchService } from '@cfggen/value';
-import type { SearchResult, SearchResultItem, SearchResultCode } from '@cfggen/value';
+import { SearchService as ValueSearchService } from '@cfgforge/value';
+import type { SearchResult, SearchResultItem, SearchResultCode } from '@cfgforge/value';
 import type { EditorService } from './EditorService';
 
 // Re-export types for convenience

@@ -19,10 +19,10 @@
 
 import * as path from 'path';
 
-import { Context } from '@cfggen/context';
-import type { CfgValue } from '@cfggen/value';
-import { TableSchemaRefGraph } from '@cfggen/schema';
-import type { TableSchemaRefGraph as TableSchemaRefGraphType } from '@cfggen/schema';
+import { Context } from '@cfgforge/context';
+import type { CfgValue } from '@cfgforge/value';
+import { TableSchemaRefGraph } from '@cfgforge/schema';
+import type { TableSchemaRefGraph as TableSchemaRefGraphType } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Context cache (by absolute dataDir)

@@ -15,7 +15,7 @@ import * as path from 'path';
 import { TableFileLocator } from '../TableFileLocator';
 import { CsvTableFile } from '../storages/CsvTableFile';
 import { ExcelTableFile } from '../storages/ExcelTableFile';
-import { DCell, DRowId, DRawSheet, DCellList, DTable } from '@cfggen/data';
+import { DCell, DRowId, DRawSheet, DCellList, DTable } from '@cfgforge/data';
 
 const TEMP_DIR = path.join(__dirname, '..', '..', '..', '..', '.temp', 'write-locator-tests');
 

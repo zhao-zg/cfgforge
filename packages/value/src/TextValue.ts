@@ -13,8 +13,8 @@
  * Java source: configgen.value.TextValue.java (80 lines)
  */
 
-import { hasText } from '@cfggen/schema';
-import type { Nameable } from '@cfggen/schema';
+import { hasText } from '@cfgforge/schema';
+import type { Nameable } from '@cfgforge/schema';
 import {
   type Value,
   type PrimitiveValue,

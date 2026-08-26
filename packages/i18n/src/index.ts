@@ -1,5 +1,5 @@
 /**
- * @cfggen/i18n — Internationalization text finder and utilities.
+ * @cfgforge/i18n — Internationalization text finder and utilities.
  *
  * Phase 5 (T5.1–T5.4): LangTextFinder, TextByValueFinder, TextByIdFinder,
  *                       I18nUtils, LangSwitchable, LangSwitchableRuntime, TodoFile

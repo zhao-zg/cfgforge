@@ -4,8 +4,8 @@
  * Java source: configgen.gencs.ProcessorModel.java (31 lines)
  */
 
-import type { TableSchema } from '@cfggen/schema';
-import { isEEnum } from '@cfggen/schema';
+import type { TableSchema } from '@cfgforge/schema';
+import { isEEnum } from '@cfgforge/schema';
 import type { CsCodeGenerator } from './CsCodeGenerator';
 import { CsName } from './CsName';
 

@@ -16,8 +16,8 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
-import { CachedFiles } from '@cfggen/shared';
+import { Context } from '@cfgforge/context';
+import { CachedFiles } from '@cfgforge/shared';
 import { GenPipeline } from '../GenPipeline';
 import { Generators } from '../Generators';
 import { JavaCodeGenerator } from '../JavaCodeGenerator';
@@ -64,7 +64,7 @@ describe('GenPipeline', () => {
   let dataDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-pipeline-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-pipeline-'));
     dataDir = path.join(tempDir, 'data');
     fs.mkdirSync(dataDir, { recursive: true });
     writeFile(dataDir, 'config.cfg', USER_CFG);

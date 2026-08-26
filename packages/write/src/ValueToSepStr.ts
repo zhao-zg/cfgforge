@@ -14,14 +14,14 @@ import {
   VBool, VInt, VLong, VFloat, VString, VText,
   type SimpleValue,
   type PrimitiveValue,
-} from '@cfggen/value';
+} from '@cfgforge/value';
 import {
   type FieldSchema,
   type Structural,
   Sep,
   AutoOrPack,
   FList,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 export class ValueToSepStr {
   /**

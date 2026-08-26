@@ -7,9 +7,9 @@
  * ValueUtil: static helpers for value creation, extraction, and inspection.
  */
 
-import { DCell, DCellList, DFile } from '@cfggen/data';
-import { parsePack, parseFunction } from '@cfggen/shared';
-import { parseList } from '@cfggen/shared';
+import { DCell, DCellList, DFile } from '@cfgforge/data';
+import { parsePack, parseFunction } from '@cfgforge/shared';
+import { parseList } from '@cfgforge/shared';
 import {
   type Value,
   type SimpleValue,
@@ -22,9 +22,9 @@ import {
   VStruct,
   type StringValue,
 } from './CfgValue';
-import type { ForeignKeySchema, TableSchema } from '@cfggen/schema';
-import { findFieldIndices, findFieldIndexByName } from '@cfggen/schema';
-import { RefPrimary, RefUniq, RefList } from '@cfggen/schema';
+import type { ForeignKeySchema, TableSchema } from '@cfgforge/schema';
+import { findFieldIndices, findFieldIndexByName } from '@cfgforge/schema';
+import { RefPrimary, RefUniq, RefList } from '@cfgforge/schema';
 import type { CfgValue } from './CfgValue';
 
 // ---------------------------------------------------------------------------

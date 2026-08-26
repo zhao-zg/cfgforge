@@ -22,15 +22,15 @@ import {
   VText,
 } from './CfgValue';
 import type { CfgValueErrs } from './CfgValueErrs';
-import type { FieldType } from '@cfggen/schema';
-import { AutoOrPack } from '@cfggen/schema';
-import { FieldSchema } from '@cfggen/schema';
-import { StructSchema } from '@cfggen/schema';
-import { StructRef } from '@cfggen/schema';
-import { Metadata_of } from '@cfggen/schema';
-import type { TableSchema } from '@cfggen/schema';
-import { DCell } from '@cfggen/data';
-import { HeadRows } from '@cfggen/data';
+import type { FieldType } from '@cfgforge/schema';
+import { AutoOrPack } from '@cfgforge/schema';
+import { FieldSchema } from '@cfgforge/schema';
+import { StructSchema } from '@cfgforge/schema';
+import { StructRef } from '@cfgforge/schema';
+import { Metadata_of } from '@cfgforge/schema';
+import type { TableSchema } from '@cfgforge/schema';
+import { DCell } from '@cfgforge/data';
+import { HeadRows } from '@cfgforge/data';
 import { ValueParser, ParseContext, dummyBlockParser } from './ValueParser';
 import { ValueUtil } from './ValueUtil';
 

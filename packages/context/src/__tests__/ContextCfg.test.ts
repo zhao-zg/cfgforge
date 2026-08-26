@@ -12,7 +12,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { ContextCfg } from '../ContextCfg';
-import { HeadRows } from '@cfggen/data';
+import { HeadRows } from '@cfgforge/data';
 import { ExplicitDir } from '../ExplicitDir';
 
 describe('ContextCfg', () => {

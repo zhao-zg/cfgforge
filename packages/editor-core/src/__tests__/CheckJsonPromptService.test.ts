@@ -55,7 +55,7 @@ describe('CheckJsonService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-checkjson-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-checkjson-'));
     writeFile(tempDir, 'config.cfg', CFG);
     writeFile(tempDir, 'item.csv', CSV);
   });
@@ -137,7 +137,7 @@ describe('PromptService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-prompt-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-prompt-'));
     writeFile(tempDir, 'config.cfg', CFG);
     writeFile(tempDir, 'item.csv', CSV);
   });

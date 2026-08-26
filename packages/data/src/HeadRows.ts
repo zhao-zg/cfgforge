@@ -11,7 +11,7 @@
  *   - A4: 4 header rows (name=0, type=1, data=2, comment=3)
  */
 
-import { Primitive, type FieldType } from '@cfggen/schema';
+import { Primitive, type FieldType } from '@cfgforge/schema';
 
 export enum ParseBoolResult {
   TRUE,

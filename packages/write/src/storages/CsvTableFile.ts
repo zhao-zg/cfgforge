@@ -15,7 +15,7 @@
  *   ColumnModeCsvTableFile.java (98 lines)
  */
 
-import { readAndNormalizeCSV, writeCSVToFile, type CSVRow } from '@cfggen/shared';
+import { readAndNormalizeCSV, writeCSVToFile, type CSVRow } from '@cfgforge/shared';
 import type { RecordBlockTransformed } from '../RecordBlock';
 import type { TableFile } from '../TableFile';
 

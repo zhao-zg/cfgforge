@@ -21,7 +21,7 @@ import {
   VList,
   VMap,
 } from './CfgValue';
-import { type Source } from '@cfggen/data';
+import { type Source } from '@cfgforge/data';
 import {
   type FieldType,
   type Nameable,
@@ -32,7 +32,7 @@ import {
   isStructRef,
   isFList,
   isFMap,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 export class ValueDefault {
   /**

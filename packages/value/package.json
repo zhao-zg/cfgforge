@@ -1,5 +1,5 @@
 {
-  "name": "@cfggen/value",
+  "name": "@cfgforge/value",
   "type": "module",
   "version": "0.1.0",
   "scripts": {
@@ -8,10 +8,10 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@cfggen/data": "workspace:*",
-    "@cfggen/i18n": "workspace:*",
-    "@cfggen/shared": "workspace:*",
-    "@cfggen/schema": "workspace:*"
+    "@cfgforge/data": "workspace:*",
+    "@cfgforge/i18n": "workspace:*",
+    "@cfgforge/shared": "workspace:*",
+    "@cfgforge/schema": "workspace:*"
   },
   "main": "./src/index.ts",
   "private": true

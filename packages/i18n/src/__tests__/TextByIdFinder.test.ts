@@ -46,7 +46,7 @@ describe('TextByIdFinder', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-byid-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-byid-test-'));
   });
 
   afterEach(() => {

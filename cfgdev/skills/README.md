@@ -1,10 +1,10 @@
-# cfggen-architect
+# cfgforge-architect
 
-游戏架构师与数据驱动配置生成 Claude Code 插件。根据策划文档或自然语言描述，生成符合 cfggen 规范的模块化 schema 定义文件。
+游戏架构师与数据驱动配置生成 Claude Code 插件。根据策划文档或自然语言描述，生成符合 cfgforge 规范的模块化 schema 定义文件。
 
 ## 安装
 
-将整个 `schema-gen-plugin\cfggen-architect` 目录复制到 项目的`.claude\skills` 目录下：
+将整个 `schema-gen-plugin\cfgforge-architect` 目录复制到 项目的`.claude\skills` 目录下：
 
 
 ## 使用方法

@@ -13,8 +13,8 @@
 
 import { z } from 'zod';
 import type { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import type { EditorService } from '@cfggen/editor-core';
-import { RecordEditService } from '@cfggen/editor-core';
+import type { EditorService } from '@cfgforge/editor-core';
+import { RecordEditService } from '@cfgforge/editor-core';
 
 // ---------------------------------------------------------------------------
 // WriteRecordTool

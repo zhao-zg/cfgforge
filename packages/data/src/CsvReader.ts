@@ -4,12 +4,12 @@
  * Uses shared/CSVUtil to read .csv files. Produces a DRawSheet with DRawCsvRow.
  *
  * Key differences from Java:
- * - Java uses fastcsv, TS uses csv-parse via @cfggen/shared
+ * - Java uses fastcsv, TS uses csv-parse via @cfgforge/shared
  * - Java CsvRecord.getFieldCount() → array.length
  * - Java CsvRecord.getField(c) → array[c]
  */
 
-import { readCSV, type CSVRow } from '@cfggen/shared';
+import { readCSV, type CSVRow } from '@cfgforge/shared';
 import { type DRawRow } from './DRawRow';
 import { DRawSheet } from './DRawSheet';
 import { ReadResult, OneSheet } from './ReadResult';

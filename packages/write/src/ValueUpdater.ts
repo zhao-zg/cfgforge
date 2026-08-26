@@ -22,11 +22,11 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Context } from '@cfggen/context';
-import { DataUpdater } from '@cfggen/context';
-import type { CfgData } from '@cfggen/data';
-import { DFile } from '@cfggen/data';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import type { Context } from '@cfgforge/context';
+import { DataUpdater } from '@cfgforge/context';
+import type { CfgData } from '@cfgforge/data';
+import { DFile } from '@cfgforge/data';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import {
   CfgValue,
   type VTable,
@@ -40,7 +40,7 @@ import {
   TextValue,
   ValueJsonParser,
   ValueUtil,
-} from '@cfggen/value';
+} from '@cfgforge/value';
 
 export class ValueUpdater {
   readonly newCfgValue: CfgValue;

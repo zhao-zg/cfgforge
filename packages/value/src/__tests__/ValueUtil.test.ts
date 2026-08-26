@@ -9,10 +9,10 @@ import {
   VBool, VInt, VLong, VFloat, VString, VText, VStruct, VInterface, VList, VMap,
   type Value, type SimpleValue,
 } from '../CfgValue';
-import { DCell, DCellList, DFile, DRowId } from '@cfggen/data';
-import type { Structural, TableSchema, CfgSchema } from '@cfggen/schema';
-import { RefPrimary, RefUniq, RefList, KeySchema, ForeignKeySchema, Metadata_of } from '@cfggen/schema';
-import { findFieldIndexByName } from '@cfggen/schema';
+import { DCell, DCellList, DFile, DRowId } from '@cfgforge/data';
+import type { Structural, TableSchema, CfgSchema } from '@cfgforge/schema';
+import { RefPrimary, RefUniq, RefList, KeySchema, ForeignKeySchema, Metadata_of } from '@cfgforge/schema';
+import { findFieldIndexByName } from '@cfgforge/schema';
 
 // Helper: create a DCell with simple defaults
 function makeCell(value: string, row = 0, col = 0): DCell {

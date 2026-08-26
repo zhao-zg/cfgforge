@@ -207,7 +207,7 @@ describe('CfgUtil.findConfigFilesRecursively', () => {
 
   beforeEach(() => {
     // Create a temp directory structure mirroring example/config
-    tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cfggen-test-'));
+    tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cfgforge-test-'));
   });
 
   afterEach(() => {
@@ -379,7 +379,7 @@ describe('CfgUtil integration: read/write round-trip', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cfggen-rt-'));
+    tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'cfgforge-rt-'));
   });
 
   afterEach(() => {

@@ -8,18 +8,18 @@
  * Java source: configgen.geni18n.I18nByValueGenerator.java (49 lines)
  */
 
-import { hasText } from '@cfggen/schema';
-import type { Nameable } from '@cfggen/schema';
-import type { Context } from '@cfggen/context';
+import { hasText } from '@cfgforge/schema';
+import type { Nameable } from '@cfgforge/schema';
+import type { Context } from '@cfgforge/context';
 import {
   type CfgValue,
   type Value,
   type PrimitiveValue,
   VText,
-} from '@cfggen/value';
-import { ForeachValue, ValueVisitorForSearch } from '@cfggen/value';
-import { writeCSVToFileAsync, getDefaultFileSystem } from '@cfggen/shared';
-import type { CSVRow } from '@cfggen/shared';
+} from '@cfgforge/value';
+import { ForeachValue, ValueVisitorForSearch } from '@cfgforge/value';
+import { writeCSVToFileAsync, getDefaultFileSystem } from '@cfgforge/shared';
+import type { CSVRow } from '@cfgforge/shared';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 

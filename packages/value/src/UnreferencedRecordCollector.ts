@@ -22,9 +22,9 @@ import {
 } from './CfgValue';
 import { ValueUtil } from './ValueUtil';
 import { ValueRefInCollector } from './ValueRefInCollector';
-import { TableSchemaRefGraph } from '@cfggen/schema';
-import type { TableSchema } from '@cfggen/schema';
-import { isEEnum, isEEntry } from '@cfggen/schema';
+import { TableSchemaRefGraph } from '@cfgforge/schema';
+import type { TableSchema } from '@cfgforge/schema';
+import { isEEnum, isEEntry } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Types (Java records → TS classes)

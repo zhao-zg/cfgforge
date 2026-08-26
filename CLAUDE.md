@@ -17,7 +17,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 这是一个策划配表系统，包含对象数据库浏览器、编辑器和程序访问代码生成器。
 
-- **`packages/`** - TypeScript monorepo，核心配置生成器 (cfggen) 的全部实现
+- **`packages/`** - TypeScript monorepo，核心配置生成器 (cfgforge) 的全部实现
   - `shared/` - 通用工具（文件 I/O、CSV、字符串、加密等）
   - `data/` - 数据读取（Excel/CSV/JSON → 统一数据模型）
   - `value/` - 配置值模型（多态、嵌套、外键引用）
@@ -27,7 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - `i18n/` - 国际化工具
   - `schema/` - ANTLR schema 解析（独立包，需特殊构建步骤）
   - `editor-core/` - 编辑器后端服务（Record/Schema/Search/Note 等 Service）
-  - `cli/` - 命令行入口（`npx cfggen`）
+  - `cli/` - 命令行入口（`npx cfgforge`）
   - `mcp/` - MCP Server（AI 工具调用接口）
 - **`cfgeditor/`** - 可视化配置编辑器，React 19 + TypeScript + Vite + Tauri 桌面应用
   - 直接 import `editor-core` 包，无需 Java 后端
@@ -50,13 +50,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 pnpm install
 
 # 运行全部测试
-pnpm --filter "!@cfggen/schema" -r test
+pnpm --filter "!@cfgforge/schema" -r test
 
 # 构建所有包
 pnpm -r run build
 
 # CLI 运行
-npx cfggen -datadir example/config -gen java,bytes,verify
+npx cfgforge -datadir example/config -gen java,bytes,verify
 
 # cfgeditor 开发
 cd cfgeditor && pnpm run dev
@@ -73,7 +73,7 @@ cd cfgeditor && npx vitest run
 
 ```bash
 # 运行 Go 代码生成测试
-npx cfggen -datadir example/config -gen go,dir:.,encoding:UTF-8 -gen bytes
+npx cfgforge -datadir example/config -gen go,dir:.,encoding:UTF-8 -gen bytes
 
 # 构建编辑器桌面应用（需 Rust）
 cd cfgeditor && pnpm tauri build

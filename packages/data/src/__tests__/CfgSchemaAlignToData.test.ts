@@ -36,7 +36,7 @@ import {
   ForeignKeySchema,
   RefPrimary,
   TAG,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import { CfgSchemaAlignToData } from '../CfgSchemaAlignToData';
 import { DField } from '../DField';
 import { DTable } from '../DTable';

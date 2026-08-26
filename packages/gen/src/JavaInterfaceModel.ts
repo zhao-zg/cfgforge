@@ -4,8 +4,8 @@
  * Model for GenInterface.jte template.
  */
 
-import type { InterfaceSchema } from '@cfggen/schema';
-import { hasRef } from '@cfggen/schema';
+import type { InterfaceSchema } from '@cfgforge/schema';
+import { hasRef } from '@cfgforge/schema';
 
 import {
   NameableName,

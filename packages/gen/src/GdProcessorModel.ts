@@ -4,7 +4,7 @@
  * Model used by Processor template to generate ConfigProcessor.gd.
  */
 
-import type { Nameable, TableSchema } from '@cfggen/schema';
+import type { Nameable, TableSchema } from '@cfgforge/schema';
 import { GdName } from './GdName';
 import type { GdCodeGenerator } from './GdCodeGenerator';
 

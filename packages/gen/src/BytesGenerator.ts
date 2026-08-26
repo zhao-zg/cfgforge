@@ -24,17 +24,17 @@
  * Differences from Java:
  * - generate(ctx) is async (Promise<void>)
  * - Uses Buffer instead of ByteArrayOutputStream/OutputStream
- * - Uses XorCipher from @cfggen/shared for encryption
+ * - Uses XorCipher from @cfgforge/shared for encryption
  * - Schema embedding (SchemaParser/SchemaSerializer) is P1, not yet ported
  *
  * Java source: configgen.genbytes.BytesGenerator.java (129 lines)
  */
 
 import * as path from 'path';
-import type { Context } from '@cfggen/context';
-import { CachedFiles, XorCipher } from '@cfggen/shared';
-import { LangSwitchableRuntime } from '@cfggen/i18n';
-import type { LangSwitchable } from '@cfggen/i18n';
+import type { Context } from '@cfgforge/context';
+import { CachedFiles, XorCipher } from '@cfgforge/shared';
+import { LangSwitchableRuntime } from '@cfgforge/i18n';
+import type { LangSwitchable } from '@cfgforge/i18n';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 import { ConfigOutput } from './ConfigOutput';

@@ -1,7 +1,7 @@
 /**
  * apiClient tests — T12.1
  *
- * 改造后 apiClient 直接调用 @cfggen/editor-core 的服务类，
+ * 改造后 apiClient 直接调用 @cfgforge/editor-core 的服务类，
  * 不再经过 axios HTTP 层。测试用临时数据目录验证每个函数
  * 正确调用 editor-core 并返回符合类型契约的结果。
  *
@@ -61,7 +61,7 @@ describe('apiClient', () => {
     let tempDir: string;
 
     beforeEach(async () => {
-        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-api-'));
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-api-'));
         writeFile(tempDir, 'config.cfg', CFG);
         writeFile(tempDir, 'user.csv', USER_CSV);
         writeFile(tempDir, 'item.csv', ITEM_CSV);

@@ -22,15 +22,15 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Context } from '@cfggen/context';
-import type { CfgValue } from '@cfggen/value';
-import { TextValue } from '@cfggen/value';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue } from '@cfgforge/value';
+import { TextValue } from '@cfgforge/value';
 import {
   TextByIdFinder,
   TodoFile,
   TodoFileLine,
-} from '@cfggen/i18n';
-import { Logger } from '@cfggen/shared';
+} from '@cfgforge/i18n';
+import { Logger } from '@cfgforge/shared';
 import type { Parameter } from './Parameter';
 import { Generator } from './Generator';
 import { LangText, LangStat } from './LangText';

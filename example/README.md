@@ -9,9 +9,9 @@ AIGC:
   ReservedCode2: '7037ae44-92ae-429a-b702-a3febfbe0e66'
 ---
 
-# Example - cfggen 示例配置
+# Example - cfgforge 示例配置
 
-cfggen 配置生成器的示例项目，展示如何定义配置结构并生成多种语言的代码。
+cfgforge 配置生成器的示例项目，展示如何定义配置结构并生成多种语言的代码。
 
 
 
@@ -62,7 +62,7 @@ example/
 
 ### 前置条件
 
-- 确保已安装 cfggen CLI（在项目根目录执行 `pnpm -r build` 或 `npm i -g cfggen`）
+- 确保已安装 cfgforge CLI（在项目根目录执行 `pnpm -r build` 或 `npm i -g cfgforge`）
 
 ### 查看使用说明
 

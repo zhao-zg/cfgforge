@@ -11,9 +11,9 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Context } from '@cfggen/context';
-import type { CfgValue, VTable } from '@cfggen/value';
-import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfggen/shared';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue, VTable } from '@cfgforge/value';
+import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfgforge/shared';
 import { SchemaToTs } from './SchemaToTs';
 import { TableRelatedInfoFinder } from './TableRelatedInfoFinder';
 import type { ModuleRule, TableRule } from './TableRelatedInfoFinder';

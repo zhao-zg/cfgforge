@@ -24,13 +24,13 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { CachedFiles, CachedIndentPrinter } from '@cfggen/shared';
-import { isMetaInt } from '@cfggen/schema';
-import { hasText as schemaHasText } from '@cfggen/schema';
-import { StructSchema, InterfaceSchema } from '@cfggen/schema';
-import type { CfgSchema } from '@cfggen/schema';
-import type { Context } from '@cfggen/context';
-import type { CfgValue, VTable, Value } from '@cfggen/value';
+import { CachedFiles, CachedIndentPrinter } from '@cfgforge/shared';
+import { isMetaInt } from '@cfgforge/schema';
+import { hasText as schemaHasText } from '@cfgforge/schema';
+import { StructSchema, InterfaceSchema } from '@cfgforge/schema';
+import type { CfgSchema } from '@cfgforge/schema';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue, VTable, Value } from '@cfgforge/value';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 import { LuaAContext } from './LuaAContext';

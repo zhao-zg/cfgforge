@@ -7,10 +7,10 @@
  */
 
 import * as path from 'path';
-import type { Context } from '@cfggen/context';
+import type { Context } from '@cfgforge/context';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
-import { CachedIndentPrinter } from '@cfggen/shared';
+import { CachedIndentPrinter } from '@cfgforge/shared';
 import { SchemaToTs } from './SchemaToTs';
 
 export class TsSchemaGenerator extends GeneratorWithTag {

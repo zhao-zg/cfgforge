@@ -24,8 +24,8 @@ import {
   EntryRecordCollector,
   EntryTypeTag,
 } from '../EntryRecordCollector';
-import { DCellList } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
+import { DCellList } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
 import {
   TableSchema,
   KeySchema,
@@ -40,7 +40,7 @@ import {
   EEntry,
   EEnum,
   type Structural,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

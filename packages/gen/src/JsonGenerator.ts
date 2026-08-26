@@ -11,11 +11,11 @@
  *   Path.of(dst))
  */
 
-import { Logger } from '@cfggen/shared';
-import { hasMap } from '@cfggen/schema';
-import type { Context } from '@cfggen/context';
-import { VTableJsonStorage } from '@cfggen/write';
-import type { CfgValue } from '@cfggen/value';
+import { Logger } from '@cfgforge/shared';
+import { hasMap } from '@cfgforge/schema';
+import type { Context } from '@cfgforge/context';
+import { VTableJsonStorage } from '@cfgforge/write';
+import type { CfgValue } from '@cfgforge/value';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 

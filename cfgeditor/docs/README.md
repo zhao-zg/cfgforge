@@ -17,7 +17,7 @@ AIGC:
 
 ## 一、cfgeditor 是什么
 
-cfgeditor 是 [cfggen](../) 配表体系的**可视化前端**：策划在图形界面里浏览 / 编辑配表（游戏配置数据），编辑完的数据由 cfggen 生成多语言程序代码。
+cfgeditor 是 [cfgforge](../) 配表体系的**可视化前端**：策划在图形界面里浏览 / 编辑配表（游戏配置数据），编辑完的数据由 cfgforge 生成多语言程序代码。
 
 React 19 + TypeScript + Vite + Tauri 桌面应用，图形用 React Flow（`@xyflow/react`），UI 用 Ant Design v6，状态用 Resso + React Query。**自己不存配表数据**——所有数据通过 editor-core（TypeScript）直接读写本地文件：
 
@@ -33,9 +33,9 @@ Excel / CSV / JSON 配表文件（磁盘）
 
 ## 二、核心概念词汇表
 
-新人最容易卡住：同一个东西，在**类型系统（cfggen 领域）**和**画布视图（cfgeditor 前端）**里叫不同的名字。先把这层分清，后面所有文档都好读。
+新人最容易卡住：同一个东西，在**类型系统（cfgforge 领域）**和**画布视图（cfgeditor 前端）**里叫不同的名字。先把这层分清，后面所有文档都好读。
 
-### 领域层（cfggen 的类型系统，从后端 `/schemas` 拉来）
+### 领域层（cfgforge 的类型系统，从后端 `/schemas` 拉来）
 
 | 概念 | 一句话 | 锚点 |
 |---|---|---|
@@ -76,7 +76,7 @@ sequenceDiagram
     participant UN as UndoStack
     participant Q as React Query
     participant L as "布局 (ELK)"
-    participant B as cfggen 后端
+    participant B as cfgforge 后端
 
     Note over F,L: 读路径（进入页面时一次）
     Q->>B: GET /record + /schemas
@@ -157,7 +157,7 @@ api/        HTTP：apiClient, recordModel, schemaModel, noteModel, searchModel, 
 
 ## 一页速记
 
-- cfgeditor = **瘦前端**，数据在后端（cfggen `-gen server`）。
+- cfgeditor = **瘦前端**，数据在后端（cfgforge `-gen server`）。
 - record + schema → entity → node + edge → 画布；编辑反着走（表单改值 → 写回 record → 提交后端）。
 - 八目录四组分层，依赖**只能向下**，oxlint `no-restricted-imports` 守门。
 

@@ -13,7 +13,7 @@
  *   Error) are preserved.
  */
 
-import type { Context } from '@cfggen/context';
+import type { Context } from '@cfgforge/context';
 import type { Parameter } from './Parameter';
 
 /**

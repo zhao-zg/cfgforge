@@ -5,8 +5,8 @@ rm -f config/ConfigErrors.gd
 rm -f config/TextPoolManager.gd
 rm -f config/ConfigText.gd
 
-call %~dp0..\cfggen_common.bat
-%CFGGEN% -langswitchdir ../i18n/langs -gen gd,own:-nogd,dir:config -gen bytes,own:-nogd
+call %~dp0..\cfgforge_common.bat
+%CFGFORGE% -langswitchdir ../i18n/langs -gen gd,own:-nogd,dir:config -gen bytes,own:-nogd
 
 echo Generated GDScript client code to gd_ls_client/
 

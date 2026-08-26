@@ -8,7 +8,7 @@
  * - `call()` is async (Promise<void>), not `throws IOException`
  */
 
-import type { Parameter } from '@cfggen/gen';
+import type { Parameter } from '@cfgforge/gen';
 
 export abstract class Tool {
   protected readonly parameter: Parameter;

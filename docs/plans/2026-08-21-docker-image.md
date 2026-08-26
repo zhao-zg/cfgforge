@@ -12,7 +12,7 @@ AIGC:
 # Docker 镜像构建与 GitHub Actions CI 计划
 
 > 日期：2026-08-21
-> 目标：为 cfggen 项目添加 Docker 镜像（后端 jar + 前端 dist + Nginx 一体化），并通过 GitHub Actions 自动构建推送到 GHCR。
+> 目标：为 cfgforge 项目添加 Docker 镜像（后端 jar + 前端 dist + Nginx 一体化），并通过 GitHub Actions 自动构建推送到 GHCR。
 
 ## 架构
 
@@ -22,7 +22,7 @@ AIGC:
                 └── /api/*     → 反代到 Java (:3456, bind=0.0.0.0)
 ```
 
-容器内两个进程：Nginx（前端 + 反代）、Java（cfggen.jar -gen server）。
+容器内两个进程：Nginx（前端 + 反代）、Java（cfgforge.jar -gen server）。
 entrypoint.sh 用 Nginx 前台运行 + Java 后台运行的方式管理进程。
 
 ## 新增文件
@@ -54,7 +54,7 @@ entrypoint.sh 用 Nginx 前台运行 + Java 后台运行的方式管理进程。
 
 ### Task 3: .docker/entrypoint.sh
 
-- 启动 Java 后端：`java -jar /app/cfggen.jar -datadir /data -gen server,bind=0.0.0.0,port=3456` &
+- 启动 Java 后端：`java -jar /app/cfgforge.jar -datadir /data -gen server,bind=0.0.0.0,port=3456` &
 - 等待 Java 就绪（轮询 3456 端口）
 - Nginx 前台运行：`nginx -g 'daemon off;'`
 
@@ -64,7 +64,7 @@ entrypoint.sh 用 Nginx 前台运行 + Java 后台运行的方式管理进程。
 - 基础镜像：`eclipse-temurin:25-jdk`
 - COPY app/ → /build/app/
 - RUN `./gradlew.bat fatJar --no-daemon`
-- 产出：`/build/app/build/libs/cfggen.jar`
+- 产出：`/build/app/build/libs/cfgforge.jar`
 
 **Stage 2: builder-web** — Node 24 + pnpm build
 - 基础镜像：`node:24-alpine`
@@ -75,7 +75,7 @@ entrypoint.sh 用 Nginx 前台运行 + Java 后台运行的方式管理进程。
 **Stage 3: runtime** — Nginx + JRE
 - 基础镜像：`eclipse-temurin:25-jre`
 - 安装 nginx
-- COPY --from=builder-jar cfggen.jar → /app/cfggen.jar
+- COPY --from=builder-jar cfgforge.jar → /app/cfgforge.jar
 - COPY --from=builder-web dist → /app/web
 - COPY .docker/nginx.conf → /etc/nginx/nginx.conf
 - COPY .docker/entrypoint.sh → /app/entrypoint.sh
@@ -87,8 +87,8 @@ entrypoint.sh 用 Nginx 前台运行 + Java 后台运行的方式管理进程。
 
 ```yaml
 services:
-  cfggen:
-    image: ghcr.io/${OWNER}/cfggen:latest
+  cfgforge:
+    image: ghcr.io/${OWNER}/cfgforge:latest
     ports:
       - "8080:80"
     volumes:
@@ -108,8 +108,8 @@ services:
   5. docker/build-push-action:
      - context: .
      - tags: |
-         ghcr.io/${{ github.repository_owner }}/cfggen:latest  (master)
-         ghcr.io/${{ github.repository_owner }}/cfggen:${{ github.ref_name }}  (tag)
+         ghcr.io/${{ github.repository_owner }}/cfgforge:latest  (master)
+         ghcr.io/${{ github.repository_owner }}/cfgforge:${{ github.ref_name }}  (tag)
      - cache-from: type=gha
      - cache-to: type=gha,mode=max
 

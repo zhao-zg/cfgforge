@@ -19,7 +19,7 @@ import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import * as XLSX from 'xlsx';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { I18nByValueGenerator } from '../I18nByValueGenerator';
 import { I18nByIdGenerator } from '../I18nByIdGenerator';
 import { LangText } from '../LangText';
@@ -90,7 +90,7 @@ describe('I18nByValueGenerator', () => {
   let outDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-i18n-val-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-i18n-val-'));
     outDir = path.join(tempDir, 'out');
     fs.mkdirSync(outDir, { recursive: true });
   });
@@ -168,7 +168,7 @@ describe('I18nByIdGenerator', () => {
   let outDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-i18n-id-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-i18n-id-'));
     outDir = path.join(tempDir, 'out');
     fs.mkdirSync(outDir, { recursive: true });
   });
@@ -343,7 +343,7 @@ describe('LangText', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-langtext-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-langtext-'));
   });
 
   afterEach(() => {

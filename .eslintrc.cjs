@@ -1,4 +1,4 @@
-// ESLint config for cfggen monorepo — enforces package layer dependencies
+// ESLint config for cfgforge monorepo — enforces package layer dependencies
 // Design doc: docs/plans/2026-08-24-ts-rewrite-design.md
 //
 // Dependency graph (only downward allowed):
@@ -24,14 +24,14 @@ module.exports = {
     },
   },
   rules: {
-    // shared: no imports from any other cfggen package
+    // shared: no imports from any other cfgforge package
     'no-restricted-imports': [
       'error',
       {
         patterns: [
           {
-            group: ['@cfggen/*', '!@cfggen/shared'],
-            message: 'packages/shared cannot import other cfggen packages',
+            group: ['@cfgforge/*', '!@cfgforge/shared'],
+            message: 'packages/shared cannot import other cfgforge packages',
           },
         ],
       },
@@ -47,8 +47,8 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared'],
-                message: 'packages/schema can only import @cfggen/shared',
+                group: ['@cfgforge/*', '!@cfgforge/shared'],
+                message: 'packages/schema can only import @cfgforge/shared',
               },
             ],
           },
@@ -64,8 +64,8 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared', '!@cfggen/schema'],
-                message: 'packages/data can only import @cfggen/shared and @cfggen/schema',
+                group: ['@cfgforge/*', '!@cfgforge/shared', '!@cfgforge/schema'],
+                message: 'packages/data can only import @cfgforge/shared and @cfgforge/schema',
               },
             ],
           },
@@ -81,7 +81,7 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared', '!@cfggen/schema', '!@cfggen/data', '!@cfggen/i18n'],
+                group: ['@cfgforge/*', '!@cfgforge/shared', '!@cfgforge/schema', '!@cfgforge/data', '!@cfgforge/i18n'],
                 message: 'packages/value can only import shared, schema, data, i18n',
               },
             ],
@@ -98,8 +98,8 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared', '!@cfggen/schema'],
-                message: 'packages/i18n can only import @cfggen/shared and @cfggen/schema',
+                group: ['@cfgforge/*', '!@cfgforge/shared', '!@cfgforge/schema'],
+                message: 'packages/i18n can only import @cfgforge/shared and @cfgforge/schema',
               },
             ],
           },
@@ -115,7 +115,7 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared', '!@cfggen/schema', '!@cfggen/data', '!@cfggen/value', '!@cfggen/i18n'],
+                group: ['@cfgforge/*', '!@cfgforge/shared', '!@cfgforge/schema', '!@cfgforge/data', '!@cfgforge/value', '!@cfgforge/i18n'],
                 message: 'packages/context can only import shared, schema, data, value, i18n',
               },
             ],
@@ -132,8 +132,8 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared', '!@cfggen/schema', '!@cfggen/data', '!@cfggen/value', '!@cfggen/i18n', '!@cfggen/context'],
-                message: 'packages/gen can only import up to @cfggen/context',
+                group: ['@cfgforge/*', '!@cfgforge/shared', '!@cfgforge/schema', '!@cfgforge/data', '!@cfgforge/value', '!@cfgforge/i18n', '!@cfgforge/context'],
+                message: 'packages/gen can only import up to @cfgforge/context',
               },
             ],
           },
@@ -149,8 +149,8 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared', '!@cfggen/schema', '!@cfggen/data', '!@cfggen/value', '!@cfggen/context'],
-                message: 'packages/write can only import up to @cfggen/context',
+                group: ['@cfgforge/*', '!@cfgforge/shared', '!@cfgforge/schema', '!@cfgforge/data', '!@cfgforge/value', '!@cfgforge/context'],
+                message: 'packages/write can only import up to @cfgforge/context',
               },
             ],
           },
@@ -166,8 +166,8 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared', '!@cfggen/schema', '!@cfggen/data', '!@cfggen/value', '!@cfggen/i18n', '!@cfggen/context', '!@cfggen/write'],
-                message: 'packages/editor-core can only import up to @cfggen/write',
+                group: ['@cfgforge/*', '!@cfgforge/shared', '!@cfgforge/schema', '!@cfgforge/data', '!@cfgforge/value', '!@cfgforge/i18n', '!@cfgforge/context', '!@cfgforge/write'],
+                message: 'packages/editor-core can only import up to @cfgforge/write',
               },
             ],
           },
@@ -183,8 +183,8 @@ module.exports = {
           {
             patterns: [
               {
-                group: ['@cfggen/*', '!@cfggen/shared', '!@cfggen/context', '!@cfggen/editor-core'],
-                message: 'packages/mcp can only import @cfggen/shared, @cfggen/context, @cfggen/editor-core',
+                group: ['@cfgforge/*', '!@cfgforge/shared', '!@cfgforge/context', '!@cfgforge/editor-core'],
+                message: 'packages/mcp can only import @cfgforge/shared, @cfgforge/context, @cfgforge/editor-core',
               },
             ],
           },

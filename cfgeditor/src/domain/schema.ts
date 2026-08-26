@@ -310,7 +310,7 @@ export class Schema {
                     break;
                 case 'list':
                 case 'map':
-                    // map<K,V> 在 cfggen 的 JSON 序列化里是 entry 结构体的 list（见构造器 mapEntryTypes 填充），
+                    // map<K,V> 在 cfgforge 的 JSON 序列化里是 entry 结构体的 list（见构造器 mapEntryTypes 填充），
                     // 故 map 与 list 的默认值都是空数组 []。
                     res[field.name] = [];
                     break;

@@ -13,7 +13,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 
 export class JsonFileInfo {
   readonly lastModified: number;

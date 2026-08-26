@@ -29,7 +29,7 @@ describe('NoteEditService', () => {
   let noteCsvPath: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-noteedit-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-noteedit-'));
     noteCsvPath = path.join(tempDir, 'note.csv');
   });
 

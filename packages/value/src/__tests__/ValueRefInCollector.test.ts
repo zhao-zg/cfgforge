@@ -26,9 +26,9 @@ import {
 } from '../CfgValue';
 import { ValueRefInCollector } from '../ValueRefInCollector';
 import { RefId } from '../ValueRefCollector';
-import { DCellList, DFile, DCell } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
-import { TableSchemaRefGraph } from '@cfggen/schema';
+import { DCellList, DFile, DCell } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
+import { TableSchemaRefGraph } from '@cfgforge/schema';
 import {
   TableSchema,
   KeySchema,
@@ -48,7 +48,7 @@ import {
   RefUniq,
   RefList,
   type Structural,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers (copied from RefValidator.test.ts pattern)

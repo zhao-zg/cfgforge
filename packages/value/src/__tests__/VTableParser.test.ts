@@ -18,7 +18,7 @@ import { ValueParser, ParseContext, CellsWithRowIndex, dummyBlockParser } from '
 import { CfgValueErrs } from '../CfgValueErrs';
 import { VTable, VStruct, VInt, VString, VList } from '../CfgValue';
 import { VTableCreator } from '../VTableCreator';
-import { DCell, DRowId, DTable, HeadRows } from '@cfggen/data';
+import { DCell, DRowId, DTable, HeadRows } from '@cfgforge/data';
 import {
   TableSchema,
   KeySchema,
@@ -37,7 +37,7 @@ import {
   type FieldType,
   type FieldFormat,
   type Structural,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

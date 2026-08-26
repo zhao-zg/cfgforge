@@ -1,5 +1,5 @@
 {
-  "name": "@cfggen/editor-core",
+  "name": "@cfgforge/editor-core",
   "type": "module",
   "version": "0.1.0",
   "scripts": {
@@ -8,14 +8,14 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@cfggen/write": "workspace:*",
-    "@cfggen/value": "workspace:*",
-    "@cfggen/shared": "workspace:*",
-    "@cfggen/data": "workspace:*",
-    "@cfggen/i18n": "workspace:*",
-    "@cfggen/schema": "workspace:*",
-    "@cfggen/context": "workspace:*",
-    "@cfggen/gen": "workspace:*"
+    "@cfgforge/write": "workspace:*",
+    "@cfgforge/value": "workspace:*",
+    "@cfgforge/shared": "workspace:*",
+    "@cfgforge/data": "workspace:*",
+    "@cfgforge/i18n": "workspace:*",
+    "@cfgforge/schema": "workspace:*",
+    "@cfgforge/context": "workspace:*",
+    "@cfgforge/gen": "workspace:*"
   },
   "main": "./src/index.ts",
   "private": true

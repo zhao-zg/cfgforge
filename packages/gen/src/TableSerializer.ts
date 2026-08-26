@@ -18,7 +18,7 @@
  * - configgen.genbytes.MultiLangTableSerializer.java (68 lines)
  */
 
-import type { LangSwitchableRuntime } from '@cfggen/i18n';
+import type { LangSwitchableRuntime } from '@cfgforge/i18n';
 import {
   type Value,
   type PrimitiveValue,
@@ -33,8 +33,8 @@ import {
   VList,
   VMap,
   VTable,
-} from '@cfggen/value';
-import { ForeachValue, type ValueVisitor } from '@cfggen/value';
+} from '@cfgforge/value';
+import { ForeachValue, type ValueVisitor } from '@cfgforge/value';
 
 import { ConfigOutput } from './ConfigOutput';
 import { StringPool } from './StringPool';

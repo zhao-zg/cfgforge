@@ -10,7 +10,7 @@
  * Java source: configgen.ctx.ExplicitDir.java (37 lines)
  */
 
-import { parseToMap, parseToSet } from '@cfggen/shared';
+import { parseToMap, parseToSet } from '@cfgforge/shared';
 
 export class ExplicitDir {
   readonly txtAsTsvFileInThisDirAsInRoot_To_AddTag_Map: Map<string, string | null>;

@@ -1,6 +1,6 @@
 # 01 数据流：URL → API → React Query
 
-> cfgeditor 是瘦前端，所有配表数据来自后端 HTTP 服务（cfggen `-gen server`）。本文讲三层：URL 怎么编码「在看什么」、API 怎么搬数据、React Query 怎么缓存 / 失效 / 取消。
+> cfgeditor 是瘦前端，所有配表数据来自后端 HTTP 服务（cfgforge `-gen server`）。本文讲三层：URL 怎么编码「在看什么」、API 怎么搬数据、React Query 怎么缓存 / 失效 / 取消。
 >
 > **不讲**：状态分类与 resso / EditingSession（→ [02 状态管理](02-state-management.md)）、目录分层（→ [README §四](README.md)）。本文只盯 URL / API / React Query 这条数据主线。
 >
@@ -82,7 +82,7 @@ URL 形态：
 [`apiClient.ts`](../src/api/apiClient.ts) 内两件事：
 
 - **每次请求 `axios.create` 一个新实例**：`server` 是用户动态配置（可换库），无法在模块加载时定死全局实例。`axios.create` 开销可忽略。
-- **`normalizeServer` 剥前缀 / 尾斜杠**：剥掉用户可能误填的 `http://` / `https://` 前缀和尾随 `/`，避免拼出 `http://https://host`。固定拼 `http://` 因后端 `cfggen -gen server` 只支持 http。
+- **`normalizeServer` 剥前缀 / 尾斜杠**：剥掉用户可能误填的 `http://` / `https://` 前缀和尾随 `/`，避免拼出 `http://https://host`。固定拼 `http://` 因后端 `cfgforge -gen server` 只支持 http。
 
 ### 3.2 端点清单
 

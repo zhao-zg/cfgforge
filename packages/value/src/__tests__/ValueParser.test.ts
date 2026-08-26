@@ -26,14 +26,14 @@ import {
   VBool, VInt, VLong, VFloat, VString, VText,
   VStruct, VInterface, VList, VMap,
 } from '../CfgValue';
-import { DCell, DRowId, HeadRows, ParseBoolResult } from '@cfggen/data';
+import { DCell, DRowId, HeadRows, ParseBoolResult } from '@cfgforge/data';
 import {
   Primitive, StructRef, FList, FMap,
   FieldSchema, StructSchema, InterfaceSchema,
   AutoOrPack, Sep, Block,
   Metadata, Metadata_of, TAG,
   type FieldType, type FieldFormat,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

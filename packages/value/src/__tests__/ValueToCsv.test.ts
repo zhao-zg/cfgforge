@@ -22,8 +22,8 @@ import {
   type Value,
 } from '../CfgValue';
 import { ValueToCsv } from '../ValueToCsv';
-import { DCellList } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
+import { DCellList } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
 import {
   TableSchema,
   KeySchema,
@@ -32,8 +32,8 @@ import {
   Primitive,
   AutoOrPack,
   ENo,
-} from '@cfggen/schema';
-import { writeCSV } from '@cfggen/shared';
+} from '@cfgforge/schema';
+import { writeCSV } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------
 // Helpers

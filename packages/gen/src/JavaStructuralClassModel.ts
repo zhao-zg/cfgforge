@@ -5,9 +5,9 @@
  * foreign key info, interface/enum-ref metadata, and helper method strings.
  */
 
-import type { Structural, InterfaceSchema } from '@cfggen/schema';
-import { TableSchema, StructSchema, hasRef } from '@cfggen/schema';
-import { lower1 } from '@cfggen/shared';
+import type { Structural, InterfaceSchema } from '@cfgforge/schema';
+import { TableSchema, StructSchema, hasRef } from '@cfgforge/schema';
+import { lower1 } from '@cfgforge/shared';
 
 import {
   NameableName,

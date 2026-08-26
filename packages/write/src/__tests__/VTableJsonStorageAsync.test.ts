@@ -12,8 +12,8 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import { VTableJsonStorage } from '../storages/VTableJsonStorage';
-import { ValueToJson } from '@cfggen/value';
-import { setDefaultFileSystem, NodeFileSystem } from '@cfggen/shared';
+import { ValueToJson } from '@cfgforge/value';
+import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 
 const TEMP_DIR = path.join(__dirname, '..', '..', '..', '..', '.temp', 'write-vtablejsonstorage-async-tests');
 

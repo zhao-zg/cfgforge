@@ -6,16 +6,16 @@
  * and optionally generates union types from actual enum/ref table data values.
  */
 
-import type { CfgValue } from '@cfggen/value';
-import { VString, VText, VInt, VLong, VFloat } from '@cfggen/value';
-import { ValueUtil } from '@cfggen/value';
-import type { TableSchema, Nameable, Structural, FieldSchema, FieldType } from '@cfggen/schema';
-import { StructSchema, InterfaceSchema, TableSchema as TableSchemaCls } from '@cfggen/schema';
-import { findAllIncludedStructs } from '@cfggen/schema';
-import { RefPrimary, RefUniq } from '@cfggen/schema';
-import { Primitive, FList, StructRef, isPrimitive, isStructRef, isFList, isFMap } from '@cfggen/schema';
-import { isEEnum } from '@cfggen/schema';
-import { isMetaStr } from '@cfggen/schema';
+import type { CfgValue } from '@cfgforge/value';
+import { VString, VText, VInt, VLong, VFloat } from '@cfgforge/value';
+import { ValueUtil } from '@cfgforge/value';
+import type { TableSchema, Nameable, Structural, FieldSchema, FieldType } from '@cfgforge/schema';
+import { StructSchema, InterfaceSchema, TableSchema as TableSchemaCls } from '@cfgforge/schema';
+import { findAllIncludedStructs } from '@cfgforge/schema';
+import { RefPrimary, RefUniq } from '@cfgforge/schema';
+import { Primitive, FList, StructRef, isPrimitive, isStructRef, isFList, isFMap } from '@cfgforge/schema';
+import { isEEnum } from '@cfgforge/schema';
+import { isMetaStr } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Internal helper types

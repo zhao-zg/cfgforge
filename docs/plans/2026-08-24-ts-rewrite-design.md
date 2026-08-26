@@ -38,7 +38,7 @@ AIGC:
 ## 3. Monorepo 结构
 
 ```
-cfggen/
+cfgforge/
 ├── pnpm-workspace.yaml
 ├── packages/
 │   ├── schema/          # CFG 语法解析 + 类型系统 (替代 schema/ 48 文件)
@@ -358,9 +358,9 @@ src/
 
 CLI 用法不变：
 ```bash
-npx cfggen -datadir example/config -gen java,dir:.
-npx cfggen -datadir config -gen verify
-npx cfggen -datadir config -gen bytes
+npx cfgforge -datadir example/config -gen java,dir:.
+npx cfgforge -datadir config -gen verify
+npx cfgforge -datadir config -gen bytes
 ```
 
 ### 4.11 packages/shared
@@ -438,7 +438,7 @@ export async function fetchSchema(dataDir: string, signal: AbortSignal): Promise
 ```json
 {
   "bundle": {
-    "resources": []  // 去掉 cfggen.jar 和 jre/
+    "resources": []  // 去掉 cfgforge.jar 和 jre/
   }
 }
 ```
@@ -452,7 +452,7 @@ export async function fetchSchema(dataDir: string, signal: AbortSignal): Promise
 
 ### 5.6 分层依赖规则更新
 
-oxlint 规则更新——api/ 层从"只能 import 外部库"变为"可以 import @cfggen/editor-core"：
+oxlint 规则更新——api/ 层从"只能 import 外部库"变为"可以 import @cfgforge/editor-core"：
 
 ```json
 {
@@ -466,7 +466,7 @@ oxlint 规则更新——api/ 层从"只能 import 外部库"变为"可以 impor
 }
 ```
 
-去掉对 @cfggen/editor-core 的限制 (不在 patterns 中)，其余不变。
+去掉对 @cfgforge/editor-core 的限制 (不在 patterns 中)，其余不变。
 
 ## 6. 实施策略
 
@@ -485,7 +485,7 @@ Phase 9:  packages/editor-core (编辑器服务，依赖 context+write+value)
 Phase 10: packages/cli        (命令行入口，依赖以上所有)
 Phase 11: packages/mcp        (MCP服务，依赖 editor-core)
 Phase 12: cfgeditor 改造      (api层改 Tauri IPC)
-Phase 13: 清理               (删除 app/ Java代码、cfggen.jar、JRE)
+Phase 13: 清理               (删除 app/ Java代码、cfgforge.jar、JRE)
 ```
 
 ### 6.2 TDD 强制策略

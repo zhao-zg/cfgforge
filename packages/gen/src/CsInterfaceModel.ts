@@ -4,7 +4,7 @@
  * Java source: configgen.gencs.InterfaceModel.java (28 lines)
  */
 
-import type { Nameable, InterfaceSchema } from '@cfggen/schema';
+import type { Nameable, InterfaceSchema } from '@cfgforge/schema';
 import type { CsCodeGenerator } from './CsCodeGenerator';
 import { CsName } from './CsName';
 

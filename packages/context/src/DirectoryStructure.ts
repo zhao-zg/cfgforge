@@ -15,8 +15,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { CfgFileInfo } from '@cfggen/schema';
-import { CfgUtil } from '@cfggen/schema';
+import type { CfgFileInfo } from '@cfgforge/schema';
+import { CfgUtil } from '@cfgforge/schema';
 import {
   type ExcelFileInfo,
   JsonFileInfo,
@@ -26,8 +26,8 @@ import {
   isFileIgnored,
   getTableNameIfTableDirForJson,
   getSubTableNameIfJsonSubDir,
-} from '@cfggen/data';
-import { getCodeName, getDefaultFileSystem } from '@cfggen/shared';
+} from '@cfgforge/data';
+import { getCodeName, getDefaultFileSystem } from '@cfgforge/shared';
 import type { ExplicitDir } from './ExplicitDir';
 
 // ---------------------------------------------------------------------------

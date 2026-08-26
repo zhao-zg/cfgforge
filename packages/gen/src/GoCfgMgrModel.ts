@@ -6,7 +6,7 @@
  * Java source: configgen.gengo.CfgMgrModel.java (7 lines)
  */
 
-import type { CfgValue } from '@cfggen/value';
+import type { CfgValue } from '@cfgforge/value';
 
 export class GoCfgMgrModel {
   constructor(

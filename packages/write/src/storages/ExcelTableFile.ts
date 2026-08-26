@@ -23,7 +23,7 @@
 import ExcelJS from 'exceljs';
 import type { RecordBlockTransformed } from '../RecordBlock';
 import type { TableFile } from '../TableFile';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 
 export class ExcelTableFile implements TableFile {
   private readonly _filePath: string;

@@ -12,7 +12,7 @@ AIGC:
 # SVN 工作副本 + 远程 Docker 部署方案
 
 > 日期：2026-08-21
-> 目标：让 cfggen 后端跑在远程 Docker 容器中，而配表数据（Excel/CSV/CFG）通过 SVN 版本管理，本机编辑提交、远程自动生效。
+> 目标：让 cfgforge 后端跑在远程 Docker 容器中，而配表数据（Excel/CSV/CFG）通过 SVN 版本管理，本机编辑提交、远程自动生效。
 > 关联：[Docker 镜像构建与 GitHub Actions CI 计划](./2026-08-21-docker-image.md)
 
 ## 架构与数据流
@@ -20,14 +20,14 @@ AIGC:
 ```
 本机（编辑侧）                      远程服务器（运行侧）
 ┌─────────────────────┐   svn    ┌──────────────────────────────┐
-│ SVN 工作副本          │  commit  │ SVN 工作副本 /opt/cfggen-data │
+│ SVN 工作副本          │  commit  │ SVN 工作副本 /opt/cfgforge-data │
 │ Excel/CSV/CFG 编辑   ├─────────►│  (svn update 保持最新)         │
 └─────────────────────┘          │            │ volume 挂载       │
                                  │            ▼                  │
                                  │   ┌──────────────────┐        │
                                  │   │ Docker 容器        │        │
                                  │   │ /data ← 挂载       │        │
-                                 │   │  Nginx + cfggen.jar│        │
+                                 │   │  Nginx + cfgforge.jar│        │
                                  │   └──────────────────┘        │
                                  └──────────────────────────────┘
 浏览器（前端 cfgeditor）──► http://远程IP:8080（Nginx 反代 / → 静态，/schemas、/record 等 → Java:3456）
@@ -55,10 +55,10 @@ AIGC:
 
 ```bash
 # 1. 创建数据目录
-sudo mkdir -p /opt/cfggen-data
+sudo mkdir -p /opt/cfgforge-data
 
 # 2. 检出（只检配置目录；若 SVN 仓库根就是 config，则直接检出根）
-svn checkout https://svn.example.com/repo/config /opt/cfggen-data
+svn checkout https://svn.example.com/repo/config /opt/cfgforge-data
 ```
 
 > 若已在别处有工作副本，也可 `svn checkout` 或 `svn export`。`export` 不含 `.svn` 元数据，可避免 watcher 干扰（见下文「watch 与 SVN 的注意」），但不能 `svn update` 增量更新，只能重新 export。
@@ -69,13 +69,13 @@ svn checkout https://svn.example.com/repo/config /opt/cfggen-data
 
 ```yaml
 services:
-  cfggen:
-    image: ghcr.io/zhao-zg/cfggen:0.0.1
+  cfgforge:
+    image: ghcr.io/zhao-zg/cfgforge:0.0.1
     ports:
       - "8080:80"
     volumes:
       # 挂载 SVN 工作副本（须含 config.cfg 等配表文件）
-      - /opt/cfggen-data:/data
+      - /opt/cfgforge-data:/data
     environment:
       - JAVA_PORT=3456
       - DATADIR=/data
@@ -106,7 +106,7 @@ curl -I http://127.0.0.1:8080/            # 应返回前端 HTML
 2. 远程服务器执行：
 
 ```bash
-cd /opt/cfggen-data
+cd /opt/cfgforge-data
 svn update
 docker compose restart        # 使容器重新加载新数据
 ```
@@ -116,21 +116,21 @@ docker compose restart        # 使容器重新加载新数据
 在远程服务器配置 cron，每 N 分钟自动 update + 重启：
 
 ```bash
-# /etc/cron.d/cfggen-sync
-*/5 * * * * root /opt/scripts/cfggen-sync.sh >> /var/log/cfggen-sync.log 2>&1
+# /etc/cron.d/cfgforge-sync
+*/5 * * * * root /opt/scripts/cfgforge-sync.sh >> /var/log/cfgforge-sync.log 2>&1
 ```
 
-脚本 `/opt/scripts/cfggen-sync.sh`：
+脚本 `/opt/scripts/cfgforge-sync.sh`：
 
 ```bash
 #!/bin/bash
 set -euo pipefail
 
-cd /opt/cfggen-data
+cd /opt/cfgforge-data
 if svn update | grep -qE '^[UAGERC]'; then
     # 有更新才重启容器
-    cd /opt/cfggen-deploy
-    docker compose restart cfggen
+    cd /opt/cfgforge-deploy
+    docker compose restart cfgforge
 fi
 ```
 
@@ -138,7 +138,7 @@ fi
 >
 > **注意**：若出现 `C`（冲突），本脚本仍会重启容器。若希望冲突时不生效（避免加载冲突标记文件），可先 `svn update --accept postpone` 并人工处理，或改用 `grep -qE '^[UAGER]'`（排除冲突才重启）——但那样冲突时会一直不更新，需人工介入。配表目录冲突概率低，按需取舍。
 
-给脚本执行权限：`sudo chmod +x /opt/scripts/cfggen-sync.sh`
+给脚本执行权限：`sudo chmod +x /opt/scripts/cfgforge-sync.sh`
 
 ## 四、前端如何连接
 
@@ -160,7 +160,7 @@ fi
 ## 六、回滚与排错
 
 - **回滚数据**：`svn update -r <版本号>` 或 `svn merge -r` 回退，再重启容器。
-- **容器起不来**：`docker compose logs cfggen` 查看 Java 是否报错（如 `config.cfg` 缺失、编码错误）。
+- **容器起不来**：`docker compose logs cfgforge` 查看 Java 是否报错（如 `config.cfg` 缺失、编码错误）。
 - **前端 404 / 白屏**：确认 `server` 留空或填对端口；`curl http://远程IP:8080/schemas` 是否通（nginx 按无前缀路径精确反代到 Java）。
 - **CORS 报错**：前端通过 `http://远程IP:8080` 访问时与 Java 同源（Nginx 反代），不会跨域；只有前端单独部署在其他域名时才需 alloworigin。
 
@@ -168,4 +168,4 @@ fi
 
 - 不修改现有 `app/` 与 `cfgeditor/` 源码（本方案只涉及部署配置与脚本）。
 - 数据目录与容器 volume 解耦：数据变更只重启容器即可生效，无需重新构建镜像。
-- 所有远程侧文件建议放 `/opt/cfggen-deploy`（compose 所在）与 `/opt/scripts`（脚本），保持部署与数据分离。
+- 所有远程侧文件建议放 `/opt/cfgforge-deploy`（compose 所在）与 `/opt/scripts`（脚本），保持部署与数据分离。

@@ -29,7 +29,7 @@
  * Java source: configgen.editorserver.RecordRefIdsService.java (173 lines)
  */
 
-import type { CfgValue, VStruct, Value } from '@cfggen/value';
+import type { CfgValue, VStruct, Value } from '@cfgforge/value';
 import {
   ValuePack,
   ValueRefCollector,
@@ -39,8 +39,8 @@ import {
   ForeachContext,
   valueEquals,
   type FieldRef,
-} from '@cfggen/value';
-import type { TableSchemaRefGraph } from '@cfggen/schema';
+} from '@cfgforge/value';
+import type { TableSchemaRefGraph } from '@cfgforge/schema';
 import { RecordService } from './RecordService';
 import type { ResultCode } from './RecordService';
 

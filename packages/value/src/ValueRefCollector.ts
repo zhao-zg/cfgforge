@@ -30,9 +30,9 @@ import {
   valueEquals,
 } from './CfgValue';
 import { ValueUtil } from './ValueUtil';
-import { upper1 } from '@cfggen/shared';
-import type { ForeignKeySchema, Structural } from '@cfggen/schema';
-import { isRefPrimary, isRefUniq, isFList, isFMap, isSimpleType, type RefSimple } from '@cfggen/schema';
+import { upper1 } from '@cfgforge/shared';
+import type { ForeignKeySchema, Structural } from '@cfgforge/schema';
+import { isRefPrimary, isRefUniq, isFList, isFMap, isSimpleType, type RefSimple } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Record types (Java records → TS classes)

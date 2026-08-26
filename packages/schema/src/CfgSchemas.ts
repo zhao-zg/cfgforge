@@ -14,7 +14,7 @@ import { CfgSchema } from './CfgSchema';
 import { CfgReader } from './cfg/CfgReader';
 import { CfgWriter } from './cfg/CfgWriter';
 import { CfgUtil } from './cfg/CfgUtil';
-import { CachedFiles } from '@cfggen/shared';
+import { CachedFiles } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------
 // CfgFileInfo — TypeScript port of Java record CfgFileInfo

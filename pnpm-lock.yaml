@@ -29,10 +29,10 @@ importers:
       '@ant-design/x-sdk':
         specifier: 2.8.0
         version: 2.8.0(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
-      '@cfggen/editor-core':
+      '@cfgforge/editor-core':
         specifier: workspace:*
         version: link:../packages/editor-core
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../packages/shared
       '@tanstack/react-query':
@@ -165,61 +165,61 @@ importers:
 
   packages/cli:
     dependencies:
-      '@cfggen/context':
+      '@cfgforge/context':
         specifier: workspace:*
         version: link:../context
-      '@cfggen/data':
+      '@cfgforge/data':
         specifier: workspace:*
         version: link:../data
-      '@cfggen/editor-core':
+      '@cfgforge/editor-core':
         specifier: workspace:*
         version: link:../editor-core
-      '@cfggen/gen':
+      '@cfgforge/gen':
         specifier: workspace:*
         version: link:../gen
-      '@cfggen/i18n':
+      '@cfgforge/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@cfggen/mcp':
+      '@cfgforge/mcp':
         specifier: workspace:*
         version: link:../mcp
-      '@cfggen/schema':
+      '@cfgforge/schema':
         specifier: workspace:*
         version: link:../schema
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
-      '@cfggen/value':
+      '@cfgforge/value':
         specifier: workspace:*
         version: link:../value
-      '@cfggen/write':
+      '@cfgforge/write':
         specifier: workspace:*
         version: link:../write
 
   packages/context:
     dependencies:
-      '@cfggen/data':
+      '@cfgforge/data':
         specifier: workspace:*
         version: link:../data
-      '@cfggen/i18n':
+      '@cfgforge/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@cfggen/schema':
+      '@cfgforge/schema':
         specifier: workspace:*
         version: link:../schema
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
-      '@cfggen/value':
+      '@cfgforge/value':
         specifier: workspace:*
         version: link:../value
 
   packages/data:
     dependencies:
-      '@cfggen/schema':
+      '@cfgforge/schema':
         specifier: workspace:*
         version: link:../schema
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
       exceljs:
@@ -228,52 +228,52 @@ importers:
 
   packages/editor-core:
     dependencies:
-      '@cfggen/context':
+      '@cfgforge/context':
         specifier: workspace:*
         version: link:../context
-      '@cfggen/data':
+      '@cfgforge/data':
         specifier: workspace:*
         version: link:../data
-      '@cfggen/gen':
+      '@cfgforge/gen':
         specifier: workspace:*
         version: link:../gen
-      '@cfggen/i18n':
+      '@cfgforge/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@cfggen/schema':
+      '@cfgforge/schema':
         specifier: workspace:*
         version: link:../schema
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
-      '@cfggen/value':
+      '@cfgforge/value':
         specifier: workspace:*
         version: link:../value
-      '@cfggen/write':
+      '@cfgforge/write':
         specifier: workspace:*
         version: link:../write
 
   packages/gen:
     dependencies:
-      '@cfggen/context':
+      '@cfgforge/context':
         specifier: workspace:*
         version: link:../context
-      '@cfggen/data':
+      '@cfgforge/data':
         specifier: workspace:*
         version: link:../data
-      '@cfggen/i18n':
+      '@cfgforge/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@cfggen/schema':
+      '@cfgforge/schema':
         specifier: workspace:*
         version: link:../schema
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
-      '@cfggen/value':
+      '@cfgforge/value':
         specifier: workspace:*
         version: link:../value
-      '@cfggen/write':
+      '@cfgforge/write':
         specifier: workspace:*
         version: link:../write
       xlsx:
@@ -282,10 +282,10 @@ importers:
 
   packages/i18n:
     dependencies:
-      '@cfggen/schema':
+      '@cfgforge/schema':
         specifier: workspace:*
         version: link:../schema
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
       exceljs:
@@ -297,22 +297,22 @@ importers:
 
   packages/mcp:
     dependencies:
-      '@cfggen/context':
+      '@cfgforge/context':
         specifier: workspace:*
         version: link:../context
-      '@cfggen/editor-core':
+      '@cfgforge/editor-core':
         specifier: workspace:*
         version: link:../editor-core
-      '@cfggen/gen':
+      '@cfgforge/gen':
         specifier: workspace:*
         version: link:../gen
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
-      '@cfggen/value':
+      '@cfgforge/value':
         specifier: workspace:*
         version: link:../value
-      '@cfggen/write':
+      '@cfgforge/write':
         specifier: workspace:*
         version: link:../write
       '@modelcontextprotocol/sdk':
@@ -324,7 +324,7 @@ importers:
 
   packages/schema:
     dependencies:
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
       fast-xml-parser:
@@ -345,34 +345,34 @@ importers:
 
   packages/value:
     dependencies:
-      '@cfggen/data':
+      '@cfgforge/data':
         specifier: workspace:*
         version: link:../data
-      '@cfggen/i18n':
+      '@cfgforge/i18n':
         specifier: workspace:*
         version: link:../i18n
-      '@cfggen/schema':
+      '@cfgforge/schema':
         specifier: workspace:*
         version: link:../schema
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
 
   packages/write:
     dependencies:
-      '@cfggen/context':
+      '@cfgforge/context':
         specifier: workspace:*
         version: link:../context
-      '@cfggen/data':
+      '@cfgforge/data':
         specifier: workspace:*
         version: link:../data
-      '@cfggen/schema':
+      '@cfgforge/schema':
         specifier: workspace:*
         version: link:../schema
-      '@cfggen/shared':
+      '@cfgforge/shared':
         specifier: workspace:*
         version: link:../shared
-      '@cfggen/value':
+      '@cfgforge/value':
         specifier: workspace:*
         version: link:../value
       exceljs:

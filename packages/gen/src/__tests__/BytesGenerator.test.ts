@@ -17,7 +17,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { BytesGenerator } from '../BytesGenerator';
 import type { Parameter } from '../Parameter';
 import { ConfigOutput } from '../ConfigOutput';
@@ -320,7 +320,7 @@ describe('BytesGenerator', () => {
   let outDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-bytes-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-bytes-'));
     outDir = path.join(tempDir, 'out');
     fs.mkdirSync(outDir, { recursive: true });
   });
@@ -790,7 +790,7 @@ table apple[id] {
     expect(encBuf.equals(plainBuf)).toBe(false);
 
     // Decrypt: XOR with same key should recover original
-    const { XorCipher } = await import('@cfggen/shared');
+    const { XorCipher } = await import('@cfgforge/shared');
     const cipher = new XorCipher('secret');
     const decrypted = cipher.process(encBuf);
     expect(Buffer.from(decrypted).equals(plainBuf)).toBe(true);

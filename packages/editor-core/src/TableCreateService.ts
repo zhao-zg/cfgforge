@@ -41,8 +41,8 @@ import {
   type Nameable,
   type FieldType,
   fieldSpan,
-} from '@cfggen/schema';
-import { writeCSVToFile, writeCSVToFileAsync, getDefaultFileSystem } from '@cfggen/shared';
+} from '@cfgforge/schema';
+import { writeCSVToFile, writeCSVToFileAsync, getDefaultFileSystem } from '@cfgforge/shared';
 import type { EditorService } from './EditorService';
 
 // ---------------------------------------------------------------------------

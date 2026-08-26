@@ -15,7 +15,7 @@ AIGC:
 
 ## 项目概述
 
-这是 cfggen 配置生成器的示例项目，用于测试和展示多语言代码生成功能。
+这是 cfgforge 配置生成器的示例项目，用于测试和展示多语言代码生成功能。
 
 ## 目录说明
 
@@ -85,7 +85,7 @@ config/
 ### 基本格式
 
 ```bash
-npx cfggen -datadir ../config -gen <目标类型>[,选项...] [-gen <目标类型2>...]
+npx cfgforge -datadir ../config -gen <目标类型>[,选项...] [-gen <目标类型2>...]
 ```
 
 ### 常用目标类型
@@ -161,7 +161,7 @@ npx cfggen -datadir ../config -gen <目标类型>[,选项...] [-gen <目标类�
 
 ## 注意事项
 
-1. 确保已安装 cfggen CLI（`pnpm -r build` 或 `npm i -g cfggen`）
+1. 确保已安装 cfgforge CLI（`pnpm -r build` 或 `npm i -g cfgforge`）
 2. 生成前会清理旧的生成代码（各 gen*.bat 开头的 rm 命令）
 3. 多语言版本需要配置语言表（i18n 目录）
 4. GDScript 项目使用 Godot 4.x

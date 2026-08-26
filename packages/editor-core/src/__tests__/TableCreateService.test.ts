@@ -67,7 +67,7 @@ describe('TableCreateService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-tablecreate-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-tablecreate-'));
   });
 
   afterEach(() => {

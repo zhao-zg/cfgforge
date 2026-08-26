@@ -10,9 +10,9 @@
  * - ProviderRegistry is inlined (same as Generators.ts)
  */
 
-import { ParameterParser } from '@cfggen/gen';
-import type { Parameter } from '@cfggen/gen';
-import { Logger } from '@cfggen/shared';
+import { ParameterParser } from '@cfgforge/gen';
+import type { Parameter } from '@cfgforge/gen';
+import { Logger } from '@cfgforge/shared';
 import type { Tool } from './Tool';
 
 export type ToolProvider = (parameter: Parameter) => Tool;

@@ -13,7 +13,7 @@
 
 import { VStruct, VTable } from './CfgValue';
 import { ValueUtil } from './ValueUtil';
-import { writeCSV, type CSVRow } from '@cfggen/shared';
+import { writeCSV, type CSVRow } from '@cfgforge/shared';
 import type { StringValue } from './CfgValue';
 import { VString, VText } from './CfgValue';
 

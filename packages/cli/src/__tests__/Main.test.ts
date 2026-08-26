@@ -7,8 +7,8 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { run, runWithCatch, CliError, registerAllProviders } from '../Main';
-import { Generators } from '@cfggen/gen';
-import { Logger } from '@cfggen/shared';
+import { Generators } from '@cfgforge/gen';
+import { Logger } from '@cfgforge/shared';
 import { Tools } from '../Tools';
 
 describe('Main (CLI entry point)', () => {

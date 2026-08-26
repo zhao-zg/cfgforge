@@ -15,7 +15,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目说明
 
-这是 cfggen 配置生成器的 **GDScript (Godot) 代码生成示例项目**，展示如何从配置表生成类型安全的 GDScript 配置访问代码。
+这是 cfgforge 配置生成器的 **GDScript (Godot) 代码生成示例项目**，展示如何从配置表生成类型安全的 GDScript 配置访问代码。
 
 ## 目录结构
 
@@ -44,7 +44,7 @@ gengd.bat
 ### 生成命令详解
 
 ```bash
-npx cfggen -datadir config -gen gd,own:-nogd,dir:gd/config,encoding:UTF-8 -gen bytes,own:-nogd,file=gd/config.bytes,stringpool
+npx cfgforge -datadir config -gen gd,own:-nogd,dir:gd/config,encoding:UTF-8 -gen bytes,own:-nogd,file=gd/config.bytes,stringpool
 ```
 
 - `-datadir config` - 配置数据源目录
@@ -133,9 +133,9 @@ print(jewelry.RefKeyAbility.name)
 
 ## 重要约束
 
-1. **config/ 目录完全由 cfggen 生成，不要手工修改**
+1. **config/ 目录完全由 cfgforge 生成，不要手工修改**
 2. 如需修改配置结构，应修改 `../config/` 中的 `.cfg` schema 文件
-3. 如需修改生成逻辑，应修改 `../../packages/` 中的 cfggen TypeScript 代码
+3. 如需修改生成逻辑，应修改 `../../packages/` 中的 cfgforge TypeScript 代码
 4. `config.bytes` 必须与生成的代码版本匹配
 
 ## 配置数据源

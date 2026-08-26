@@ -7,8 +7,8 @@
  * Java source: configgen.ctx.Context.java (ContextCfg record, L18-38)
  */
 
-import type { HeadRow } from '@cfggen/data';
-import { HeadRows } from '@cfggen/data';
+import type { HeadRow } from '@cfgforge/data';
+import { HeadRows } from '@cfgforge/data';
 import type { ExplicitDir } from './ExplicitDir';
 
 export class ContextCfg {

@@ -1,3 +1,3 @@
 rm ConfigUtil.ts
-call %~dp0..\cfggen_common.bat
-%CFGGEN% -gen ts -gen bytes
+call %~dp0..\cfgforge_common.bat
+%CFGFORGE% -gen ts -gen bytes

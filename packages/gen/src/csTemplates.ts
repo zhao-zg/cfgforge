@@ -22,7 +22,7 @@ import {
   isSimpleType,
   type FList as FListType,
   type FMap as FMapType,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import {
   hasRef,
   hasRefFieldType,
@@ -33,9 +33,9 @@ import {
   type RefSimple,
   type InterfaceSchema,
   type KeySchema,
-} from '@cfggen/schema';
-import { StructSchema as StructSchemaClass, EEntry, EEnum } from '@cfggen/schema';
-import { removeLineSep, upper1, lower1 } from '@cfggen/shared';
+} from '@cfgforge/schema';
+import { StructSchema as StructSchemaClass, EEntry, EEnum } from '@cfgforge/schema';
+import { removeLineSep, upper1, lower1 } from '@cfgforge/shared';
 import { CsStructModel } from './CsStructModel';
 import { CsInterfaceModel } from './CsInterfaceModel';
 import { CsModuleModel } from './CsModuleModel';

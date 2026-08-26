@@ -21,7 +21,7 @@ import { CellParser } from './CellParser';
 import type { HeadRow } from './HeadRows';
 import type { ReadResult } from './ReadResult';
 import { FileFmt, getTableNameIndex } from './DataUtil';
-import { CfgSchemaErrs } from '@cfggen/schema';
+import { CfgSchemaErrs } from '@cfgforge/schema';
 
 // Minimal CfgSchemaErrs interface to avoid tight coupling
 export interface CfgSchemaErrsLike {

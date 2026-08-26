@@ -20,7 +20,7 @@ import {
   VBool, VInt, VLong, VFloat, VString, VText,
   type SimpleValue,
   type PrimitiveValue,
-} from '@cfggen/value';
+} from '@cfgforge/value';
 import {
   type FieldSchema,
   type Structural,
@@ -32,7 +32,7 @@ import {
   FMap,
   span,
   simpleTypeSpan,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import { RecordBlock } from './RecordBlock';
 import { ValueToSepStr } from './ValueToSepStr';
 

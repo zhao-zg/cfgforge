@@ -8,8 +8,8 @@
  */
 
 import * as path from 'path';
-import type { DRowId, DTable, DRawSheet } from '@cfggen/data';
-import { DCell, DCellList, DFile } from '@cfggen/data';
+import type { DRowId, DTable, DRawSheet } from '@cfgforge/data';
+import { DCell, DCellList, DFile } from '@cfgforge/data';
 import type { TableFile } from './TableFile';
 import { CsvTableFile } from './storages/CsvTableFile';
 import { ExcelTableFile } from './storages/ExcelTableFile';

@@ -26,13 +26,13 @@ import {
 import { CfgValueErrs, foreignValueNotFound, refNotNullableButCellEmpty } from './CfgValueErrs';
 import { ForeachVStruct, type ForeachContext, type VStructVisitor } from './ForeachVStruct';
 import { ValueUtil } from './ValueUtil';
-import type { ForeignKeySchema, TableSchema, FieldType } from '@cfggen/schema';
+import type { ForeignKeySchema, TableSchema, FieldType } from '@cfgforge/schema';
 import {
   isFList,
   isFMap,
   RefPrimary,
   RefUniq,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helper: Map key lookup using valueEquals (TS Map uses ===, not equals/hashCode)

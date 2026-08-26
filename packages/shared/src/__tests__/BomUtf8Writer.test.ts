@@ -8,7 +8,7 @@ describe('BomUtf8Writer', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-test-'));
   });
 
   afterEach(() => {

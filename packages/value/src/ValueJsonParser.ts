@@ -12,7 +12,7 @@
  * Java source: configgen.value.ValueJsonParser.java (377 lines)
  */
 
-import { DFile } from '@cfggen/data';
+import { DFile } from '@cfgforge/data';
 import {
   type FieldType,
   type Nameable,
@@ -27,7 +27,7 @@ import {
   isFMap,
   type TableSchema,
   type FieldSchema,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import {
   type Value,
   type SimpleValue,

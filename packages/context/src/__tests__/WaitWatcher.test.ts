@@ -29,7 +29,7 @@ describe('WaitWatcher', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-wait-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-wait-'));
   });
 
   afterEach(() => {

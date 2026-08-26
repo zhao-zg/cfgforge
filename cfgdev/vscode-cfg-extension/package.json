@@ -22,12 +22,12 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/stallboy/cfggen.git"
+    "url": "https://github.com/stallboy/cfgforge.git"
   },
   "bugs": {
-    "url": "https://github.com/stallboy/cfggen/issues"
+    "url": "https://github.com/stallboy/cfgforge/issues"
   },
-  "homepage": "https://github.com/stallboy/cfggen/cfgdev/vscode-cfg-extension#readme",
+  "homepage": "https://github.com/stallboy/cfgforge/cfgdev/vscode-cfg-extension#readme",
   "main": "./dist/extension.js",
   "contributes": {
     "languages": [

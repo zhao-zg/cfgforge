@@ -1,5 +1,5 @@
 {
-  "name": "@cfggen/i18n",
+  "name": "@cfgforge/i18n",
   "type": "module",
   "version": "0.1.0",
   "scripts": {
@@ -8,8 +8,8 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@cfggen/schema": "workspace:*",
-    "@cfggen/shared": "workspace:*",
+    "@cfgforge/schema": "workspace:*",
+    "@cfgforge/shared": "workspace:*",
     "exceljs": "^4.4.0",
     "xlsx": "^0.18.5"
   },

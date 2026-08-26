@@ -54,10 +54,10 @@ AIGC:
 - 内存分配优化：hashCode 去 varargs、keyMap 容量预分配，总分配 -15%
 - 统一 bytes 序列化格式，多语言共享同一结构与小端字节序
 - 编辑器大表/大图渲染优化：schema select 稳定化、列表虚拟滚动、代码分割、elk 布局移入 Web Worker
-- cfggen 无参启动改为打印帮助（原为启动 GUI）
+- cfgforge 无参启动改为打印帮助（原为启动 GUI）
 
 #### Fixed
-- cfggen：Context 缓存竞态与 allowErr 缓存污染
+- cfgforge：Context 缓存竞态与 allowErr 缓存污染
 - DirectoryStructure.findTableToJsonFiles：同名表跨目录（如 _skill_buff / skill/_buff）编辑后落盘位置变更，导致下次启动失败
 
 ### [v1.3.0] - 2026-02-05

@@ -53,7 +53,7 @@ describe('SearchService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-search-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-search-'));
   });
 
   afterEach(() => {

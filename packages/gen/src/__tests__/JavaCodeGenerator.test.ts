@@ -19,7 +19,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { JavaCodeGenerator } from '../JavaCodeGenerator';
 import type { Parameter } from '../Parameter';
 import { GeneratorWithTag } from '../GeneratorWithTag';
@@ -62,7 +62,7 @@ describe('JavaCodeGenerator', () => {
   let dstDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-java-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-java-'));
     dstDir = path.join(tempDir, 'out');
     fs.mkdirSync(dstDir, { recursive: true });
   });

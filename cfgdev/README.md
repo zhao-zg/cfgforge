@@ -1,14 +1,14 @@
-# cfgdev - cfggen 开发工具集
+# cfgdev - cfgforge 开发工具集
 
-cfggen 配置系统的配套开发工具和插件。
+cfgforge 配置系统的配套开发工具和插件。
 
 ---
 
 ## 项目列表
 
-### 1. [cfggen-architect](./skills/)
+### 1. [cfgforge-architect](./skills/)
 
-Claude Code 插件 - 根据自然语言描述生成 cfggen schema、数据。包括.cfg、csv、json文件。
+Claude Code 插件 - 根据自然语言描述生成 cfgforge schema、数据。包括.cfg、csv、json文件。
 
 ### 2. [cfg-support](./vscode-cfg-extension/)
 

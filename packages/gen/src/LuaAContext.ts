@@ -14,9 +14,9 @@
  * - LangSwitchSupport is inlined here rather than a separate class
  */
 
-import { Logger } from '@cfggen/shared';
-import type { LangSwitchable } from '@cfggen/i18n';
-import type { TextFinder } from '@cfggen/i18n';
+import { Logger } from '@cfgforge/shared';
+import type { LangSwitchable } from '@cfgforge/i18n';
+import type { TextFinder } from '@cfgforge/i18n';
 
 // ---------------------------------------------------------------------------
 // LuaAStat — statistics (ported from AStat.java)
@@ -55,7 +55,7 @@ export class LuaAStat {
 
 interface LangTexts {
   lang: string;
-  langI18n: import('@cfggen/i18n').LangTextFinder;
+  langI18n: import('@cfgforge/i18n').LangTextFinder;
   curTableTextFinder: TextFinder | null;
   texts: string[];
 }

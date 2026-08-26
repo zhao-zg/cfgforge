@@ -9,9 +9,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import * as path from 'path';
 import * as fs from 'fs';
 import { run, runWithCatch, registerAllProviders } from '../Main';
-import { Generators } from '@cfggen/gen';
+import { Generators } from '@cfgforge/gen';
 import { Tools } from '../Tools';
-import { Logger } from '@cfggen/shared';
+import { Logger } from '@cfgforge/shared';
 
 const EXAMPLE_CONFIG = path.resolve(__dirname, '../../../../example/config');
 

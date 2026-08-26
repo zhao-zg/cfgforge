@@ -7,9 +7,9 @@
  * Java source: configgen.gencs.Name.java (42 lines)
  */
 
-import { underscoreToPascalCase } from '@cfggen/shared';
-import type { Nameable } from '@cfggen/schema';
-import { StructSchema } from '@cfggen/schema';
+import { underscoreToPascalCase } from '@cfgforge/shared';
+import type { Nameable } from '@cfgforge/schema';
+import { StructSchema } from '@cfgforge/schema';
 
 export class CsName {
   readonly pkg: string;

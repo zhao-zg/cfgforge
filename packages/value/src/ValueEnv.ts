@@ -7,10 +7,10 @@
  * Java source: configgen.value.ValueEnv.java (16 lines)
  */
 
-import type { CfgSchema } from '@cfggen/schema';
-import type { CfgData } from '@cfggen/data';
-import type { HeadRow } from '@cfggen/data';
-import type { JsonTableFiles } from '@cfggen/data';
+import type { CfgSchema } from '@cfgforge/schema';
+import type { CfgData } from '@cfgforge/data';
+import type { HeadRow } from '@cfgforge/data';
+import type { JsonTableFiles } from '@cfgforge/data';
 import type { LangTextFinder } from './LangTextFinder';
 
 export class ValueEnv {

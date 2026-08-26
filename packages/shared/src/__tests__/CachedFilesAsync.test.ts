@@ -10,7 +10,7 @@ describe('CachedFiles async (T12.0b)', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-test-'));
     setDefaultFileSystem(new NodeFileSystem());
   });
 

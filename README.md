@@ -33,11 +33,11 @@ AIGC:
 
 ## 📚 Documentation
 
-请阅读[详细文档](https://stallboy.github.io/cfggen)
+请阅读[详细文档](https://stallboy.github.io/cfgforge)
 
 ## 🚀 快速开始
 
-### 🗂️ 配表系统 cfggen
+### 🗂️ 配表系统 cfgforge
 
 请参考 [配置系统文档](packages/cli/README.md)。
 

@@ -1,5 +1,5 @@
 {
-  "name": "@cfggen/mcp",
+  "name": "@cfgforge/mcp",
   "type": "module",
   "version": "0.1.0",
   "scripts": {
@@ -8,12 +8,12 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@cfggen/context": "workspace:*",
-    "@cfggen/editor-core": "workspace:*",
-    "@cfggen/gen": "workspace:*",
-    "@cfggen/shared": "workspace:*",
-    "@cfggen/value": "workspace:*",
-    "@cfggen/write": "workspace:*",
+    "@cfgforge/context": "workspace:*",
+    "@cfgforge/editor-core": "workspace:*",
+    "@cfgforge/gen": "workspace:*",
+    "@cfgforge/shared": "workspace:*",
+    "@cfgforge/value": "workspace:*",
+    "@cfgforge/write": "workspace:*",
     "@modelcontextprotocol/sdk": "^1.30.0",
     "zod": "^4.4.3"
   },

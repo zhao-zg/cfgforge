@@ -30,11 +30,11 @@ An object database browser, editor, and program access code generator
 
 ## Documentation
 
-Please read the [detailed documentation](https://stallboy.github.io/cfggen)
+Please read the [detailed documentation](https://stallboy.github.io/cfgforge)
 
 ## Quick Start
 
-### Configuration System cfggen
+### Configuration System cfgforge
 
 Please refer to [Configuration System Documentation](packages/cli/README.md).
 

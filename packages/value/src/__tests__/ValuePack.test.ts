@@ -13,13 +13,13 @@ import {
   type Value,
 } from '../CfgValue';
 import { CfgValueErrs } from '../CfgValueErrs';
-import { DCell, DCellList } from '@cfggen/data';
-import type { Structural, InterfaceSchema } from '@cfggen/schema';
+import { DCell, DCellList } from '@cfgforge/data';
+import type { Structural, InterfaceSchema } from '@cfgforge/schema';
 import {
   Primitive, FList, FMap, StructRef,
   FieldSchema, StructSchema, TableSchema, KeySchema,
   AutoOrPack, Metadata_of, ENo,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 function makeCell(value: string): DCell {
   return DCell.of(value, 'test');

@@ -32,7 +32,7 @@ describe('Watcher', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-watch-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-watch-'));
   });
 
   afterEach(() => {

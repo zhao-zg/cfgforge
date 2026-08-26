@@ -17,14 +17,14 @@
  * Java source: configgen.editorserver.RecordEditService.java (101 lines)
  */
 
-import type { Context } from '@cfggen/context';
-import type { CfgValue } from '@cfggen/value';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue } from '@cfgforge/value';
 import {
   AddOrUpdateService,
   AddOrUpdateErrorCode,
   DeleteService,
   DeleteErrorCode,
-} from '@cfggen/write';
+} from '@cfgforge/write';
 import type { EditorService } from './EditorService';
 
 // ---------------------------------------------------------------------------

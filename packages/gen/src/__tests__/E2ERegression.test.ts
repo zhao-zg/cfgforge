@@ -15,8 +15,8 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 
-import { Context } from '@cfggen/context';
-import { CachedFiles } from '@cfggen/shared';
+import { Context } from '@cfgforge/context';
+import { CachedFiles } from '@cfgforge/shared';
 import { GenPipeline } from '../GenPipeline';
 import { JavaCodeGenerator } from '../JavaCodeGenerator';
 import { CsCodeGenerator } from '../CsCodeGenerator';
@@ -85,7 +85,7 @@ describe('E2E: GenPipeline with example/config/ (T8.13)', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-e2e-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-e2e-'));
   });
 
   afterEach(() => {

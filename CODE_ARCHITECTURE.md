@@ -9,15 +9,15 @@ AIGC:
   ReservedCode2: '22a8c449-2c81-433b-afb3-5edc1dca5f97'
 ---
 
-# cfggen 代码架构文档
+# cfgforge 代码架构文档
 
 > 本文档基于实际代码结构，提供结构化的代码地图：包/类/职责/依赖关系。便于开发者快速定位代码位置，理解模块间的协作关系。
 
 ## 1. 仓库顶层结构
 
 ```
-cfggen/
-├── packages/      # [TypeScript] 核心配置生成器 (cfggen)，monorepo
+cfgforge/
+├── packages/      # [TypeScript] 核心配置生成器 (cfgforge)，monorepo
 ├── cfgeditor/     # [React+TS] 可视化配置编辑器，Tauri 桌面应用
 ├── cfgdev/        # 开发工具集（Claude Code 插件 + VSCode 扩展）
 ├── docs/          # [Astro] 用户文档站点
@@ -30,7 +30,7 @@ cfggen/
 └── genjar.bat     # 便捷打包脚本（Windows cmd 语法）
 ```
 
-## 2. packages/ — cfggen 核心生成器
+## 2. packages/ — cfgforge 核心生成器
 
 ### 2.1 构建配置
 

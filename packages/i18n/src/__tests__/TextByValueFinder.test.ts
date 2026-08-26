@@ -28,7 +28,7 @@ describe('TextByValueFinder', () => {
   let tmpDir: string;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-i18n-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-i18n-test-'));
   });
 
   afterEach(() => {

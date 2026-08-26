@@ -20,8 +20,8 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
-import { CachedFiles } from '@cfggen/shared';
+import { Context } from '@cfgforge/context';
+import { CachedFiles } from '@cfgforge/shared';
 import { GdCodeGenerator } from '../GdCodeGenerator';
 import type { Parameter } from '../Parameter';
 
@@ -63,7 +63,7 @@ describe('GdCodeGenerator', () => {
   let dstDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-gd-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-gd-'));
     dstDir = path.join(tempDir, 'out');
     fs.mkdirSync(dstDir, { recursive: true });
   });

@@ -20,11 +20,11 @@
  * Java source: configgen.write.DeleteService.java (87 lines)
  */
 
-import type { Context } from '@cfggen/context';
-import type { CfgValue, Value, VStruct } from '@cfggen/value';
-import { CfgValueErrs, ValuePack, valueEquals } from '@cfggen/value';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue, Value, VStruct } from '@cfgforge/value';
+import { CfgValueErrs, ValuePack, valueEquals } from '@cfgforge/value';
 import { VTableStorage, VTableJsonStorage, ValueUpdater } from './index';
-import { Logger } from '@cfggen/shared';
+import { Logger } from '@cfgforge/shared';
 
 export enum DeleteErrorCode {
   OK,
@@ -101,7 +101,7 @@ export class DeleteService {
     }
 
     try {
-      let nr: { newCfgValue: CfgValue; newCfgData: import('@cfggen/data').CfgData; errStrList: string[] };
+      let nr: { newCfgValue: CfgValue; newCfgData: import('@cfgforge/data').CfgData; errStrList: string[] };
 
       if (vTable.schema.isJson()) {
         const relativeJsonPath = VTableJsonStorage.deleteRecord(

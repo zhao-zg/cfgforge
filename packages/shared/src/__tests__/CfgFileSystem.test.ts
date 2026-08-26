@@ -16,7 +16,7 @@ describe('CfgFileSystem', () => {
   let nodeFs: NodeFileSystem;
 
   beforeEach(() => {
-    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-fs-test-'));
+    tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-fs-test-'));
     nodeFs = new NodeFileSystem();
   });
 

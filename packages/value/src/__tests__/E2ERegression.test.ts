@@ -20,22 +20,22 @@ import * as path from 'path';
 import * as os from 'os';
 
 // Schema layer
-import { CfgSchemas, type CfgFileInfo } from '@cfggen/schema';
-import { CfgSchemaErrs } from '@cfggen/schema';
-import { CfgUtil } from '@cfggen/schema';
-import type { CfgSchema, TableSchema } from '@cfggen/schema';
+import { CfgSchemas, type CfgFileInfo } from '@cfgforge/schema';
+import { CfgSchemaErrs } from '@cfgforge/schema';
+import { CfgUtil } from '@cfgforge/schema';
+import type { CfgSchema, TableSchema } from '@cfgforge/schema';
 
 // Data layer
-import { CfgDataReader, type ExcelFileInfo } from '@cfggen/data';
-import { HeadRows } from '@cfggen/data';
-import { readExcel } from '@cfggen/data';
-import { readCsv } from '@cfggen/data';
-import { FileFmt, getFileFormat, isFileIgnored } from '@cfggen/data';
-import { CfgSchemaAlignToData } from '@cfggen/data';
-import { JsonFileInfo, type JsonTableFiles } from '@cfggen/data';
-import type { ReadResult } from '@cfggen/data';
-import type { HeadRow } from '@cfggen/data';
-import { getCodeName } from '@cfggen/shared';
+import { CfgDataReader, type ExcelFileInfo } from '@cfgforge/data';
+import { HeadRows } from '@cfgforge/data';
+import { readExcel } from '@cfgforge/data';
+import { readCsv } from '@cfgforge/data';
+import { FileFmt, getFileFormat, isFileIgnored } from '@cfgforge/data';
+import { CfgSchemaAlignToData } from '@cfgforge/data';
+import { JsonFileInfo, type JsonTableFiles } from '@cfgforge/data';
+import type { ReadResult } from '@cfgforge/data';
+import type { HeadRow } from '@cfgforge/data';
+import { getCodeName } from '@cfgforge/shared';
 
 // Value layer
 import { CfgValueParser } from '../CfgValueParser';

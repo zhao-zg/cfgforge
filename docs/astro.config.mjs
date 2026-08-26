@@ -39,7 +39,7 @@ function remarkMermaid() {
 
 // https://astro.build/config
 export default defineConfig({
-	base: '/cfggen',
+	base: '/cfgforge',
 	markdown: {
 		remarkPlugins: [remarkMermaid],
 	},
@@ -49,7 +49,7 @@ export default defineConfig({
 				starlightImageZoom(),
 				// starlightLinksValidator(),
 			],
-			title: 'cfggen 文档',
+			title: 'cfgforge 文档',
 			description: 'excel/CSV/JSON object mapping. object database viewer and editor. generate reading code.',
 			locales: {
 				root: {
@@ -61,11 +61,11 @@ export default defineConfig({
 				{
 					icon: 'github',
 					label: 'GitHub',
-					href: 'https://github.com/stallboy/cfggen',
+					href: 'https://github.com/stallboy/cfgforge',
 				},
 			],
 			editLink: {
-				baseUrl: 'https://github.com/stallboy/cfggen/edit/master/docs/'
+				baseUrl: 'https://github.com/stallboy/cfgforge/edit/master/docs/'
 			},
 			sidebar: [
 				{

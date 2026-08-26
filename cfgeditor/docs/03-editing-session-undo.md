@@ -300,7 +300,7 @@ sequenceDiagram
     participant S as EditingSession
     participant UN as UndoStack
     participant Q as React Query
-    participant B as cfggen 后端
+    participant B as cfgforge 后端
 
     Note over F,S: ① 值类（键入）—— 就地改，不重渲
     U->>F: 键入

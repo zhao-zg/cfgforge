@@ -11,7 +11,7 @@
  */
 
 import * as XLSX from 'xlsx';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import type { LangTextFinder } from './LangTextFinder';
 import { TextByIdFinder, OneText } from './TextByIdFinder';
 import { normalize } from './I18nUtils';

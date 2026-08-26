@@ -15,9 +15,9 @@ import * as path from 'path';
 import * as os from 'os';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { ValueUpdater } from '../ValueUpdater';
-import { VInt, valueEquals, type Value } from '@cfggen/value';
+import { VInt, valueEquals, type Value } from '@cfgforge/value';
 
 function writeFile(dir: string, filename: string, content: string): void {
   fs.writeFileSync(path.join(dir, filename), content, 'utf8');
@@ -53,7 +53,7 @@ describe('ValueUpdater', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-valupd-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-valupd-'));
   });
 
   afterEach(() => {

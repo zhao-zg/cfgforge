@@ -123,7 +123,7 @@ describe('RecordService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-record-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-record-'));
   });
 
   afterEach(() => {

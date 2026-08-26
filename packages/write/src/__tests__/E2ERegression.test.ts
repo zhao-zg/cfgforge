@@ -17,7 +17,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { AddOrUpdateService, AddOrUpdateErrorCode } from '../AddOrUpdateService';
 import { DeleteService, DeleteErrorCode } from '../DeleteService';
 
@@ -53,7 +53,7 @@ describe('E2E: Write-back pipeline', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-e2e-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-e2e-'));
   });
 
   afterEach(() => {

@@ -12,16 +12,16 @@
  * - No backup/temp/overwrite file logic
  */
 
-import type { Context } from '@cfggen/context';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import type { Context } from '@cfgforge/context';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import type { Parameter } from './Parameter';
 import { Generator } from './Generator';
-import type { VTable } from '@cfggen/value';
-import { ValueJsonParser } from '@cfggen/value';
-import { CfgValueErrs } from '@cfggen/value';
-import { ValueUtil } from '@cfggen/value';
-import { VTableStorage } from '@cfggen/write';
-import { VTableJsonStorage } from '@cfggen/write';
+import type { VTable } from '@cfgforge/value';
+import { ValueJsonParser } from '@cfgforge/value';
+import { CfgValueErrs } from '@cfgforge/value';
+import { ValueUtil } from '@cfgforge/value';
+import { VTableStorage } from '@cfgforge/write';
+import { VTableJsonStorage } from '@cfgforge/write';
 import { readAICfgFromFileAsync, type AICfg } from './AICfg';
 import { PromptGen } from './PromptGen';
 import { FIX_ERROR } from './PromptDefault';

@@ -53,7 +53,7 @@ describe('RecordEditService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-recedit-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-recedit-'));
   });
 
   afterEach(() => {

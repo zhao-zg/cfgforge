@@ -8,20 +8,20 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { Context } from '@cfggen/context';
-import type { CfgValue, VTable, VStruct } from '@cfggen/value';
-import { ValuePack } from '@cfggen/value';
-import { ValueToJson } from '@cfggen/value';
-import { ValueToCsv } from '@cfggen/value';
-import { CfgValueErrs } from '@cfggen/value';
-import type { TableSchema } from '@cfggen/schema';
-import { StructSchema as StructSchemaCls } from '@cfggen/schema';
-import { findAllIncludedStructs } from '@cfggen/schema';
-import { TableSchemaRefGraph } from '@cfggen/schema';
-import { CfgWriter } from '@cfggen/schema';
-import { isEEnum } from '@cfggen/schema';
-import { isMetaStr } from '@cfggen/schema';
-import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfggen/shared';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue, VTable, VStruct } from '@cfgforge/value';
+import { ValuePack } from '@cfgforge/value';
+import { ValueToJson } from '@cfgforge/value';
+import { ValueToCsv } from '@cfgforge/value';
+import { CfgValueErrs } from '@cfgforge/value';
+import type { TableSchema } from '@cfgforge/schema';
+import { StructSchema as StructSchemaCls } from '@cfgforge/schema';
+import { findAllIncludedStructs } from '@cfgforge/schema';
+import { TableSchemaRefGraph } from '@cfgforge/schema';
+import { CfgWriter } from '@cfgforge/schema';
+import { isEEnum } from '@cfgforge/schema';
+import { isMetaStr } from '@cfgforge/schema';
+import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfgforge/shared';
 import type { Example } from './PromptModel';
 import { example } from './PromptModel';
 

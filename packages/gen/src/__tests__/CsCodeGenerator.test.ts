@@ -18,7 +18,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { CsCodeGenerator } from '../CsCodeGenerator';
 import type { Parameter } from '../Parameter';
 
@@ -60,7 +60,7 @@ describe('CsCodeGenerator', () => {
   let dstDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-cs-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-cs-'));
     dstDir = path.join(tempDir, 'out');
     fs.mkdirSync(dstDir, { recursive: true });
   });

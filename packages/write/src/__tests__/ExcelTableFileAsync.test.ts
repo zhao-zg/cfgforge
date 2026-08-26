@@ -13,7 +13,7 @@ import * as path from 'path';
 import ExcelJS from 'exceljs';
 import { ExcelTableFile } from '../storages/ExcelTableFile';
 import { RecordBlock, RecordBlockTransformed } from '../RecordBlock';
-import { setDefaultFileSystem, NodeFileSystem } from '@cfggen/shared';
+import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 
 const TEMP_DIR = path.join(__dirname, '..', '..', '..', '..', '.temp', 'write-excel-async-tests');
 

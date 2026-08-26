@@ -117,7 +117,7 @@ describe('SchemaService', () => {
   let tempDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-schema-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-schema-'));
   });
 
   afterEach(() => {

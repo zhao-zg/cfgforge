@@ -22,8 +22,6 @@ example/*/node_modules
 # Pre-built binaries
 *.jar
 *.exe
-cfggen.jar
-cfggen.zip
 cfgeditor.exe
 
 # IDE & OS

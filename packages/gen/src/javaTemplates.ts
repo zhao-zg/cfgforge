@@ -32,8 +32,8 @@ import {
   type KeySchema,
   type TableSchema,
   type Structural,
-} from '@cfggen/schema';
-import { upper1, lower1 } from '@cfggen/shared';
+} from '@cfgforge/schema';
+import { upper1, lower1 } from '@cfgforge/shared';
 
 import {
   NameableName,

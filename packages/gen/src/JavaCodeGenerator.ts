@@ -18,13 +18,13 @@
 import * as path from 'path';
 import * as fs from 'fs';
 
-import { CachedFiles } from '@cfggen/shared';
-import type { Context } from '@cfggen/context';
-import type { CfgValue, VTable } from '@cfggen/value';
-import type { CfgData } from '@cfggen/data';
-import { StructSchema, InterfaceSchema, isEEnum, isENo } from '@cfggen/schema';
+import { CachedFiles } from '@cfgforge/shared';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue, VTable } from '@cfgforge/value';
+import type { CfgData } from '@cfgforge/data';
+import { StructSchema, InterfaceSchema, isEEnum, isENo } from '@cfgforge/schema';
 import type { EntryBase } from './JavaEntryOrEnumModel';
-import type { LangSwitchable } from '@cfggen/i18n';
+import type { LangSwitchable } from '@cfgforge/i18n';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 import {

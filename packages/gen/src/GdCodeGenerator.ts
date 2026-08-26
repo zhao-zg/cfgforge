@@ -16,12 +16,12 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { CachedFiles, Logger } from '@cfggen/shared';
-import type { Context } from '@cfggen/context';
-import type { CfgValue } from '@cfggen/value';
-import type { CfgSchema, Structural } from '@cfggen/schema';
-import { StructSchema, InterfaceSchema } from '@cfggen/schema';
-import type { VTable } from '@cfggen/value';
+import { CachedFiles, Logger } from '@cfgforge/shared';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue } from '@cfgforge/value';
+import type { CfgSchema, Structural } from '@cfgforge/schema';
+import { StructSchema, InterfaceSchema } from '@cfgforge/schema';
+import type { VTable } from '@cfgforge/value';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 import { GdStructModel } from './GdStructModel';

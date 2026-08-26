@@ -17,11 +17,11 @@
  * Java source: configgen.write.AddOrUpdateService.java (99 lines)
  */
 
-import type { Context } from '@cfggen/context';
-import type { CfgValue, Value } from '@cfggen/value';
-import { CfgValueErrs, ValueJsonParser, ValueUtil, valueEquals } from '@cfggen/value';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue, Value } from '@cfgforge/value';
+import { CfgValueErrs, ValueJsonParser, ValueUtil, valueEquals } from '@cfgforge/value';
 import { VTableStorage, VTableJsonStorage, ValueUpdater } from './index';
-import { Logger } from '@cfggen/shared';
+import { Logger } from '@cfgforge/shared';
 
 export enum AddOrUpdateErrorCode {
   AddOK,
@@ -108,7 +108,7 @@ export class AddOrUpdateService {
       : AddOrUpdateErrorCode.AddOK;
 
     try {
-      let nr: { newCfgValue: CfgValue; newCfgData: import('@cfggen/data').CfgData; errStrList: string[] };
+      let nr: { newCfgValue: CfgValue; newCfgData: import('@cfgforge/data').CfgData; errStrList: string[] };
 
       if (tableSchema.isJson()) {
         const relativeJsonPath = VTableJsonStorage.addOrUpdateRecord(

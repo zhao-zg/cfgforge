@@ -14,12 +14,12 @@
  * - No static singleton; fullName takes a pkgPrefixStr parameter
  */
 
-import { upper1 } from '@cfggen/shared';
-import type { Nameable } from '@cfggen/schema';
-import { InterfaceSchema, StructSchema, TableSchema } from '@cfggen/schema';
-import type { ForeignKeySchema, KeySchema } from '@cfggen/schema';
-import type { RefKey } from '@cfggen/schema';
-import { RefList, RefPrimary, RefUniq } from '@cfggen/schema';
+import { upper1 } from '@cfgforge/shared';
+import type { Nameable } from '@cfgforge/schema';
+import { InterfaceSchema, StructSchema, TableSchema } from '@cfgforge/schema';
+import type { ForeignKeySchema, KeySchema } from '@cfgforge/schema';
+import type { RefKey } from '@cfgforge/schema';
+import { RefList, RefPrimary, RefUniq } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Constants (match Java Name.java)

@@ -9,8 +9,8 @@
  */
 
 import * as fs from 'fs';
-import { readCSV, writeCSVToFile, writeCSVToFileAsync, type CSVRow } from '@cfggen/shared';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { readCSV, writeCSVToFile, writeCSVToFileAsync, type CSVRow } from '@cfgforge/shared';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 
 export interface Note {
   key: string;
@@ -78,7 +78,7 @@ export class NoteEditService {
 
   /**
    * Simple CSV parser (handles basic CSV without quoting edge cases).
-   * readCSV from @cfggen/shared uses fs directly; this is a lightweight
+   * readCSV from @cfgforge/shared uses fs directly; this is a lightweight
    * inline parser for async path.
    */
   private static parseCsvText(text: string): CSVRow[] {

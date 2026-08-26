@@ -13,7 +13,7 @@
 import { ParameterParser } from './ParameterParser';
 import type { Parameter } from './Parameter';
 import type { Generator } from './Generator';
-import { Logger } from '@cfggen/shared';
+import { Logger } from '@cfgforge/shared';
 
 export type GeneratorProvider = (parameter: Parameter) => Generator;
 

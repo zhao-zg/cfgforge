@@ -11,8 +11,8 @@
  * those calls to record what parameters each provider expects.
  */
 
-import type { Parameter } from '@cfggen/gen';
-import { Logger } from '@cfggen/shared';
+import type { Parameter } from '@cfgforge/gen';
+import { Logger } from '@cfgforge/shared';
 
 export interface ParamInfo {
   def: string | null;

@@ -28,8 +28,8 @@ import {
 } from '../CfgValue';
 import { CfgValueErrs } from '../CfgValueErrs';
 import { VTableCreator } from '../VTableCreator';
-import { DCellList } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
+import { DCellList } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
 
 import {
   TableSchema,
@@ -46,7 +46,7 @@ import {
   AutoOrPack,
   TAG,
   type FieldSchema as FS,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

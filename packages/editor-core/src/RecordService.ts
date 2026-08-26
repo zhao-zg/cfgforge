@@ -17,7 +17,7 @@
  * Java source: configgen.editorserver.RecordService.java (334 lines)
  */
 
-import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
+import type { CfgValue, VTable, VStruct, Value } from '@cfgforge/value';
 import {
   ValueUtil,
   ValuePack,
@@ -30,11 +30,11 @@ import {
   RefId,
   valueEquals,
   type FieldRef,
-} from '@cfggen/value';
-import type { TableSchemaRefGraph } from '@cfggen/schema';
-import { TableSchema } from '@cfggen/schema';
-import { isEEnum } from '@cfggen/schema';
-import type { FieldSchema } from '@cfggen/schema';
+} from '@cfgforge/value';
+import type { TableSchemaRefGraph } from '@cfgforge/schema';
+import { TableSchema } from '@cfgforge/schema';
+import { isEEnum } from '@cfgforge/schema';
+import type { FieldSchema } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Types (mirror cfgeditor/src/api/recordModel.ts)

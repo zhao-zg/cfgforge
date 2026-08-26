@@ -37,8 +37,8 @@ import {
   type ValueVisitor,
   type ValueVisitorForSearch,
 } from '../ForeachValue';
-import { DCellList, DFile } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
+import { DCellList, DFile } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
 import {
   TableSchema,
   StructSchema,
@@ -51,7 +51,7 @@ import {
   AutoOrPack,
   ENo,
   type Structural,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers (reused from ForeachVStruct tests pattern)

@@ -35,7 +35,7 @@ import {
   // VWarn factory
   jsonHasExtraFields,
 } from '../CfgValueErrs';
-import { DFile, DCell } from '@cfggen/data';
+import { DFile, DCell } from '@cfgforge/data';
 import type { Value } from '../CfgValue';
 
 // Helper: create a minimal mock Value for error records

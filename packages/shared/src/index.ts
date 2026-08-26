@@ -1,4 +1,4 @@
-// @cfggen/shared - Shared utilities for cfggen
+// @cfgforge/shared - Shared utilities for cfgforge
 // All exports from this package
 
 export * from './CfgFileSystem';

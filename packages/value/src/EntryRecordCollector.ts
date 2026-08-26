@@ -20,8 +20,8 @@ import {
   type CfgValue,
 } from './CfgValue';
 import { ValueUtil } from './ValueUtil';
-import type { TableSchema } from '@cfggen/schema';
-import { isEEntry, isEEnum } from '@cfggen/schema';
+import type { TableSchema } from '@cfgforge/schema';
+import { isEEntry, isEEnum } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Types (Java records → TS classes)

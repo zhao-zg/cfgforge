@@ -20,7 +20,7 @@
  * Java source: configgen.value.ForeachValue.java (148 lines)
  */
 
-import type { FieldSchema } from '@cfggen/schema';
+import type { FieldSchema } from '@cfgforge/schema';
 import {
   type Value,
   type PrimitiveValue,

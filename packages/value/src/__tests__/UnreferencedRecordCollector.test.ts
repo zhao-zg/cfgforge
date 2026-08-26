@@ -23,8 +23,8 @@ import {
 import {
   UnreferencedRecordCollector,
 } from '../UnreferencedRecordCollector';
-import { DCellList } from '@cfggen/data';
-import type { Source } from '@cfggen/data';
+import { DCellList } from '@cfgforge/data';
+import type { Source } from '@cfgforge/data';
 import {
   TableSchema,
   KeySchema,
@@ -41,7 +41,7 @@ import {
   RefPrimary,
   TableSchemaRefGraph,
   type Structural,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers

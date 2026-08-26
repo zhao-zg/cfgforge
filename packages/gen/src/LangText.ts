@@ -16,19 +16,19 @@
 
 import * as path from 'path';
 import * as XLSX from 'xlsx';
-import { hasText } from '@cfggen/schema';
-import type { Nameable } from '@cfggen/schema';
+import { hasText } from '@cfgforge/schema';
+import type { Nameable } from '@cfgforge/schema';
 import {
   type CfgValue,
   type Value,
   type PrimitiveValue,
   VText,
-} from '@cfggen/value';
-import { ForeachValue, ValueVisitorForPrimitive } from '@cfggen/value';
-import { ValueUtil } from '@cfggen/value';
-import { TextByIdFinder, OneText, OneRecord } from '@cfggen/i18n';
-import { normalize, fieldChainStr } from '@cfggen/i18n';
-import { Logger } from '@cfggen/shared';
+} from '@cfgforge/value';
+import { ForeachValue, ValueVisitorForPrimitive } from '@cfgforge/value';
+import { ValueUtil } from '@cfgforge/value';
+import { TextByIdFinder, OneText, OneRecord } from '@cfgforge/i18n';
+import { normalize, fieldChainStr } from '@cfgforge/i18n';
+import { Logger } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------
 // LangStat — translation statistics

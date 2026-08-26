@@ -18,7 +18,7 @@ import * as os from 'os';
 import * as path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 
-import { Context } from '@cfggen/context';
+import { Context } from '@cfgforge/context';
 import { GoCodeGenerator } from '../GoCodeGenerator';
 import type { Parameter } from '../Parameter';
 
@@ -60,7 +60,7 @@ describe('GoCodeGenerator', () => {
   let dstDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfggen-go-'));
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-go-'));
     dstDir = path.join(tempDir, 'out');
     fs.mkdirSync(dstDir, { recursive: true });
   });

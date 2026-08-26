@@ -9,7 +9,7 @@ AIGC:
   ReservedCode2: '22b7b07d-cf69-4caa-a641-57573a74ca07'
 ---
 
-# cfggen 开发者入门指南
+# cfgforge 开发者入门指南
 
 > 本文档面向新加入项目的开发者，帮助你从零搭建环境、理解关键概念、导航代码、完成常见开发任务。读完后你应该能：构建项目、修改 schema、生成代码、调试问题。
 
@@ -19,7 +19,7 @@ AIGC:
 
 | 工具 | 版本要求 | 用途 | 验证 |
 |---|---|---|---|
-| Node.js | 20+ | cfggen 核心编译运行 | `node --version` |
+| Node.js | 20+ | cfgforge 核心编译运行 | `node --version` |
 | Git | 任意，需在 PATH | 版本控制 | `git --version` |
 | pnpm | 9+ | monorepo 包管理 | `pnpm --version` |
 | Rust | stable | Tauri 桌面应用打包（可选） | `rustc --version` |
@@ -28,15 +28,15 @@ AIGC:
 
 ```bash
 # 克隆仓库
-git clone <repo-url> cfggen
-cd cfggen
+git clone <repo-url> cfgforge
+cd cfgforge
 
 # 构建所有包
 pnpm install
 pnpm -r build
 
 # 验证构建成功
-npx cfggen -h
+npx cfgforge -h
 ```
 
 > **Windows 注意**：构建使用 `pnpm -r build`，跨平台兼容，无需特殊处理。
@@ -61,7 +61,7 @@ pnpm run dev
 
 ```bash
 # 启动服务模式
-npx cfggen -datadir ../example/config -gen server,watch=1
+npx cfgforge -datadir ../example/config -gen server,watch=1
 ```
 
 ### 1.4 构建 Tauri 桌面应用（可选）
@@ -76,7 +76,7 @@ pnpm tauri build
 
 ```bash
 # 全部测试
-pnpm --filter "!@cfggen/schema" -r test   # 全部测试
+pnpm --filter "!@cfgforge/schema" -r test   # 全部测试
 
 # 前端测试
 cd cfgeditor
@@ -88,7 +88,7 @@ pnpm test                                 # watch 模式
 
 ### 2.1 核心数据流：四层流水线
 
-理解 cfggen 的关键在于理解这条数据流：
+理解 cfgforge 的关键在于理解这条数据流：
 
 ```
 Schema → Data → Value → Generate
@@ -106,7 +106,7 @@ Schema → Data → Value → Generate
 
 ### 2.2 CFG Schema 语法
 
-cfggen 使用自定义 DSL（`.cfg` 文件）定义配置结构：
+cfgforge 使用自定义 DSL（`.cfg` 文件）定义配置结构：
 
 ```
 // struct — 复合结构
@@ -152,13 +152,13 @@ Tools.addProvider("xmltocfg", XmlToCfgTool::new);
 
 命令行使用：
 ```bash
-npx cfggen -datadir <dir> -gen <name>[,key=value...]
-npx cfggen -datadir <dir> -tool <name>[,key=value...]
+npx cfgforge -datadir <dir> -gen <name>[,key=value...]
+npx cfgforge -datadir <dir> -tool <name>[,key=value...]
 ```
 
 ### 2.4 分层依赖规则
 
-**cfggen (TypeScript monorepo)** 层次（eslint 强制）：
+**cfgforge (TypeScript monorepo)** 层次（eslint 强制）：
 
 ```
 gen(含 gen*/write/editorserver/mcpserver/tool)
@@ -178,12 +178,12 @@ app/features → flow/res → store/services → domain → api
 代码生成用模板引擎（`packages/gen/templates/`）：
 
 - **构建期** `pnpm -r build` 预编译模板，运行时零编译
-- **开发期** `npx cfggen` 改模板立即见效
+- **开发期** `npx cfgforge` 改模板立即见效
 - **改模板后必须重新 `pnpm -r build`** 才能让预编译生效
 
 ## 3. 代码导航地图
 
-### 3.1 cfggen (TypeScript) 代码地图
+### 3.1 cfgforge (TypeScript) 代码地图
 
 ```
 packages/
@@ -332,7 +332,7 @@ cfgeditor/src/
 
 | 想了解 | 从哪开始读 |
 |---|---|
-| cfggen 整体架构 | `docs/01-architecture-overview.md` |
+| cfgforge 整体架构 | `docs/01-architecture-overview.md` |
 | CFG schema 语法 | `docs/src/content/docs/core/schema.mdx` |
 | Schema 解析器内部 | `docs/02-schema-and-cfg.md` |
 | 数据读取 | `docs/03-data-reading.md` |
@@ -355,7 +355,7 @@ cfgeditor/src/
 cd example/java
 genjava.bat         # Windows
 # 或
-npx cfggen -datadir ../config -gen java,dir:.
+npx cfgforge -datadir ../config -gen java,dir:.
 
 # 3. 验证
 run.bat
@@ -379,7 +379,7 @@ run.bat
 packages/gen/templates/
 
 # 开发期动态编译（改完立即见效）
-npx cfggen -datadir ../example/config -gen cs,dir:../example/cs
+npx cfgforge -datadir ../example/config -gen cs,dir:../example/cs
 
 # 发布前必须重新构建
 pnpm -r build
@@ -391,7 +391,7 @@ pnpm -r build
 cd cfgeditor
 
 # 启动服务模式
-npx cfggen -datadir ../example/config -gen server,watch=1
+npx cfgforge -datadir ../example/config -gen server,watch=1
 
 # 启动前端开发服务器
 pnpm run dev
@@ -417,7 +417,7 @@ genjava.bat && run.bat
 
 ```bash
 # 启动 MCP 服务（端口 3457）
-npx cfggen -datadir example/config -gen mcpserver
+npx cfgforge -datadir example/config -gen mcpserver
 
 # AI 工具可调用：SchemaTool, ReadRecordTool, WriteRecordTool, SearchTool
 ```
@@ -428,14 +428,14 @@ npx cfggen -datadir example/config -gen mcpserver
 
 ```bash
 # 打印每步耗时和内存
-npx cfggen -datadir config -gen java -p
+npx cfgforge -datadir config -gen java -p
 
 # 更稳定的内存数（先 gc）
-npx cfggen -datadir config -gen java -pp
+npx cfgforge -datadir config -gen java -pp
 
 # 详细统计
-npx cfggen -datadir config -gen java -v    # verbose
-npx cfggen -datadir config -gen java -vv   # very verbose
+npx cfgforge -datadir config -gen java -v    # verbose
+npx cfgforge -datadir config -gen java -vv   # very verbose
 ```
 
 > 关键原则：看 `-p` 的工作秒/分配量，不要看墙上时间（server 场景噪声 ±50%）。
@@ -444,16 +444,16 @@ npx cfggen -datadir config -gen java -vv   # very verbose
 
 ```bash
 # 校验配置引用完整性
-npx cfggen -datadir config -gen verify
+npx cfgforge -datadir config -gen verify
 
 # 搜索配置
-npx cfggen -datadir config -gen search
+npx cfgforge -datadir config -gen search
 
 # 关闭警告
-npx cfggen -datadir config -gen java -nowarn
+npx cfgforge -datadir config -gen java -nowarn
 
 # 显示弱警告
-npx cfggen -datadir config -gen java -weakwarn
+npx cfgforge -datadir config -gen java -weakwarn
 ```
 
 错误分三级：
@@ -475,7 +475,7 @@ Context 构造时比较 schema 与 alignedSchema：
 
 ```bash
 # 启动服务模式
-npx cfggen -datadir example/config -gen server,watch=1
+npx cfgforge -datadir example/config -gen server,watch=1
 
 # 直接调用 API
 curl http://localhost:3456/schemas

@@ -5,7 +5,7 @@
  */
 
 import * as path from 'path';
-import { getCodeName } from '@cfggen/shared';
+import { getCodeName } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------
 // FileFmt
@@ -142,4 +142,4 @@ function subTableNameIfJsonDir(dirName: string): string | null {
 // These are re-exported from shared, but DataUtil in Java had them inline.
 // Importing directly from shared would create a circular dependency,
 // so we re-implement the minimal check here.
-import { isFirstNotAzChar, findFirstHanIndex } from '@cfggen/shared';
+import { isFirstNotAzChar, findFirstHanIndex } from '@cfgforge/shared';

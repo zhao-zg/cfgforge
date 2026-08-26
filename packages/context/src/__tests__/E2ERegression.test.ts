@@ -14,7 +14,7 @@ import { describe, it, expect } from 'vitest';
 import * as path from 'path';
 import * as fs from 'fs';
 import { Context } from '../Context';
-import type { CfgValue, VTable } from '@cfggen/value';
+import type { CfgValue, VTable } from '@cfgforge/value';
 
 const REPO_ROOT = path.resolve(__dirname, '..', '..', '..', '..');
 const EXAMPLE_CONFIG_DIR = path.join(REPO_ROOT, 'example', 'config');

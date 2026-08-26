@@ -24,15 +24,15 @@ import {
   type StructRef,
   type FList as FListType,
   type FMap as FMapType,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import type {
   ForeignKeySchema,
   KeySchema,
   TableSchema,
   Structural,
-} from '@cfggen/schema';
-import { upper1, lower1, removeLineSep } from '@cfggen/shared';
-import type { VTable } from '@cfggen/value';
+} from '@cfgforge/schema';
+import { upper1, lower1, removeLineSep } from '@cfgforge/shared';
+import type { VTable } from '@cfgforge/value';
 
 import { GoName } from './GoName';
 import { GoStructModel } from './GoStructModel';

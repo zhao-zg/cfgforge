@@ -1,5 +1,5 @@
 {
-  "name": "@cfggen/schema",
+  "name": "@cfgforge/schema",
   "type": "module",
   "version": "0.1.0",
   "scripts": {
@@ -8,7 +8,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@cfggen/shared": "workspace:*",
+    "@cfgforge/shared": "workspace:*",
     "fast-xml-parser": "^5.11.0"
   },
   "main": "./src/index.ts",

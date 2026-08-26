@@ -14,13 +14,13 @@
  * - No concurrency (TS single-threaded; Java used LongAdder for counters)
  */
 
-import type { Structural } from '@cfggen/schema';
-import { FList, FMap, StructRef } from '@cfggen/schema';
-import type { VTable, Value, CompositeValue } from '@cfggen/value';
+import type { Structural } from '@cfgforge/schema';
+import { FList, FMap, StructRef } from '@cfgforge/schema';
+import type { VTable, Value, CompositeValue } from '@cfgforge/value';
 import {
   VStruct, VInterface, VList, VMap,
-} from '@cfggen/value';
-import { TextValue } from '@cfggen/value';
+} from '@cfgforge/value';
+import { TextValue } from '@cfgforge/value';
 import type { LuaAContext } from './LuaAContext';
 import { LuaCtxName } from './LuaName';
 

@@ -15,12 +15,12 @@
 
 import * as path from 'path';
 
-import { CachedFiles, Logger, upper1, getDefaultFileSystem } from '@cfggen/shared';
-import type { Context } from '@cfggen/context';
-import type { CfgValue } from '@cfggen/value';
-import type { CfgSchema } from '@cfggen/schema';
-import type { Nameable } from '@cfggen/schema';
-import type { LangSwitchable } from '@cfggen/i18n';
+import { CachedFiles, Logger, upper1, getDefaultFileSystem } from '@cfgforge/shared';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue } from '@cfgforge/value';
+import type { CfgSchema } from '@cfgforge/schema';
+import type { Nameable } from '@cfgforge/schema';
+import type { LangSwitchable } from '@cfgforge/i18n';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 import { genConfig } from './tsTemplates';

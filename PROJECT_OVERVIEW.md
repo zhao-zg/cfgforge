@@ -3,19 +3,19 @@ AIGC:
   ContentProducer: '001191110102MAD55U9H0F10002'
   ContentPropagator: '001191110102MAD55U9H0F10002'
   Label: '1'
-  ProduceID: '21da6a05-e9da-44b1-9423-7ec74ad90d7b'
-  PropagateID: '21da6a05-e9da-44b1-9423-7ec74ad90d7b'
-  ReservedCode1: 'b3f2acf5-2e97-4d7f-a88f-6eefecdd3f04'
-  ReservedCode2: 'b3f2acf5-2e97-4d7f-a88f-6eefecdd3f04'
+  ProduceID: '38dd05aa-e176-4cda-8448-bf1705ac347e'
+  PropagateID: '38dd05aa-e176-4cda-8448-bf1705ac347e'
+  ReservedCode1: '8f104a58-90e3-4260-b4d3-1de38cf505f6'
+  ReservedCode2: '8f104a58-90e3-4260-b4d3-1de38cf505f6'
 ---
 
-# cfggen 策划配表系统 — 项目总览架构文档
+# cfgforge 策划配表系统 — 项目总览架构文档
 
-> 本文档从全局视角介绍 cfggen 项目：四个组件如何协作、数据如何流转、系统全景架构。适合新成员快速建立心智模型，也可作为项目交接参考。
+> 本文档从全局视角介绍 cfgforge 项目：四个组件如何协作、数据如何流转、系统全景架构。适合新成员快速建立心智模型，也可作为项目交接参考。
 
 ## 1. 项目定位
 
-cfggen 是一个**配置定义驱动**的多语言代码生成器，面向游戏开发团队解决以下问题：
+cfgforge 是一个**配置定义驱动**的多语言代码生成器，面向游戏开发团队解决以下问题：
 
 - 策划在 Excel/CSV/JSON 中维护配置数据
 - 程序需要类型安全的代码来访问这些配置
@@ -33,11 +33,11 @@ cfggen 是一个**配置定义驱动**的多语言代码生成器，面向游戏
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│                        cfggen 策划配表系统                         │
+│                        cfgforge 策划配表系统                         │
 │                                                                    │
 │  ┌─────────────┐   ┌──────────────┐   ┌───────────┐   ┌─────────┐ │
 │  │  packages/  │   │  cfgeditor/  │   │  cfgdev/  │   │  docs/  │ │
-│  │  (cfggen)   │   │  (编辑器)     │   │ (开发工具) │   │ (文档站) │ │
+│  │  (cfgforge)   │   │  (编辑器)     │   │ (开发工具) │   │ (文档站) │ │
 │  │             │   │              │   │           │   │         │ │
 │  │ TypeScript  │   │ React 19+TS  │   │ Claude插件 │   │ Astro+  │ │
 │  │ pnpm        │   │ Tauri桌面    │   │ VSCode扩展 │   │ Starlight│ │
@@ -53,7 +53,7 @@ cfggen 是一个**配置定义驱动**的多语言代码生成器，面向游戏
 
 | 组件 | 目录 | 技术栈 | 职责 | 规模 |
 |---|---|---|---|---|
-| **cfggen** | `packages/` | TypeScript, pnpm | 核心生成器：从 .cfg schema + Excel/CSV/JSON → 6+ 语言代码/数据 | TypeScript monorepo |
+| **cfgforge** | `packages/` | TypeScript, pnpm | 核心生成器：从 .cfg schema + Excel/CSV/JSON → 6+ 语言代码/数据 | TypeScript monorepo |
 | **cfgeditor** | `cfgeditor/` | React 19 + TypeScript + Tauri | 可视化浏览器/编辑器：浏览+编辑表结构和记录 | 8 目录分层架构 |
 | **cfgdev** | `cfgdev/` | Claude Code 插件 + VSCode 扩展 | 开发工具集：自然语言生成 schema + .cfg 语法高亮 | 2 个子项目 |
 | **docs** | `docs/` | Astro + Starlight | 用户文档站点（在线部署） | 含语法/CLI/编辑器/AI 文档 |
@@ -63,24 +63,24 @@ cfggen 是一个**配置定义驱动**的多语言代码生成器，面向游戏
 ```mermaid
 flowchart TB
     subgraph 策划工作流
-        EXCEL["Excel/CSV/JSON<br/>配置数据"] --> CFGGEN
+        EXCEL["Excel/CSV/JSON<br/>配置数据"] --> CFGFORGE
         EDITOR["cfgeditor.exe<br/>可视化编辑器"]
-        EDITOR -->|"HTTP REST :3456"| SERVER["cfggen -gen server<br/>编辑器后端服务"]
+        EDITOR -->|"HTTP REST :3456"| SERVER["cfgforge -gen server<br/>编辑器后端服务"]
         SERVER --> EXCEL
     end
 
     subgraph 程序工作流
-        CFG[".cfg schema 定义"] --> CFGGEN["npx cfggen<br/>命令行生成器"]
-        EXCEL --> CFGGEN
-        CFGGEN -->|"生成"| CODE["Java/C#/TS/Go/Lua/GD<br/>读表代码"]
-        CFGGEN -->|"生成"| BYTES["config.bytes<br/>二进制数据"]
-        CFGGEN -->|"生成"| JSON_OUT["JSON 数据"]
+        CFG[".cfg schema 定义"] --> CFGFORGE["npx cfgforge<br/>命令行生成器"]
+        EXCEL --> CFGFORGE
+        CFGFORGE -->|"生成"| CODE["Java/C#/TS/Go/Lua/GD<br/>读表代码"]
+        CFGFORGE -->|"生成"| BYTES["config.bytes<br/>二进制数据"]
+        CFGFORGE -->|"生成"| JSON_OUT["JSON 数据"]
     end
 
     subgraph AI 工作流
-        AI["AI / Claude Code"] -->|"MCP :3457"| MCP["cfggen -gen mcpserver<br/>MCP 服务"]
+        AI["AI / Claude Code"] -->|"MCP :3457"| MCP["cfgforge -gen mcpserver<br/>MCP 服务"]
         MCP --> EXCEL
-        CLAUDE_PLUGIN["cfggen-architect<br/>Claude 插件"] --> CFG
+        CLAUDE_PLUGIN["cfgforge-architect<br/>Claude 插件"] --> CFG
     end
 
     subgraph 开发者工作流
@@ -131,7 +131,7 @@ flowchart TB
 
 ## 3. 核心组件详解
 
-### 3.1 packages/ — cfggen 核心生成器
+### 3.1 packages/ — cfgforge 核心生成器
 
 #### 技术栈
 
@@ -288,7 +288,7 @@ cfgeditor 是**瘦前端**，所有数据来自 TypeScript editor-core（直接 
 
 | 子项目 | 技术 | 功能 |
 |---|---|---|
-| `cfggen-architect` (skills/) | Claude Code 插件 | 根据自然语言生成 .cfg schema、数据（.cfg/csv/json） |
+| `cfgforge-architect` (skills/) | Claude Code 插件 | 根据自然语言生成 .cfg schema、数据（.cfg/csv/json） |
 | `cfg-support` (vscode-cfg-extension/) | VSCode 扩展 | .cfg 文件语法高亮、跳转定义、大纲视图 |
 
 ### 3.4 docs/ — 用户文档站点
@@ -345,23 +345,23 @@ cfgeditor 是**瘦前端**，所有数据来自 TypeScript editor-core（直接 
 ### 场景 1：生成 Java 读表代码
 
 ```bash
-npx cfggen -datadir example/config -gen java,dir:example/java
+npx cfgforge -datadir example/config -gen java,dir:example/java
 ```
 
 ### 场景 2：生成多语言客户端 + 服务端
 
 ```bash
 # C# 服务端（包含所有语言文本）
-npx cfggen -datadir example/config -langswitchdir i18n -gen cs,dir:example/cs_ls
+npx cfgforge -datadir example/config -langswitchdir i18n -gen cs,dir:example/cs_ls
 
 # C# 客户端（运行时切换语言）
-npx cfggen -datadir example/config -langswitchdir i18n -gen cs,dir:example/cs_ls_client
+npx cfgforge -datadir example/config -langswitchdir i18n -gen cs,dir:example/cs_ls_client
 ```
 
 ### 场景 3：CI 校验配置完整性
 
 ```bash
-npx cfggen -datadir config -gen verify
+npx cfgforge -datadir config -gen verify
 # 有引用错误则非零退出码，CI 失败
 ```
 
@@ -369,7 +369,7 @@ npx cfggen -datadir config -gen verify
 
 ```bash
 # 终端 1：启动后端
-npx cfggen -datadir example/config -gen server,watch=1
+npx cfgforge -datadir example/config -gen server,watch=1
 
 # 终端 2：启动前端
 cd cfgeditor && pnpm run dev
@@ -379,7 +379,7 @@ cd cfgeditor && pnpm run dev
 ### 场景 5：生成二进制发布数据
 
 ```bash
-npx cfggen -datadir config -gen bytes,schema -gen java,dir:src
+npx cfgforge -datadir config -gen bytes,schema -gen java,dir:src
 # 产出 config.bytes（含 schema 自描述）+ Java 读取代码
 ```
 
@@ -402,7 +402,7 @@ npx cfggen -datadir config -gen bytes,schema -gen java,dir:src
 | 本文档（项目总览） | `PROJECT_OVERVIEW.md` | 所有人 |
 | 开发者入门指南 | `DEVELOPER_GUIDE.md` | 新开发者 |
 | 代码架构文档 | `CODE_ARCHITECTURE.md` | 开发者（代码导航） |
-| cfggen 源码设计系列 | `packages/ 对应文档` | cfggen TypeScript 开发者 |
+| cfgforge 源码设计系列 | `packages/ 对应文档` | cfgforge TypeScript 开发者 |
 | cfgeditor 源码设计系列 | `cfgeditor/docs/01-09` | cfgeditor 前端开发者 |
 | 用户文档站 | `docs/src/content/docs/` | 最终用户（策划/程序） |
 | CLAUDE.md | 各子目录根 | AI 辅助开发速查 |

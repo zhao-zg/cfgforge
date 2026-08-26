@@ -27,8 +27,8 @@
  * CfgValueStat: tracks JSON file last-modified times for cfgeditor (copy-on-write).
  */
 
-import { DCell, DCellList, type Source } from '@cfggen/data';
-import type { Structural, InterfaceSchema, TableSchema, CfgSchema } from '@cfggen/schema';
+import { DCell, DCellList, type Source } from '@cfgforge/data';
+import type { Structural, InterfaceSchema, TableSchema, CfgSchema } from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Value interfaces (TS "sealed" simulation via abstract classes + instanceof)

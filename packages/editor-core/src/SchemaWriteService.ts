@@ -24,8 +24,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { CfgReader, ParseError, CfgSchemaException, CfgSchemaErrs } from '@cfggen/schema';
-import { getDefaultFileSystem } from '@cfggen/shared';
+import { CfgReader, ParseError, CfgSchemaException, CfgSchemaErrs } from '@cfgforge/schema';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import type { EditorService } from './EditorService';
 
 // Re-import fs for readSchemaText (reads from disk, not cached content)

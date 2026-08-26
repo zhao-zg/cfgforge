@@ -28,17 +28,17 @@ import {
   type StructRef,
   StructSchema,
   InterfaceSchema,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 import type {
   Structural,
   Nameable,
   FieldSchema,
   ForeignKeySchema,
   KeySchema,
-} from '@cfggen/schema';
-import { isRefList, type RefSimple } from '@cfggen/schema';
-import { upper1, lower1 } from '@cfggen/shared';
-import type { VTable } from '@cfggen/value';
+} from '@cfgforge/schema';
+import { isRefList, type RefSimple } from '@cfgforge/schema';
+import { upper1, lower1 } from '@cfgforge/shared';
+import type { VTable } from '@cfgforge/value';
 import type { GoCodeGenerator } from './GoCodeGenerator';
 import { GoName } from './GoName';
 

@@ -16,7 +16,7 @@
 
 import { XMLParser } from 'fast-xml-parser';
 import * as path from 'path';
-import { Logger } from '@cfggen/shared';
+import { Logger } from '@cfgforge/shared';
 import { CfgSchema } from '../CfgSchema';
 import { CfgUtil } from './CfgUtil';
 import type { CfgFileInfo } from '../CfgSchemas';

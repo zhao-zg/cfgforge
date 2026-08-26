@@ -16,7 +16,7 @@ import {
   VStruct, VInterface, VList, VMap,
   type Value, type SimpleValue,
 } from '../CfgValue';
-import { DFile } from '@cfggen/data';
+import { DFile } from '@cfgforge/data';
 import {
   Primitive, FList, FMap, StructRef,
   StructSchema, InterfaceSchema,
@@ -24,7 +24,7 @@ import {
   AutoOrPack,
   type Nameable, type Structural,
   ENo, KeySchema,
-} from '@cfggen/schema';
+} from '@cfgforge/schema';
 
 // ---------------------------------------------------------------------------
 // Helpers: create minimal schema objects for testing

@@ -16,14 +16,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
-import { CachedFiles, Logger, upper1 } from '@cfggen/shared';
-import type { Context } from '@cfggen/context';
-import type { CfgValue } from '@cfggen/value';
-import type { CfgSchema } from '@cfggen/schema';
-import { StructSchema, InterfaceSchema } from '@cfggen/schema';
-import type { TableSchema } from '@cfggen/schema';
-import type { VTable } from '@cfggen/value';
-import type { LangSwitchable } from '@cfggen/i18n';
+import { CachedFiles, Logger, upper1 } from '@cfgforge/shared';
+import type { Context } from '@cfgforge/context';
+import type { CfgValue } from '@cfgforge/value';
+import type { CfgSchema } from '@cfgforge/schema';
+import { StructSchema, InterfaceSchema } from '@cfgforge/schema';
+import type { TableSchema } from '@cfgforge/schema';
+import type { VTable } from '@cfgforge/value';
+import type { LangSwitchable } from '@cfgforge/i18n';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
 import { CsStructModel } from './CsStructModel';

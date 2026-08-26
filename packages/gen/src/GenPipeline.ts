@@ -14,8 +14,8 @@
  *   finalExit)
  */
 
-import type { Context } from '@cfggen/context';
-import { CachedFiles, Logger } from '@cfggen/shared';
+import type { Context } from '@cfgforge/context';
+import { CachedFiles, Logger } from '@cfgforge/shared';
 import type { Generator } from './Generator';
 
 export const GenPipeline = {

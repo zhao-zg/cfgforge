@@ -11,11 +11,10 @@ import type { Nameable } from './Nameable';
 import type { Fieldable } from './Fieldable';
 import type { Structural } from './Structural';
 import type { FieldSchema } from './FieldSchema';
-import type { FieldType, SimpleType } from './FieldType';
-import { Primitive, isStructRef, isFList, isFMap, isPrimitive } from './FieldType';
+import type { SimpleType } from './FieldType';
+import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType';
 import type { FieldFormat } from './FieldFormat';
-import { AutoOrPack, Sep, Block, Fix, isSep, isBlock, isFix } from './FieldFormat';
-import type { Metadata } from './Metadata';
+import { AutoOrPack, isSep, isBlock, isFix } from './FieldFormat';
 import { isMetaInt } from './Metadata';
 import { StructSchema } from './StructSchema';
 import { TableSchema } from './TableSchema';
@@ -44,7 +43,7 @@ export function preCalculateAllNeededSpans(cfgSchema: CfgSchema, errs: CfgSchema
       }
     } catch (e) {
       if (e instanceof StructNestLoop) {
-        errs.addErr(Errs.mappingToExcelLoop([...e.stack]));
+        errs.addErr(Errs.mappingToExcelLoop([...e.stackNames]));
       } else {
         throw e;
       }
@@ -57,11 +56,11 @@ export function preCalculateAllNeededSpans(cfgSchema: CfgSchema, errs: CfgSchema
 // ---------------------------------------------------------------------------
 
 class StructNestLoop extends Error {
-  readonly stack: Set<string>;
+  readonly stackNames: Set<string>;
   constructor(stack: Set<string>) {
     super('StructNestLoop');
     this.name = 'StructNestLoop';
-    this.stack = stack;
+    this.stackNames = stack;
   }
 }
 

@@ -36,8 +36,8 @@ import {
   SchemaAst, StructDeclAst, InterfaceDeclAst, TableDeclAst, EnumDeclAst,
   FieldDeclAst, ForeignDeclAst, KeyDeclAst, EnumValueEmptyAst, EnumValueAssignedAst,
   FieldTypeAst, FieldTypeEleAst, MetadataAst, MetaEntryAst, MetaValueAst,
-  RefAst, KeyAst, CommentData,
-  commentFromFull, commentFromLeadingTrailing, emptyComment,
+  RefAst, KeyAst,
+  commentFromFull, commentFromLeadingTrailing,
 } from './AstNode';
 
 export class ParseError extends Error {
@@ -409,13 +409,10 @@ export class CfgParser {
   // foreign_decl: leading_comment* REF identifier COLON key ref metadata SEMI_COMMENT
   private parseForeignDecl(leadingComments: Token[]): ForeignDeclAst {
     // REF (-> or =>)
-    let isListRef: boolean;
     if (this.check(TokenType.REF)) {
       this.advance();
-      isListRef = false;
     } else {
       this.expect(TokenType.LISTREF);
-      isListRef = true;
     }
 
     const name = this.parseIdentifier();
@@ -620,7 +617,6 @@ export class CfgParser {
 
       // Check if it's assigned (identifier EQ) or empty (identifier SEMI_COMMENT)
       // We need lookahead: skip identifier, check if next is EQ or SEMI_COMMENT
-      const offset = valueLeadingComments.length; // already consumed comments
       const identToken = this.peek(0);
       if (!identToken) break;
 

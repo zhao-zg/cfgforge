@@ -6,7 +6,6 @@
  */
 
 import type { Nameable } from './Nameable';
-import type { Fieldable } from './Fieldable';
 import { StructSchema } from './StructSchema';
 import { TableSchema } from './TableSchema';
 import { InterfaceSchema } from './InterfaceSchema';

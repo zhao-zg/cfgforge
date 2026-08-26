@@ -16,7 +16,7 @@
  */
 
 import type { CfgSchema, TableSchema } from '@cfggen/schema';
-import type { CfgData, HeadRow, JsonTableFiles, DTable } from '@cfggen/data';
+import type { DTable } from '@cfggen/data';
 import { CfgValue, CfgValueStat, VTable } from './CfgValue';
 import { CfgValueErrs } from './CfgValueErrs';
 import { ValueEnv } from './ValueEnv';

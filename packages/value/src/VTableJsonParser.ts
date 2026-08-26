@@ -56,7 +56,7 @@ export class VTableJsonParser {
   parseTable(): VTable {
     const valueList: VStruct[] = [];
     const tableName = this.tableSchema.name();
-    const idMap = new Map<string, number>();
+    const idMap = new Map<string, bigint>();
     const jsonFiles: JsonFileInfo[] = this.jsonTableFiles.jsonFilesOf(tableName);
 
     for (const jf of jsonFiles) {
@@ -77,7 +77,7 @@ export class VTableJsonParser {
         valueList.push(vStruct);
         const pkValue: Value = ValueUtil.extractPrimaryKeyValue(vStruct, this.subTableSchema);
         const id = pkValue.packStr();
-        idMap.set(id, modified);
+        idMap.set(id, BigInt(modified));
       }
     }
 

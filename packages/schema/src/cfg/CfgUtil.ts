@@ -19,7 +19,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { CfgSchema } from '../CfgSchema';
-import type { Nameable } from '../Nameable';
 import { getCodeName, getDefaultFileSystem } from '@cfggen/shared';
 import type { CfgFileInfo } from '../CfgSchemas';
 

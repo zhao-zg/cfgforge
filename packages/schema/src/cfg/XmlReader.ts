@@ -30,7 +30,7 @@ import { EntryType, ENo, EEntry, EEnum } from '../EntryType';
 import { RefKey, RefPrimary, RefUniq, RefList } from '../RefKey';
 import { FieldType, Primitive, StructRef, FList, FMap, SimpleType } from '../FieldType';
 import { FieldFormat, AutoOrPack, Sep, Fix, Block } from '../FieldFormat';
-import { Metadata, Metadata_of, TAG, metaStr, metaInt } from '../Metadata';
+import { Metadata, Metadata_of, metaStr, metaInt } from '../Metadata';
 import { CommentData } from '../CommentData';
 import type { Fieldable } from '../Fieldable';
 import type { Nameable } from '../Nameable';

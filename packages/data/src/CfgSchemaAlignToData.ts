@@ -19,20 +19,16 @@ import {
   TableSchema,
   FieldSchema,
   KeySchema,
-  Metadata,
   Metadata_of,
   CommentData,
   ENo,
   EEntry,
   EEnum,
-  isENo,
   isEEntry,
   isEEnum,
   Primitive,
   AutoOrPack,
   Fix,
-  FList,
-  FMap,
   isFList,
   isFMap,
   fieldSpan,
@@ -41,10 +37,8 @@ import {
   copyFieldType,
   type ForeignKeySchema,
   type Nameable,
-  type Fieldable,
   type EntryType,
   type FieldType,
-  type FieldFormat,
 } from '@cfggen/schema';
 import type { HeadRow } from './HeadRows';
 
@@ -61,15 +55,8 @@ import {
 import type { DTable } from './DTable';
 import type { DField } from './DField';
 import type { CfgData } from './CfgData';
-import type { DRawSheet } from './DRawSheet';
 
-// Type guards for Nameable → Fieldable/TableSchema discrimination
-function isFieldable(item: Nameable): item is Fieldable {
-  return typeof (item as unknown as Fieldable).fmt === 'function'
-    && typeof (item as unknown as Fieldable).meta === 'function'
-    && typeof (item as unknown as Fieldable).fullName === 'function';
-}
-
+// Type guard: Nameable → TableSchema discrimination
 function isTableSchema(item: Nameable): item is TableSchema {
   return typeof (item as unknown as TableSchema).isJson === 'function'
     && typeof (item as unknown as TableSchema).primaryKey !== 'undefined';

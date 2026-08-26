@@ -20,7 +20,6 @@
 
 import {
   type Value,
-  type SimpleValue,
   VStruct,
   VInterface,
   VList,

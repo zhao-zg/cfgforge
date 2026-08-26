@@ -40,13 +40,13 @@ export class Watcher {
     if (this._watcher !== null) return;
 
     try {
-      this._watcher = fs.watch(this._rootDir, { recursive: true }, (eventType, filename) => {
+      this._watcher = fs.watch(this._rootDir, { recursive: true }, (_eventType, filename) => {
         if (filename === null || this._stopped) return;
         this.handleFileEvent(filename);
       });
     } catch (e) {
       // Fallback: non-recursive watch (some platforms)
-      this._watcher = fs.watch(this._rootDir, (eventType, filename) => {
+      this._watcher = fs.watch(this._rootDir, (_eventType, filename) => {
         if (filename === null || this._stopped) return;
         this.handleFileEvent(filename);
       });

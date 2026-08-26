@@ -30,7 +30,6 @@ import {
   RefId,
   valueEquals,
   type FieldRef,
-  type ForeachContext,
 } from '@cfggen/value';
 import type { TableSchemaRefGraph } from '@cfggen/schema';
 import { TableSchema } from '@cfggen/schema';
@@ -107,7 +106,7 @@ function refIdKey(r: RefId): string {
 /**
  * Remove a RefId from a Map<RefId, VStruct> using value-based equality.
  */
-function refIdMapDelete(map: Map<RefId, VStruct>, target: RefId): void {
+function refIdMapDelete<V>(map: Map<RefId, V>, target: RefId): void {
   const tk = refIdKey(target);
   for (const k of map.keys()) {
     if (refIdKey(k) === tk) {
@@ -115,17 +114,6 @@ function refIdMapDelete(map: Map<RefId, VStruct>, target: RefId): void {
       return;
     }
   }
-}
-
-/**
- * Check if a RefId is in a Set<RefId> using value-based equality.
- */
-function refIdSetHas(set: Set<RefId>, target: RefId): boolean {
-  const tk = refIdKey(target);
-  for (const k of set) {
-    if (refIdKey(k) === tk) return true;
-  }
-  return false;
 }
 
 // ---------------------------------------------------------------------------

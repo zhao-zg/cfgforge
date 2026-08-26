@@ -11,8 +11,6 @@
  * - We need to handle empty rows (Java fastexcel skips them; we use fillRows)
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
 import ExcelJS from 'exceljs';
 import { type DRawRow, EMPTY_ROW } from './DRawRow';
 import { DRawSheet } from './DRawSheet';
@@ -83,7 +81,6 @@ export async function readExcel(
 
     // Convert ExcelJS rows to DRawRow[]
     const rows: DRawRow[] = [];
-    let lastRowNumber = 0;
 
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       // rowNumber is 1-based; fill gaps with EMPTY_ROW
@@ -101,7 +98,6 @@ export async function readExcel(
       }
 
       rows.push(new DRawExcelRow(values));
-      lastRowNumber = rowNumber;
     });
 
     // Fix empty rows at end - if the sheet had rows but they were all empty after content
@@ -140,14 +136,14 @@ function cellToString(cell: ExcelJS.Cell): string {
     case ExcelJS.ValueType.Merge:
       return '';
     case ExcelJS.ValueType.RichText: {
-      const rt = cell.value as ExcelJS.CellRichText;
+      const rt = cell.value as ExcelJS.CellRichTextValue;
       return rt.richText.map((r) => r.text).join('');
     }
     case ExcelJS.ValueType.Hyperlink: {
       const hl = cell.value as ExcelJS.CellHyperlinkValue;
       if (typeof hl.text === 'string') return hl.text;
       if (typeof hl.text === 'object' && hl.text !== null) {
-        const rt = hl.text as ExcelJS.CellRichText;
+        const rt = hl.text as ExcelJS.CellRichTextValue;
         return rt.richText.map((r) => r.text).join('');
       }
       return String(hl.text ?? '');

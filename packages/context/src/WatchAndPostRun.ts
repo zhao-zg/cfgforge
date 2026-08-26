@@ -20,7 +20,6 @@
  */
 
 import { Context } from './Context';
-import type { DirectoryStructure } from './DirectoryStructure';
 import { Watcher } from './Watcher';
 import { WaitWatcher } from './WaitWatcher';
 

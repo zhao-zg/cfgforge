@@ -11,7 +11,7 @@
  * Java source: configgen.value.ValueToCsv.java (44 lines)
  */
 
-import { type Value, VStruct, VTable, type CfgValue } from './CfgValue';
+import { VStruct, VTable } from './CfgValue';
 import { ValueUtil } from './ValueUtil';
 import { writeCSV, type CSVRow } from '@cfggen/shared';
 import type { StringValue } from './CfgValue';

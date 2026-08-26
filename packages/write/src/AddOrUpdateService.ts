@@ -18,7 +18,7 @@
  */
 
 import type { Context } from '@cfggen/context';
-import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
+import type { CfgValue, Value } from '@cfggen/value';
 import { CfgValueErrs, ValueJsonParser, ValueUtil, valueEquals } from '@cfggen/value';
 import { VTableStorage, VTableJsonStorage, ValueUpdater } from './index';
 import { Logger } from '@cfggen/shared';

@@ -12,17 +12,15 @@
  * Java source: configgen.value.ValueJsonParser.java (377 lines)
  */
 
-import { DFile, type Source } from '@cfggen/data';
+import { DFile } from '@cfggen/data';
 import {
   type FieldType,
   type Nameable,
   type Structural,
-  type Fieldable,
   InterfaceSchema,
   Primitive,
   FList,
   FMap,
-  StructRef,
   isPrimitive,
   isStructRef,
   isFList,
@@ -43,7 +41,6 @@ import {
   VInterface,
   VList,
   VMap,
-  type CfgValueStat,
 } from './CfgValue';
 import {
   type CfgValueErrs,

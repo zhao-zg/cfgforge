@@ -19,7 +19,7 @@ import * as path from 'path';
 
 import type { CfgSchema } from '@cfggen/schema';
 import { CfgSchemas, CfgSchemaErrs, CfgSchemaResolver, CfgSchemaFilterByTag } from '@cfggen/schema';
-import type { CfgData, ExcelFileInfo, ReadResult } from '@cfggen/data';
+import type { CfgData, ReadResult } from '@cfggen/data';
 import { CfgDataReader, CfgSchemaAlignToData, FileFmt, readExcel, readCsv } from '@cfggen/data';
 import type { CfgValue } from '@cfggen/value';
 import { CfgValueParser, CfgValueErrs, ValueEnv } from '@cfggen/value';

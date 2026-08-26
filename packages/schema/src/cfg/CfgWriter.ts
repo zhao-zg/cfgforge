@@ -19,17 +19,15 @@ import type { ForeignKeySchema } from '../ForeignKeySchema';
 import type { KeySchema } from '../KeySchema';
 import type { Structural } from '../Structural';
 import type { FieldType, SimpleType } from '../FieldType';
-import { Primitive, FList, FMap, StructRef, isStructRef } from '../FieldType';
+import { Primitive, FList, FMap, isStructRef } from '../FieldType';
 import type { FieldFormat } from '../FieldFormat';
-import { AutoOrPack, isSep, isFix, isBlock } from '../FieldFormat';
 import type { Metadata, MetaValue } from '../Metadata';
 import { Metadata_of } from '../Metadata';
 import {
-  isMetaTag, isMetaInt, isMetaFloat, isMetaStr, isMetaEnumValues, isMetaComment,
+  isMetaTag, isMetaInt, isMetaFloat, isMetaStr,
 } from '../Metadata';
 import { CommentData } from '../CommentData';
 import { isRefPrimary, isRefUniq, isRefList } from '../RefKey';
-import { ENo, isENo, isEEntry, isEEnum } from '../EntryType';
 import type { MetaEnumValues } from '../Metadata';
 
 // ---------------------------------------------------------------------------

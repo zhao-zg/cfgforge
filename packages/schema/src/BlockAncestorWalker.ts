@@ -13,7 +13,7 @@ import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType';
 import { AutoOrPack, isSep, isBlock } from './FieldFormat';
 import { StructSchema } from './StructSchema';
 import { InterfaceSchema } from './InterfaceSchema';
-import { fieldSpan, simpleTypeSpan, span } from './Span';
+import { fieldSpan, simpleTypeSpan } from './Span';
 
 export interface BlockFieldVisitor {
   onBlockField(structural: Structural, field: FieldSchema, startCol: number, outerAncestors: Set<number>): void;
@@ -108,4 +108,3 @@ function concatSorted(base: Set<number>, add: number): Set<number> {
 }
 
 // Need span for walkFieldable
-import type { Nameable } from './Nameable';

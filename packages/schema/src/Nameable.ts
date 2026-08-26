@@ -8,7 +8,6 @@
 
 import type { FieldFormat } from './FieldFormat';
 import type { Metadata } from './Metadata';
-import type { CommentData } from './CommentData';
 
 export interface Nameable {
   name(): string;

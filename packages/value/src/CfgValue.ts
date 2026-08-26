@@ -27,7 +27,7 @@
  * CfgValueStat: tracks JSON file last-modified times for cfgeditor (copy-on-write).
  */
 
-import { DCell, DFile, DCellList, type Source } from '@cfggen/data';
+import { DCell, DCellList, type Source } from '@cfggen/data';
 import type { Structural, InterfaceSchema, TableSchema, CfgSchema } from '@cfggen/schema';
 
 // ---------------------------------------------------------------------------
@@ -105,7 +105,7 @@ export abstract class CompositeValue {
 /**
  * Boolean value. hashCode: 1 (true) or 0 (false).
  */
-export class VBool implements PrimitiveValue {
+export class VBool {
   readonly value: boolean;
   readonly source: Source;
 
@@ -136,7 +136,7 @@ export class VBool implements PrimitiveValue {
 /**
  * 32-bit integer value. hashCode === value.
  */
-export class VInt implements PrimitiveValue {
+export class VInt {
   readonly value: number;
   readonly source: Source;
 
@@ -169,7 +169,7 @@ export class VInt implements PrimitiveValue {
  * hashCode: (int)(value ^ (value >>> 32)) — for values fitting in 32 bits,
  * this is just the low 32 bits.
  */
-export class VLong implements PrimitiveValue {
+export class VLong {
   readonly value: bigint;
   readonly source: Source;
 
@@ -206,7 +206,7 @@ export class VLong implements PrimitiveValue {
  * Float value. `repr()` preserves the original cell string to avoid
  * floating-point precision loss.
  */
-export class VFloat implements PrimitiveValue {
+export class VFloat {
   readonly value: number;
   readonly source: Source;
 
@@ -258,7 +258,7 @@ export class VFloat implements PrimitiveValue {
 /**
  * Immutable string value.
  */
-export class VString implements StringValue {
+export class VString {
   readonly value: string;
   readonly source: Source;
 
@@ -295,7 +295,7 @@ export class VString implements StringValue {
  * `value` defaults to `original`; after `setTranslated(nonEmpty)`, value
  * becomes the translated text.
  */
-export class VText implements StringValue {
+export class VText {
   readonly original: string;
   readonly source: Source;
   private _value: string;
@@ -359,7 +359,7 @@ export class VText implements StringValue {
  * equals uses schema reference equality (===) to prevent dynamic struct schemas
  * from being used for lookups.
  */
-export class VStruct extends CompositeValue implements SimpleValue {
+export class VStruct extends CompositeValue {
   readonly schema: Structural;
   readonly values: Value[];
   private _note?: string;
@@ -423,7 +423,7 @@ export class VStruct extends CompositeValue implements SimpleValue {
  * An interface value: interface schema + child struct (the implementation).
  * equals uses schema reference equality (===).
  */
-export class VInterface extends CompositeValue implements SimpleValue {
+export class VInterface extends CompositeValue {
   readonly schema: InterfaceSchema;
   readonly child: VStruct;
 
@@ -463,7 +463,7 @@ export class VInterface extends CompositeValue implements SimpleValue {
 // VList — a list value (list of SimpleValues)
 // ---------------------------------------------------------------------------
 
-export class VList extends CompositeValue implements ContainerValue {
+export class VList extends CompositeValue {
   readonly valueList: SimpleValue[];
 
   constructor(valueList: SimpleValue[], source: Source) {
@@ -490,7 +490,7 @@ export class VList extends CompositeValue implements ContainerValue {
 // VMap — a map value (Map<SimpleValue, SimpleValue>)
 // ---------------------------------------------------------------------------
 
-export class VMap extends CompositeValue implements ContainerValue {
+export class VMap extends CompositeValue {
   readonly valueMap: Map<SimpleValue, SimpleValue>;
   private _entryEmbeds?: Map<SimpleValue, boolean>;
   private _foldedEntries?: Set<SimpleValue>;

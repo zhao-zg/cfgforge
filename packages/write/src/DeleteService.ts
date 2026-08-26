@@ -21,7 +21,7 @@
  */
 
 import type { Context } from '@cfggen/context';
-import type { CfgValue, VTable, Value, VStruct } from '@cfggen/value';
+import type { CfgValue, Value, VStruct } from '@cfggen/value';
 import { CfgValueErrs, ValuePack, valueEquals } from '@cfggen/value';
 import { VTableStorage, VTableJsonStorage, ValueUpdater } from './index';
 import { Logger } from '@cfggen/shared';

@@ -104,19 +104,19 @@ export function isMetaTag(v: MetaValue | undefined): v is MetaTag {
 }
 
 export function isMetaInt(v: MetaValue | undefined): v is MetaInt {
-  return v !== undefined && typeof v === 'object' && v !== null && (v as Record<string, unknown>)._tag === 'MetaInt';
+  return v !== undefined && typeof v === 'object' && v !== null && (v as { _tag: string })._tag === 'MetaInt';
 }
 
 export function isMetaFloat(v: MetaValue | undefined): v is MetaFloat {
-  return v !== undefined && typeof v === 'object' && v !== null && (v as Record<string, unknown>)._tag === 'MetaFloat';
+  return v !== undefined && typeof v === 'object' && v !== null && (v as { _tag: string })._tag === 'MetaFloat';
 }
 
 export function isMetaStr(v: MetaValue | undefined): v is MetaStr {
-  return v !== undefined && typeof v === 'object' && v !== null && (v as Record<string, unknown>)._tag === 'MetaStr';
+  return v !== undefined && typeof v === 'object' && v !== null && (v as { _tag: string })._tag === 'MetaStr';
 }
 
 export function isMetaComment(v: MetaValue | undefined): v is MetaComment {
-  return v !== undefined && typeof v === 'object' && v !== null && (v as Record<string, unknown>)._tag === 'MetaComment';
+  return v !== undefined && typeof v === 'object' && v !== null && (v as { _tag: string })._tag === 'MetaComment';
 }
 
 export function isMetaEnumValues(v: MetaValue | undefined): v is MetaEnumValues {
@@ -124,7 +124,7 @@ export function isMetaEnumValues(v: MetaValue | undefined): v is MetaEnumValues 
     v !== undefined &&
     typeof v === 'object' &&
     v !== null &&
-    ((v as Record<string, unknown>)._tag === 'OfEmpty' || (v as Record<string, unknown>)._tag === 'OfAssigned')
+    ((v as { _tag: string })._tag === 'OfEmpty' || (v as { _tag: string })._tag === 'OfAssigned')
   );
 }
 
@@ -390,12 +390,12 @@ export class Metadata {
   // --- Entry type (putFirst) ---
 
   putEntry(entry: EntryType): void {
-    if (isENo(entry)) {
-      // ENo → store nothing
-    } else if (isEEntry(entry)) {
+    if (isEEntry(entry)) {
       this.putFirst(ENTRY, metaStr(entry.field));
     } else if (isEEnum(entry)) {
       this.putFirst(ENUM, metaStr(entry.field));
+    } else if (isENo(entry)) {
+      // ENo → store nothing
     }
   }
 

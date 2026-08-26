@@ -8,7 +8,6 @@ import type { Nameable } from './Nameable';
 import { StructSchema } from './StructSchema';
 import { TableSchema } from './TableSchema';
 import type { Structural } from './Structural';
-import type { FieldFormat } from './FieldFormat';
 import { isBlock } from './FieldFormat';
 import { isMetaInt } from './Metadata';
 import { foreachNameable } from './ForeachSchema';

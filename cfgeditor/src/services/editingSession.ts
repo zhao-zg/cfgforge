@@ -92,7 +92,7 @@ export class EditingSession {
         this.fitViewToIdPosition = undefined;
         // 首次初始化（构造期，纯字段赋值，不 bump/emit/onStructureChange：首帧 useMemo 本就会跑，
         // 此时还没有订阅者）。notify 由 Record 的 effect 负责。
-        const obj = prepareEditingObject(recordResult.object);
+        const obj = prepareEditingObject(recordResult.object as JSONObject);
         this.table = recordResult.table;
         this.id = recordResult.id;
         this.originalEditingObject = structuredClone(obj);
@@ -157,7 +157,7 @@ export class EditingSession {
     maybeReset(recordResult: RecordResult): void {
         const newTable = recordResult.table;
         const newId = recordResult.id;
-        const newObj = prepareEditingObject(recordResult.object);
+        const newObj = prepareEditingObject(recordResult.object as JSONObject);
 
         if (newTable === this.table && newId === this.id
             && isDeeplyEqual(this.originalEditingObject, newObj)) {

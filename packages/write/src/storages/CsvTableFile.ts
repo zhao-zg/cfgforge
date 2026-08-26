@@ -15,7 +15,6 @@
  *   ColumnModeCsvTableFile.java (98 lines)
  */
 
-import * as path from 'path';
 import { readAndNormalizeCSV, writeCSVToFile, type CSVRow } from '@cfggen/shared';
 import type { RecordBlockTransformed } from '../RecordBlock';
 import type { TableFile } from '../TableFile';

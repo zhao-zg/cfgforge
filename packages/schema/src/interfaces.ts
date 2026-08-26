@@ -6,5 +6,5 @@
  * This file provides a single import point for Fieldable and Structural.
  */
 
-export { Fieldable } from './Fieldable';
-export { Structural } from './Structural';
+export type { Fieldable } from './Fieldable';
+export type { Structural } from './Structural';

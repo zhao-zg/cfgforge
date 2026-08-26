@@ -20,8 +20,6 @@
  *   ColumnModeExcelTableFile.java (89 lines)
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
 import ExcelJS from 'exceljs';
 import type { RecordBlockTransformed } from '../RecordBlock';
 import type { TableFile } from '../TableFile';

@@ -3,8 +3,11 @@
  *
  * A per-language text finder that holds translation data for multiple tables.
  * Full implementation (reading from disk, TextByIdFinder, TextByValueFinder)
- * is Phase 5. This module defines the interfaces and a minimal stub class
- * that the value layer can depend on without waiting for Phase 5.
+ * is in @cfggen/i18n (Phase 5).
+ *
+ * This module defines the interfaces that the value layer can depend on
+ * without waiting for Phase 5. The i18n package's LangTextFinder class
+ * structurally satisfies this interface.
  *
  * Java source: configgen.i18n.LangTextFinder.java (50 lines)
  */
@@ -41,23 +44,11 @@ export interface TextFinder {
 /**
  * Maps table name → TextFinder.
  * Java extends TreeMap<String, TextFinder> (sorted); TS uses Map.
+ *
+ * Defined as an interface so the i18n package's class can structurally
+ * satisfy it without private-field nominal incompatibility.
  */
-export class LangTextFinder {
-  private readonly _map: Map<string, TextFinder> = new Map();
-
-  getTextFinder(table: string): TextFinder | null {
-    return this._map.get(table) ?? null;
-  }
-
-  setTextFinder(table: string, finder: TextFinder): void {
-    this._map.set(table, finder);
-  }
-
-  /**
-   * Read a LangTextFinder from a path.
-   * Full implementation is in Phase 5 (TextByIdFinder / TextByValueFinder).
-   */
-  static read(_path: string): LangTextFinder {
-    throw new Error('LangTextFinder.read() not yet implemented (Phase 5)');
-  }
+export interface LangTextFinder {
+  getTextFinder(table: string): TextFinder | null;
+  setTextFinder(table: string, finder: TextFinder): void;
 }

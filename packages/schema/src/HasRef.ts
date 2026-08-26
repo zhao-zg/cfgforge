@@ -7,13 +7,13 @@
 import type { CfgSchema } from './CfgSchema';
 import type { Nameable } from './Nameable';
 import type { FieldType, SimpleType } from './FieldType';
-import { Primitive, isStructRef, isFList, isFMap, isPrimitive } from './FieldType';
+import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType';
 import { StructSchema } from './StructSchema';
 import { TableSchema } from './TableSchema';
 import type { Structural } from './Structural';
 import { isMetaInt } from './Metadata';
 import { foreachNameable } from './ForeachSchema';
-import { checkAnyOk, CheckResult, type Checker } from './IncludedStructs';
+import { checkAnyOk, CheckResult } from './IncludedStructs';
 
 export function preCalculateAllHasRef(schema: CfgSchema): void {
   foreachNameable(calcHasRef, schema);

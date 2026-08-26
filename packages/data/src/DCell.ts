@@ -9,6 +9,7 @@
  */
 
 import { DRowId } from './DRowId';
+export { DRowId } from './DRowId';
 
 const N = 'Z'.charCodeAt(0) - 'A'.charCodeAt(0) + 1; // 26
 

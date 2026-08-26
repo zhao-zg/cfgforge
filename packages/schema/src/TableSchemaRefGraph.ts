@@ -14,7 +14,6 @@ import type { Structural } from './Structural';
 import { InterfaceSchema } from './InterfaceSchema';
 import { StructSchema } from './StructSchema';
 import { findAllIncludedStructs } from './IncludedStructs';
-import type { ForeignKeySchema } from './ForeignKeySchema';
 
 // ---------------------------------------------------------------------------
 // Refs — per-table reference info

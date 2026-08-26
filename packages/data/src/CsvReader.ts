@@ -10,7 +10,7 @@
  */
 
 import { readCSV, type CSVRow } from '@cfggen/shared';
-import { type DRawRow, EMPTY_ROW } from './DRawRow';
+import { type DRawRow } from './DRawRow';
 import { DRawSheet } from './DRawSheet';
 import { ReadResult, OneSheet } from './ReadResult';
 import { CfgDataStat } from './CfgDataStat';

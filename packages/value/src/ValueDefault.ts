@@ -21,17 +21,13 @@ import {
   VList,
   VMap,
 } from './CfgValue';
-import { DFile, type Source } from '@cfggen/data';
+import { type Source } from '@cfggen/data';
 import {
   type FieldType,
   type Nameable,
   type Structural,
-  type Fieldable,
   InterfaceSchema,
   Primitive,
-  FList,
-  FMap,
-  StructRef,
   isPrimitive,
   isStructRef,
   isFList,

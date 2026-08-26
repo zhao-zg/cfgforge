@@ -29,7 +29,7 @@
  * Java source: configgen.editorserver.RecordRefIdsService.java (173 lines)
  */
 
-import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
+import type { CfgValue, VStruct, Value } from '@cfggen/value';
 import {
   ValuePack,
   ValueRefCollector,
@@ -38,6 +38,7 @@ import {
   RefId,
   ForeachContext,
   valueEquals,
+  type FieldRef,
 } from '@cfggen/value';
 import type { TableSchemaRefGraph } from '@cfggen/schema';
 import { RecordService } from './RecordService';
@@ -222,11 +223,11 @@ export class RecordRefIdsService {
       const newRefOutFrontier = new Map<RefId, VStruct>();
 
       for (const [, record] of refOutFrontier) {
-        const fieldRefs: unknown[] = [];
+        const fieldRefs: FieldRef[] = [];
         const collector = new ValueRefCollector(
           this.cfgValue,
           newRefOutFrontier,
-          fieldRefs as Parameters<typeof ValueRefCollector.prototype.collect>[2],
+          fieldRefs,
         );
         collector.collect(record, []);
       }

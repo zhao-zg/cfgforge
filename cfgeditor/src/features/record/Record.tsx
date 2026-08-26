@@ -1,5 +1,5 @@
 import {Entity, isEditableEntity, EditingObjectRes, EFitView} from "@/domain/entityModel.ts";
-import {JSONObject, RecordEditResult, RecordResult, RefId} from "@/api/recordModel.ts";
+import {JSONObject, RecordEditResult, RecordResult, RefId, Refs} from "@/api/recordModel.ts";
 import {App} from "antd";
 import {createRefEntities, getId, getLabel} from "./recordRefUtils.ts";
 import {RecordEntityCreator} from "./recordEntityCreator.ts";
@@ -111,7 +111,7 @@ function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
         if (!isEditing) {
             const refId = {table: curTable.name, id: curId};
             const refs = recordResult.refs ?? [];
-            const obj = recordResult.object ?? {};
+            const obj = (recordResult.object ?? {}) as JSONObject & Refs;
             const creator = new RecordEntityCreator(entityMap, schema, refId, refs, tauriConf, resourceDir, resMap);
             creator.createRecordEntity(getId(curTable.name, curId), obj, getId(getLabel(curTable.name), curId));
             createRefEntities({

@@ -23,7 +23,6 @@
 import type { FieldSchema } from '@cfggen/schema';
 import {
   type Value,
-  type SimpleValue,
   type PrimitiveValue,
   VString,
   VStruct,

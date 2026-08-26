@@ -13,7 +13,6 @@
  */
 
 import {
-  type Value,
   VStruct,
   VString,
   VText,
@@ -22,7 +21,7 @@ import {
 } from './CfgValue';
 import { ValueUtil } from './ValueUtil';
 import type { TableSchema } from '@cfggen/schema';
-import { isEEntry, isEEnum, isENo } from '@cfggen/schema';
+import { isEEntry, isEEnum } from '@cfggen/schema';
 
 // ---------------------------------------------------------------------------
 // Types (Java records → TS classes)

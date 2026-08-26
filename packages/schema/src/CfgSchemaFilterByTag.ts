@@ -22,7 +22,6 @@
 
 import { CfgSchema } from './CfgSchema';
 import type { CfgSchemaErrs } from './CfgSchemaErrs';
-import type { Nameable } from './Nameable';
 import type { Structural } from './Structural';
 import type { FieldSchema } from './FieldSchema';
 import type { ForeignKeySchema } from './ForeignKeySchema';
@@ -32,7 +31,6 @@ import { InterfaceSchema } from './InterfaceSchema';
 import { StructSchema } from './StructSchema';
 import type { EntryType } from './EntryType';
 import { ENo, EEntry, EEnum, isEEntry, isEEnum } from './EntryType';
-import type { RefKey } from './RefKey';
 import { isRefPrimary, isRefUniq, isRefList } from './RefKey';
 import { makeName } from './Nameable';
 import {

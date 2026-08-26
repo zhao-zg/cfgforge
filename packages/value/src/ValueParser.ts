@@ -12,13 +12,12 @@
  * Java source: configgen.value.ValueParser.java (538 lines)
  */
 
-import { DCell, DCellList, type Source, type HeadRow } from '@cfggen/data';
+import { DCell, DCellList, type HeadRow } from '@cfggen/data';
 import { ParseBoolResult } from '@cfggen/data';
 import type {
   Structural,
   FieldSchema,
   SimpleType,
-  Fieldable,
 } from '@cfggen/schema';
 import {
   Primitive,
@@ -32,7 +31,6 @@ import {
   isSimpleType,
 } from '@cfggen/schema';
 import { InterfaceSchema, StructSchema } from '@cfggen/schema';
-import type { FieldFormat } from '@cfggen/schema';
 import { AutoOrPack, Sep, isSep, isBlock } from '@cfggen/schema';
 import { span, fieldSpan, simpleTypeSpan } from '@cfggen/schema';
 import type { Value, SimpleValue } from './CfgValue';
@@ -213,8 +211,8 @@ export class ValueParser {
       vImpl = this.parseStructural(subImpl, parsed, impl,
         new ParseContext(parseContext.nameable, true, true, parseContext.curRowIndex));
     } else {
-      let impl: StructSchema;
-      let subImpl: StructSchema;
+      let impl: StructSchema | null;
+      let subImpl: StructSchema | null;
       let implCells: DCell[];
 
       if (isNumberOrBool) {
@@ -225,19 +223,19 @@ export class ValueParser {
       } else {
         const implName = parsed[0].value();
         if (implName.length > 0) {
-          impl = sInterface.findImpl(implName) as StructSchema | null;
+          impl = sInterface.findImpl(implName);
           if (impl === null) {
             this.errs.addErr(Errs.interfaceCellImplNotFound(parsed[0], sInterface.name(), implName));
             return null;
           }
-          subImpl = subInterface.findImpl(implName) as StructSchema | null;
+          subImpl = subInterface.findImpl(implName);
         } else {
           impl = sInterface.defaultImplStruct();
           subImpl = subInterface.defaultImplStruct();
         }
 
         this.require(subImpl !== null);
-        const expected = isPack ? 1 : span(impl);
+        const expected = isPack ? 1 : span(impl!);
         if (parsed.length - 1 < expected) {
           this.errs.addErr(Errs.internalError(parsed[0].toString() + ' impl span not enough'));
           return null;
@@ -245,7 +243,7 @@ export class ValueParser {
         implCells = parsed.slice(1, expected + 1);
       }
 
-      vImpl = this.parseStructural(subImpl, implCells, impl,
+      vImpl = this.parseStructural(subImpl!, implCells, impl!,
         new ParseContext(parseContext.nameable, isPack, canChildBeEmpty, parseContext.curRowIndex));
     }
 
@@ -312,7 +310,7 @@ export class ValueParser {
       for (const subField of subStructural.fields()) {
         const field = this.findFieldCached(structural, subField.name);
         this.require(field !== null);
-        const v = this.parseField(subField, parsed, field,
+        const v = this.parseField(subField, parsed, field!,
           new ParseContext(structural.name(), true, true, parseContext.curRowIndex));
         if (v !== null) {
           values.push(v);

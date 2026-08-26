@@ -18,9 +18,7 @@ import type { Nameable } from '@cfggen/schema';
 import {
   type Value,
   type PrimitiveValue,
-  type StringValue,
   VText,
-  VString,
   VStruct,
   VInterface,
   VList,

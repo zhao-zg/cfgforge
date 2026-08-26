@@ -9,14 +9,12 @@
  * so we parse sequentially. Worker threads can be added later if needed.
  */
 
-import * as fs from 'fs';
 import * as path from 'path';
 import { CfgSchema } from './CfgSchema';
 import { CfgReader } from './cfg/CfgReader';
 import { CfgWriter } from './cfg/CfgWriter';
 import { CfgUtil } from './cfg/CfgUtil';
 import { CachedFiles } from '@cfggen/shared';
-import type { Nameable } from './Nameable';
 
 // ---------------------------------------------------------------------------
 // CfgFileInfo — TypeScript port of Java record CfgFileInfo

@@ -17,7 +17,6 @@
 
 import {
   type Value,
-  type SimpleValue,
   VStruct,
   VList,
   VMap,
@@ -27,14 +26,12 @@ import {
 import { CfgValueErrs, foreignValueNotFound, refNotNullableButCellEmpty } from './CfgValueErrs';
 import { ForeachVStruct, type ForeachContext, type VStructVisitor } from './ForeachVStruct';
 import { ValueUtil } from './ValueUtil';
-import type { ForeignKeySchema, Structural, TableSchema, FieldSchema, FieldType } from '@cfggen/schema';
+import type { ForeignKeySchema, TableSchema, FieldType } from '@cfggen/schema';
 import {
   isFList,
   isFMap,
-  isSimpleType,
   RefPrimary,
   RefUniq,
-  type RefKey,
 } from '@cfggen/schema';
 
 // ---------------------------------------------------------------------------

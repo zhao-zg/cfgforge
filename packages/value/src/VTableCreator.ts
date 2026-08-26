@@ -19,7 +19,6 @@ import {
   VTable,
   valueEquals,
   type Value,
-  type SimpleValue,
 } from './CfgValue';
 import type { CfgValueErrs } from './CfgValueErrs';
 import {
@@ -34,17 +33,13 @@ import { DCellList, type Source } from '@cfggen/data';
 import {
   type TableSchema,
   type KeySchema,
-  type EntryType,
   type MetaEnumValues,
   type MetaEnumValuesOfEmpty,
   type MetaEnumValuesOfAssigned,
-  Metadata,
-  ENo,
   isEEntry,
   isEEnum,
   findFieldIndices,
   findFieldIndex,
-  Primitive,
 } from '@cfggen/schema';
 
 export class VTableCreator {
@@ -66,7 +61,6 @@ export class VTableCreator {
     }
 
     // Collect primary key and unique keys
-    const capacity = Math.floor(valueList.length / 0.75) + 1;
     let primaryKeyMap = new Map<Value, VStruct>();
     const uniqueKeyValueSetMap = new Map<string[], Map<Value, VStruct>>();
 

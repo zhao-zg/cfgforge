@@ -29,7 +29,6 @@ import { StructSchema } from '@cfggen/schema';
 import { StructRef } from '@cfggen/schema';
 import { Metadata_of } from '@cfggen/schema';
 import type { TableSchema } from '@cfggen/schema';
-import { findFieldIndices } from '@cfggen/schema';
 import { DCell } from '@cfggen/data';
 import { HeadRows } from '@cfggen/data';
 import { ValueParser, ParseContext, dummyBlockParser } from './ValueParser';

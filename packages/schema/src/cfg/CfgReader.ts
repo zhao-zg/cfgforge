@@ -7,12 +7,11 @@
  * Also includes CommentUtil functionality (ported from Java CommentUtil.java).
  */
 
-import { CfgLexer } from './CfgLexer';
 import { CfgParser } from './CfgParser';
 import type {
-  SchemaAst, StructDeclAst, InterfaceDeclAst, TableDeclAst, EnumDeclAst,
-  FieldDeclAst, ForeignDeclAst, KeyDeclAst, EnumValueEmptyAst, EnumValueAssignedAst,
-  FieldTypeAst, FieldTypeEleAst, MetadataAst, MetaEntryAst, MetaValueAst,
+  StructDeclAst, InterfaceDeclAst, TableDeclAst, EnumDeclAst,
+  FieldDeclAst, ForeignDeclAst,
+  FieldTypeAst, FieldTypeEleAst, MetadataAst, MetaValueAst,
   RefAst, KeyAst, CommentData as AstCommentData,
 } from './AstNode';
 import { CfgSchema } from '../CfgSchema';
@@ -23,13 +22,12 @@ import { FieldSchema } from '../FieldSchema';
 import { ForeignKeySchema } from '../ForeignKeySchema';
 import { KeySchema } from '../KeySchema';
 import { RefPrimary, RefUniq, RefList } from '../RefKey';
-import { ENo, EEntry, EEnum } from '../EntryType';
+import { EEnum } from '../EntryType';
 import { Primitive, FList, FMap, StructRef } from '../FieldType';
-import type { FieldType } from '../FieldType';
+import type { FieldType, SimpleType } from '../FieldType';
 import { AutoOrPack } from '../FieldFormat';
-import type { FieldFormat } from '../FieldFormat';
 import { Metadata, Metadata_of, metaInt, metaFloat, metaStr, TAG } from '../Metadata';
-import type { MetaEnumValues } from '../Metadata';
+import type { MetaValue } from '../Metadata';
 import { CommentData } from '../CommentData';
 
 // ---------------------------------------------------------------------------
@@ -342,7 +340,7 @@ export class CfgReader {
     }
   }
 
-  private readTypeEle(ctx: FieldTypeEleAst): FieldType {
+  private readTypeEle(ctx: FieldTypeEleAst): SimpleType {
     switch (ctx.kind) {
       case 'primitive':
         return this.readPrimitive(ctx.name);
@@ -353,7 +351,7 @@ export class CfgReader {
     }
   }
 
-  private readPrimitive(name: string): FieldType {
+  private readPrimitive(name: string): Primitive {
     const upper = name.toUpperCase();
     switch (upper) {
       case 'BOOL': return Primitive.BOOL;
@@ -412,7 +410,7 @@ export class CfgReader {
         meta.data().set(entry.key, TAG);
       } else {
         const k = entry.key;
-        const val = entry.value;
+        const val = (entry as { key: string; value: MetaValueAst | null }).value;
         if (val === null) {
           meta.data().set(k, TAG);
         } else {
@@ -423,7 +421,7 @@ export class CfgReader {
     return meta;
   }
 
-  private readMetaValue(val: MetaValueAst): import('./Metadata').MetaValue {
+  private readMetaValue(val: MetaValueAst): MetaValue {
     switch (val.kind) {
       case 'int':
         return metaInt(val.value);

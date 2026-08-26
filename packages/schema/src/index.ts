@@ -3,9 +3,10 @@ export * from './cfg/AstNode';
 export * from './cfg/CfgParser';
 export * from './FieldType';
 export * from './FieldFormat';
-export { Fieldable } from './Fieldable';
-export { Structural } from './Structural';
-export { Nameable, makeName, defaultNamespace, defaultLastName } from './Nameable';
+export type { Fieldable } from './Fieldable';
+export type { Structural } from './Structural';
+export type { Nameable } from './Nameable';
+export { makeName, defaultNamespace, defaultLastName } from './Nameable';
 export {
   Metadata,
   Metadata_of,
@@ -35,13 +36,14 @@ export type {
   MetaEnumValuesOfAssigned,
   EnumValueEmpty,
   EnumValueAssigned,
-  MetaTag,
 } from './Metadata';
 export { KeySchema } from './KeySchema';
 export { FieldSchema } from './FieldSchema';
 export { ForeignKeySchema } from './ForeignKeySchema';
-export { EntryType, ENo, EEntry, EEnum, isENo, isEEntry, isEEnum } from './EntryType';
-export { RefKey, RefPrimary, RefUniq, RefList, RefSimple, isRefPrimary, isRefUniq, isRefList } from './RefKey';
+export type { EntryType } from './EntryType';
+export { ENo, EEntry, EEnum, isENo, isEEntry, isEEnum } from './EntryType';
+export type { RefKey, RefSimple } from './RefKey';
+export { RefPrimary, RefUniq, RefList, isRefPrimary, isRefUniq, isRefList } from './RefKey';
 export { StructSchema } from './StructSchema';
 export { TableSchema } from './TableSchema';
 export { InterfaceSchema } from './InterfaceSchema';
@@ -56,7 +58,8 @@ export * from './CfgSchemaErrs';
 export { CfgSchemaResolver } from './CfgSchemaResolver';
 export * from './ForeachSchema';
 export { findFieldIndices, findFieldIndex, findFieldIndexByName } from './FindFieldIndex';
-export { checkAnyOk, findAllIncludedStructs, CheckResult } from './IncludedStructs';
+export { checkAnyOk, findAllIncludedStructs } from './IncludedStructs';
+export type { CheckResult } from './IncludedStructs';
 export type { Checker } from './IncludedStructs';
 export { preCalculateAllNeededSpans, span, fieldSpan, simpleTypeSpan } from './Span';
 export { preCalculateAllHasRef, hasRef, hasRefFieldType } from './HasRef';

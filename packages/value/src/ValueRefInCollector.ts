@@ -252,7 +252,7 @@ export class ValueRefInCollector {
       return ValueUtil.extractKeyValue(targetRecord, indices);
     }
 
-    throw new Error(`Unknown RefKey type: ${refKey.constructor.name}`);
+    throw new Error(`Unknown RefKey type: ${(refKey as unknown as { constructor: { name: string } }).constructor.name}`);
   }
 
   private static addCtx(

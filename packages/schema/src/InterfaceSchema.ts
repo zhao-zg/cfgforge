@@ -10,8 +10,7 @@ import type { FieldFormat } from './FieldFormat';
 import type { Metadata } from './Metadata';
 import type { StructSchema } from './StructSchema';
 import type { TableSchema } from './TableSchema';
-import { Primitive, isFList, isFMap, isStructRef } from './FieldType';
-import type { FieldType } from './FieldType';
+import { Primitive } from './FieldType';
 import { defaultNamespace, defaultLastName } from './Nameable';
 import type { Fieldable } from './interfaces';
 

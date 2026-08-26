@@ -14,7 +14,6 @@
  */
 
 import {
-  type Value,
   VStruct,
   VString,
   VText,

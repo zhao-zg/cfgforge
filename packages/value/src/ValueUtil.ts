@@ -7,7 +7,7 @@
  * ValueUtil: static helpers for value creation, extraction, and inspection.
  */
 
-import { DCell, DCellList, DFile, type Source } from '@cfggen/data';
+import { DCell, DCellList, DFile } from '@cfggen/data';
 import { parsePack, parseFunction } from '@cfggen/shared';
 import { parseList } from '@cfggen/shared';
 import {
@@ -19,11 +19,10 @@ import {
   VFloat,
   VString,
   VText,
-  VBool,
   VStruct,
   type StringValue,
 } from './CfgValue';
-import type { ForeignKeySchema, Structural, TableSchema } from '@cfggen/schema';
+import type { ForeignKeySchema, TableSchema } from '@cfggen/schema';
 import { findFieldIndices, findFieldIndexByName } from '@cfggen/schema';
 import { RefPrimary, RefUniq, RefList } from '@cfggen/schema';
 import type { CfgValue } from './CfgValue';
@@ -167,7 +166,7 @@ export class ValueUtil {
       return (value as VInt).value === 0;
     }
     if (value instanceof VLong) {
-      return (value as VLong).value === 0;
+      return (value as VLong).value === 0n;
     }
     if (value instanceof VFloat) {
       return (value as VFloat).value === 0;

@@ -4,7 +4,6 @@
  * Java record: name, type, fmt, meta.
  */
 
-import { KeySchema } from './KeySchema';
 import type { FieldType } from './FieldType';
 import type { FieldFormat } from './FieldFormat';
 import type { Metadata } from './Metadata';

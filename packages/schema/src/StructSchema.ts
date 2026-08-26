@@ -5,7 +5,7 @@
  * Has mutable nullableInterface pointer.
  */
 
-import type { FieldFormat, Sep } from './FieldFormat';
+import type { FieldFormat } from './FieldFormat';
 import { AutoOrPack, isSep } from './FieldFormat';
 import type { Metadata } from './Metadata';
 import type { FieldSchema } from './FieldSchema';
@@ -137,4 +137,4 @@ function fieldFormatEquals(a: FieldFormat, b: FieldFormat): boolean {
   return false;
 }
 
-type FieldFormat = import('./FieldFormat').FieldFormat;
+

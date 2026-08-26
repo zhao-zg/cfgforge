@@ -171,15 +171,15 @@ export class SchemaService {
   private static fromTable(ts: TableSchema, cfgValue: CfgValue | null): STable {
     let entryType: SEntryType;
     let entryField: string | undefined;
-    if (isENo(ts.entry)) {
-      entryType = 'eNo';
-      entryField = undefined;
-    } else if (isEEntry(ts.entry)) {
+    if (isEEntry(ts.entry)) {
       entryType = 'eEntry';
       entryField = ts.entry.field;
     } else if (isEEnum(ts.entry)) {
       entryType = 'eEnum';
       entryField = ts.entry.field;
+    } else if (isENo(ts.entry)) {
+      entryType = 'eNo';
+      entryField = undefined;
     } else {
       entryType = 'eNo';
       entryField = undefined;

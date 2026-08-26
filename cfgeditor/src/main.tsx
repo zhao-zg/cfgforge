@@ -1,3 +1,8 @@
+// Buffer polyfill: editor-core 服务层（NoteEditService 等）使用 Node.js Buffer.from()，
+// 浏览器环境无此全局变量，需在入口注入 polyfill。
+import { Buffer } from 'buffer';
+(globalThis as any).Buffer = (globalThis as any).Buffer ?? Buffer;
+
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
 import {QueryClientProvider} from '@tanstack/react-query'

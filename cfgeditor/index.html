@@ -4,6 +4,96 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>cfgeditor</title>
+    <!-- Buffer polyfill: editor-core 服务层使用 Node.js Buffer.from()，浏览器无此全局，需在 ES 模块执行前注入 -->
+    <script>
+        (function(){
+            if (typeof globalThis.Buffer === 'undefined') {
+                var B = {};
+                B.from = function(value, encoding) {
+                    if (typeof value === 'string') {
+                        return new TextEncoder().encode(value);
+                    }
+                    if (Array.isArray(value)) {
+                        return new Uint8Array(value);
+                    }
+                    if (value instanceof ArrayBuffer) {
+                        return new Uint8Array(value);
+                    }
+                    if (ArrayBuffer.isView(value)) {
+                        return new Uint8Array(value.buffer, value.byteOffset, value.byteLength);
+                    }
+                    return new Uint8Array(0);
+                };
+                B.isBuffer = function(x) { return x instanceof Uint8Array; };
+                B.concat = function(list, totalLength) {
+                    var len = totalLength;
+                    if (len === undefined) {
+                        len = 0;
+                        for (var i = 0; i < list.length; i++) len += list[i].length;
+                    }
+                    var result = new Uint8Array(len);
+                    var offset = 0;
+                    for (var i = 0; i < list.length; i++) {
+                        result.set(list[i], offset);
+                        offset += list[i].length;
+                    }
+                    return result;
+                };
+                B.compare = function(a, b) {
+                    var aa = a instanceof Uint8Array ? a : new Uint8Array(a);
+                    var bb = b instanceof Uint8Array ? b : new Uint8Array(b);
+                    for (var i = 0; i < Math.min(aa.length, bb.length); i++) {
+                        if (aa[i] !== bb[i]) return aa[i] - bb[i];
+                    }
+                    return aa.length - bb.length;
+                };
+                // Add toString and equals to Uint8Array for Buffer compatibility
+                var proto = Uint8Array.prototype;
+                if (!proto.toString) {
+                    Object.defineProperty(proto, 'toString', {
+                        value: function(encoding) {
+                            if (encoding === 'hex') {
+                                return Array.from(this).map(function(b){ return ('0'+b.toString(16)).slice(-2); }).join('');
+                            }
+                            return new TextDecoder('utf8').decode(this);
+                        },
+                        configurable: true,
+                        writable: true
+                    });
+                }
+                if (!proto.equals) {
+                    Object.defineProperty(proto, 'equals', {
+                        value: function(other) {
+                            if (this.length !== other.length) return false;
+                            for (var i = 0; i < this.length; i++) {
+                                if (this[i] !== other[i]) return false;
+                            }
+                            return true;
+                        },
+                        configurable: true,
+                        writable: true
+                    });
+                }
+                if (!proto.copy) {
+                    Object.defineProperty(proto, 'copy', {
+                        value: function(target, targetStart, start, end) {
+                            targetStart = targetStart || 0;
+                            start = start || 0;
+                            end = end || this.length;
+                            var sub = this.subarray(start, end);
+                            for (var i = 0; i < sub.length; i++) {
+                                target[targetStart + i] = sub[i];
+                            }
+                            return sub.length;
+                        },
+                        configurable: true,
+                        writable: true
+                    });
+                }
+                globalThis.Buffer = B;
+            }
+        })();
+    </script>
     <!-- <script src="https://unpkg.com/react-scan/dist/install-hook.global.js"></script> -->
 </head>
 <body>

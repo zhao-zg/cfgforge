@@ -59,6 +59,9 @@ importers:
       axios:
         specifier: ^1.18.1
         version: 1.19.0(debug@4.4.3(supports-color@7.2.0))(supports-color@7.2.0)
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
       elkjs:
         specifier: ^0.11.1
         version: 0.11.1

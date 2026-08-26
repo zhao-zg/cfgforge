@@ -13,10 +13,9 @@
  *   only two fixed filenames are produced — see CLAUDE.md note #7)
  */
 
-import * as fs from 'fs';
 import * as path from 'path';
 
-import { CachedFiles, Logger, upper1 } from '@cfggen/shared';
+import { CachedFiles, Logger, upper1, getDefaultFileSystem } from '@cfggen/shared';
 import type { Context } from '@cfggen/context';
 import type { CfgValue } from '@cfggen/value';
 import type { CfgSchema } from '@cfggen/schema';
@@ -56,11 +55,14 @@ export class TsCodeGenerator extends GeneratorWithTag {
     CachedFiles.writeFile(configTsPath, Buffer.from(content, this.encoding as BufferEncoding));
 
     // Copy ConfigUtil.ts (static runtime library)
+    const dfs = getDefaultFileSystem();
     const configUtilTsPath = path.join(this.dstDir, 'ConfigUtil.ts');
-    if (!fs.existsSync(configUtilTsPath)) {
+    if (!await dfs.exists(configUtilTsPath)) {
       const resourcePath = path.join(__dirname, 'resources', 'ConfigUtil.ts');
-      if (fs.existsSync(resourcePath)) {
-        fs.copyFileSync(resourcePath, configUtilTsPath);
+      if (await dfs.exists(resourcePath)) {
+        // Read resource and write to destination via CfgFileSystem
+        const bytes = await dfs.readFile(resourcePath);
+        await dfs.writeFile(configUtilTsPath, bytes);
         Logger.log('create file: ' + configUtilTsPath);
       } else {
         throw new Error('ConfigUtil.ts resource not found at ' + resourcePath);

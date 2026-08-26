@@ -18,7 +18,7 @@ import {
   VText,
 } from '@cfggen/value';
 import { ForeachValue, ValueVisitorForSearch } from '@cfggen/value';
-import { writeCSVToFile } from '@cfggen/shared';
+import { writeCSVToFileAsync, getDefaultFileSystem } from '@cfggen/shared';
 import type { CSVRow } from '@cfggen/shared';
 import type { Parameter } from './Parameter';
 import { GeneratorWithTag } from './GeneratorWithTag';
@@ -42,7 +42,13 @@ export class I18nByValueGenerator extends GeneratorWithTag {
       }
     }
 
-    writeCSVToFile(this.file, this.data);
+    if (this.data.length === 0) {
+      // Write empty file with BOM to match sync writeCSVToFile behavior
+      const dfs = getDefaultFileSystem();
+      await dfs.writeFile(this.file, Buffer.from('\uFEFF', 'utf8'));
+    } else {
+      await writeCSVToFileAsync(this.file, this.data);
+    }
   }
 }
 

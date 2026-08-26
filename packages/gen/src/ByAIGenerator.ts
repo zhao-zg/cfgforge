@@ -12,8 +12,8 @@
  * - No backup/temp/overwrite file logic
  */
 
-import * as fs from 'fs';
 import type { Context } from '@cfggen/context';
+import { getDefaultFileSystem } from '@cfggen/shared';
 import type { Parameter } from './Parameter';
 import { Generator } from './Generator';
 import type { CfgValue, VTable, VStruct, Value } from '@cfggen/value';
@@ -22,7 +22,7 @@ import { CfgValueErrs } from '@cfggen/value';
 import { ValueUtil } from '@cfggen/value';
 import { VTableStorage } from '@cfggen/write';
 import { VTableJsonStorage } from '@cfggen/write';
-import { readAICfgFromFile, type AICfg } from './AICfg';
+import { readAICfgFromFileAsync, type AICfg } from './AICfg';
 import { PromptGen } from './PromptGen';
 import { FIX_ERROR } from './PromptDefault';
 
@@ -66,11 +66,13 @@ export class ByAIGenerator extends Generator {
       throw new Error('retry must > 0');
     }
 
-    const aiCfg = readAICfgFromFile(this.cfgFn);
-    if (!fs.existsSync(this.askFn)) {
+    const aiCfg = await readAICfgFromFileAsync(this.cfgFn);
+    const dfs = getDefaultFileSystem();
+    if (!await dfs.exists(this.askFn)) {
       throw new Error(`${this.askFn} not exist!`);
     }
-    const asks = fs.readFileSync(this.askFn, 'utf-8').split('\n');
+    const askBytes = await dfs.readFile(this.askFn);
+    const asks = Buffer.from(askBytes).toString('utf-8').split('\n');
 
     const cfgValue = ctx.makeValue();
     const vTable = cfgValue.getTable(this.table);
@@ -78,7 +80,7 @@ export class ByAIGenerator extends Generator {
       throw new Error(`table=${this.table} not found!`);
     }
 
-    const prompt = PromptGen.genPrompt(ctx, cfgValue, vTable);
+    const prompt = await PromptGen.genPromptAsync(ctx, cfgValue, vTable);
     // eslint-disable-next-line no-console
     console.log(prompt.prompt);
     // eslint-disable-next-line no-console

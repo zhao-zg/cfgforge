@@ -21,7 +21,7 @@ import { TableSchemaRefGraph } from '@cfggen/schema';
 import { CfgWriter } from '@cfggen/schema';
 import { isEEnum } from '@cfggen/schema';
 import { isMetaStr } from '@cfggen/schema';
-import { readMarkdown } from '@cfggen/shared';
+import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfggen/shared';
 import type { Example } from './PromptModel';
 import { example } from './PromptModel';
 
@@ -133,6 +133,60 @@ export class TableRelatedInfoFinder {
     const tabFile = path.join(modDir, tableSchema.lastName() + '.md');
     if (fs.existsSync(tabFile)) {
       const doc = readMarkdown(tabFile, 'utf-8');
+      const refTables = doc.frontmatter.get('refTables');
+      if (refTables && refTables.trim().length > 0) {
+        const trim = refTables.trim();
+        extraRefTables.push(...trim.split(/[;,]/));
+      }
+      exampleId = doc.frontmatter.get('exampleId') ?? null;
+      exampleDescription = doc.frontmatter.get('exampleDescription') ?? null;
+
+      rule = doc.content;
+    }
+
+    return { rule, extraRefTables, exampleId, exampleDescription };
+  }
+
+  // -------------------------------------------------------------------------
+  // Async variants (T12.0e)
+  // -------------------------------------------------------------------------
+
+  static async findModuleRuleForTableAsync(context: Context, tableSchema: TableSchema): Promise<ModuleRule | null> {
+    const namespace = tableSchema.namespace();
+    const cfgFilePath = context.sourceStructure().getCfgFilePathByPkgName(namespace);
+    if (cfgFilePath === null) {
+      return null;
+    }
+
+    const dfs = getDefaultFileSystem();
+    const modDir = path.dirname(cfgFilePath);
+    const modFile = path.join(modDir, '$mod.md');
+    if (!await dfs.exists(modFile)) {
+      return null;
+    }
+
+    const doc = await readMarkdownAsync(modFile, 'utf-8');
+    const description = doc.frontmatter.get('description') ?? '';
+    return { description, rule: doc.content };
+  }
+
+  static async findTableRuleAsync(context: Context, tableSchema: TableSchema): Promise<TableRule> {
+    const namespace = tableSchema.namespace();
+    const cfgFilePath = context.sourceStructure().getCfgFilePathByPkgName(namespace);
+    if (cfgFilePath === null) {
+      return { rule: null, extraRefTables: [], exampleId: null, exampleDescription: null };
+    }
+    const modDir = path.dirname(cfgFilePath);
+    const dfs = getDefaultFileSystem();
+
+    let rule: string | null = null;
+    const extraRefTables: string[] = [];
+    let exampleId: string | null = null;
+    let exampleDescription: string | null = null;
+
+    const tabFile = path.join(modDir, tableSchema.lastName() + '.md');
+    if (await dfs.exists(tabFile)) {
+      const doc = await readMarkdownAsync(tabFile, 'utf-8');
       const refTables = doc.frontmatter.get('refTables');
       if (refTables && refTables.trim().length > 0) {
         const trim = refTables.trim();

@@ -14,7 +14,7 @@ import * as path from 'path';
 import type { Context } from '@cfggen/context';
 import type { CfgValue, VTable } from '@cfggen/value';
 import type { TableSchema } from '@cfggen/schema';
-import { readMarkdown } from '@cfggen/shared';
+import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfggen/shared';
 import { SchemaToTs } from './SchemaToTs';
 import { TableRelatedInfoFinder } from './TableRelatedInfoFinder';
 import type { ModuleRule, TableRule } from './TableRelatedInfoFinder';
@@ -74,6 +74,55 @@ export class PromptGen {
     const initFile = path.join(rootDir, 'init.md');
     if (fs.existsSync(initFile)) {
       const doc = readMarkdown(initFile, 'utf-8');
+      const c = doc.content;
+      if (c.trim().length > 0) {
+        init = c.trim();
+      }
+    }
+
+    return { prompt, init };
+  }
+
+  /**
+   * Async variant of genPrompt.
+   * Uses CfgFileSystem abstraction (Tauri/WebView compatible).
+   */
+  static async genPromptAsync(context: Context, cfgValue: CfgValue, vTable: VTable): Promise<Prompt> {
+    const table = vTable.name();
+    const tableSchema = vTable.schema;
+
+    const moduleRule = await TableRelatedInfoFinder.findModuleRuleForTableAsync(context, tableSchema);
+    const rule = await TableRelatedInfoFinder.findTableRuleAsync(context, tableSchema);
+
+    const structInfo = new SchemaToTs(
+      cfgValue, tableSchema,
+      rule !== null ? rule.extraRefTables : [],
+      true,
+    ).generate();
+
+    const ex = TableRelatedInfoFinder.getExample(rule, vTable);
+    const model = new PromptModel(
+      table, structInfo,
+      PromptGen.combineRule(moduleRule, rule),
+      ex !== null ? [ex] : [],
+    );
+
+    const rootDir = context.rootDir();
+    const dfs = getDefaultFileSystem();
+    const customTemplatePath = path.join(rootDir, 'config.jte');
+    let prompt: string;
+    if (await dfs.exists(customTemplatePath)) {
+      const bytes = await dfs.readFile(customTemplatePath);
+      const template = Buffer.from(bytes).toString('utf-8');
+      prompt = PromptGen.renderTemplate(template, model);
+    } else {
+      prompt = PromptGen.renderDefaultTemplate(model);
+    }
+
+    let init = DEFAULT_INIT;
+    const initFile = path.join(rootDir, 'init.md');
+    if (await dfs.exists(initFile)) {
+      const doc = await readMarkdownAsync(initFile, 'utf-8');
       const c = doc.content;
       if (c.trim().length > 0) {
         init = c.trim();

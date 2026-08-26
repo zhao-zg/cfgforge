@@ -14,7 +14,6 @@
  * Java source: configgen.geni18n.LangText.java (233 lines)
  */
 
-import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
 import { hasText } from '@cfggen/schema';

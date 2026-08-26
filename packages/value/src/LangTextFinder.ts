@@ -45,10 +45,20 @@ export interface TextFinder {
  * Maps table name → TextFinder.
  * Java extends TreeMap<String, TextFinder> (sorted); TS uses Map.
  *
- * Defined as an interface so the i18n package's class can structurally
- * satisfy it without private-field nominal incompatibility.
+ * Defined as a class with public fields so that:
+ * 1. Tests can `new LangTextFinder()` directly
+ * 2. The i18n package's LangTextFinder class (which has private fields)
+ *    is structurally compatible — TS structural typing applies because
+ *    this class has no private members.
  */
-export interface LangTextFinder {
-  getTextFinder(table: string): TextFinder | null;
-  setTextFinder(table: string, finder: TextFinder): void;
+export class LangTextFinder {
+  readonly _map: Map<string, TextFinder> = new Map();
+
+  getTextFinder(table: string): TextFinder | null {
+    return this._map.get(table) ?? null;
+  }
+
+  setTextFinder(table: string, finder: TextFinder): void {
+    this._map.set(table, finder);
+  }
 }

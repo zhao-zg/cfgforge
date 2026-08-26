@@ -77,7 +77,7 @@ export class VTableJsonParser {
         valueList.push(vStruct);
         const pkValue: Value = ValueUtil.extractPrimaryKeyValue(vStruct, this.subTableSchema);
         const id = pkValue.packStr();
-        idMap.set(id, BigInt(modified));
+        idMap.set(id, BigInt(Math.trunc(modified)));
       }
     }
 

@@ -45,7 +45,7 @@ export interface TextFinder {
  * Java extends TreeMap<String, TextFinder> (sorted); TS uses Map.
  */
 export class LangTextFinder {
-  private readonly _map: Map<string, TextFinder> = new Map();
+  readonly _map: Map<string, TextFinder> = new Map();
 
   getTextFinder(table: string): TextFinder | null {
     return this._map.get(table) ?? null;

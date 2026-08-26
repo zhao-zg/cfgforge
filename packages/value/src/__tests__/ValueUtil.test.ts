@@ -265,7 +265,7 @@ describe('ValueUtil', () => {
     });
 
     it('returns true for VLong 0', () => {
-      expect(ValueUtil.isValueNumber0(new VLong(0, makeCell('0')))).toBe(true);
+      expect(ValueUtil.isValueNumber0(new VLong(0n, makeCell('0')))).toBe(true);
     });
 
     it('returns true for VFloat 0', () => {

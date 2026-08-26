@@ -1,6 +1,6 @@
 import {memo, useEffect, useState} from "react";
 import {App, Empty, Input, Result, Skeleton, Typography} from "antd";
-import {searchServer} from "@/api/apiClient.ts";
+import {searchConfig} from "@/api/apiClient.ts";
 import {queryKeys} from "@/services/queryKeys.ts";
 import {useTranslation} from "react-i18next";
 import {setQuery, useMyStore} from "@/store/store.ts";
@@ -18,7 +18,7 @@ export const SearchValue = memo(function SearchValue() {
 
     const {data: searchResult, isFetching, error} = useQuery({
         queryKey: queryKeys.search(value, searchMax, dataDir),
-        queryFn: ({signal}) => searchServer(value, searchMax, signal),
+        queryFn: ({signal}) => searchConfig(value, searchMax, signal),
         enabled: value.length > 0,
         retry: false,
     });

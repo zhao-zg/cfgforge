@@ -1,15 +1,10 @@
 /**
  * apiClient — 直接调用 @cfgforge/editor-core 的服务层。
  *
- * 改造前：通过 axios HTTP 调用 Java 后端（-gen server）。
- * 改造后：直接 import 并调用 editor-core 的 TypeScript 服务类。
+ * 通过 initEditor(dataDir) 初始化后，所有调用走 editor-core → CfgFileSystem
+ * → NodeFileSystem / TauriFileSystem。Tauri IPC 发生在更底层
+ * （@tauri-apps/plugin-fs），而非此层。
  *
- * Tauri IPC 发生在更底层（@tauri-apps/plugin-fs），而非此层。
- * apiClient 层只需 initEditor(dataDir) 初始化，之后所有调用
- * 走 editor-core → CfgFileSystem → NodeFileSystem / TauriFileSystem。
- *
- * 函数签名尽量保持与旧 axios 版本一致（参数名/返回值类型），
- * 但 server: string 参数被替换为 dataDir（通过 initEditor 设置）。
  * AbortSignal 参数保留但不使用（直接调用无法中途取消）。
  */
 
@@ -275,7 +270,7 @@ export async function checkJson(
 // Search API
 // ---------------------------------------------------------------------------
 
-export async function searchServer(
+export async function searchConfig(
     q: string,
     max: number,
     _signal?: AbortSignal,

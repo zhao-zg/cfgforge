@@ -35,7 +35,7 @@ export const Setting = memo(function Setting({schema, curTable, flowRef}: {
             children: <BasicSetting/>,
         },
         {
-            key: 'connection',
+            key: 'dataDir',
             label: t('connection'),
             children: <ConnectionSetting/>,
         },

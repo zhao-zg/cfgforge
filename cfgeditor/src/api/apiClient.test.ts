@@ -2,7 +2,7 @@
  * apiClient tests — T12.1
  *
  * 改造后 apiClient 直接调用 @cfgforge/editor-core 的服务类，
- * 不再经过 axios HTTP 层。测试用临时数据目录验证每个函数
+ * 直接调用 @cfgforge/editor-core 的服务类，测试用临时数据目录验证每个函数
  * 正确调用 editor-core 并返回符合类型契约的结果。
  *
  * 测试策略：创建临时 config.cfg + CSV 数据文件，调用 initEditor()
@@ -297,20 +297,20 @@ describe('apiClient', () => {
     });
 
     // -----------------------------------------------------------------
-    // searchServer
+    // searchConfig
     // -----------------------------------------------------------------
-    describe('searchServer', () => {
+    describe('searchConfig', () => {
         it('returns search results', async () => {
-            const {searchServer} = await import('./apiClient');
-            const result = await searchServer('Alice', 100);
+            const {searchConfig} = await import('./apiClient');
+            const result = await searchConfig('Alice', 100);
             expect(result.resultCode).toBe('ok');
             expect(result.items.length).toBeGreaterThan(0);
             expect(result.items[0].table).toBe('user');
         });
 
         it('returns empty for no match', async () => {
-            const {searchServer} = await import('./apiClient');
-            const result = await searchServer('NonExistent', 100);
+            const {searchConfig} = await import('./apiClient');
+            const result = await searchConfig('NonExistent', 100);
             expect(result.resultCode).toBe('ok');
             expect(result.items.length).toBe(0);
         });

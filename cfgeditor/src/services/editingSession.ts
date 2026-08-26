@@ -392,7 +392,7 @@ export class EditingSession {
 
     /**
      * 整体替换编辑对象（Chat/AddJson 写入 / funcClear）。不改 originalEditingObject（保留脏比较基准）。用 FitFull。
-     * 入参就地剥离 $refs，与 prepareEditingObject 对齐：Chat/AddJson 的外部 JSON 可能带后端附加的 $refs（引用元数据），
+     * 入参就地剥离 $refs，与 prepareEditingObject 对齐：Chat/AddJson 的外部 JSON 可能带 editor-core 附加的 $refs（引用元数据），
      * 不剥离会污染提交载荷、并让 getIsEdited 误判 dirty（基准 originalEditingObject 构造期已净化过）。
      * 入参均为调用方 fresh 构造（JSON.parse / defaultValueOfStructural，无共享引用），故就地净化而非 clone。
      */

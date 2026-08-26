@@ -129,7 +129,7 @@ export const CreateTableForm = memo(function CreateTableForm({open, onClose, onC
         }
     }, [elementType, name, fields, primaryKey, withDataFile, enumValues, queryClient, resetForm, onCreated, onClose]);
 
-    // table 名必须全小写，struct/enum 名没有此限制（后端会校验）
+    // table 名必须全小写，struct/enum 名没有此限制（editor-core 会校验）
     const namePlaceholder = elementType === 'table'
         ? t('createTableNamePlaceholder')
         : t('createStructNamePlaceholder');

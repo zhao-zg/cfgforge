@@ -191,7 +191,7 @@ describe('EditingSession submit / replaceEditingObject', () => {
 
     it('replaceEditingObject：就地剥离入参的 $refs（与 prepareEditingObject 对齐）', () => {
         const s = new EditingSession(makeRecord('t', '1', {'$type': 'Foo', items: []}));
-        // 模拟 Chat/AddJson 的外部 JSON 带后端附加的 $refs 引用元数据
+        // 模拟 Chat/AddJson 的外部 JSON 带 editor-core 附加的 $refs 引用元数据
         const withRefs: JSONObject = {'$type': 'Bar', items: [], '$refs': [{$type: 'Ref'}]};
         s.replaceEditingObject(withRefs);
         expect('$refs' in s.getEditingObject()).toBe(false);   // $refs 被剥离

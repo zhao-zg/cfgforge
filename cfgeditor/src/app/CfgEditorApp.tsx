@@ -1,5 +1,5 @@
 import {CSSProperties, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {Alert, Button, Empty, Flex, Form, Input, Modal, Splitter, Spin, Typography,} from "antd";
+import {Alert, Button, Empty, Flex, Modal, Splitter, Spin, Typography,} from "antd";
 import {useTranslation} from "react-i18next";
 import {Schema} from "@/domain/schema";
 import {
@@ -79,7 +79,7 @@ function RefPageInFlow({schema, notes, curTable, curTableId, curPage, curId, ref
     </FlowGraph>;
 }
 
-function onConnectServer(value: string) {
+function onSetDataDir(value: string) {
     setDataDir(value);
 }
 
@@ -152,16 +152,16 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
 
 
     const handleModalOk = useCallback(() => {
-        onConnectServer(dataDir);
+        onSetDataDir(dataDir);
     }, [dataDir]);
 
     let content;
     if (!dataDir) {
-        // 桌面端首次启动 / 未配置连接：引导用户去设置页选择本机部署或远程服务器
+        // 桌面端首次启动 / 未配置数据目录：引导用户去设置页选择
         content = <Flex justify="center" align="center" vertical gap="middle" style={fullDivStyle}>
             <Empty description={false}/>
-            <Typography.Title level={4}>{t('noServerTitle')}</Typography.Title>
-            <Typography.Text type="secondary">{t('noServerDesc')}</Typography.Text>
+            <Typography.Title level={4}>{t('noDataDirTitle')}</Typography.Title>
+            <Typography.Text type="secondary">{t('noDataDirDesc')}</Typography.Text>
         </Flex>;
     } else if (isLoading && !schema) {
         // 加载中：居中 Spin
@@ -252,20 +252,17 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
 
         {content}
 
-        <Modal title={t('serverConnectFail')} open={isError}
+        <Modal title={t('dataDirLoadFail')} open={isError}
                cancelButtonProps={disabledProps}
                closable={false}
                confirmLoading={isLoading}
-               okText={t('reconnectCurServer')}
+               okText={t('retry')}
                onOk={handleModalOk}>
 
             <Flex vertical>
                 <Alert title={error ? error.message : ''} type='error'/>
-                <p> {t('netErrFixTip')} </p>
-                <p> {t('curServer')}: {dataDir}</p>
-                <Form.Item label={t('newServer') + ':'}>
-                    <Input.Search enterButton={t('connectNewServer')} onSearch={onConnectServer}/>
-                </Form.Item>
+                <p> {t('dataDirErrTip')} </p>
+                <p> {t('curDataDir')}: {dataDir}</p>
             </Flex>
         </Modal>
 

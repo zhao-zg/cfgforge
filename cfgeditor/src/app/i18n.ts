@@ -25,14 +25,10 @@ i18n.use(LanguageDetector)
                     unreferencedRecords: "Unreferenced Records",
                     fix: "fix",
 
-                    serverConnectFail: 'connect failed',
-                    netErrFixTip: "run cfgeditor_server.bat to view your own data！ " +
-                        "or use another server address to view other's data！",
-                    curServer: 'current server',
-                    newServer: 'new server',
-                    connectNewServer: 'link',
-                    connect: 'link',
-                    reconnectCurServer: 'reconnect',
+                    dataDirLoadFail: 'Data directory load failed',
+                    dataDirErrTip: 'Please check if the data directory is valid and contains config.cfg',
+                    curDataDir: 'Current data directory',
+                    retry: 'Retry',
 
                     dataDir: 'Data directory',
                     selectDataDir: 'Select data directory',
@@ -41,7 +37,7 @@ i18n.use(LanguageDetector)
                     browse: 'Browse',
                     dataDirConnected: 'Data directory connected',
                     dataDirConnectFailed: 'Failed to connect to data directory',
-                    localBackendTip: 'Select a data directory containing config.cfg to start editing. No Java installation required.',
+                    dataDirTip: 'Select a data directory containing config.cfg to start editing.',
 
                     deleteCurRecord: 'delete cur record',
                     toPng: 'save relation png',
@@ -103,7 +99,7 @@ i18n.use(LanguageDetector)
                     recordShowSetting: "Display",
                     behavior: "Behavior",
                     resourceSetting: "Resource",
-                    connection: "Connection",
+                    connection: "Data directory",
                     addData: "Add data",
                     builtinPanel: "Panels",
                     aiGenerate: "AI generate",
@@ -218,10 +214,10 @@ i18n.use(LanguageDetector)
                     // 空数据引导
                     emptySchemaTitle: 'No configuration tables found',
                     emptySchemaDesc: 'The data directory has no config.cfg file or it is empty. You can create tables to get started.',
-                    emptySchemaServer: 'Current server',
+                    emptySchemaServer: 'Current data directory',
                     selectTableHint: 'Please select a table from the dropdown above',
-                    noServerTitle: 'No backend connected',
-                    noServerDesc: 'Go to Settings → Connection to select local deployment or enter a remote server address.',
+                    noDataDirTitle: 'No data directory selected',
+                    noDataDirDesc: 'Go to Settings → Data directory to select a directory containing config.cfg.',
 
                     // CFG 文本编辑器
                     cfgEditor: 'CFG Editor',
@@ -274,13 +270,10 @@ i18n.use(LanguageDetector)
                     chat: "AI➕",
                     setting: "设置",
 
-                    serverConnectFail: '服务器连接失败',
-                    netErrFixTip: '请 启动 cfgeditor服务器.bat，查看自己的配表！ 或 更改服务器地址，查看别人的配表！',
-                    curServer: '当前服务器',
-                    newServer: '新服务器',
-                    connectNewServer: '连接新服',
-                    connect: '连接',
-                    reconnectCurServer: '重连当前服务器',
+                    dataDirLoadFail: '数据目录加载失败',
+                    dataDirErrTip: '请检查数据目录是否有效且包含 config.cfg 文件',
+                    curDataDir: '当前数据目录',
+                    retry: '重试',
 
                     dataDir: '数据目录',
                     selectDataDir: '选择数据目录',
@@ -289,12 +282,12 @@ i18n.use(LanguageDetector)
                     browse: '浏览',
                     dataDirConnected: '数据目录已连接',
                     dataDirConnectFailed: '连接数据目录失败',
-                    localBackendTip: '选择包含 config.cfg 的数据目录即可开始编辑，无需安装 Java。',
+                    dataDirTip: '选择包含 config.cfg 的数据目录即可开始编辑。',
 
                     recordShowSetting: '显示',
                     behavior: '行为',
                     resourceSetting: "资源",
-                    connection: '连接',
+                    connection: '数据目录',
                     addData: '添加数据',
                     builtinPanel: '内置面板',
                     aiGenerate: 'AI 生成',
@@ -419,10 +412,10 @@ i18n.use(LanguageDetector)
                     // 空数据引导
                     emptySchemaTitle: '当前数据目录没有配置表',
                     emptySchemaDesc: '数据目录中没有 config.cfg 文件或文件为空。你可以创建配置表来开始使用。',
-                    emptySchemaServer: '当前服务器',
+                    emptySchemaServer: '当前数据目录',
                     selectTableHint: '请从上方下拉列表中选择一张表',
-                    noServerTitle: '未连接后端',
-                    noServerDesc: '请前往 设置 → 连接 选择本机部署或输入远程服务器地址。',
+                    noDataDirTitle: '未选择数据目录',
+                    noDataDirDesc: '请前往 设置 → 数据目录 选择包含 config.cfg 的目录。',
 
                     // CFG 文本编辑器
                     cfgEditor: 'CFG编辑器',

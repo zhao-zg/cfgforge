@@ -1,7 +1,7 @@
 import {describe, it, expect} from 'vitest'
 import {isNumberType, isPrimitiveType, NUMBER_TYPES, PRIMITIVE_TYPES} from './schemaModel'
 
-// isPrimitiveType / isNumberType / PRIMITIVE_TYPES / NUMBER_TYPES 是后端 cfgforge 类型系统的
+// isPrimitiveType / isNumberType / PRIMITIVE_TYPES / NUMBER_TYPES 是 editor-core cfgforge 类型系统的
 // "原始类型 / 数字类型" 分类，集中在本文件为单一权威（原散落于 embedding/entityModel/schema.tsx/EntityForm）。
 
 describe('isPrimitiveType / isNumberType', () => {

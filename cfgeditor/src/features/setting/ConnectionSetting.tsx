@@ -9,8 +9,8 @@ import {isTauri} from "@tauri-apps/api/core";
 const {Title, Text} = Typography;
 
 /**
- * "连接" tab：
- * - 桌面端：选择数据目录 → 自动初始化 editor-core（无需启动 Java 后端）
+ * "数据目录" tab：
+ * - 桌面端：选择数据目录 → 自动初始化 editor-core
  * - Web 端：输入数据目录路径
  * + AI 服务配置（AiSetting，提交保存）。
  */
@@ -64,7 +64,7 @@ export const ConnectionSetting = memo(function ConnectionSetting() {
                 </Form.Item>
             )}
             <Form.Item>
-                <Text type="secondary">{t('localBackendTip')}</Text>
+                <Text type="secondary">{t('dataDirTip')}</Text>
             </Form.Item>
         </Form>
 

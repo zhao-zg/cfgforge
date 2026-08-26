@@ -36,7 +36,7 @@ export interface DisplayField extends FieldBase {
  */
 export type PrimitiveValue = string | number | boolean;
 
-// PrimitiveType 已下沉到 @/api/schemaModel（后端类型系统权威），此处经顶部 import 复用。
+// PrimitiveType 已下沉到 @/api/schemaModel（editor-core 类型系统权威），此处经顶部 import 复用。
 
 // ============================================================================
 // 编辑字段类型定义

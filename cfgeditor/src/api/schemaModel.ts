@@ -13,11 +13,11 @@ export interface SField {
 
 // ---------------------------------------------------------------------------
 // 字段类型分类：原始类型 / 数字类型
-// 这是后端 cfgforge 类型系统的一部分（SField.type 的字面量分类），集中在此为单一权威，
+// 这是 editor-core cfgforge 类型系统的一部分（SField.type 的字面量分类），集中在此为单一权威，
 // 供 domain / flow / routes 各层复用，消除散落的重复集合。
 // ---------------------------------------------------------------------------
 
-/** 原始字段类型（cfgforge 后端基础类型字面量） */
+/** 原始字段类型（cfgforge 基础类型字面量） */
 export type PrimitiveType = 'bool' | 'int' | 'long' | 'float' | 'str' | 'text';
 
 /** 原始类型集合（与 PrimitiveType 字面量一致） */

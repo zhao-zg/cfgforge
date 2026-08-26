@@ -38,7 +38,7 @@ export const queryKeys = {
     // 搜索（含 dataDir：唯一把 dataDir 进 key 的查询；换库时由 setDataDir 的 removeAllQueryCache 全清兜底）
     search: (q: string, max: number, dataDir: string) => ['search', q, max, dataDir],
 
-    // 资源 / Tauri（与 server 无关的本地查询）
+    // 资源 / Tauri（与数据目录无关的本地查询）
     vtt2: (path: string) => ['vtt2', path],
     tauriResourceDir: () => ['tauri', 'resourceDir'],
 
@@ -92,7 +92,7 @@ export function refetchResInfoCache(): void {
     });
 }
 
-/** updateNote 成功后精确写 notes 缓存：后端返回全量 notes，直接替它回答（setQueryData），
+/** updateNote 成功后精确写 notes 缓存：editor-core 返回全量 notes，直接替它回答（setQueryData），
  *  省一次 GET /notes refetch。存原始 Notes——Map 转换由查询侧的 select（notesToMap）做，
  *  这里若存 Map，select 再转一次会直接抛错。 */
 export function setNotesCache(notes: Notes): void {

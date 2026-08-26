@@ -221,7 +221,7 @@ function filterEmptyListFields(fields: SField[], obj: JSONObject): SField[] {
  */
 function resolveImpl(iface: SInterface, obj: JSONObject): { impl: SStruct; implName: string } | null {
     const type = obj['$type'];
-    if (typeof type !== 'string') return null;  // 后端脏数据/新旧 schema 不一致时 $type 可能缺失
+    if (typeof type !== 'string') return null;  // editor-core 脏数据/新旧 schema 不一致时 $type 可能缺失
     const implName = type.split('.').pop() || type;
     const impl = getImpl(iface, implName);
     if (!impl) return null;

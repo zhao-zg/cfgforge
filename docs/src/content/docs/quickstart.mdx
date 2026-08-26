@@ -8,21 +8,30 @@ sidebar:
 欢迎使用 cfggen 配表系统!本指南将帮助您在 **5 分钟内**完成第一个配置示例。
 
 
-##  前置准备
+## 前置准备
 
 ### 1. 环境要求
 
-- **Java 21** (运行 cfggen 和生成的代码)
+- **Node.js 20+**（运行 cfggen CLI）
+- **pnpm**（Monorepo 构建，可选）
 - **Excel** (编辑数据,可选)
 - **任意文本编辑器** (VS Code 推荐配合 CFG 插件)
 
-### 2. 下载 cfggen,cfgeditor
+### 2. 获取 cfggen
 
-从 [GitHub Releases](https://github.com/stallboy/cfggen/releases) 下载预编译的 `cfggen.jar`, `cfgeditor.exe`。
+cfggen 已重写为 TypeScript Monorepo。从源码构建 CLI：
+
+```bash
+# 克隆仓库后安装依赖并构建
+pnpm install
+pnpm build
+```
+
+CLI 入口为 `packages/cli`，构建产物在 `packages/cli/dist/`。
 
 ---
 
-## ️ 5 分钟快速上手
+## 5 分钟快速上手
 
 ### 步骤 1: 创建第一个配置结构 (1 分钟)
 
@@ -41,8 +50,6 @@ mkdir item
 # 创建结构定义文件
 touch item\item.cfg
 ```
-
-拷贝`cfggen.jar`到config目录
 
 编辑 `item\item.cfg`,写入以下内容:
 
@@ -105,159 +112,58 @@ table item[id] {
 
 将 `item.xlsx` 保存到 `config/` 目录。
 
-### 步骤 3: 生成代码和数据 (1 分钟)
+### 步骤 3: 校验并生成数据 (1 分钟)
 
 ```bash
-# 从 config 目录执行
-cd config
-java -jar cfggen.jar -datadir . -gen java,dir:../java,configgendir:../java -gen javadata,file:../java/config.data
-```
-
-**生成结果**:
-```
-mygame/
-├── config/              # 配置源文件
-│   └── cfggen.jar
-│   └── item/            # item 模块
-│       ├── item.cfg     # 结构定义
-│       └── item.xlsx    # 数据文件
-│
-└──java/                # 生成的代码和数据
-    ├── config/          # 配置类
-    ├── configgen/       # Schema 框架（自动生成）
-    └── config.data      # 数据文件
+# 从项目根目录执行
+node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen verify
+node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen bytes,dir:.
 ```
 
 **说明**:
-- `-gen java,dir:../java,configgendir:../java`: 生成 Java 访问代码到 `../java` 目录，同时生成 Schema 框架文件
-- `-gen javadata,file:../java/config.data`: 生成二进制数据文件到 `../java/config.data`
-- 生成的代码位于 `java/config/` 目录
-- Schema 框架文件自动生成到 `java/configgen/genjava/` 目录
-- 数据文件为 `java/config.data`
+- `-gen verify`: 校验数据一致性（外键、主键、类型等）
+- `-gen bytes,dir:.`: 生成二进制数据文件（供运行时加载）
+- 完整的语言代码生成请参考 `example/` 目录下的各语言示例（ts/cs/go/lua 等）
 
-### 步骤 4: 配置 Gradle 构建
+### 步骤 4: 使用 cfgeditor 可视化编辑
+
+cfgeditor 是新的桌面编辑器（Tauri 应用），直接读写本机文件系统，无需单独启动后端服务器。
 
 ```bash
-cd ../java
-# 创建settings.gradle
-echo rootProject.name = 'mygame' > settings.gradle
+cd cfgeditor
+pnpm tauri dev    # 开发模式
+# 或使用 CI 构建的 cfgeditor.exe
 ```
 
-创建 `build.gradle` 文件：
+打开编辑器后选择配置目录即可浏览、编辑数据。
 
-```groovy
-plugins {
-    id 'application'
-}
+### 步骤 5: 生成访问代码
 
-sourceSets {
-    main {
-        java {
-            srcDirs = ['.']
-        }
-    }
-}
+cfggen 支持生成多种语言的类型化访问代码：
 
-compileJava {
-    options.encoding = "UTF-8"
-}
-
-application {
-    mainClass = 'LoadConfig'
-}
-
-jar {
-    manifest {
-        attributes 'Main-Class': 'LoadConfig'
-    }
-}
-```
-
-### 步骤 5: 使用生成的代码 (1 分钟)
-
-创建 `LoadConfig.java`:
-
-```java
-import config.ConfigCodeSchema;
-import config.ConfigMgr;
-import config.ConfigMgrLoader;
-import configgen.genjava.ConfigInput;
-import configgen.genjava.Schema;
-import configgen.genjava.SchemaCompatibleException;
-
-import java.io.DataInputStream;
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-
-public class LoadConfig {
-    public static void main(String[] args) throws Exception {
-        // 1. 检查 Schema 兼容性
-        Schema codeSchema = ConfigCodeSchema.getCodeSchema();
-
-        try (ConfigInput input = new ConfigInput(
-                new DataInputStream(new BufferedInputStream(
-                    new FileInputStream("config.data"))))) {
-
-            // 2. 读取数据文件的 Schema
-            Schema dataSchema = Schema.create(input);
-
-            // 3. 检查兼容性
-            if (!codeSchema.compatible(dataSchema)) {
-                throw new SchemaCompatibleException("schema not compatible");
-            }
-
-            // 4. 加载配置数据
-            ConfigMgr mgr = ConfigMgrLoader.load(input);
-            ConfigMgr.setMgr(mgr);
-        }
-
-        // 5. 使用配置
-        config.item.Item item = config.item.Item.get(1001);
-        System.out.println(item.getName());   // 输出: 铁剑
-        System.out.println(item.getPrice());  // 输出: 100
-
-        // 6. 遍历所有道具
-        for (config.item.Item i : config.item.Item.all()) {
-            System.out.println(i.getId() + ": " + i);
-        }
-    }
-}
-```
-
-**运行程序**:
 ```bash
-# 编译
-gradle build
-
-# 运行
-gradle run
-
-# 或直接运行 JAR
-java -jar build/libs/mygame.jar
+node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen ts,dir:../ts -gen bytes
+node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen cs,dir:../cs
+node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen go,dir:../go
+node <cfggen路径>/packages/cli/dist/index.js -datadir config -gen lua,dir:../lua
 ```
 
-**API 说明**:
-- `ConfigCodeSchema.getCodeSchema()`: 获取代码定义的 Schema
-- `Schema.create(input)`: 从数据文件读取 Schema
-- `codeSchema.compatible(dataSchema)`: 检查兼容性
-- `ConfigMgrLoader.load(input)`: 加载配置数据
-- `Item.get(id)`: 根据主键获取记录
-- `Item.all()`: 获取所有记录的集合
+生成的代码提供类型化的数据访问、外键引用解析、entry/enum（消除程序中的魔数）。
 
 ---
 
+## 编辑器
 
-## ️编辑器
+cfgeditor 是全新的 Tauri 桌面编辑器，直接读写本机文件系统（无需 Java 后端）。
 
-在使用 cfgeditor.exe 之前，需要先启动后端服务器。
-
-执行以下命令启动服务器：
+启动方式：
 
 ```bash
-java -jar cfggen.jar -datadir . -gen server
+cd cfgeditor
+pnpm tauri dev
 ```
 
-用cfgeditor查看或编辑数据
+或使用 [GitHub Releases](https://github.com/stallboy/cfggen/releases) 下载预编译的 `cfgeditor.exe`。
 
 ## AI 生成配置
 
@@ -287,7 +193,6 @@ model: deepseek-chat
 - [AI 配置指南](../ai/mcpserver/) - Claude Code 集成和高级用法
 - [Schema 生成](../ai/schema-gen/) - 使用自然语言生成 CFG Schema 定义文件
 
-
 ---
 
 ## 下一步学习
@@ -297,7 +202,6 @@ model: deepseek-chat
 ### 1️⃣ 使用配置编辑器
 
 - [配置编辑器功能介绍](../editor/overview/) - 可视化配置编辑器，提供图形化界面查看和编辑配置
-
 
 ### 2️⃣ 深入结构定义
 
@@ -316,6 +220,5 @@ model: deepseek-chat
 查看 `example/` 目录下的完整示例:
 
 - `example/config/` - 配置定义和数据文件
-- `example/genjava.bat` - 生成 Java 代码和数据的完整脚本
-- `example/javaload/LoadConfig.java` - 配置加载示例
-- `example/build.gradle` - Gradle 构建配置示例
+- `example/cs/`、`example/ts/`、`example/go/`、`example/lua/` - 各语言生成示例
+- `example/cfggen_common.bat` - 生成命令公共脚本

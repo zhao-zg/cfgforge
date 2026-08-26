@@ -1,1 +1,1 @@
-@set "CFGGEN=java --sun-misc-unsafe-memory-access=allow -jar ../../cfggen.jar -datadir ../config"
+@set "CFGGEN=node ../../packages/cli/dist/index.js -datadir ../config"

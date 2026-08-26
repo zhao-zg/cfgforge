@@ -16,7 +16,7 @@ cfgeditor_server 内置了文件监控功能，能够实时监测配置文件目
 要启用自动重载功能，只需在启动命令中添加 `watch` 参数：
 
 ```bat
-java -jar ../cfggen.jar -datadir ../example/config -gen server,watch=1
+node ../packages/cli/dist/index.js -datadir ../example/config -gen server,watch=1
 ```
 
 ### 参数详解
@@ -43,7 +43,7 @@ java -jar ../cfggen.jar -datadir ../example/config -gen server,watch=1
 在启动命令中添加 `postrun` 参数：
 
 ```bat
-java -jar ../cfggen.jar -datadir ../example/config -gen server,watch=1,postrun=upload.bat
+node ../packages/cli/dist/index.js -datadir ../example/config -gen server,watch=1,postrun=upload.bat
 ```
 
 ### postrun 脚本示例
@@ -153,7 +153,7 @@ echo "[$(date '+%Y-%m-%d %H:%M:%S')] 配置更新流程完成"
 
 **1. 服务器启动命令**
 ```bat
-java -jar cfggen.jar -datadir ./game_config -gen server,watch=3,postrun=deploy.bat,port=3456
+node <cfggen>/packages/cli/dist/index.js -datadir ./game_config -gen server,watch=3,postrun=deploy.bat,port=3456
 ```
 
 **2. deploy.bat 脚本**

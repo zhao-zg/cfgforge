@@ -1,3 +1,3 @@
 
-java  -jar ../cfggen.jar -datadir config -gen mcpserver
+node ../packages/cli/dist/index.js -datadir config -gen mcpserver
 pause

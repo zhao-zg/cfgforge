@@ -1,2 +1,2 @@
-java -jar ../cfggen.jar -datadir config -gen search
+node ../packages/cli/dist/index.js -datadir config -gen search
 

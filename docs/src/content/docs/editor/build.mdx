@@ -14,11 +14,9 @@ sidebar:
 2. `pnpm install`
 
 
-## 准备工作：启动对象数据服务器
+## 准备配表目录
 
-```bash
-java -jar ../cfggen.jar -datadir ../example/config  -gen server
-```
+cfgeditor 直接读写本机文件系统，无需启动后端服务器。准备一个含 `config.cfg` 的配表目录即可，例如 `example/config`。
 
 ## Build
 

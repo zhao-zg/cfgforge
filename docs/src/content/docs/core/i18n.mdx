@@ -45,9 +45,9 @@ sidebar:
 ```bash
 # -i18nfile en.csv 参数用于复用已有的翻译结果
 # 首次运行时可不加此参数，或手动创建空的 en.csv 文件
-java -jar ../../cfggen.jar -datadir ../config -i18nfile en.csv -gen i18n,file=en.csv
-java -jar ../../cfggen.jar -datadir ../config -i18nfile kr.csv -gen i18n,file=kr.csv
-java -jar ../../cfggen.jar -datadir ../config -i18nfile tw.csv -gen i18n,file=tw.csv
+node ../../packages/cli/dist/index.js -datadir ../config -i18nfile en.csv -gen i18n,file=en.csv
+node ../../packages/cli/dist/index.js -datadir ../config -i18nfile kr.csv -gen i18n,file=kr.csv
+node ../../packages/cli/dist/index.js -datadir ../config -i18nfile tw.csv -gen i18n,file=tw.csv
 ```
 
 ### 生成文件结构

@@ -27,7 +27,7 @@ cfggen 提供了完整的验证机制，涵盖以下四个方面：
 ### 基本用法
 
 ```bash
-java -jar cfggen.jar -datadir <配置目录> -gen verify[,参数]
+node <cfggen>/packages/cli/dist/index.js -datadir <配置目录> -gen verify[,参数]
 ```
 
 **参数说明**：
@@ -42,10 +42,10 @@ java -jar cfggen.jar -datadir <配置目录> -gen verify[,参数]
 
 ```bash
 # 执行外键一致性检查
-java -jar cfggen.jar -datadir ../example/config -gen verify
+node <cfggen>/packages/cli/dist/index.js -datadir ../example/config -gen verify
 
 # 额外检查未引用记录,入口记录
-java -jar cfggen.jar -datadir ../example/config -gen verify,unreferenced,entry
+node <cfggen>/packages/cli/dist/index.js -datadir ../example/config -gen verify,unreferenced,entry
 ```
 
 
@@ -457,7 +457,7 @@ table LevelReward[level] (root) {
 
 ```bash
 # 在 CI 脚本中添加验证步骤
-java -jar cfggen.jar -datadir config -gen verify
+node <cfggen>/packages/cli/dist/index.js -datadir config -gen verify
 if [ $? -ne 0 ]; then
     echo "配置验证失败，请检查未引用记录或错误"
     exit 1

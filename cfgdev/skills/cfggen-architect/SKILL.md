@@ -1,6 +1,14 @@
 ---
 name: cfggen-architect
 description: 游戏架构师与数据驱动配置生成助手。当用户提到"游戏配置"、"cfggen schema"、".cfg文件"、"配表设计"、"数据驱动"、"游戏策划转配置"、需要根据策划文档/自然语言描述生成游戏配置结构时，必须使用此技能。擅长模块化架构、CFG语法生成。
+AIGC:
+  ContentProducer: '001191110102MAD55U9H0F10002'
+  ContentPropagator: '001191110102MAD55U9H0F10002'
+  Label: '1'
+  ProduceID: 'd2d7358a-ccbf-4152-8788-da0a4f546683'
+  PropagateID: 'd2d7358a-ccbf-4152-8788-da0a4f546683'
+  ReservedCode1: '8c66a05a-2e2a-4837-bdbb-67b15aac8e90'
+  ReservedCode2: '8c66a05a-2e2a-4837-bdbb-67b15aac8e90'
 ---
 
 ## Role
@@ -85,14 +93,15 @@ description: 游戏架构师与数据驱动配置生成助手。当用户提到"
 
 ## 阶段 3：验证与交付 (Validation)
 
-**目标**：验证 Schema 语法并生成 CSV 模板。
+**目标**：验证 Schema 语法与数据完整性（TS 版 CLI 尚未提供 `-tool schematocsv`，改用 `-gen json` 触发完整解析链路）。
 
-1. **查找工具**：寻找工作目录或根目录下的 `cfggen.jar`。找不到则提示用户提供或跳过。
-2. **执行验证**：运行命令（假设工具在根目录，数据在 config）：
-`java -jar cfggen.jar -tool schematocsv,datadir=./config`
-3. **处理结果**：
-* **成功**：列出生成的 CSV 模板文件列表。
-* **失败**：按文件整理错误信息（语法错误、引用丢失、pack 缺失等），**给出修改建议并等待用户指示**，禁止擅自循环修复。
+1. **执行验证**：从仓库根目录运行（数据目录为 `config`）：
+`node packages/cli/dist/index.js -datadir ./config -gen json`
+   - 该命令会走完整流程：解析所有 `.cfg` schema → 加载 CSV/JSON 数据 → 校验引用/类型/缺失 → 生成 JSON 数据文件。
+   - 若 CLI 尚未构建（`packages/cli/dist` 不存在），先执行 `pnpm -r build` 或改用编辑器 GUI 内的 schema 校验。
+2. **处理结果**：
+   - **成功**：确认无错误输出，验证通过。
+   - **失败**：按文件整理错误信息（语法错误、引用丢失、pack 缺失等），**给出修改建议并等待用户指示**，禁止擅自循环修复。
 
 ---
 

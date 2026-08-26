@@ -21,7 +21,7 @@ sidebar:
 执行以下命令生成翻译文件：
 
 ```bat
-java -jar ../../cfggen.jar -datadir ../config -langswitchdir langs -gen i18nbyid,dir=langs,backup=backup
+node ../../packages/cli/dist/index.js -datadir ../config -langswitchdir langs -gen i18nbyid,dir=langs,backup=backup
 ```
 
 ### 参数说明
@@ -91,7 +91,7 @@ java -jar ../../cfggen.jar -datadir ../config -langswitchdir langs -gen i18nbyid
 ### 多语言版本生成
 
 ```bat
-java -jar ../cfggen.jar -datadir config -langswitchdir i18n/langs -gen ...
+node ../packages/cli/dist/index.js -datadir config -langswitchdir i18n/langs -gen ...
 ```
 
 **参数说明**：
@@ -102,7 +102,7 @@ java -jar ../cfggen.jar -datadir config -langswitchdir i18n/langs -gen ...
 ### 单语言版本生成
 
 ```bat
-java -jar ../cfggen.jar -datadir config -i18nfile i18n/langs/en -gen ...
+node ../packages/cli/dist/index.js -datadir config -i18nfile i18n/langs/en -gen ...
 ```
 
 **参数说明**：

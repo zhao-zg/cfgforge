@@ -1,2 +1,2 @@
-java -jar ../cfggen.jar
+node ../packages/cli/dist/index.js
 pause

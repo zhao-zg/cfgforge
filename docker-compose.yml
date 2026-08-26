@@ -1,17 +1,9 @@
 services:
   cfggen:
-    # 直接使用 GHCR 已构建的镜像（CI push tag v0.0.1 后自动发布）
-    # 如需本地构建，注释 image 行并取消注释下方 build 段
-    image: ghcr.io/zhao-zg/cfggen:0.0.1
-    # build:
-    #   context: .
-    #   dockerfile: Dockerfile
+    # 纯静态前端只读预览（TS 重写架构）。
+    # 注意：新架构下编辑功能由本地 Tauri 桌面应用直接读写本机文件系统完成，
+    # 浏览器/Docker 环境无法读写配表，仅作只读预览部署。
+    image: ghcr.io/zhao-zg/cfggen:latest
     ports:
-      - "8080:80"
-    volumes:
-      # 挂载配置数据目录（须包含 config.cfg 等配表文件）
-      - ./example/config:/data
-    environment:
-      - JAVA_PORT=3456
-      - DATADIR=/data
+      - "8181:80"
     restart: unless-stopped

@@ -1,4 +1,4 @@
 
-java  -jar ../cfggen.jar -datadir . -nowarn -gen server,watch=1
+node ../packages/cli/dist/index.js -datadir . -nowarn -gen server,watch=1
 
 pause

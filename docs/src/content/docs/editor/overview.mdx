@@ -37,21 +37,19 @@ sidebar:
   - 引用完整性验证
 
 
-## 服务器配置
+## 启动编辑器
 
-启动后端服务器时,可以使用以下参数自定义服务器行为:
+cfgeditor 是 Tauri 桌面应用，**直接读写本机文件系统，无需单独启动后端服务器**。
 
-| 参数 | 说明 | 示例值 |
-|------|------|--------|
-| `port` | 服务器监听的端口号，cfgeditor 将通过此端口连接 | `port=3456` |
-| `note` | 存储非 JSON 格式标注信息的位置 | `note=_note.csv` |
-| `watch` | 文件监控间隔（秒），大于 0 时自动重载修改后的配置文件 | `watch=5` |
-| `postrun` | 配置重载后执行的脚本文件路径 | `postrun=reload.bat` |
-
-**启动示例**:
 ```bash
-java -jar cfggen.jar -datadir . -gen server,port=3456,watch=5
+cd cfgeditor
+pnpm tauri dev       # 开发模式（需 Rust 工具链）
+# 或使用 GitHub Releases 下载的 cfgeditor.exe
 ```
+
+打开编辑器后选择配置目录（含 `config.cfg` 的根目录）即可浏览、编辑数据。所有文件读写通过 CfgFileSystem 抽象完成（Tauri WebView 内调用本机文件系统）。
+
+> 旧架构的 `-gen server`（Java HTTP 后端）已随 TypeScript 重写移除，`-gen mcpserver` 仍可用于为 AI Agent 提供 MCP 服务。
 
 
 ## 界面介绍
@@ -276,12 +274,12 @@ cfgeditor 提供了多种方式来新增配置记录:
 
 ## 常见问题
 
-### Q: 编辑器无法连接到服务器?
+### Q: 编辑器无法打开配置目录?
 
 **A**: 检查以下几点:
-1. 确认后端服务器已启动: `java -jar cfggen.jar -datadir config -gen server`
-2. 检查服务器地址配置 (默认: `http://localhost:3456`)
-3. 检查防火墙设置
+1. 确认选择的目录下存在 `config.cfg`（配表根目录标志）
+2. 确认文件系统权限可读写（Tauri 直接读写本机文件系统）
+3. 若使用 Docker 只读预览部署，浏览器环境无法读写文件，编辑只能在本地 Tauri 应用中完成
 
 ### Q: 如何自定义可视化样式?
 

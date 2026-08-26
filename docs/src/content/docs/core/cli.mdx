@@ -6,7 +6,6 @@ sidebar:
 ---
 
 import { Code } from '@astrojs/starlight/components';
-import genjavaBat from '~/../../example/java/genjava.bat?raw';
 import genluaBat from '~/../../example/lua/genlua.bat?raw';
 import gencsBat from '~/../../example/cs/gencs.bat?raw';
 import gengoBat from '~/../../example/go/gengo.bat?raw';
@@ -14,10 +13,9 @@ import gentsBat from '~/../../example/ts/gents.bat?raw';
 
 
 ```cmd help
-Usage: java -jar cfggen.jar [options] [-tool toolName[,param=value...]] -datadir <dir> [-gen genName[,param=value...]]
+Usage: cfggen [options] [-tool toolName[,param=value...]] -datadir <dir> [-gen genName[,param=value...]]
 
-   or: java -jar cfggen.jar [-h] (print help)
-   or: java -jar cfggen.jar -gui (launch GUI)
+   or: cfggen [-h] (print help)
 
 Parameters can be in any order, but -datadir is required when using generators.
 以下tool/gen参数之间由,分割,参数名和参数取值之间由=或:分割
@@ -177,23 +175,27 @@ Parameters can be in any order, but -datadir is required when using generators.
 
 ## Build & Test
 
-### 生成 cfggen.jar
+### 构建 CLI
 
 ```bash
-genjar.bat  # 生成cfggen.jar
+pnpm build   # 编译所有 packages（含 packages/cli）
 ```
 
-
-### 测试 Java：生成 java 代码和数据
+### 运行 CLI
 
 ```bash
-cd example/java
-genjava.bat
+node packages/cli/dist/index.js  # 或通过项目内脚本调用
+```
+
+### 测试 TypeScript 生成
+
+```bash
+cd example/ts
+gents.bat
 run.bat
 ```
 
-<Code code={genjavaBat.trim()} title="genjava.bat" lang="bash" />
-
+<Code code={gentsBat.trim()} title="gents.bat" lang="bash" />
 
 ### 测试 Lua
 
@@ -226,15 +228,4 @@ run.bat
 ```
 
 <Code code={gengoBat.trim()} title="gengo.bat" lang="bash" />
-
-
-### 测试 TypeScript
-
-```bash
-cd example/ts
-gents.bat
-run.bat
-```
-
-<Code code={gentsBat.trim()} title="gents.bat" lang="bash" />
 

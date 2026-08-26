@@ -141,7 +141,7 @@ if errorlevel 1 (
 
 echo.
 echo   [CONFIRM] Push annotated tag %VERSION% to %REMOTE%? This triggers GitHub Actions.
-echo          Artifacts: cfggen.jar + cfgeditor (win/linux/mac) + source zip
+echo          Artifacts: cfgeditor (win/linux/mac) + source zip
 echo.
 set /p CONFIRM=  Push now? (y/N): 
 if /i not "%CONFIRM%"=="y" (

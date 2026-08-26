@@ -9,7 +9,8 @@
  */
 
 import * as fs from 'fs';
-import { readCSV, writeCSVToFile, type CSVRow } from '@cfggen/shared';
+import { readCSV, writeCSVToFile, writeCSVToFileAsync, type CSVRow } from '@cfggen/shared';
+import { getDefaultFileSystem } from '@cfggen/shared';
 
 export interface Note {
   key: string;
@@ -52,12 +53,94 @@ export class NoteEditService {
     }
   }
 
+  /**
+   * Async factory: creates a NoteEditService and loads notes from CSV.
+   * Uses CfgFileSystem abstraction (Tauri/WebView compatible).
+   */
+  static async create(noteCsvPath: string): Promise<NoteEditService> {
+    const svc = new NoteEditService(noteCsvPath);
+    // Clear the sync-loaded data and re-load async
+    svc.noteMap.clear();
+    const dfs = getDefaultFileSystem();
+    if (await dfs.exists(noteCsvPath)) {
+      const bytes = await dfs.readFile(noteCsvPath);
+      const text = Buffer.from(bytes).toString('utf8');
+      // Parse CSV manually (same as readCSV but from string)
+      const rows = NoteEditService.parseCsvText(text);
+      for (const row of rows) {
+        if (row.length === 2) {
+          svc.noteMap.set(row[0], row[1]);
+        }
+      }
+    }
+    return svc;
+  }
+
+  /**
+   * Simple CSV parser (handles basic CSV without quoting edge cases).
+   * readCSV from @cfggen/shared uses fs directly; this is a lightweight
+   * inline parser for async path.
+   */
+  private static parseCsvText(text: string): CSVRow[] {
+    // Strip UTF-8 BOM if present (writeCSVToFileAsync writes BOM)
+    if (text.charCodeAt(0) === 0xfeff) {
+      text = text.slice(1);
+    }
+    const lines = text.split(/\r?\n/).filter((l) => l.length > 0);
+    return lines.map((line) => line.split(','));
+  }
+
   private writeNoteMap(): void {
     const list: CSVRow[] = [];
     for (const [key, note] of this.noteMap) {
       list.push([key, note]);
     }
     writeCSVToFile(this.noteCsvPath, list);
+  }
+
+  /**
+   * Async variant of writeNoteMap.
+   * Uses CfgFileSystem abstraction (Tauri/WebView compatible).
+   */
+  private async writeNoteMapAsync(): Promise<void> {
+    const list: CSVRow[] = [];
+    for (const [key, note] of this.noteMap) {
+      list.push([key, note]);
+    }
+    if (list.length === 0) {
+      // Write empty file to clear existing content (matches sync BomUtf8Writer behavior)
+      const dfs = getDefaultFileSystem();
+      await dfs.writeFile(this.noteCsvPath, Buffer.from('\uFEFF', 'utf8'));
+      return;
+    }
+    await writeCSVToFileAsync(this.noteCsvPath, list);
+  }
+
+  /**
+   * Async variant of updateNote.
+   * Uses CfgFileSystem abstraction (Tauri/WebView compatible).
+   */
+  async updateNoteAsync(key: string, note: string): Promise<NoteEditResult> {
+    if (key == null || key === '') {
+      return { resultCode: 'keyNotSet', notes: this.getNotes().notes };
+    }
+
+    try {
+      let code: NoteResultCode;
+      if (note === '') {
+        const old = this.noteMap.get(key);
+        this.noteMap.delete(key);
+        code = old != null ? 'deleteOk' : 'keyNotFoundOnDelete';
+      } else {
+        const old = this.noteMap.get(key);
+        this.noteMap.set(key, note);
+        code = old != null ? 'updateOk' : 'addOk';
+      }
+      await this.writeNoteMapAsync();
+      return { resultCode: code, notes: this.getNotes().notes };
+    } catch {
+      return { resultCode: 'storeErr', notes: this.getNotes().notes };
+    }
   }
 
   getNotes(): Notes {

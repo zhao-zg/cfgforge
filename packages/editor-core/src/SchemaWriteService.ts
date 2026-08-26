@@ -25,6 +25,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import { CfgReader, ParseError, CfgSchemaException, CfgSchemaErrs } from '@cfggen/schema';
+import { getDefaultFileSystem } from '@cfggen/shared';
 import type { EditorService } from './EditorService';
 
 // Re-import fs for readSchemaText (reads from disk, not cached content)
@@ -70,6 +71,33 @@ export class SchemaWriteService {
         }
       } catch {
         // Failed to read — skip (Java logs and continues)
+      }
+    }
+
+    return { text: sb };
+  }
+
+  /**
+   * Async variant of readSchemaText.
+   * Uses CfgFileSystem abstraction (Tauri/WebView compatible).
+   */
+  static async readSchemaTextAsync(editor: EditorService): Promise<SchemaTextResult> {
+    const cfgFiles = editor.context().sourceStructure().getCfgFiles();
+    let sb = '';
+    const dfs = getDefaultFileSystem();
+
+    for (const c of cfgFiles) {
+      try {
+        const bytes = await dfs.readFile(c.path);
+        const content = Buffer.from(bytes).toString('utf-8');
+        if (content.length > 0) {
+          if (sb.length > 0 && !content.startsWith('\n')) {
+            sb += '\n';
+          }
+          sb += content;
+        }
+      } catch {
+        // Failed to read — skip
       }
     }
 
@@ -128,6 +156,53 @@ export class SchemaWriteService {
 
     // Note: Java does NOT reload context here — caller is responsible for
     // calling editor.reload() if it needs the context updated.
+    return { ok: true, errors: [] };
+  }
+
+  /**
+   * Async variant of writeSchemaText.
+   * Uses CfgFileSystem abstraction (Tauri/WebView compatible).
+   */
+  static async writeSchemaTextAsync(editor: EditorService, cfgText: string): Promise<SchemaWriteResult> {
+    const errors: string[] = [];
+
+    // 1. Parse CFG text (syntax check)
+    let schema;
+    try {
+      schema = CfgReader.parse(cfgText);
+    } catch (e) {
+      if (e instanceof ParseError) {
+        errors.push(e.message);
+      } else {
+        errors.push((e as Error).message);
+      }
+      return { ok: false, errors };
+    }
+
+    // 2. Schema semantic validation
+    try {
+      const errs: CfgSchemaErrs = schema.resolve();
+      errs.checkErrors('schemaWrite');
+    } catch (e) {
+      if (e instanceof CfgSchemaException) {
+        for (const err of e.errs.errs) {
+          errors.push(err.msg());
+        }
+      } else {
+        errors.push((e as Error).message);
+      }
+      return { ok: false, errors };
+    }
+
+    // 3. Write to config.cfg
+    const cfgPath = path.join(editor.rootDir(), 'config.cfg');
+    try {
+      await getDefaultFileSystem().writeFile(cfgPath, Buffer.from(cfgText, 'utf8'));
+    } catch (e) {
+      errors.push(`Failed to write config.cfg: ${(e as Error).message}`);
+      return { ok: false, errors };
+    }
+
     return { ok: true, errors: [] };
   }
 }

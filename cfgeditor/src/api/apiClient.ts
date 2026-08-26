@@ -1,206 +1,315 @@
-import axios from 'axios';
-import { RawSchema } from "./schemaModel.ts";
+/**
+ * apiClient — 直接调用 @cfggen/editor-core 的服务层。
+ *
+ * 改造前：通过 axios HTTP 调用 Java 后端（-gen server）。
+ * 改造后：直接 import 并调用 editor-core 的 TypeScript 服务类。
+ *
+ * Tauri IPC 发生在更底层（@tauri-apps/plugin-fs），而非此层。
+ * apiClient 层只需 initEditor(dataDir) 初始化，之后所有调用
+ * 走 editor-core → CfgFileSystem → NodeFileSystem / TauriFileSystem。
+ *
+ * 函数签名尽量保持与旧 axios 版本一致（参数名/返回值类型），
+ * 但 server: string 参数被替换为 dataDir（通过 initEditor 设置）。
+ * AbortSignal 参数保留但不使用（直接调用无法中途取消）。
+ */
+
 import {
-    JSONObject,
-    RecordEditResult,
-    RecordRefIdsResult,
-    RecordRefsResult,
+    EditorService,
+    SchemaService,
+    RecordService,
+    RecordEditService,
+    RecordRefIdsService,
+    SchemaWriteService,
+    TableCreateService,
+    CheckJsonService,
+    PromptService,
+    NoteEditService,
+    SearchService,
+} from '@cfggen/editor-core';
+
+import type {
+    RawSchema,
     RecordResult,
-    UnreferencedRecordsResult
-} from "./recordModel.ts";
-import { NoteEditResult, Notes } from "./noteModel.ts";
-import { CheckJsonResult, PromptResult } from "./chatModel.ts";
-import { SearchResult } from "./searchModel.ts";
+    RecordRefsResult,
+    UnreferencedRecordsResult,
+    RecordRefIdsResult,
+    RecordEditResult,
+    SchemaTextResult,
+    SchemaWriteResult,
+    CreateResult,
+    TableCreateRequest,
+    CheckJsonResult,
+    PromptResult,
+    NoteEditResult,
+    SearchResult,
+} from '@cfggen/editor-core';
 
-const DEFAULT_TIMEOUT_MS = 15000;
+import type {Notes} from './noteModel';
+import type {JSONObject} from './recordModel';
 
-/**
- * 规范化 server：用户可能填入 `http://host:port`、`https://host:port`、`host:port` 或带尾随斜杠，
- * 统一剥成 `host[:port]`，避免拼出 `http://https://host` 这种非法 URL。
- * 注意：cfggen 的 `-gen server` 后端只支持 http，故这里固定用 http。
- */
-function normalizeServer(server: string): string {
-    return server.trim().replace(/^https?:\/\//i, '').replace(/\/+$/, '');
+// ---------------------------------------------------------------------------
+// EditorService instance management
+// ---------------------------------------------------------------------------
+
+let editor: EditorService | null = null;
+
+/** Join path segments using the OS-appropriate separator. */
+function joinPath(base: string, file: string): string {
+    const sep = base.includes('/') && !base.includes('\\') ? '/' : '\\';
+    return base + sep + file;
 }
 
 /**
- * 为给定 server 创建带默认超时与 header 的 axios 实例。
- * server 由用户动态配置，故按调用创建（axios.create 开销可忽略）。
- * server 为空时（Docker 部署场景），跟随当前页面域名，用相对路径请求，
- * 浏览器自动发到页面所在 host:port，Nginx 反代到容器内 Java 后端。
+ * Initialize the EditorService with a data directory.
+ * Must be called before any API function.
  */
-function httpClient(server: string) {
-    const normalized = normalizeServer(server);
-    const baseURL = normalized ? `http://${normalized}` : '';
-    return axios.create({
-        baseURL,
-        timeout: DEFAULT_TIMEOUT_MS,
-        headers: { 'Content-Type': 'application/json' },
-    });
+export async function initEditor(dataDir: string): Promise<void> {
+    editor = await EditorService.create(dataDir);
 }
 
-export async function fetchSchema(server: string, signal: AbortSignal): Promise<RawSchema> {
-    const { data } = await httpClient(server).get<RawSchema>('/schemas', { signal });
-    return data;
+/**
+ * Reload the EditorService from disk (pick up file changes).
+ */
+export async function reloadEditor(): Promise<void> {
+    if (editor === null) {
+        throw new Error('Editor not initialized. Call initEditor(dataDir) first.');
+    }
+    await editor.reload();
 }
 
-export async function fetchRecordRefIds(server: string, tableId: string, id: string,
-    refInDepth: number, refOutDepth: number, maxIds: number,
-    signal: AbortSignal): Promise<RecordRefIdsResult> {
-    const { data } = await httpClient(server).get<RecordRefIdsResult>('/recordRefIds', {
-        params: { table: tableId, id, in: refInDepth, out: refOutDepth, maxIds },
-        signal,
-    });
-    return data;
+/**
+ * Shutdown the EditorService (clear the cached instance).
+ */
+export function shutdownEditor(): void {
+    editor = null;
 }
 
-export async function fetchRecord(server: string, tableId: string, id: string, signal: AbortSignal): Promise<RecordResult> {
-    const { data } = await httpClient(server).get<RecordResult>('/record', {
-        params: { table: tableId, id, depth: 1 },
-        signal,
-    });
-    return data;
+/**
+ * Get the current EditorService instance (internal).
+ */
+function getEditor(): EditorService {
+    if (editor === null) {
+        throw new Error('Editor not initialized. Call initEditor(dataDir) first.');
+    }
+    return editor;
+}
+
+// ---------------------------------------------------------------------------
+// Schema API
+// ---------------------------------------------------------------------------
+
+export async function fetchSchema(_signal?: AbortSignal): Promise<RawSchema> {
+    return SchemaService.fromCfgValue(getEditor().cfgValue());
+}
+
+// ---------------------------------------------------------------------------
+// Record API
+// ---------------------------------------------------------------------------
+
+export async function fetchRecord(
+    tableId: string,
+    id: string,
+    _signal?: AbortSignal,
+): Promise<RecordResult> {
+    const editor = getEditor();
+    const svc = new RecordService(
+        editor.cfgValue(),
+        editor.graph(),
+        tableId,
+        id,
+        1,      // depth
+        false,  // in
+        1000,   // maxObjs
+        'requestRecord',
+    );
+    return svc.retrieve() as RecordResult;
+}
+
+export async function fetchRecordRefIds(
+    tableId: string,
+    id: string,
+    refInDepth: number,
+    refOutDepth: number,
+    maxIds: number,
+    _signal?: AbortSignal,
+): Promise<RecordRefIdsResult> {
+    const editor = getEditor();
+    const svc = new RecordRefIdsService(
+        editor.cfgValue(),
+        editor.graph(),
+        tableId,
+        id,
+        refInDepth,
+        refOutDepth,
+        maxIds,
+    );
+    return svc.retrieve();
 }
 
 export async function fetchRecordRefs(
-    server: string,
     tableId: string,
     id: string,
     refOutDepth: number,
     maxNode: number,
     refIn: boolean,
-    signal: AbortSignal
+    _signal?: AbortSignal,
 ): Promise<RecordRefsResult> {
-    // 后端 EditorServer.queryToMap 对 refs / in 做存在性判断（!= null），
-    // 故用空串占位即可，等价于原先无值的 `&refs`、`&in`。
-    const { data } = await httpClient(server).get<RecordRefsResult>('/record', {
-        params: {
-            table: tableId,
-            id,
-            depth: refOutDepth,
-            maxObjs: maxNode,
-            refs: '',
-            ...(refIn ? { in: '' } : {}),
-        },
-        signal,
-    });
-    return data;
+    const editor = getEditor();
+    const svc = new RecordService(
+        editor.cfgValue(),
+        editor.graph(),
+        tableId,
+        id,
+        refOutDepth,
+        refIn,
+        maxNode,
+        'requestRefs',
+    );
+    return svc.retrieve() as RecordRefsResult;
 }
 
-// 获取某个table下所有未被引用的记录
 export async function fetchUnreferencedRecords(
-    server: string,
     tableId: string,
     maxNode: number,
-    signal: AbortSignal
+    _signal?: AbortSignal,
 ): Promise<UnreferencedRecordsResult> {
-    const { data } = await httpClient(server).get<UnreferencedRecordsResult>('/record', {
-        params: { table: tableId, maxObjs: maxNode, noRefIn: '' },
-        signal,
-    });
-    return data;
+    const editor = getEditor();
+    const svc = new RecordService(
+        editor.cfgValue(),
+        editor.graph(),
+        tableId,
+        null,
+        0,
+        false,
+        maxNode,
+        'requestUnreferenced',
+    );
+    return svc.retrieve() as UnreferencedRecordsResult;
 }
 
-export async function addOrUpdateRecord(server: string, tableId: string, editingObject: JSONObject, signal?: AbortSignal): Promise<RecordEditResult> {
-    const { data } = await httpClient(server).post<RecordEditResult>(
-        '/recordAddOrUpdate', editingObject, { params: { table: tableId }, signal });
-    return data;
+// ---------------------------------------------------------------------------
+// Record Edit API
+// ---------------------------------------------------------------------------
+
+export async function addOrUpdateRecord(
+    tableId: string,
+    editingObject: JSONObject,
+    _signal?: AbortSignal,
+): Promise<RecordEditResult> {
+    const editor = getEditor();
+    return RecordEditService.addOrUpdateRecord(
+        editor,
+        tableId,
+        JSON.stringify(editingObject),
+    );
 }
 
-
-export async function deleteRecord(server: string, tableId: string, id: string, signal?: AbortSignal): Promise<RecordEditResult> {
-    const { data } = await httpClient(server).post<RecordEditResult>(
-        '/recordDelete', null, { params: { table: tableId, id }, signal });
-    return data;
+export async function deleteRecord(
+    tableId: string,
+    id: string,
+    _signal?: AbortSignal,
+): Promise<RecordEditResult> {
+    const editor = getEditor();
+    return RecordEditService.deleteRecord(editor, tableId, id);
 }
 
-export async function fetchNotes(server: string, signal: AbortSignal): Promise<Notes> {
-    const { data } = await httpClient(server).get<Notes>('/notes', { signal });
-    return data;
+// ---------------------------------------------------------------------------
+// Notes API
+// ---------------------------------------------------------------------------
+
+export async function fetchNotes(_signal?: AbortSignal): Promise<Notes> {
+    const editor = getEditor();
+    const notePath = joinPath(editor.rootDir(), 'note.csv');
+    const svc = await NoteEditService.create(notePath);
+    return svc.getNotes();
 }
 
-export async function updateNote(server: string, key: string, note: string, signal?: AbortSignal): Promise<NoteEditResult> {
-    const { data } = await httpClient(server).post<NoteEditResult>(
-        '/noteUpdate', note, { params: { key }, headers: { 'Content-Type': 'text/plain' }, signal });
-    return data;
+export async function updateNote(
+    key: string,
+    note: string,
+    _signal?: AbortSignal,
+): Promise<NoteEditResult> {
+    const editor = getEditor();
+    const notePath = joinPath(editor.rootDir(), 'note.csv');
+    const svc = await NoteEditService.create(notePath);
+    return svc.updateNoteAsync(key, note);
 }
 
-export async function getPrompt(server: string, table: string, signal: AbortSignal): Promise<PromptResult> {
-    const { data } = await httpClient(server).get<PromptResult>('/prompt', {
-        params: { table },
-        signal,
-    });
-    return data;
+// ---------------------------------------------------------------------------
+// AI Prompt API
+// ---------------------------------------------------------------------------
+
+export async function getPrompt(
+    table: string,
+    _signal?: AbortSignal,
+): Promise<PromptResult> {
+    return PromptService.gen(getEditor(), table);
 }
 
+// ---------------------------------------------------------------------------
+// JSON Check API
+// ---------------------------------------------------------------------------
 
-export async function checkJson(server: string, tableId: string, raw: string, signal?: AbortSignal): Promise<CheckJsonResult> {
-    const { data } = await httpClient(server).post<CheckJsonResult>(
-        '/checkJson', raw, { params: { table: tableId }, headers: { 'Content-Type': 'text/plain' }, signal });
-    return data;
+export async function checkJson(
+    tableId: string,
+    raw: string,
+    _signal?: AbortSignal,
+): Promise<CheckJsonResult> {
+    return CheckJsonService.checkJson(getEditor(), tableId, raw);
 }
 
-// /search 原由 SearchValue 用原生 fetch 直发，绕过 normalizeServer → 用户填带 http:// 前缀的 server 时
-// 拼出 http://http://host 双前缀导致搜索挂掉，且丢了统一超时 / header / 错误处理。收回 apiClient 统一管线。
-export async function searchServer(server: string, q: string, max: number, signal: AbortSignal): Promise<SearchResult> {
-    const { data } = await httpClient(server).get<SearchResult>('/search', {
-        params: { q, max },
-        signal,
-    });
-    return data;
+// ---------------------------------------------------------------------------
+// Search API
+// ---------------------------------------------------------------------------
+
+export async function searchServer(
+    q: string,
+    max: number,
+    _signal?: AbortSignal,
+): Promise<SearchResult> {
+    return SearchService.search(getEditor(), q, max);
 }
 
-export interface SchemaTextResult {
-    text: string;
+// ---------------------------------------------------------------------------
+// Schema Text API
+// ---------------------------------------------------------------------------
+
+export async function fetchSchemaText(_signal?: AbortSignal): Promise<SchemaTextResult> {
+    return SchemaWriteService.readSchemaTextAsync(getEditor());
 }
 
-export interface SchemaWriteResult {
-    ok: boolean;
-    errors: string[];
+export async function writeSchemaText(
+    cfgText: string,
+    _signal?: AbortSignal,
+): Promise<SchemaWriteResult> {
+    const editor = getEditor();
+    const result = await SchemaWriteService.writeSchemaTextAsync(editor, cfgText);
+    if (result.ok) {
+        await editor.reload();
+    }
+    return result;
 }
 
-export async function fetchSchemaText(server: string, signal?: AbortSignal): Promise<SchemaTextResult> {
-    const { data } = await httpClient(server).get<SchemaTextResult>('/schemaText', { signal });
-    return data;
+// ---------------------------------------------------------------------------
+// Table Creation API
+// ---------------------------------------------------------------------------
+
+export async function createTable(
+    request: TableCreateRequest,
+    _signal?: AbortSignal,
+): Promise<CreateResult> {
+    const editor = getEditor();
+    const result = await TableCreateService.createTableAsync(editor, request);
+    if (result.ok) {
+        await editor.reload();
+    }
+    return result;
 }
 
-export async function writeSchemaText(server: string, cfgText: string, signal?: AbortSignal): Promise<SchemaWriteResult> {
-    const { data } = await httpClient(server).post<SchemaWriteResult>(
-        '/schemaWrite', cfgText, { headers: { 'Content-Type': 'text/plain' }, signal });
-    return data;
-}
-
-export interface CreateResult {
-    ok: boolean;
-    errors: string[];
-}
-
-export interface CreateTableRequest {
-    type: 'table' | 'struct' | 'enum';
-    name: string;
-    fields?: FieldDef[];
-    primaryKey?: string[];
-    withDataFile?: boolean;
-    enumValues?: EnumValueDef[];
-}
-
-export interface FieldDef {
-    name: string;
-    type: string;
-    comment?: string;
-}
-
-export interface EnumValueDef {
-    name: string;
-    comment?: string;
-}
-
-export async function createTable(server: string, request: CreateTableRequest, signal?: AbortSignal): Promise<CreateResult> {
-    const { data } = await httpClient(server).post<CreateResult>('/createTable', request, { signal });
-    return data;
-}
-
-export async function createDataFile(server: string, tableName: string, signal?: AbortSignal): Promise<CreateResult> {
-    const { data } = await httpClient(server).post<CreateResult>('/createDataFile', null, { params: { table: tableName }, signal });
-    return data;
+export async function createDataFile(
+    tableName: string,
+    _signal?: AbortSignal,
+): Promise<CreateResult> {
+    const editor = getEditor();
+    return TableCreateService.createDataFileAsync(editor, tableName);
 }

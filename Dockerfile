@@ -6,7 +6,7 @@ FROM node:24-alpine AS builder
 WORKDIR /build
 
 # Copy monorepo config files
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY package.json pnpm-workspace.yaml pnpm-lock.yaml tsconfig.base.json ./
 COPY packages ./packages
 COPY cfgeditor/package.json cfgeditor/pnpm-lock.yaml cfgeditor/pnpm-workspace.yaml cfgeditor/tsconfig.json cfgeditor/tsconfig.node.json cfgeditor/vite.config.ts cfgeditor/index.html ./cfgeditor/
 COPY cfgeditor/src ./cfgeditor/src

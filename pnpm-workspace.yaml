@@ -1,3 +1,7 @@
 packages:
   - 'packages/*'
   - 'cfgeditor'
+
+onlyBuiltDependencies:
+  - '@swc/core'
+  - esbuild

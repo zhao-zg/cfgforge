@@ -23,6 +23,8 @@ export interface BriefDescription {
     comment: string;
 }
 
+// BriefRecord 字段名与 editor-core 对齐：
+// $refs = FieldRef[]（出边引用），与 ValueToJson 产出的 JSON $refs 键名一致。
 export interface BriefRecord extends Refs {
     table: string;
     id: string;
@@ -63,15 +65,18 @@ export type ResultCode =
     | 'idNotFound'
     | 'paramErr';
 
+// editor-core 的 RecordResult 允许 object/refs 为 null（错误码路径），
+// cfgeditor 本地类型与之对齐以保持结构兼容。
 export interface RecordResult {
     resultCode: ResultCode;
     table: string;
     id: string;
     maxObjs: number;
-    object: JSONObject & Refs;  //自身详细信息
-    refs: BriefRecord[];
+    object: Record<string, unknown> | null;  //自身详细信息
+    refs: BriefRecord[] | null;
 }
 
+// editor-core 的 RecordRefsResult 允许 refs 为 null（错误码路径）
 export interface RecordRefsResult {
     resultCode: ResultCode;
     table: string;
@@ -79,15 +84,15 @@ export interface RecordRefsResult {
     depth: number;
     in: boolean;
     maxObjs: number;
-    refs: BriefRecord[];
+    refs: BriefRecord[] | null;
 }
 
-// 未被引用记录的查询结果
+// editor-core 的 UnreferencedRecordsResult 允许 refs 为 null（错误码路径）
 export interface UnreferencedRecordsResult {
     resultCode: ResultCode;
     table: string;
     maxObjs: number;
-    refs: BriefRecord[];  // 复用BriefRecord，表示所有未引用的记录
+    refs: BriefRecord[] | null;  // 复用BriefRecord，表示所有未引用的记录
 }
 
 export interface RecordRefIdsResult {

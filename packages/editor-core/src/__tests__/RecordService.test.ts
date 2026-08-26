@@ -495,12 +495,12 @@ describe('RecordService', () => {
     const result = rs.retrieve() as RecordRefsResult;
 
     const selfRef = result.refs!.find((r) => r.table === 'user' && r.id === '1');
-    expect(selfRef!.refs.length).toBe(2);
-    const itemFieldRef = selfRef!.refs.find((r) => r.toTable === 'item');
+    expect(selfRef!.$refs.length).toBe(2);
+    const itemFieldRef = selfRef!.$refs.find((r) => r.toTable === 'item');
     expect(itemFieldRef).toBeDefined();
     expect(itemFieldRef!.toId).toBe('100');
     expect(itemFieldRef!.firstField).toBe('ref');
-    const weaponFieldRef = selfRef!.refs.find((r) => r.toTable === 'weapon');
+    const weaponFieldRef = selfRef!.$refs.find((r) => r.toTable === 'weapon');
     expect(weaponFieldRef).toBeDefined();
     expect(weaponFieldRef!.toId).toBe('1');
     expect(weaponFieldRef!.firstField).toBe('weaponref');

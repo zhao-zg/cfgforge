@@ -18,6 +18,7 @@ import {
 import {History} from "@/domain/historyModel";
 import {ResInfo} from "@/domain/resInfo";
 import {removeAllQueryCache} from "@/services/queryClient.ts";
+import {initEditor} from "@/api/apiClient.ts";
 
 // 导航/history 簇（navTo/useLocationData/FixedPage 工厂守卫等）拆至 navigation.ts；
 // 此处 re-export 保持既有导入方零改动
@@ -26,12 +27,8 @@ export * from './navigation.ts';
 export const pageEnums = ['table', 'tableRef', 'record', 'recordRef', 'recordUnref'] as const;
 export type PageType = typeof pageEnums[number];
 
-export type BackendMode = 'local' | 'remote';
-
 export type StoreState = {
-    server: string;
-    backendMode: BackendMode;
-    localDataDir: string;
+    dataDir: string;
     aiConf: AIConf;
     themeConfig: ThemeConfig;
 
@@ -81,9 +78,7 @@ export type StoreState = {
 
 // → cfgeditor.yml（团队共享）
 const sharedPrefState = {
-    server: '',
-    backendMode: 'remote' as BackendMode,
-    localDataDir: '',
+    dataDir: '',
     themeConfig: {
         themeFile: '',
     },
@@ -324,25 +319,15 @@ export function setFixedPagesConf(newPageConf: FixedPagesConf) {
     // pageConf 不改当前路由的 layout 输入（固定页各自有独立 pathname → 独立 layout query），无需清缓存。
 }
 
-export function setServer(value: string) {
-    store.server = value;
-    setPref('server', value);
-    // server 改了（含「重连当前 server」「换库」）：清空全部缓存强制重取。
-    // 所有 queryKey 都不含 server（queryFn 直接闭包捕获 store.server），不清的话换库后旧库数据
+export async function setDataDir(value: string) {
+    store.dataDir = value;
+    setPref('dataDir', value);
+    // dataDir 改了（换库）：清空全部缓存强制重取。
+    // 所有 queryKey 都不含 dataDir（queryFn 直接闭包捕获 store.dataDir），不清的话换库后旧库数据
     // 会赖在缓存里直到 staleTime（schema 5min / record 30s）过期才刷新——期间显示错库数据。
     removeAllQueryCache();
-}
-
-export function setBackendMode(value: BackendMode) {
-    store.backendMode = value;
-    setPref('backendMode', value);
-    // 切换模式时清缓存，确保数据从新后端重新加载
-    removeAllQueryCache();
-}
-
-export function setLocalDataDir(value: string) {
-    store.localDataDir = value;
-    setPref('localDataDir', value);
+    // 重新初始化 EditorService（EditorService 有 context cache，会自动复用同一 dataDir 的 Context）
+    await initEditor(value);
 }
 
 export function setNodeShow(nodeShow: NodeShowType) {

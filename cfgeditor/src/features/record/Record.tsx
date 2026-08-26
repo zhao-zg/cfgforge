@@ -27,14 +27,14 @@ import {QueryGate} from "@/app/QueryGate.tsx";
 
 function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
     const {schema, notes, curTable} = useOutletContext<SchemaTableType>();
-    const {server, tauriConf, resourceDir, resMap} = useMyStore();
+    const {tauriConf, resourceDir, resMap} = useMyStore();
     const {notification} = App.useApp();
     const {curTableId, curId, edit, pathname} = useLocationData();
     const navigate = useNavigate();
     const {t} = useTranslation();
 
     const addOrUpdateRecordMutation = useMutation<RecordEditResult, Error, JSONObject>({
-        mutationFn: (jsonObject: JSONObject) => addOrUpdateRecord(server, curTableId, jsonObject),
+        mutationFn: (jsonObject: JSONObject) => addOrUpdateRecord(curTableId, jsonObject),
 
         onError: (error) => {
             notification.error({
@@ -110,12 +110,14 @@ function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
 
         if (!isEditing) {
             const refId = {table: curTable.name, id: curId};
-            const creator = new RecordEntityCreator(entityMap, schema, refId, recordResult.refs, tauriConf, resourceDir, resMap);
-            creator.createRecordEntity(getId(curTable.name, curId), recordResult.object, getId(getLabel(curTable.name), curId));
+            const refs = recordResult.refs ?? [];
+            const obj = recordResult.object ?? {};
+            const creator = new RecordEntityCreator(entityMap, schema, refId, refs, tauriConf, resourceDir, resMap);
+            creator.createRecordEntity(getId(curTable.name, curId), obj, getId(getLabel(curTable.name), curId));
             createRefEntities({
                 entityMap,
                 schema,
-                briefRecordRefs: recordResult.refs,
+                briefRecordRefs: refs,
                 isCreateRefs: false,
                 tauriConf,
                 resourceDir,
@@ -310,7 +312,6 @@ function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
 
 
 export const Record = memo(function () {
-    const {server} = useMyStore();
     const {curTableId, curId} = useLocationData();
     const {schema, curTable} = useOutletContext<SchemaTableType>();
 
@@ -319,7 +320,7 @@ export const Record = memo(function () {
     // 对于现有记录，使用API获取数据
     const recordQuery = useQuery({
         queryKey: queryKeys.record(curTableId, curId),
-        queryFn: ({signal}) => fetchRecord(server, curTableId, curId, signal),
+        queryFn: ({signal}) => fetchRecord(curTableId, curId, signal),
         // curId 可能为空串（路由 * 可匹配空 id、pref 恢复的 navTo 缺 id），空 id 不发请求
         enabled: !isNewRecord && curId.length > 0,
     })

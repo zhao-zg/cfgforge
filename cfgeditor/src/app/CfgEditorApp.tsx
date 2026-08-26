@@ -6,7 +6,7 @@ import {
     getFixedPage,
     getLastNavToInLocalStore,
     setDragPanel,
-    setServer,
+    setDataDir,
     useMyStore,
     useLocationData,
     isFixedRefPage,
@@ -80,7 +80,7 @@ function RefPageInFlow({schema, notes, curTable, curTableId, curPage, curId, ref
 }
 
 function onConnectServer(value: string) {
-    setServer(value);
+    setDataDir(value);
 }
 
 // select 必须是稳定引用：内联箭头每次 render 新身份 → React Query 每次 render 重跑 select →
@@ -91,7 +91,7 @@ const schemaSelector = (rawSchema: RawSchema) => new Schema(rawSchema);
 
 export const CfgEditorApp = memo(function CfgEditorApp() {
     const {
-        server, dragPanel, pageConf,
+        dataDir, dragPanel, pageConf,
         recordRefIn, recordRefOutDepth, recordMaxNode, nodeShow,
     } = useMyStore();
 
@@ -113,19 +113,19 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
 
     const {isLoading, isError, error, data: schema} = useQuery({
         queryKey: queryKeys.schema(),
-        queryFn: ({signal}) => fetchSchema(server, signal),
+        queryFn: ({signal}) => fetchSchema(signal),
         staleTime: 1000 * 60 * 5,
         select: schemaSelector,
-        // server 为空（桌面端首次启动、未配置连接）时跳过查询，避免请求落到 tauri://localhost 返回 HTML
-        enabled: !!server,
+        // dataDir 为空（桌面端首次启动、未配置连接）时跳过查询
+        enabled: !!dataDir,
     })
 
     const {data: notes} = useQuery({
         queryKey: queryKeys.notes(),
-        queryFn: ({signal}) => fetchNotes(server, signal),
+        queryFn: ({signal}) => fetchNotes(signal),
         staleTime: 1000 * 60 * 5,
         select: notesToMap,
-        enabled: !!server,
+        enabled: !!dataDir,
     })
 
 
@@ -152,11 +152,11 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
 
 
     const handleModalOk = useCallback(() => {
-        onConnectServer(server);
-    }, [server]);
+        onConnectServer(dataDir);
+    }, [dataDir]);
 
     let content;
-    if (!server) {
+    if (!dataDir) {
         // 桌面端首次启动 / 未配置连接：引导用户去设置页选择本机部署或远程服务器
         content = <Flex justify="center" align="center" vertical gap="middle" style={fullDivStyle}>
             <Empty description={false}/>
@@ -177,7 +177,7 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
             <Button type="primary" onClick={() => setCreateTableOpen(true)}>
                 {t('createTableTitle')}
             </Button>
-            <Typography.Text type="secondary">{t('emptySchemaServer')}: {server}</Typography.Text>
+            <Typography.Text type="secondary">{t('emptySchemaServer')}: {dataDir}</Typography.Text>
         </Flex>;
     } else if (schema && curTable == null) {
         // 有表但未选中：提示从下拉列表选择
@@ -262,7 +262,7 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
             <Flex vertical>
                 <Alert title={error ? error.message : ''} type='error'/>
                 <p> {t('netErrFixTip')} </p>
-                <p> {t('curServer')}: {server}</p>
+                <p> {t('curServer')}: {dataDir}</p>
                 <Form.Item label={t('newServer') + ':'}>
                     <Input.Search enterButton={t('connectNewServer')} onSearch={onConnectServer}/>
                 </Form.Item>

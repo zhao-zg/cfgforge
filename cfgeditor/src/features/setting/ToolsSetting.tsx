@@ -26,14 +26,14 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
     flowRef: RefObject<HTMLDivElement | null>;
 }) {
     const {t} = useTranslation();
-    const {server, imageSizeScale} = useMyStore();
+    const {imageSizeScale} = useMyStore();
 
     const {curPage, curTableId, curId} = useLocationData();
     const {notification} = App.useApp();
     const navigate = useNavigate();
 
     const deleteRecordMutation = useMutation<RecordEditResult, Error>({
-        mutationFn: () => deleteRecord(server, curTableId, curId),
+        mutationFn: () => deleteRecord(curTableId, curId),
 
         onError: (error) => {
             notification.error({

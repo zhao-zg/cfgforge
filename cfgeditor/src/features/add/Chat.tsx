@@ -75,7 +75,7 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
             background: token.colorBgContainer,
         },
     } satisfies Record<string, CSSProperties>;
-    const {server, aiConf} = useMyStore();
+    const {aiConf} = useMyStore();
     const {curTableId} = useLocationData();
     const editable = useIsCurTableEditable(schema);
 
@@ -91,14 +91,14 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
 
     const promptQuery = useQuery({
         queryKey: queryKeys.prompt(curTableId),
-        queryFn: ({signal}) => getPrompt(server, curTableId, signal),
+        queryFn: ({signal}) => getPrompt(curTableId, signal),
         staleTime: Infinity,
         enabled: editable,
     });
     const promptRes = promptQuery.data;
 
     const checkJsonMutation = useMutation<CheckJsonResult, Error, string>({
-        mutationFn: (raw: string) => checkJson(server, submitTableIdRef.current, raw),
+        mutationFn: (raw: string) => checkJson(submitTableIdRef.current, raw),
 
         onError: (error) => {
             // 不动输入框：异步回调到达时用户可能正在输入下一条消息

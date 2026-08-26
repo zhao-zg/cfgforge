@@ -10,15 +10,15 @@ import {getLastSegment} from "@/domain/strUtils.ts";
 
 
 export const SearchValue = memo(function SearchValue() {
-    const {server, query, searchMax} = useMyStore();
+    const {dataDir, query, searchMax} = useMyStore();
     const {notification} = App.useApp();
     const {t} = useTranslation();
     // 初始化为持久化的上次搜索词，与输入框 defaultValue={query} 保持一致
     const [value, setValue] = useState(query);
 
     const {data: searchResult, isFetching, error} = useQuery({
-        queryKey: queryKeys.search(value, searchMax, server),
-        queryFn: ({signal}) => searchServer(server, value, searchMax, signal),
+        queryKey: queryKeys.search(value, searchMax, dataDir),
+        queryFn: ({signal}) => searchServer(value, searchMax, signal),
         enabled: value.length > 0,
         retry: false,
     });

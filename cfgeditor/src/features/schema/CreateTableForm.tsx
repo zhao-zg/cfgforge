@@ -2,8 +2,8 @@ import {memo, useCallback, useState} from "react";
 import {Alert, Button, Flex, Input, Modal, Select, Space, Switch, Typography} from "antd";
 import {PlusOutlined, MinusCircleOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
-import {createTable, CreateTableRequest, FieldDef, EnumValueDef} from "@/api/apiClient.ts";
-import {useMyStore} from "@/store/store.ts";
+import {createTable} from "@/api/apiClient.ts";
+import type {TableCreateRequest, FieldRequest, EnumValueRequest} from "@/api/apiClient.ts";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "@/services/queryKeys.ts";
 
@@ -19,17 +19,16 @@ export const CreateTableForm = memo(function CreateTableForm({open, onClose, onC
     onCreated?: () => void;
 }) {
     const {t} = useTranslation();
-    const {server} = useMyStore();
     const queryClient = useQueryClient();
 
     const [elementType, setElementType] = useState<ElementType>('table');
     const [name, setName] = useState('');
-    const [fields, setFields] = useState<FieldDef[]>([
+    const [fields, setFields] = useState<FieldRequest[]>([
         {name: 'id', type: 'int', comment: ''},
     ]);
     const [primaryKey, setPrimaryKey] = useState<string[]>(['id']);
     const [withDataFile, setWithDataFile] = useState(true);
-    const [enumValues, setEnumValues] = useState<EnumValueDef[]>([
+    const [enumValues, setEnumValues] = useState<EnumValueRequest[]>([
         {name: '', comment: ''},
     ]);
     const [saving, setSaving] = useState(false);
@@ -64,7 +63,7 @@ export const CreateTableForm = memo(function CreateTableForm({open, onClose, onC
         });
     }, []);
 
-    const handleFieldChange = useCallback((index: number, key: keyof FieldDef, value: string) => {
+    const handleFieldChange = useCallback((index: number, key: keyof FieldRequest, value: string) => {
         setFields(prev => {
             const next = [...prev];
             const oldName = next[index].name;
@@ -85,7 +84,7 @@ export const CreateTableForm = memo(function CreateTableForm({open, onClose, onC
         setEnumValues(prev => prev.filter((_, i) => i !== index));
     }, []);
 
-    const handleEnumValueChange = useCallback((index: number, key: keyof EnumValueDef, value: string) => {
+    const handleEnumValueChange = useCallback((index: number, key: keyof EnumValueRequest, value: string) => {
         setEnumValues(prev => {
             const next = [...prev];
             next[index] = {...next[index], [key]: value};
@@ -97,7 +96,7 @@ export const CreateTableForm = memo(function CreateTableForm({open, onClose, onC
         setSaving(true);
         setErrors([]);
 
-        const request: CreateTableRequest = {
+        const request: TableCreateRequest = {
             type: elementType,
             name: name.trim(),
         };
@@ -113,7 +112,7 @@ export const CreateTableForm = memo(function CreateTableForm({open, onClose, onC
         }
 
         try {
-            const result = await createTable(server, request);
+            const result = await createTable(request);
             if (result.ok) {
                 // 刷新 schema 缓存让 UI 更新
                 await queryClient.invalidateQueries({queryKey: queryKeys.schema()});
@@ -128,7 +127,7 @@ export const CreateTableForm = memo(function CreateTableForm({open, onClose, onC
         } finally {
             setSaving(false);
         }
-    }, [elementType, name, fields, primaryKey, withDataFile, enumValues, server, queryClient, resetForm, onCreated, onClose]);
+    }, [elementType, name, fields, primaryKey, withDataFile, enumValues, queryClient, resetForm, onCreated, onClose]);
 
     // table 名必须全小写，struct/enum 名没有此限制（后端会校验）
     const namePlaceholder = elementType === 'table'

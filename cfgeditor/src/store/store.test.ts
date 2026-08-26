@@ -11,8 +11,8 @@ describe('store 持久化键集分类', () => {
         expect(getPrefKeySet().has('aiConf')).toBe(false);
     });
 
-    it('团队配置（server/nodeShow/pageConf/tauriConf 等）归共享', () => {
-        for (const k of ['server', 'nodeShow', 'pageConf', 'tauriConf', 'maxImpl', 'themeConfig']) {
+    it('团队配置（dataDir/nodeShow/pageConf/tauriConf 等）归共享', () => {
+        for (const k of ['dataDir', 'nodeShow', 'pageConf', 'tauriConf', 'maxImpl', 'themeConfig']) {
             expect(getPrefKeySet().has(k)).toBe(true);
             expect(getPrefSelfKeySet().has(k)).toBe(false);
         }

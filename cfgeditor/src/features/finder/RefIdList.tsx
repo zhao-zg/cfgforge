@@ -66,7 +66,7 @@ function RefIdListResult({refIdsResult}: {
 export const RefIdList = memo(function ({lockedId}: {
     lockedId: RefId | undefined
 }) {
-    const {server, refIdsInDepth, refIdsOutDepth, refIdsMaxNode} = useMyStore();
+    const {refIdsInDepth, refIdsOutDepth, refIdsMaxNode} = useMyStore();
     const {curTableId, curId} = useLocationData();
 
     const thisTable = lockedId ? lockedId.table : curTableId;
@@ -75,7 +75,7 @@ export const RefIdList = memo(function ({lockedId}: {
     const recordQuery = useQuery({
         queryKey: queryKeys.recordRefIds(thisTable, thisId, refIdsInDepth, refIdsOutDepth, refIdsMaxNode),
         queryFn: ({signal}) =>
-            fetchRecordRefIds(server, thisTable, thisId,
+            fetchRecordRefIds(thisTable, thisId,
                 refIdsInDepth, refIdsOutDepth, refIdsMaxNode,
                 signal),
         // 未选表/无记录时 thisTable/thisId 为空串，空参数不发请求（与 RecordRef.tsx 的 enabled 先例一致）

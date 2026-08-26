@@ -1,4 +1,4 @@
-import {navTo, useMyStore, useLocationData} from "@/store/store.ts";
+import {navTo, useLocationData} from "@/store/store.ts";
 import {invalidateAllExceptLayout} from "@/services/queryClient.ts";
 
 import {memo, useCallback, useState} from "react";
@@ -22,7 +22,6 @@ interface AddJsonProps {
 
 export const AddJson = memo(function AddJson() {
     const {t} = useTranslation();
-    const {server} = useMyStore();
     const navigate = useNavigate();
     const {curTableId} = useLocationData();
 
@@ -30,7 +29,7 @@ export const AddJson = memo(function AddJson() {
 
     const addOrUpdateRecordMutation = useMutation<RecordEditResult, Error, string>({
         mutationFn: (json: string) =>
-            addOrUpdateRecord(server, curTableId, JSON.parse(json)),
+            addOrUpdateRecord(curTableId, JSON.parse(json)),
 
         onMutate: () => {
             // 发起新请求前清掉上次的陈旧结果，避免飞行中/下次打开面板时还展示旧结果

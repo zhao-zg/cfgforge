@@ -64,7 +64,7 @@ export interface BriefRecord {
   title?: string;
   descriptions?: BriefDescription[];
   value: string; // packStr
-  refs: FieldRef[];
+  $refs: FieldRef[];
   depth: number;
 }
 
@@ -392,7 +392,7 @@ export class RecordService {
       title,
       descriptions,
       value,
-      refs,
+      $refs: refs,
       depth,
     };
   }

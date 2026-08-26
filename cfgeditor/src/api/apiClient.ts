@@ -40,11 +40,18 @@ import type {
     TableCreateRequest,
     CheckJsonResult,
     PromptResult,
-    NoteEditResult,
     SearchResult,
 } from '@cfggen/editor-core';
 
-import type {Notes} from './noteModel';
+// Re-export types needed by UI components ( CreateTableForm 等)
+export type {
+    TableCreateRequest,
+    FieldRequest,
+    EnumValueRequest,
+    CreateResult,
+} from '@cfggen/editor-core';
+
+import type {Notes, NoteEditResult as LocalNoteEditResult} from './noteModel';
 import type {JSONObject} from './recordModel';
 
 // ---------------------------------------------------------------------------
@@ -228,11 +235,17 @@ export async function updateNote(
     key: string,
     note: string,
     _signal?: AbortSignal,
-): Promise<NoteEditResult> {
+): Promise<LocalNoteEditResult> {
     const editor = getEditor();
     const notePath = joinPath(editor.rootDir(), 'note.csv');
     const svc = await NoteEditService.create(notePath);
-    return svc.updateNoteAsync(key, note);
+    const result = await svc.updateNoteAsync(key, note);
+    // editor-core NoteEditResult.notes is Note[] (flat), wrap to local Notes type
+    // for setNotesCache() compatibility ({notes: NoteModel[]}).
+    return {
+        resultCode: result.resultCode,
+        notes: {notes: result.notes},
+    };
 }
 
 // ---------------------------------------------------------------------------

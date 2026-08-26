@@ -2,7 +2,6 @@ import {memo, useCallback, useEffect, useRef, useState} from "react";
 import {Alert, Button, Flex, Modal, Spin, Typography} from "antd";
 import {useTranslation} from "react-i18next";
 import {fetchSchemaText, writeSchemaText} from "@/api/apiClient.ts";
-import {useMyStore} from "@/store/store.ts";
 import {useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "@/services/queryKeys.ts";
 
@@ -13,7 +12,6 @@ export const SchemaTextEditor = memo(function SchemaTextEditor({open, onClose}: 
     onClose: () => void;
 }) {
     const {t} = useTranslation();
-    const {server} = useMyStore();
     const queryClient = useQueryClient();
     const [text, setText] = useState('');
     const [originalText, setOriginalText] = useState('');
@@ -30,7 +28,7 @@ export const SchemaTextEditor = memo(function SchemaTextEditor({open, onClose}: 
         setLoading(true);
         setLoadError('');
         setErrors([]);
-        fetchSchemaText(server)
+        fetchSchemaText()
             .then(result => {
                 if (!cancelled) {
                     setText(result.text);
@@ -46,7 +44,7 @@ export const SchemaTextEditor = memo(function SchemaTextEditor({open, onClose}: 
                 if (!cancelled) setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [open, server]);
+    }, [open]);
 
     const isDirty = text !== originalText;
 
@@ -54,7 +52,7 @@ export const SchemaTextEditor = memo(function SchemaTextEditor({open, onClose}: 
         setSaving(true);
         setErrors([]);
         try {
-            const result = await writeSchemaText(server, text);
+            const result = await writeSchemaText(text);
             if (result.ok) {
                 setOriginalText(text);
                 // 刷新 schema 缓存让 UI 更新
@@ -71,7 +69,7 @@ export const SchemaTextEditor = memo(function SchemaTextEditor({open, onClose}: 
         } finally {
             setSaving(false);
         }
-    }, [server, text, queryClient, t]);
+    }, [text, queryClient, t]);
 
     const handleClose = useCallback(() => {
         if (isDirty) {

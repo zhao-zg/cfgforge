@@ -4,7 +4,7 @@ import {DeleteOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
 import {useMutation} from "@tanstack/react-query";
 import {updateNote} from "@/api/apiClient.ts";
-import {useMyStore, useLocationData} from "@/store/store";
+import {useLocationData} from "@/store/store";
 import {NoteEditResult} from "@/api/noteModel";
 import {removeLayoutCache, setNotesCache} from "@/services/queryKeys.ts";
 import {estimateNoteRows, NOTE_ROW_H} from "./layout/calcWidthHeight.ts";
@@ -59,14 +59,13 @@ export const NoteEdit = memo(function NoteEdit({id, note, setIsEdit}: {
     note: string;
     setIsEdit: (ie: boolean) => void;
 }) {
-    const {server} = useMyStore();
     const {pathname} = useLocationData();
     const {t} = useTranslation();
     const [newNote, setNewNote] = useState<string>(note);
     const {notification} = App.useApp();
 
     const {isPending, mutate} = useMutation<NoteEditResult, Error, string>({
-        mutationFn: (newNote: string) => updateNote(server, id, newNote),
+        mutationFn: (newNote: string) => updateNote(id, newNote),
 
         onError: (error, variables) => {
             notification.error({

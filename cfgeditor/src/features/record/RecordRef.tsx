@@ -52,7 +52,7 @@ export function RecordRefWithResult({ schema, notes, curTable, curId, nodeShow, 
         createRefEntities({
             entityMap: map,
             schema,
-            briefRecordRefs: recordRefResult.refs,
+            briefRecordRefs: recordRefResult.refs ?? [],
             isCreateRefs: !isUnrefMode,  // 未引用模式不创建引用关系
             checkTable,
             recordRefInShowLinkMaxNode,
@@ -160,8 +160,6 @@ export function RecordRef({ schema, notes, curTable, curTableId, curPage, curId,
     nodeShow: NodeShowType;
     inDragPanelAndFix: boolean;
 }) {
-    const { server } = useMyStore();
-
     // 用 curPage 判定模式（唯一标识页面），而非 curId 是否为空——
     // 这样 recordUnref 页可携带上次 record 的 curId 用于切回，不会被误判成 recordRef 模式
     const isUnrefMode = curPage === 'recordUnref';
@@ -173,9 +171,9 @@ export function RecordRef({ schema, notes, curTable, curTableId, curPage, curId,
             : queryKeys.recordRef(curTableId, curId!, refOutDepth, maxNode, refIn),
         queryFn: ({ signal }) => {
             if (isUnrefMode) {
-                return fetchUnreferencedRecords(server, curTable.name, maxNode, signal);
+                return fetchUnreferencedRecords(curTable.name, maxNode, signal);
             } else {
-                return fetchRecordRefs(server, curTable.name, curId!, refOutDepth, maxNode, refIn, signal);
+                return fetchRecordRefs(curTable.name, curId!, refOutDepth, maxNode, refIn, signal);
             }
         },
         staleTime: 1000 * 10,

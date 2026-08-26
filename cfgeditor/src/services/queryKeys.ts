@@ -35,8 +35,8 @@ export const queryKeys = {
     recordRefIds: (tableId: string, id: string, refInDepth: number, refOutDepth: number, maxIds: number) =>
         ['recordRefIds', tableId, id, refInDepth, refOutDepth, maxIds],
 
-    // 搜索（含 server：唯一把 server 进 key 的查询；换库时由 setServer 的 removeQueries([]) 全清兜底）
-    search: (q: string, max: number, server: string) => ['search', q, max, server],
+    // 搜索（含 dataDir：唯一把 dataDir 进 key 的查询；换库时由 setDataDir 的 removeAllQueryCache 全清兜底）
+    search: (q: string, max: number, dataDir: string) => ['search', q, max, dataDir],
 
     // 资源 / Tauri（与 server 无关的本地查询）
     vtt2: (path: string) => ['vtt2', path],

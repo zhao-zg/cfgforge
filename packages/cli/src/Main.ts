@@ -28,6 +28,7 @@ import {
   I18nByValueGenerator,
   I18nByIdGenerator,
   ByAIGenerator,
+  JavaMapperGenerator,
 } from '@cfgforge/gen';
 import { Context, ContextCfg, ExplicitDir } from '@cfgforge/context';
 import { HeadRows } from '@cfgforge/data';
@@ -79,6 +80,7 @@ export function registerAllProviders(): void {
   Generators.addProvider('i18n', (p) => new I18nByValueGenerator(p));
   Generators.addProvider('i18nbyid', (p) => new I18nByIdGenerator(p));
   Generators.addProvider('byai', (p) => new ByAIGenerator(p));
+  Generators.addProvider('javamapper', (p) => new JavaMapperGenerator(p));
 }
 
 function formatException(t: unknown): string {

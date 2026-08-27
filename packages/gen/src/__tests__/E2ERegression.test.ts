@@ -26,6 +26,7 @@ import { GdCodeGenerator } from '../GdCodeGenerator';
 import { TsCodeGenerator } from '../TsCodeGenerator';
 import { BytesGenerator } from '../BytesGenerator';
 import { JsonGenerator } from '../JsonGenerator';
+import { JavaMapperGenerator } from '../JavaMapperGenerator';
 import type { Generator } from '../Generator';
 import type { Parameter } from '../Parameter';
 
@@ -236,6 +237,83 @@ describe('E2E: GenPipeline with example/config/ (T8.13)', () => {
     if (fs.existsSync(rankDir)) {
       const rankFiles = fs.readdirSync(rankDir).filter(f => f.endsWith('.json'));
       expect(rankFiles.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('JavaMapper generator produces raw/bean/cfg tree for all tables (F-4)', async () => {
+    const ctx = await Context.create(EXAMPLE_CONFIG_DIR);
+    const outDir = path.join(tempDir, 'mapper');
+    fs.mkdirSync(outDir, { recursive: true });
+
+    // child=task.task → cfg/TaskTasks.java 子类（init override + prepareData）
+    const gens: Generator[] = [
+      new JavaMapperGenerator(mockParameter({
+        dir: outDir,
+        pkg: 'com.jedi.gameServer.mapper',
+        child: 'task.task',
+      })),
+    ];
+
+    await GenPipeline.run(ctx, gens);
+
+    const base = path.join(outDir, ...'com.jedi.gameServer.mapper'.split('.'));
+
+    // 关键文件存在：raw（每表 + CfgMapperInit）、bean（顶层 struct / 命名空间
+    // 子包 struct / interface + impl）、cfg child
+    const mustExist = [
+      'raw/CfgMapperInit.java',
+      'raw/RawTaskTasks.java',
+      'raw/RawOtherMonsters.java',
+      'raw/RawEquipJewelryrandoms.java', // struct 主键表（LvlRank）
+      'raw/RawEquipEquipconfigs.java',   // EEntry 表（columnMode/entry）
+      'raw/RawAiAis.java',               // 命名空间表（ai_行为）
+      'bean/Position.java',
+      'bean/LevelRank.java',
+      'bean/task/completecondition/Completecondition.java',
+      'bean/task/completecondition/KillMonster.java',
+      'bean/ai/TriggerTick/TriggerTick.java',
+      'cfg/TaskTasks.java',
+    ];
+    for (const rel of mustExist) {
+      expect(fs.existsSync(path.join(base, rel)), rel).toBe(true);
+    }
+
+    // 全量文件数（example 全表 + 可达 bean；都在 pkg 目录树下）
+    expect(countFiles(path.join(base, 'raw'), '.java')).toBeGreaterThan(20);
+    expect(countFiles(path.join(base, 'bean'), '.java')).toBeGreaterThan(10);
+
+    // CfgMapperInit：initAll（M-1 static）+ verifyRefs
+    const init = fs.readFileSync(path.join(base, 'raw', 'CfgMapperInit.java'), 'utf-8');
+    expect(init).toContain('    public static void initAll() {');
+    expect(init).toContain('public static java.util.List<String> verifyRefs() {');
+    expect(init).toContain('.getInstance().init();');
+
+    // child 子类：init() override 调 super + prepareData（F-1）
+    const child = fs.readFileSync(path.join(base, 'cfg', 'TaskTasks.java'), 'utf-8');
+    expect(child).toContain('    public void init() {');
+    expect(child).toContain('        super.init();');
+    expect(child).toContain('        prepareData();');
+
+    // EEntry 表烘焙常量（F-2：equipconfig (entry='entry') 数据行 Instance/Instance2）
+    const equipconfig = fs.readFileSync(path.join(base, 'raw', 'RawEquipEquipconfigs.java'), 'utf-8');
+    expect(equipconfig).toContain('public static final String INSTANCE = "Instance";');
+    expect(equipconfig).toContain('public static final String INSTANCE2 = "Instance2";');
+
+    // struct 主键表：getByKey(LevelRank)（bean hashCode/equals 支撑值语义，F-5）
+    const jewelryrandom = fs.readFileSync(path.join(base, 'raw', 'RawEquipJewelryrandoms.java'), 'utf-8');
+    expect(jewelryrandom).toContain('getByKey(com.jedi.gameServer.mapper.bean.LevelRank LvlRank)');
+    const levelRank = fs.readFileSync(path.join(base, 'bean', 'LevelRank.java'), 'utf-8');
+    expect(levelRank).toContain('public int hashCode() { return java.util.Objects.hash(Level, Rank); }');
+    expect(levelRank).toContain('public boolean equals(Object other) {');
+
+    // 简单括号配平：全部生成 java 文件 { } 计数相等
+    for (const entry of fs.readdirSync(path.join(outDir), { recursive: true })) {
+      if (typeof entry === 'string' && entry.endsWith('.java')) {
+        const content = fs.readFileSync(path.join(outDir, entry), 'utf-8');
+        const open = (content.match(/\{/g) ?? []).length;
+        const close = (content.match(/\}/g) ?? []).length;
+        expect({ file: entry, open, close }).toEqual({ file: entry, open, close: open });
+      }
     }
   });
 

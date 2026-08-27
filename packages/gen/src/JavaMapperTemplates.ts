@@ -13,14 +13,15 @@
  *   先逐字段解析到局部变量（局部变量名=字段名，参数即局部），最后 new 构造器。
  * - 仅 getter，无 setter（行对象不可变，配置是全局共享只读数据）。
  * - map 字段：SQL 里 VMap 存的是 [{"$type":"$entry","key":..,"value":..}] 数组，
- *   fastjson TypeReference 解不了 → 手写 LinkedHashMap 循环。
- *   list 元素为 struct/interface 时同理手写 ArrayList 循环 + `Xxx._parse(e)`。
+ *   fastjson TypeReference 解不了 → 手写 LinkedHashMap 循环；value 为 struct/interface
+ *   时对象在 $entry 的 "value" 字段下（`Xxx._parse(e.getJSONObject("value"))`）。
+ *   list 元素为 struct/interface 时无 $entry 包装，直接 `Xxx._parse(e)`。
  * - key/value/元素的标量读取表达式由模板内联的 scalarReadExpr 生成
  *   （parseExpr 固定 `o.` 前缀，对不上循环变量 `e.`，且 map/struct 容器本就 throw）。
- * - bean 类互相引用一律 FQN（不 import）；顶层只 import fastjson2 按需：
- *   JSON（基础 list）/JSONObject（_parse 或循环）。
- * - $type 匹配用 schema fullName 精确相等（防同名 impl 嵌套歧义），
- *   不匹配抛 IllegalArgumentException。
+ * - bean 类互相引用一律 FQN（不 import）；顶层 import fastjson2：
+ *   JSON（基础 list，按需）/JSONObject（_parse 签名恒引用，无条件输出）。
+ * - $type 匹配用 schema fullName 精确相等（防同名 impl 嵌套歧义），常量在前的
+ *   equals 保证 $type 缺失（null）不 NPE，不匹配抛 IllegalArgumentException。
  */
 
 import type { FieldType } from '@cfgforge/schema';
@@ -42,15 +43,11 @@ export function genPojoClass(m: PojoModel, opts: TypeOpts): string {
   L.push(`package ${m.pkg};`);
   L.push('');
 
-  // imports：仅当代码用到时输出（bean 互相引用用 FQN，不 import）
+  // imports：JSONObject 无条件输出（_parse(JSONObject o) 签名恒引用，即使字段为空），
+  // JSON 仅基础 list 用到时输出；bean 互相引用用 FQN，不 import
   const uses = analyzeFieldUsage(m.fields);
-  const imports: string[] = [];
-  if (uses.json) imports.push('import com.alibaba.fastjson2.JSON;');
-  if (uses.jsonObject) imports.push('import com.alibaba.fastjson2.JSONObject;');
-  if (imports.length > 0) {
-    L.push(...imports);
-    L.push('');
-  }
+  L.push('import com.alibaba.fastjson2.JSONObject;');
+  if (uses.json) L.push('import com.alibaba.fastjson2.JSON;');
 
   // class decl
   if (m.isInterfaceImpl) {
@@ -140,8 +137,9 @@ export function genInterfacePojo(m: InterfacePojoModel, opts: TypeOpts): string 
   L.push(`    static ${m.className} _parse(JSONObject o) {`);
   L.push(`        String type = o.getString("$type");`);
   for (const impl of m.impls) {
-    // $type 存 schema fullName，精确相等匹配（防 ConditionAnd 嵌套同名歧义）
-    L.push(`        if (type.equals("${impl.fullName}")) return ${implFqn(m.pkg, impl.className)}._parse(o);`);
+    // $type 存 schema fullName，精确相等匹配（防 ConditionAnd 嵌套同名歧义）；
+    // 常量在前的 equals：$type 缺失（null）走 throw 分支而非 NPE
+    L.push(`        if ("${impl.fullName}".equals(type)) return ${implFqn(m.pkg, impl.className)}._parse(o);`);
   }
   L.push(`        throw new IllegalArgumentException("${m.className} unknown $type: " + type);`);
   L.push(`    }`);
@@ -265,7 +263,7 @@ function genParseLocal(L: string[], f: PojoFieldModel, opts: TypeOpts): void {
       L.push(`        for (JSONObject e : o.getJSONArray("${f.name}").toJavaList(JSONObject.class)) {`);
       const keyExpr = scalarReadExpr('e', 'key', f.keyType!);
       const valueExpr = f.refClassName
-        ? `${f.refClassName}._parse(e)` // value 为 struct/interface：整个 e 即 value object
+        ? `${f.refClassName}._parse(e.getJSONObject("value"))` // value 为 struct/interface：对象在 $entry 的 "value" 字段下
         : scalarReadExpr('e', 'value', f.valueType!);
       L.push(`            ${f.name}.put(${keyExpr}, ${valueExpr});`);
       L.push(`        }`);
@@ -274,24 +272,12 @@ function genParseLocal(L: string[], f: PojoFieldModel, opts: TypeOpts): void {
   }
 }
 
-/** 统计字段解析用到的 fastjson2 符号（import 按需生成） */
-function analyzeFieldUsage(fields: PojoFieldModel[]): { json: boolean; jsonObject: boolean } {
-  const uses = { json: false, jsonObject: false };
+/** 统计字段解析用到的 fastjson2 符号（JSONObject 由 _parse 签名恒引用，模板无条件 import；此处只管 JSON 按需） */
+function analyzeFieldUsage(fields: PojoFieldModel[]): { json: boolean } {
+  const uses = { json: false };
   for (const f of fields) {
-    switch (f.fieldKind) {
-      case 'list':
-        if (f.refClassName) {
-          uses.jsonObject = true; // 手写 JSONObject e 循环
-        } else {
-          uses.json = true; // JSON.parseArray
-        }
-        break;
-      case 'map':
-        uses.jsonObject = true; // 手写 JSONObject e 循环
-        break;
-      default:
-        uses.jsonObject = true; // _parse(JSONObject o) 签名恒用
-        break;
+    if (f.fieldKind === 'list' && !f.refClassName) {
+      uses.json = true; // 基础 list：JSON.parseArray
     }
   }
   return uses;

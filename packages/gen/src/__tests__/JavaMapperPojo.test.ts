@@ -208,7 +208,7 @@ describe('genPojoClass: struct ref + $entry map + struct-element list', () => {
 });
 
 // ---------------------------------------------------------------------------
-// map 元素为 struct：value 走 Xxx._parse(e)
+// map 元素为 struct：value 在 $entry 的 "value" 字段下，走 Xxx._parse(e.getJSONObject("value"))
 // ---------------------------------------------------------------------------
 
 describe('genPojoClass: map with struct value', () => {
@@ -241,9 +241,12 @@ describe('genPojoClass: map with struct value', () => {
     expect(out).toContain(`private final java.util.Map<String, ${BEAN_PKG}.Position> beanMap;`);
   });
 
-  it('loop value uses Xxx._parse(e)', () => {
+  it('loop value unwraps $entry: Xxx._parse(e.getJSONObject("value"))', () => {
     expect(out).toContain(`        java.util.LinkedHashMap<String, ${BEAN_PKG}.Position> beanMap = new java.util.LinkedHashMap<>();`);
-    expect(out).toContain('            beanMap.put(e.getString("key"), ' + `${BEAN_PKG}.Position._parse(e));`);
+    expect(out).toContain('            beanMap.put(e.getString("key"), ' + `${BEAN_PKG}.Position._parse(e.getJSONObject("value")));`);
+    // 旧错误形态（整个 e 即 value object）不得再现；
+    // list 的 struct 元素无 $entry 包装、`_parse(e)` 不变，由 struct-element list describe 覆盖
+    expect(out).not.toContain(`${BEAN_PKG}.Position._parse(e);`);
   });
 });
 
@@ -345,6 +348,75 @@ describe('genPojoClass: comments and empty fields', () => {
 });
 
 // ---------------------------------------------------------------------------
+// 仅基础 list 字段的 struct：_parse 签名恒引用 JSONObject → import 无条件输出（C-2）
+// ---------------------------------------------------------------------------
+
+describe('genPojoClass: basic-list-only fields still import JSONObject', () => {
+  const out = genPojoClass(
+    {
+      pkg: BEAN_PKG,
+      className: 'BasicListOnly',
+      namespacePath: '',
+      isInterfaceImpl: false,
+      interfaceFqn: null,
+      enumRefType: null,
+      enumRefFieldName: null,
+      enumRefConstName: null,
+      fields: [
+        {
+          name: 'ids',
+          type: new FList(Primitive.INT),
+          comment: '',
+          fieldKind: 'list',
+          elemType: Primitive.INT,
+        },
+        {
+          name: 'names',
+          type: new FList(Primitive.STRING),
+          comment: '',
+          fieldKind: 'list',
+          elemType: Primitive.STRING,
+        },
+      ],
+    },
+    OPTS,
+  );
+
+  it('JSONObject import unconditional (_parse signature), JSON import for parseArray', () => {
+    expect(out).toContain('import com.alibaba.fastjson2.JSONObject;');
+    expect(out).toContain('import com.alibaba.fastjson2.JSON;');
+    expect(out).toContain('    public static BasicListOnly _parse(JSONObject o) {');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 空字段类：无字段也输出 JSONObject import（C-2 — _parse 签名恒引用）
+// ---------------------------------------------------------------------------
+
+describe('genPojoClass: empty-fields class imports JSONObject', () => {
+  const out = genPojoClass(
+    {
+      pkg: BEAN_PKG,
+      className: 'NoFields',
+      namespacePath: '',
+      isInterfaceImpl: false,
+      interfaceFqn: null,
+      enumRefType: null,
+      enumRefFieldName: null,
+      enumRefConstName: null,
+      fields: [],
+    },
+    OPTS,
+  );
+
+  it('JSONObject import present even with zero fields; no JSON import', () => {
+    expect(out).toContain('import com.alibaba.fastjson2.JSONObject;');
+    expect(out).not.toContain('import com.alibaba.fastjson2.JSON;');
+    expect(out).toContain('    public static NoFields _parse(JSONObject o) {');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // genInterfacePojo：$type 精确匹配分发
 // ---------------------------------------------------------------------------
 
@@ -381,15 +453,16 @@ describe('genInterfacePojo: $type dispatch + hasEnumRef', () => {
     expect(out).toContain('    static Completecondition _parse(JSONObject o) {');
   });
 
-  it('$type matched by exact fullName equality with throw fallback', () => {
+  it('$type matched by exact fullName equality (constant-first, null-safe) with throw fallback', () => {
     expect(out).toContain('        String type = o.getString("$type");');
     expect(out).toContain(
-      '        if (type.equals("task.completecondition.KillMonster")) return com.jedi.gameServer.mapper.bean.task.completecondition.KillMonster._parse(o);',
+      '        if ("task.completecondition.KillMonster".equals(type)) return com.jedi.gameServer.mapper.bean.task.completecondition.KillMonster._parse(o);',
     );
     expect(out).toContain(
-      '        if (type.equals("task.completecondition.TalkNpc")) return com.jedi.gameServer.mapper.bean.task.completecondition.TalkNpc._parse(o);',
+      '        if ("task.completecondition.TalkNpc".equals(type)) return com.jedi.gameServer.mapper.bean.task.completecondition.TalkNpc._parse(o);',
     );
     expect(out).not.toContain('endsWith');
+    expect(out).not.toContain('type.equals(');
     expect(out).toContain(
       '        throw new IllegalArgumentException("Completecondition unknown $type: " + type);',
     );
@@ -417,9 +490,9 @@ describe('genInterfacePojo: without enumRef', () => {
     OPTS,
   );
 
-  it('dispatch still generated; hasEnumRef=false only affects impl type() (Task 5 concern)', () => {
+  it('dispatch still generated (constant-first equals); hasEnumRef=false only affects impl type() (Task 5 concern)', () => {
     expect(out).toContain('public interface Reward {');
-    expect(out).toContain('if (type.equals("reward.ItemReward")) return');
+    expect(out).toContain('if ("reward.ItemReward".equals(type)) return');
     expect(out).toContain('throw new IllegalArgumentException("Reward unknown $type: " + type);');
   });
 });

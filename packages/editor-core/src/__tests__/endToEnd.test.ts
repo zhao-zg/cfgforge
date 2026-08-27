@@ -317,7 +317,7 @@ table user[id] (title='name') {
 
   it('getNotes returns existing notes from file', async () => {
     writeFile(tempDir, 'note.csv', 'key1,备注1\r\nkey2,备注2\r\n');
-    const noteSvc = new NoteEditService(path.join(tempDir, 'note.csv'));
+    const noteSvc = await NoteEditService.create(path.join(tempDir, 'note.csv'));
     const result = noteSvc.getNotes();
 
     expect(result.notes.length).toBe(2);
@@ -330,14 +330,14 @@ table user[id] (title='name') {
   // -------------------------------------------------------------------------
   it('updateNote adds a new note and persists', async () => {
     const notePath = path.join(tempDir, 'note.csv');
-    const noteSvc = new NoteEditService(notePath);
-    const result = noteSvc.updateNote('testKey', '测试备注');
+    const noteSvc = await NoteEditService.create(notePath);
+    const result = await noteSvc.updateNoteAsync('testKey', '测试备注');
 
     expect(result.resultCode).toBe('addOk');
     expect(fs.existsSync(notePath)).toBe(true);
 
     // Verify persistence via a new instance
-    const noteSvc2 = new NoteEditService(notePath);
+    const noteSvc2 = await NoteEditService.create(notePath);
     const read = noteSvc2.getNotes();
     expect(read.notes.length).toBe(1);
     expect(read.notes[0].key).toBe('testKey');

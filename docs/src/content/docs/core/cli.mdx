@@ -170,6 +170,12 @@ Parameters can be in any order, but -datadir is required when using generators.
         ask=ask.txt          问题，每行生成一个json
         table=skill.buff     表名称
         retry=1              重试llm次数，默认1代表不重试
+    -gen javamapper 生成java mapper类（MySQL运行时加载，DataStoreCompat+PBData推送，强类型POJO，替代Python autoCfgFile.py）
+        own=null
+        dir=mapper           生成目录
+        pkg=com.jedi.gameServer.mapper 生成代码的包名
+        child=               分号分隔表名，对这些表生成prepareData钩子子类，已存在则跳过
+        encoding=UTF-8       生成代码文件的编码
 ```
 
 

@@ -239,6 +239,13 @@ packages/
 │   └── TextValue.java      ← i18n 直接替换桥
 │
 ├── genjava/                ← Java 代码生成（22 文件）
+│   └── javamapper          ← Java mapper 生成器（packages/gen/src/ 下新增 6 文件）
+│       ├── JavaTypeUtil.ts    ← 从 JavaName 拆出的公共类型/命名纯函数层（参数化 TypeOpts）
+│       ├── JavaMethodStr.ts   ← 从 JavaName 拆出的方法片段纯函数层
+│       ├── JavaMapperName.ts  ← javamapper 命名规则（Raw 行类/Key 类/SQL 表名/parseExpr）
+│       ├── JavaMapperModel.ts ← javamapper 模板输入模型（fieldKind 显式标注，模板零 schema 依赖）
+│       ├── JavaMapperTemplates.ts ← javamapper 纯函数模板（POJO/raw 类/child 类/CfgMapperInit）
+│       └── JavaMapperGenerator.ts ← javamapper 生成器主类（child 校验/写 bean+raw+cfg 目录）
 ├── gencs/                  ← C# 代码生成（6 文件）
 ├── gents/                  ← TypeScript 代码生成（2 文件）
 ├── gengo/                  ← Go 代码生成（5 文件）

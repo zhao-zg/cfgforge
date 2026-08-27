@@ -220,6 +220,7 @@ gen(含 gen*/write/editorserver/mcpserver/tool)
 | `mcpserver` | `CfgMcpServer` | MCP AI 服务 |
 | `byai` | `ByAIGenerator` | AI 辅助生成 |
 | `tsschema` | `TsSchemaGenerator` | 导出 TS schema |
+| `javamapper` | `JavaMapperGenerator` | Java mapper 类（MySQL 运行时加载，`DataStoreCompat` + PBData 推送，强类型 POJO，替代 Python autoCfgFile.py） |
 
 #### 端到端流水线
 

@@ -68,3 +68,9 @@ export type {
   SearchResultItem,
   SearchResultCode,
 } from './SearchService';
+export { ExportService } from './ExportService';
+export type {
+  ExportFormat,
+  ExportResultCode,
+  ExportResult,
+} from './ExportService';

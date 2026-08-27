@@ -39,6 +39,7 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 - 行内部类 `RawTask`：字段 + `RawTask(JSONObject recored)` 构造器 + getter/setter。
   - setter 参数名小写开头（Python 生成 `setTaskid(int Taskid)`，不规范）。
   - 字段注释生成 javadoc。
+  - `toString()`：`"(" + field1 + "," + field2 + ... + ")"` 格式，同 cfggen 行对象。
 - 单主键：`public <type> key()` 直接返回主键字段。
 - 多主键：内部类 `RawTaskKey`，`hashCode`/`equals` 复用公共 `hashCodes()`/`equalsExpr()`（`Objects.hash` 风格；Python 版 equals 有重复死代码，不复制）。
 - 单例：静态 Holder 惯用法（线程安全；Python 版非线程安全）。
@@ -46,6 +47,8 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 - `init()`：`DataStoreCompat.queryStaticList("select * from \`cfg_<snake>\`")` → 构造行对象填 tableMap → PBData 列定义/记录推送（照抄 Python 逻辑，基于 JDBC 原始 JSONObject：Integer→value_int，Float→value_float，其余→value_string）→ `CfgVersions.getInstance().AddCfgPBInfo(...)`。
 - `getByKey(...)`：单主键直接 get；多主键构造 Key 查询。
 - **枚举表增强**（`(enum='...')` 的表）：`init()` 额外构建 name→行 map，生成 `getByName(String)`。枚举字段本身即主键时跳过（与 getByKey 重复）。
+- **枚举/Entry 常量**（数据在生成期已知，烘焙进代码）：`enumNameToIntegerValueMap` 非空时生成 `public static final int KILL_MONSTER = 1;`；无整数值的枚举生成 `public static final String XXX = "xxx";`；EEntry（`(entry='...')`）表按 entry 字段值生成常量。常量名复用 `enumFieldName()`。
+  - **新鲜度风险**：常量是生成期快照，DB 数据后续单独变更会漂移。缓解：`init()` 末尾校验常量集合与 DB 行一致性，不一致 Logger.error（不抛异常，避免阻断启动）。
 - **uniqueKey 查询**：schema 声明的每个 uniqueKey 生成 `xxxMap` + `getByXxx(...)`（命名复用 `uniqueKeyMapName`）。
 - **外键 Ref getter**：主键 FK 与 uniqueKey FK 都生成 `getXxxRef()`，内部调目标 raw 类 `getByKey`/`getByXxx`。仅当被引用表也在本批次生成 raw 类时生成，否则跳过 + Logger.info。nullable FK 照常生成（查不到返回 null，语义一致）。
 
@@ -65,6 +68,8 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 ### 3.4 汇总类 `raw/CfgMapperInit.java`
 
 `public static void initAll()` 依次调用所有表 init；child 表若生成子类则调子类 init（走 override）。放 raw 包（全自动产物，每次重生成；cfg/ 目录永不覆盖永不清理，不破坏手写原则）。
+
+`public static java.util.List<String> verifyRefs()`：initAll 之后调用，遍历所有表所有行的非空外键，Ref 返回 null 则收集错误明细（表名、行 key、字段、目标表），返回错误列表（空列表 = 校验通过）。对齐 cfggen `LoadValueErrs` 的加载期校验。
 
 ## 4. 类型转换（公共代码，见第 6 节）
 

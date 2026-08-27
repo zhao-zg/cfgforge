@@ -41,6 +41,10 @@ i18n.use(LanguageDetector)
 
                     deleteCurRecord: 'delete cur record',
                     toPng: 'save relation png',
+                    exportCsv: 'Export CSV',
+                    exportSql: 'Export SQL',
+                    exportSuccess: 'Exported {table} to {file}',
+                    exportFail: 'Export failed: {error}',
 
                     addColor: 'add color',
                     setNodeShow: 'set node show',
@@ -334,6 +338,10 @@ i18n.use(LanguageDetector)
                     fixCurrentPage: '固定当前页面',
                     none: '空',
                     toPng: '保存图片',
+                    exportCsv: '导出 CSV',
+                    exportSql: '导出 SQL',
+                    exportSuccess: '已导出 {table} 到 {file}',
+                    exportFail: '导出失败: {error}',
 
                     deleteCurRecord: '删除当前数据',
                     keyCode: "快捷键",

@@ -39,7 +39,7 @@
  * - init()：DataStoreCompat.queryStaticList + for 循环装配 + PBData 列定义/记录
  *   推送 + CfgVersions.AddCfgPBInfo；有枚举常量时末尾行数校验（enum drift）。
  * - 查询：getByKey(…)/静态 get（仅单主键）/all()；FK ref getter get<Xxx>Ref
- *   委托目标 raw 单例。
+ *   是行类实例方法（argExprs 引用行字段），委托目标 raw 单例。
  */
 
 import type { FieldType } from '@cfgforge/schema';
@@ -240,18 +240,6 @@ export function genRawClass(m: RawTableModel, opts: TypeOpts): string {
   L.push('');
   L.push(`    public static java.util.Collection<${row}> all() { return getInstance().tableMap.values(); }`);
 
-  // FK ref getter：委托目标 raw 单例（目标表不在生成集合时 Generator 已过滤）
-  if (m.fks.length > 0) {
-    L.push('');
-    for (const fk of m.fks) {
-      const method = 'get' + upper1(fk.fieldName) + 'Ref';
-      const target = fk.refRawFqn.substring(fk.refRawFqn.lastIndexOf('.') + 1);
-      L.push(`    public ${fk.refRawFqn} ${method}() {`);
-      L.push(`        return ${target}.getInstance().${fk.refMethod}(${fk.argExprs.join(', ')});`);
-      L.push(`    }`);
-    }
-  }
-
   L.push('}');
   return L.join('\n');
 }
@@ -290,6 +278,18 @@ function genRowClass(L: string[], m: RawTableModel, f: PojoFieldModel[], opts: T
     L.push(`        }`);
     L.push('');
   }
+
+  // FK ref getter：行类实例方法（argExprs 引用 taskid 等行字段，外层单例作用域不可解析）；
+  // 委托目标 raw 单例（目标表不在生成集合时 Generator 已过滤）
+  for (const fk of m.fks) {
+    const method = 'get' + upper1(fk.fieldName) + 'Ref';
+    const target = fk.refRawFqn.substring(fk.refRawFqn.lastIndexOf('.') + 1);
+    L.push(`        public ${fk.refRawFqn} ${method}() {`);
+    L.push(`            return ${target}.getInstance().${fk.refMethod}(${fk.argExprs.join(', ')});`);
+    L.push(`        }`);
+    L.push('');
+  }
+
   L.push(`        @Override`);
   L.push(`        public String toString() {`);
   if (f.length === 0) {

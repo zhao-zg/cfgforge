@@ -199,9 +199,9 @@ describe('genRawClass: single pk + enum constants + FK ref', () => {
     expect(out).toContain('    public static java.util.Collection<RawTask> all() { return getInstance().tableMap.values(); }');
   });
 
-  it('FK ref getter delegates to target raw singleton', () => {
-    expect(out).toContain(`    public ${RAW_PKG}.RawTaskextraexps getTaskextraexpRef() {`);
-    expect(out).toContain('        return RawTaskextraexps.getInstance().getByKey(taskid);');
+  it('FK ref getter is a row-class instance method delegating to target raw singleton', () => {
+    expect(out).toContain(`        public ${RAW_PKG}.RawTaskextraexps getTaskextraexpRef() {`);
+    expect(out).toContain('            return RawTaskextraexps.getInstance().getByKey(taskid);');
   });
 
   it('non-enum table: no getByName / nameMap', () => {
@@ -428,6 +428,55 @@ describe('genRawClass: enumStrConstants + scalar read forms', () => {
   });
 
   it('no JSON import when no basic list field', () => {
+    expect(out).not.toContain('import com.alibaba.fastjson2.JSON;');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// refFqns 兜底：list-of-ref 字段不填 refClassName，模板经 refFqns 查表注入 FQN
+// ---------------------------------------------------------------------------
+
+describe('genRawClass: refFqns fallback for list-of-ref field without refClassName', () => {
+  const EXAMPLE_BEAN = 'com.example.bean.Position';
+  const out = genRawClass(
+    {
+      names: { rawClass: 'RawPositions', rowClass: 'RawPosition', keyClass: 'RawPositionKey', childClass: 'Positions', sqlTable: 'cfg_position' },
+      pkg: RAW_PKG,
+      beanPkg: BEAN_PKG,
+      fields: [
+        { name: 'id', type: Primitive.INT, comment: '', fieldKind: 'scalar' },
+        {
+          name: 'path',
+          type: new FList(structRefOf('Position')),
+          comment: '',
+          fieldKind: 'list',
+          elemType: structRefOf('Position'),
+          // refClassName 故意不填：走模型 refFqns 查表兜底（Generator 未注入时的模板侧路径）
+        },
+      ],
+      pkFields: [{ name: 'id', type: Primitive.INT, comment: '', fieldKind: 'scalar' }],
+      uniqueKeys: [],
+      fks: [],
+      refFqns: new Map([['Position', EXAMPLE_BEAN]]),
+      isEnumTable: false,
+      enumField: null,
+      enumGetByName: false,
+      enumConstants: null,
+      enumStrConstants: null,
+    },
+    OPTS,
+  );
+
+  it('list element parse uses refFqns-resolved FQN: Fqn._parse(e)', () => {
+    expect(out).toContain(`            path.add(${EXAMPLE_BEAN}._parse(e));`);
+  });
+
+  it('ArrayList decl and this-assignment also use the resolved FQN', () => {
+    expect(out).toContain(`            java.util.ArrayList<${EXAMPLE_BEAN}> path = new java.util.ArrayList<>();`);
+    expect(out).toContain('            this.path = path;');
+  });
+
+  it('no JSON import: element is struct ref, not basic list', () => {
     expect(out).not.toContain('import com.alibaba.fastjson2.JSON;');
   });
 });

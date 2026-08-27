@@ -36,8 +36,7 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 
 结构对齐 Python 工具，含以下修复与增强：
 
-- 行内部类 `RawTask`：字段 + `RawTask(JSONObject recored)` 构造器 + getter/setter。
-  - setter 参数名小写开头（Python 生成 `setTaskid(int Taskid)`，不规范）。
+- 行内部类 `RawTask`：`private final` 字段 + `RawTask(JSONObject recored)` 构造器 + 仅 getter（**不生成 setter**，行对象不可变，同 cfggen 风格；Python 工具的 setter 不沿用——配置是全局共享只读数据，可变字段是多线程隐患，且数据来源不可追溯）。
   - 字段注释生成 javadoc。
   - `toString()`：`"(" + field1 + "," + field2 + ... + ")"` 格式，同 cfggen 行对象。
 - 单主键：`public <type> key()` 直接返回主键字段。
@@ -55,7 +54,7 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 
 ### 3.2 struct/interface POJO（强类型，同 cfggen 风格）
 
-- 表字段可达的每个 struct 生成 POJO 类：字段 + getter/setter + 静态 `_parse(JSONObject)` 逐字段解析（对应 cfggen 的 `_create(ConfigInput)`，数据源换成 JSON）。
+- 表字段可达的每个 struct 生成 POJO 类：`private final` 字段 + getter + 静态 `_parse(JSONObject)` 逐字段解析（对应 cfggen 的 `_create(ConfigInput)`，数据源换成 JSON；同样不生成 setter）。
 - interface：POJO 接口 + 每个 impl 一个类（`_parse` 各自实现）+ 静态工厂 `Xxx._parse(JSONObject)` 读 `"$type"` 字符串 switch 分发（对应 cfggen 的 tag 分发；`$type` 是 SQL 导出时 `ValueToJson` 写入 JSON 的判别字段）。有 `enumRef` 的 interface，每个 impl 生成 `type()` 方法返回对应枚举常量（同 cfggen）。
 - 基础类型 list/map 用 fastjson2 `JSON.parseArray(s, X.class)` / `JSON.parseObject(s, new TypeReference<...>(){})`；元素为 struct/interface 的容器在 `_parse` 内逐元素递归。不依赖 fastjson 字段反射，行为可控。
 - `text` 类型多语言模式下仍生成 `String`（例外：mapper 无 `Text` 运行时类），构造器 `getString`。
@@ -63,7 +62,7 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 
 ### 3.3 cfg 子类（仅 `child` 指定的表：`cfg/Tasks.java`）
 
-- `extends RawTasks`，静态 Holder 单例、`init()` override 调 super、空 `prepareData()` 手写钩子。
+- `extends RawTasks`，静态 Holder 单例、`init()` override 调 super、空 `prepareData()` 手写钩子（用于计算派生数据/缓存，行对象不可变，不用于改行数据）。
 - **文件存在即跳过，只新建缺失的**（Python 每次 `"w"` 重写会丢手写代码；其 rmtree 注释也表明 child 目录是用户领地）。跳过时打日志。
 
 ### 3.4 汇总类 `raw/CfgMapperInit.java`

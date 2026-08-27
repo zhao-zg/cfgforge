@@ -10,6 +10,11 @@
  * Static state (codeTopPkg, beautifulName, isSealedInterface) is set once
  * by JavaCodeGenerator.generate() before rendering begins.
  *
+ * Pure type/name utilities live in JavaTypeUtil.ts and method-string helpers
+ * in JavaMethodStr.ts (parameterized, no static state); this file re-exports
+ * them under the original names, injecting module static state so existing
+ * callers (javaTemplates.ts etc.) keep their exact behavior and signatures.
+ *
  * Java sources:
  * - configgen.genjava.code.Name.java (137 lines)
  * - configgen.genjava.code.NameableName.java (61 lines)
@@ -38,7 +43,35 @@ import {
   type FMap as FMapType,
   type StructRef,
 } from '@cfgforge/schema';
-import { upper1, underscoreToPascalCase, toScreamingSnakeCase } from '@cfgforge/shared';
+import { upper1 } from '@cfgforge/shared';
+
+import {
+  typeOf,
+  boxTypeOf,
+  enumFieldNameOf,
+  pascalNameOf,
+  type TypeOpts,
+} from './JavaTypeUtil';
+
+// Pure parameterized utilities re-exported for reuse (e.g. javamapper generator).
+export {
+  typeOf,
+  boxTypeOf,
+  enumFieldNameOf,
+  pascalNameOf,
+  upperStartSegments,
+  isJavaPrimitive,
+  type TypeOpts,
+} from './JavaTypeUtil';
+export {
+  actualParams,
+  actualParamsKeyRaw,
+  keyDisplayExpr,
+  hashCodes,
+  equalsExpr,
+  equal,
+} from './JavaMethodStr';
+import { formalParams as formalParamsOf, actualParamsKey as actualParamsKeyOf, keyClassNameOf } from './JavaMethodStr';
 
 // ---------------------------------------------------------------------------
 // Static state — set by JavaCodeGenerator.generate() before rendering
@@ -58,18 +91,26 @@ export function getIsSealedInterface(): boolean { return _isSealedInterface; }
 export function setIsLangSwitch(v: boolean): void { _isLangSwitch = v; }
 export function getIsLangSwitch(): boolean { return _isLangSwitch; }
 
+/**
+ * TypeOpts capturing the current module static state.
+ * resolveNameable keeps struct refs routed through NameableName (original behavior).
+ */
+function currentOpts(): TypeOpts {
+  return { langSwitchText: _isLangSwitch, codeTopPkg: _codeTopPkg, resolveNameable: fullName };
+}
+
 // ---------------------------------------------------------------------------
 // Name utility functions (from Name.java)
 // ---------------------------------------------------------------------------
 
 /** enum/entry constant field name */
 export function enumFieldName(enumName: string): string {
-  return _beautifulName ? toScreamingSnakeCase(enumName) : enumName.toUpperCase();
+  return enumFieldNameOf(enumName, _beautifulName);
 }
 
 /** PascalCase a single name segment */
 export function pascalName(part: string): string {
-  return _beautifulName ? underscoreToPascalCase(part) : upper1(part);
+  return pascalNameOf(part, _beautifulName);
 }
 
 export function GetByKeyFunctionNameInConfigMgr(
@@ -92,21 +133,7 @@ export function uniqueKeyMapName(keySchema: KeySchema): string {
 }
 
 export function keyClassName(keySchema: KeySchema, nullableName?: NameableName | null): string {
-  if (keySchema.fields().length > 1) {
-    const klsName = keySchema.fields().map(upper1).join('') + 'Key';
-    if (nullableName) {
-      return nullableName.fullName + '.' + klsName;
-    }
-    return klsName;
-  } else {
-    try {
-      const fs = keySchema.fieldSchemas();
-      if (!fs || fs.length === 0) return '';
-      return boxType(fs[0].type);
-    } catch {
-      return '';
-    }
-  }
+  return keyClassNameOf(keySchema, nullableName, currentOpts());
 }
 
 export function fullName(nameable: Nameable): string {
@@ -163,25 +190,11 @@ export function refName(fk: ForeignKeySchema): string {
 // ---------------------------------------------------------------------------
 
 export function type(t: FieldType): string {
-  return _type(t, false);
+  return typeOf(t, currentOpts());
 }
 
 export function boxType(t: FieldType): string {
-  return _type(t, true);
-}
-
-function _type(t: FieldType, box: boolean): string {
-  if (t === Primitive.BOOL) return box ? 'Boolean' : 'boolean';
-  if (t === Primitive.INT) return box ? 'Integer' : 'int';
-  if (t === Primitive.LONG) return box ? 'Long' : 'long';
-  if (t === Primitive.FLOAT) return box ? 'Float' : 'float';
-  if (t === Primitive.STRING) return 'String';
-  if (t === Primitive.TEXT) return _isLangSwitch ? _codeTopPkg + '.Text' : 'String';
-  if (isStructRef(t)) return fullName((t as StructRef).obj!);
-  if (isFList(t)) return 'java.util.List<' + _type((t as any).item, true) + '>';
-  if (isFMap(t))
-    return 'java.util.Map<' + _type((t as FMapType).key, true) + ', ' + _type((t as FMapType).value, true) + '>';
-  throw new Error('unknown FieldType: ' + t);
+  return boxTypeOf(t, currentOpts());
 }
 
 export function readValue(t: FieldType): string {
@@ -205,9 +218,7 @@ export function defaultValue(t: FieldType): string {
   throw new Error('unknown FieldType: ' + t);
 }
 
-export function isJavaPrimitive(t: FieldType): boolean {
-  return t === Primitive.BOOL || t === Primitive.INT || t === Primitive.LONG || t === Primitive.FLOAT;
-}
+// isJavaPrimitive moved to JavaTypeUtil.ts (re-exported above).
 
 // ---------------------------------------------------------------------------
 // GenJavaUtil (from GenJavaUtil.java)
@@ -232,46 +243,16 @@ function isEnumAsPrimaryKey(tableSchema: TableSchema): boolean {
 }
 
 // ---------------------------------------------------------------------------
-// MethodStr helpers (from MethodStr.java)
+// MethodStr helpers (from MethodStr.java) — pure impls live in JavaMethodStr.ts;
+// these wrappers inject module static state so signatures/behavior are unchanged.
 // ---------------------------------------------------------------------------
 
-import { lower1 } from '@cfgforge/shared';
-
 export function formalParams(fs: FieldSchema[]): string {
-  return fs.map((f) => type(f.type) + ' ' + lower1(f.name)).join(', ');
-}
-
-export function actualParams(keys: string[]): string {
-  return keys.map(lower1).join(', ');
+  return formalParamsOf(fs, currentOpts());
 }
 
 export function actualParamsKey(keySchema: KeySchema, pre: string, nullableName?: NameableName | null): string {
-  const p = actualParamsKeyRaw(keySchema, pre);
-  return keySchema.fields().length > 1
-    ? 'new ' + keyClassName(keySchema, nullableName) + '(' + p + ')'
-    : p;
-}
-
-export function actualParamsKeyRaw(keySchema: KeySchema, pre: string): string {
-  return keySchema.fields().map((e) => pre + lower1(e)).join(', ');
-}
-
-export function keyDisplayExpr(keySchema: KeySchema): string {
-  const fields = keySchema.fields();
-  if (fields.length === 1) return lower1(fields[0]);
-  return '"" + ' + fields.map((f) => lower1(f)).join(' + "," + ');
-}
-
-export function hashCodes(fs: FieldSchema[]): string {
-  return `java.util.Objects.hash(${fs.map((f) => lower1(f.name)).join(', ')})`;
-}
-
-export function equalsExpr(fs: FieldSchema[]): string {
-  return fs.map((f) => equal(lower1(f.name), 'o.' + lower1(f.name), f.type)).join(' && ');
-}
-
-export function equal(a: string, b: string, t: FieldType): string {
-  return isJavaPrimitive(t) ? a + ' == ' + b : a + '.equals(' + b + ')';
+  return actualParamsKeyOf(keySchema, pre, nullableName ?? null, currentOpts());
 }
 
 export function tableGet(

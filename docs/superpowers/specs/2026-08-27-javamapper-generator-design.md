@@ -55,6 +55,7 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 - interface：POJO 接口 + 每个 impl 一个类（`_parse` 各自实现）+ 静态工厂 `Xxx._parse(JSONObject)` 读 `"$type"` 字符串 switch 分发（对应 cfggen 的 tag 分发；`$type` 是 SQL 导出时 `ValueToJson` 写入 JSON 的判别字段）。
 - 基础类型 list/map 用 fastjson2 `JSON.parseArray(s, X.class)` / `JSON.parseObject(s, new TypeReference<...>(){})`；元素为 struct/interface 的容器在 `_parse` 内逐元素递归。不依赖 fastjson 字段反射，行为可控。
 - `text` 类型多语言模式下仍生成 `String`（例外：mapper 无 `Text` 运行时类），构造器 `getString`。
+- POJO 输出路径：`dir/pkg/bean/<schema 命名空间>/`（如 `pkg/bean/Position.java`、`pkg/bean/task/TestDefaultBean.java`、`pkg/bean/task/completecondition/Completecondition.java`）。用独立的 `bean` 子包，避免与 `raw`/`cfg` 保留目录及表命名空间冲突；bean 目录由 `CachedFiles` 自动清理过期文件（纯生成物，无手写内容）。
 
 ### 3.3 cfg 子类（仅 `child` 指定的表：`cfg/Tasks.java`）
 

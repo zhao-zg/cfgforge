@@ -37,7 +37,7 @@
  *   public static final int/String；getByName 仅当模型 enumGetByName=true；
  *   uniqueKey 索引为单字段 Map<Object, Row> + 类型化 getByXxx（v1 契约）。
  * - init()：DataStoreCompat.queryStaticList + for 循环装配 + PBData 列定义/记录
- *   推送 + CfgVersions.AddCfgPBInfo；有枚举常量时末尾行数校验（enum drift）。
+ *   推送 + CfgVersions.AddCfgPBInfo；有枚举常量时循环后行数校验（enum drift）。
  * - 查询：getByKey(…)/静态 get（仅单主键）/all()；FK ref getter get<Xxx>Ref
  *   是行类实例方法（argExprs 引用行字段），委托目标 raw 单例。
  */
@@ -87,8 +87,8 @@ export interface InitAllModel {
       /** nullable FK 不校验（null 合法） */
       nullable: boolean;
       /**
-       * 每个 key 字段各自的判空语义：'num:<字段名>'（!= 0）或
-       * 'str:<字段名>'（!= null && !isEmpty()）。多字段 AND 连接。
+       * 每个 key 字段各自的判空语义：'num:<字段名>'（!= 0）、'bool:<字段名>'
+       * （裸 getter）或 'str:<字段名>'（!= null && !isEmpty()）。多字段 AND 连接。
        */
       keyChecks: string[];
     }[];
@@ -180,8 +180,36 @@ export function genPojoClass(m: PojoModel, opts: TypeOpts): string {
   }
   L.push(`    }`);
 
+  // hashCode/equals：struct 主键表 getByKey 依赖 bean 值语义（Map<Object, Row> 的
+  // key 是 bean 实例，默认 identity 语义查不到）；与 raw Key 类同构——
+  // Objects.hash(全字段) + instanceof + 逐字段（数值 ==、其余 .equals()）。
+  // 空字段类跳过（Objects.hash() 无参无意义；无字段实例天然全等）。
+  if (m.fields.length > 0) {
+    L.push('');
+    L.push(`    @Override`);
+    L.push(`    public int hashCode() { return java.util.Objects.hash(${m.fields.map((f) => f.name).join(', ')}); }`);
+    L.push('');
+    L.push(`    @Override`);
+    L.push(`    public boolean equals(Object other) {`);
+    L.push(`        if (!(other instanceof ${m.className})) return false;`);
+    L.push(`        ${m.className} o = (${m.className}) other;`);
+    L.push(`        return ${m.fields.map((f) => pojoFieldEqual(f)).join(' && ')};`);
+    L.push(`    }`);
+  }
+
   L.push(`}`);
   return L.join('\n');
+}
+
+/**
+ * POJO 字段相等判断：数值原始类型 ==（boolean 参与布尔 == 同语义），
+ * 其余（String/容器/引用 bean）.equals()。与 raw Key 类的 keyFieldEqual 同构。
+ */
+function pojoFieldEqual(f: PojoFieldModel): string {
+  const t = f.fieldKind === 'scalar' ? f.type : null;
+  const useEq =
+    t === Primitive.INT || t === Primitive.LONG || t === Primitive.FLOAT || t === Primitive.BOOL;
+  return useEq ? `${f.name} == o.${f.name}` : `${f.name}.equals(o.${f.name})`;
 }
 
 // ---------------------------------------------------------------------------
@@ -400,9 +428,6 @@ function genRawInit(L: string[], m: RawTableModel): void {
   for (const uk of m.uniqueKeys) {
     L.push(`                ${uk.mapField}.put(newOne.get${upper1(uk.fields[0])}(), newOne);`);
   }
-  if (enumCount > 0) {
-    L.push(`                if (tableMap.size() != ${enumCount}) JLogger.error("${m.names.sqlTable} enum drift: rows=" + tableMap.size() + " expected=" + ${enumCount});`);
-  }
   L.push(`                if (infoBuilder.getColoumsCount() == 0) {`);
   L.push(`                    for (Map.Entry<String, Object> entry : recored.entrySet()) {`);
   L.push(`                        PBData.coloum_value_type valueType = PBData.coloum_value_type.value_string;`);
@@ -418,6 +443,10 @@ function genRawInit(L: string[], m: RawTableModel): void {
   L.push(`                }`);
   L.push(`                infoBuilder.addRecords(recordBuilder);`);
   L.push(`            }`);
+  if (enumCount > 0) {
+    // 行数校验只需 recoreds 处理完做一次（循环内每行重复执行是浪费）
+    L.push(`            if (tableMap.size() != ${enumCount}) JLogger.error("${m.names.sqlTable} enum drift: rows=" + tableMap.size() + " expected=" + ${enumCount});`);
+  }
   L.push(`        } catch (Exception e) {`);
   L.push(`            JLogger.error(e.getMessage(), e);`);
   L.push(`        }`);
@@ -652,7 +681,8 @@ function refFqnOf(f: PojoFieldModel, opts: TypeOpts): string | null {
 // ---------------------------------------------------------------------------
 
 /**
- * child 子类骨架：extends RawXxx，Holder 单例 + 空 prepareData() 钩子。
+ * child 子类骨架：extends RawXxx，Holder 单例 + init() override（super 后调
+ * prepareData，否则手写钩子永不执行）+ 空 prepareData() 钩子。
  * 生成后归用户所有（再跑生成器不覆盖），prepareData 是手写加工数据的入口。
  */
 export function genChildClass(m: ChildModel): string {
@@ -662,6 +692,12 @@ export function genChildClass(m: ChildModel): string {
   L.push(`public class ${m.className} extends ${m.rawClassFqn} {`);
   L.push(`    private static class Holder { static final ${m.className} INSTANCE = new ${m.className}(); }`);
   L.push(`    public static ${m.className} getInstance() { return Holder.INSTANCE; }`);
+  L.push('');
+  L.push(`    @Override`);
+  L.push(`    public void init() {`);
+  L.push(`        super.init();`);
+  L.push(`        prepareData();`);
+  L.push(`    }`);
   L.push('');
   L.push(`    public void prepareData() {`);
   L.push(`    }`);
@@ -674,21 +710,18 @@ export function genChildClass(m: ChildModel): string {
 // ---------------------------------------------------------------------------
 
 /**
- * CfgMapperInit：initAll 按 sortedTables 顺序调各表 init（child 存在时调子类），
- * verifyRefs 校验非空 FK 引用完整性：按 FK 一条校验（ref getter 名来自 FK 名，
- * 与 raw 行类模板一致），多字段 key 各字段判空 AND 连接（int/long/float `!= 0`、
- * str `!= null && !isEmpty()`），nullable FK 不校验；错误明细用 row.toString()
- * （key() 仅单主键行有）。
+ * CfgMapperInit：initAll（spec §3.4 static）按 sortedTables 顺序调各表 init
+ * （child 存在时调子类），verifyRefs 校验非空 FK 引用完整性：按 FK 一条校验
+ * （ref getter 名来自 FK 名，与 raw 行类模板一致），多字段 key 各字段判空
+ * AND 连接（int/long/float `!= 0`、bool 裸 getter、str `!= null && !isEmpty()`），
+ * nullable FK 不校验；错误明细用 row.toString()（key() 仅单主键行有）。
  */
 export function genInitAll(m: InitAllModel): string {
   const L: string[] = [];
   L.push(`package ${m.pkg};`);
   L.push('');
   L.push(`public class CfgMapperInit {`);
-  L.push(`    private static class Holder { static final CfgMapperInit INSTANCE = new CfgMapperInit(); }`);
-  L.push(`    public static CfgMapperInit getInstance() { return Holder.INSTANCE; }`);
-  L.push('');
-  L.push(`    public void initAll() {`);
+  L.push(`    public static void initAll() {`);
   for (const row of m.rows) {
     L.push(`        ${row.initFqn}.getInstance().init();`);
   }
@@ -716,9 +749,10 @@ export function genInitAll(m: InitAllModel): string {
 }
 
 /**
- * 非空判断表达式：全部 key 字段 AND 连接。数值 `getF() != 0`；
- * str `getF() != null && !getF().isEmpty()`。keyChecks 元素为
- * 'num:<字段名>'（数值语义）或 'str:<字段名>'（字符串语义）。
+ * 非空判断表达式：全部 key 字段 AND 连接。数值 `getF() != 0`；bool 裸
+ * `getF()`（boolean 不能与 int 比较）；str `getF() != null && !getF().isEmpty()`。
+ * keyChecks 元素为 'num:<字段名>'（数值语义）、'bool:<字段名>'（布尔语义）或
+ * 'str:<字段名>'（字符串语义）。
  */
 function nonEmptyCheck(keyChecks: string[]): string {
   return keyChecks.map((c) => {
@@ -726,7 +760,9 @@ function nonEmptyCheck(keyChecks: string[]): string {
     const kind = sep === -1 ? c : c.substring(0, sep);
     const field = sep === -1 ? '' : c.substring(sep + 1);
     const getter = `row.get${upper1(field)}()`;
-    return kind === 'str' ? `${getter} != null && !${getter}.isEmpty()` : `${getter} != 0`;
+    if (kind === 'str') return `${getter} != null && !${getter}.isEmpty()`;
+    if (kind === 'bool') return getter;
+    return `${getter} != 0`;
   }).join(' && ');
 }
 

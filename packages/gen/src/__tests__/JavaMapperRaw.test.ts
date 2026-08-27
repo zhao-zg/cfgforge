@@ -188,8 +188,10 @@ describe('genRawClass: single pk + enum constants + FK ref', () => {
     expect(out).toContain('        CfgVersions.getInstance().AddCfgPBInfo("cfg_task", infoBuilder);');
   });
 
-  it('enum drift check after loop when enumConstants present', () => {
+  it('enum drift check after loop (M-2: once after recoreds processed, not per-row)', () => {
     expect(out).toContain('            if (tableMap.size() != 2) JLogger.error("cfg_task enum drift: rows=" + tableMap.size() + " expected=" + 2);');
+    // 循环体内不再有行数校验（16 空格缩进的旧位置）
+    expect(out).not.toContain('                if (tableMap.size() != 2)');
   });
 
   it('queries: getByKey / static get / all', () => {
@@ -360,7 +362,7 @@ describe('genRawClass: uniqueKey index + getByName + $entry map loop', () => {
     expect(out).toContain('            this.attrMap = attrMap;');
   });
 
-  it('enum drift check counts 3', () => {
+  it('enum drift check counts 3 (post-loop position)', () => {
     expect(out).toContain(
       '            if (tableMap.size() != 3) JLogger.error("cfg_task_completeconditiontype enum drift: rows=" + tableMap.size() + " expected=" + 3);',
     );

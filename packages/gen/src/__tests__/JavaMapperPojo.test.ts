@@ -124,6 +124,20 @@ describe('genPojoClass: struct with scalars + basic list', () => {
     );
   });
 
+  it('hashCode via Objects.hash over all fields; equals instanceof + per-field (F-5)', () => {
+    // struct 主键表（jewelryrandom[LvlRank]）getByKey 依赖 bean 值语义
+    expect(out).toContain(
+      '    public int hashCode() { return java.util.Objects.hash(testInt, testBool, testString, testList); }',
+    );
+    expect(out).toContain('    public boolean equals(Object other) {');
+    expect(out).toContain('        if (!(other instanceof TestDefaultBean)) return false;');
+    expect(out).toContain('        TestDefaultBean o = (TestDefaultBean) other;');
+    // 数值 ==（boolean 布尔 == 同语义），其余 .equals()
+    expect(out).toContain(
+      '        return testInt == o.testInt && testBool == o.testBool && testString.equals(o.testString) && testList.equals(o.testList);',
+    );
+  });
+
   it('class is public, not interface impl (toString @Override is expected)', () => {
     expect(out).toContain('public class TestDefaultBean {');
     expect(out).not.toContain(' implements ');
@@ -413,6 +427,11 @@ describe('genPojoClass: empty-fields class imports JSONObject', () => {
     expect(out).toContain('import com.alibaba.fastjson2.JSONObject;');
     expect(out).not.toContain('import com.alibaba.fastjson2.JSON;');
     expect(out).toContain('    public static NoFields _parse(JSONObject o) {');
+  });
+
+  it('empty-fields class skips hashCode/equals (Objects.hash() 无参无意义)', () => {
+    expect(out).not.toContain('hashCode()');
+    expect(out).not.toContain('equals(');
   });
 });
 

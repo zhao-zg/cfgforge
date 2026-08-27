@@ -16,8 +16,8 @@
  * - fieldKind 由 FieldType 谓词 + StructRef.obj instanceof InterfaceSchema 判定
  * - bean FQN = beanPkg + schema 命名空间路径 + upperStartSegments(lastName)
  *   （同一 resolveNameable 闭包同时供 POJO _parse 与 raw 行字段引用，保证一致）
- * - 枚举常量来源 vTable.enumNameToIntegerValueMap（数据行）；为 null 且
- *   enumNames 非空时 enumStrConstants（name→name 自身）
+ * - 枚举常量来源 vTable.enumNameToIntegerValueMap / enumNames（数据行，
+ *   EEnum 与 EEntry 表都收集）；getByName 仅 EEnum（spec 限定）
  * - FK 仅当目标表在生成集合中才加入 fks；ref getter/校验共用 shouldGenRef
  *   过滤谓词（RefPrimary/RefUniq + key 全 primitive + RefUniq 单字段 uniqueKey），
  *   RefUniq 目标方法名 getBy + upper1(字段名)
@@ -279,9 +279,14 @@ export class JavaMapperGenerator extends GeneratorWithTag {
             refGetter: 'get' + upper1(fk.name) + 'Ref',
             refSqlTable: sqlTableName(refTableSchema!.name(), 'cfg_'),
             nullable: (fk.refKey as { nullable: boolean }).nullable,
-            // 每个 key 字段各自的判空表达式（'num:<字段名>' / 'str:<字段名>'，
-            // 模板按字段名拼 getter 后 AND 连接）
-            keyChecks: keyFields.map((kf) => (kf.type === Primitive.STRING || kf.type === Primitive.TEXT ? 'str:' + kf.name : 'num:' + kf.name)),
+            // 每个 key 字段各自的判空表达式（'num:<字段名>' / 'bool:<字段名>' /
+            // 'str:<字段名>'，模板按字段名拼 getter 后 AND 连接；bool key 生成
+            // 裸 getter——boolean 与 int 不可比较，`getF() != 0` 不可编译）
+            keyChecks: keyFields.map((kf) => {
+              if (kf.type === Primitive.STRING || kf.type === Primitive.TEXT) return 'str:' + kf.name;
+              if (kf.type === Primitive.BOOL) return 'bool:' + kf.name;
+              return 'num:' + kf.name;
+            }),
           });
         }
         return { rawFqn, rowFqn: `${rawFqn}.${names.rowClass}`, sqlTable: names.sqlTable, fields };
@@ -424,11 +429,16 @@ export class JavaMapperGenerator extends GeneratorWithTag {
       return found;
     });
 
-    // uniqueKeys：仅单字段保留（v1 契约）
+    // uniqueKeys：仅单字段保留（v1 契约）；多字段跳过打日志（与 FK 侧同款风格）
     const uniqueKeys: RawUniqueKeyModel[] = [];
     for (const uk of schema.uniqueKeys()) {
       const ukFields = uk.fields();
-      if (ukFields.length !== 1) continue;
+      if (ukFields.length !== 1) {
+        if (ukFields.length > 1) {
+          Logger.log(`javamapper ignore uniqueKey [${ukFields.join(',')}] of ${schema.name()}: multi-field uniqueKey not supported (v1)`);
+        }
+        continue;
+      }
       const fs = (uk.fieldSchemas() ?? []).find((s) => s.name === ukFields[0]);
       if (!fs) continue;
       uniqueKeys.push({
@@ -486,8 +496,14 @@ export class JavaMapperGenerator extends GeneratorWithTag {
       }
     }
 
-    // enum 表：EEnum 判定 + 常量烘焙（数据行来源）
+    // enum 表：常量烘焙按数据驱动（VTableCreator 对 EEnum 与 EEntry 都收集
+    // enumNameToIntegerValueMap/enumNames——EEntry 表（(entry='...')）不烘焙常量
+    // 会让 interface type() 引用不存在的常量，编译失败）；getByName 仅 EEnum
+    // （spec 限定：EEntry 的 entry 字段语义不同，不生成名字索引）
     const isEnumTable = isEEnum(schema.entry);
+    const hasBakedConsts =
+      vTable.enumNameToIntegerValueMap !== null ||
+      (vTable.enumNames !== null && vTable.enumNames.size > 0);
     let enumField: string | null = null;
     let enumGetByName = false;
     let enumConstants: { name: string; value: number }[] | null = null;
@@ -497,6 +513,8 @@ export class JavaMapperGenerator extends GeneratorWithTag {
       // 枚举名字段非主键时才生成 getByName
       const pkNames = schema.primaryKey.fields();
       enumGetByName = !pkNames.includes(enumField!);
+    }
+    if (hasBakedConsts) {
       if (vTable.enumNameToIntegerValueMap !== null) {
         enumConstants = [...vTable.enumNameToIntegerValueMap.entries()].map(([name, value]) => ({
           name: enumFieldNameOf(name, false),

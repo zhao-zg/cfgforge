@@ -100,9 +100,38 @@ const CFG = [
  '\t->MergedLoot:[lootId,lootItemId] ->lootitem[itemid,count];',
  '}',
  '',
+ // F-2：EEntry 表（(entry='entry')，columnMode）——非 EEnum，旧门控 isEEnum
+ // 不烘焙常量；但 VTableCreator 对 EEntry 同样收集 enumNames（PK 是 str
+ // entry 非单 int → 无 int map，走 String 常量兜底）。布局仿 example 的
+ // equipconfig：行模式标题+字段名列，之后每逻辑列一个 entry。
+ 'table entries[entry] (entry=\'entry\', columnMode) {',
+ '\tentry:str;',
+ '\tvalue:int;',
+ '}',
+ '',
+ // F-3：bool key FK——keyChecks 需生成裸 getter（boolean != 0 不可编译）
+ 'table gate[ok] {',
+ '\tok:bool;',
+ '\tname:str;',
+ '}',
+ '',
+ 'table gateuser[id] {',
+ '\tid:int;',
+ '\tok:bool ->gate;',
+ '}',
+ '',
 ].join('\n');
 
 const COMPLETECONDITIONTYPE_CSV = ['id表,程序用名字', 'id,name', '1,KillMonster', '2,TalkNpc'].join('\n') + '\n';
+
+// F-2：EEntry 表数据（columnMode 仿 example equipconfig：每字段一个物理行，
+// cell(1)=字段名，cell(2+)=各记录值横向展开）。entry 字段值 Instance/Instance2
+// 即两个 entry 名。PK entry 是 str → 无 int map，走 enumNames 兜底烘焙 String 常量
+const ENTRIES_CSV = ['入口,entry,Instance,Instance2', '值,value,2,3'].join('\n') + '\n';
+
+const GATE_CSV = ['开关,名字', 'ok,name', 'true,开', 'false,关'].join('\n') + '\n';
+
+const GATEUSER_CSV = ['id,开关', 'id,ok', '1,true', '2,false'].join('\n') + '\n';
 
 const TASK_CSV = [
   '任务id,名字,下一任务,完成条件,参数1,参数2,区间,经验',
@@ -130,7 +159,7 @@ const CFG_PKG = `${PKG}.cfg`;
 // ---------------------------------------------------------------------------
 
 describe('genChildClass', () => {
-  it('extends raw class with empty prepareData hook and instance Holder', () => {
+  it('extends raw class with init() override calling prepareData, and instance Holder', () => {
     const out = genChildClass({
       pkg: CFG_PKG,
       className: 'Tasks',
@@ -140,6 +169,11 @@ describe('genChildClass', () => {
     expect(out).toContain(`public class Tasks extends ${RAW_PKG}.RawTasks {`);
     expect(out).toContain('    private static class Holder { static final Tasks INSTANCE = new Tasks(); }');
     expect(out).toContain('    public static Tasks getInstance() { return Holder.INSTANCE; }');
+    // F-1：无 init() override 时 prepareData 永不被调用（死代码）
+    expect(out).toContain('    @Override');
+    expect(out).toContain('    public void init() {');
+    expect(out).toContain('        super.init();');
+    expect(out).toContain('        prepareData();');
     expect(out).toContain('    public void prepareData() {');
     expect(out).toContain('    }');
   });
@@ -163,15 +197,20 @@ describe('genInitAll', () => {
           { field: 'ename', refGetter: 'getEnameRef', refSqlTable: 'cfg_loot', nullable: false, keyChecks: ['str:ename'] },
           // 命名 FK 多字段 key：每个字段各自判空 AND 连接（C-1）
           { field: 'Loot', refGetter: 'getLootRef', refSqlTable: 'cfg_lootitem', nullable: false, keyChecks: ['num:lootId', 'str:ename'] },
+          // bool key（F-3）：裸 getter（boolean 与 int 不可比较）
+          { field: 'Gate', refGetter: 'getGateRef', refSqlTable: 'cfg_gate', nullable: false, keyChecks: ['bool:ok'] },
         ],
       },
     ],
   });
 
-  it('package + class decl + getInstance', () => {
+  it('package + class decl; initAll static, no Holder/getInstance (M-1)', () => {
     expect(out).toContain(`package ${RAW_PKG};`);
     expect(out).toContain('public class CfgMapperInit {');
-    expect(out).toContain('    public static CfgMapperInit getInstance() { return Holder.INSTANCE; }');
+    // spec §3.4：public static void initAll()——不需要实例 Holder
+    expect(out).toContain('    public static void initAll() {');
+    expect(out).not.toContain('private static class Holder');
+    expect(out).not.toContain('CfgMapperInit getInstance');
   });
 
   it('initAll calls child FQN when child exists, raw otherwise, in sortedTables order', () => {
@@ -203,6 +242,12 @@ describe('genInitAll', () => {
     expect(out).toContain('errs.add("cfg_task row=" + row.toString() + " fk=Loot -> cfg_lootitem missing");');
     expect(out).not.toContain('getLootIdRef');
   });
+
+  it('verifyRefs: bool FK key uses bare getter (F-3: boolean != 0 does not compile)', () => {
+    expect(out).toContain('if (row.getOk() && row.getGateRef() == null) {');
+    // 不得生成 boolean 与 int 比较的非法表达式
+    expect(out).not.toContain('row.getOk() != 0');
+  });
 });
 
 // ---------------------------------------------------------------------------
@@ -223,6 +268,9 @@ describe('JavaMapperGenerator', () => {
     fs.writeFileSync(path.join(tempDir, 'taskextraexp.csv'), TASKEXTRAEXP_CSV);
     fs.writeFileSync(path.join(tempDir, 'lootitem.csv'), LOOTITEM_CSV);
     fs.writeFileSync(path.join(tempDir, 'monster.csv'), MONSTER_CSV);
+    fs.writeFileSync(path.join(tempDir, 'entries.csv'), ENTRIES_CSV);
+    fs.writeFileSync(path.join(tempDir, 'gate.csv'), GATE_CSV);
+    fs.writeFileSync(path.join(tempDir, 'gateuser.csv'), GATEUSER_CSV);
   });
 
   afterEach(() => {
@@ -279,6 +327,33 @@ describe('JavaMapperGenerator', () => {
     expect(raw).toContain('public static final int TALKNPC = 2;');
     // 枚举名字段 name 非主键 → getByName
     expect(raw).toContain('public RawCompleteconditiontype getByName(String name) {');
+  });
+
+  it('EEntry table bakes constants from data rows but no getByName (F-2)', async () => {
+    // entries (entry='entry') 是 EEntry 表：旧门控 isEEnum 不烘焙常量——若
+    // interface type() 引用它即编译失败；数据驱动门控按 enumNames 烘焙。
+    // PK 是 str entry → 无 int map → String 常量（name→name）。
+    // getByName 维持仅 EEnum（spec 限定）。
+    await generateWith('task');
+    const raw = read('raw/RawEntriess.java');
+    expect(raw).toContain('public static final String INSTANCE = "Instance";');
+    expect(raw).toContain('public static final String INSTANCE2 = "Instance2";');
+    expect(raw).not.toContain('getByName');
+    expect(raw).not.toContain('nameMap');
+  });
+
+  it('bool FK key: verifyRefs uses bare getter, no boolean != 0 (F-3)', async () => {
+    // gateuser.ok ->gate（bool 主键 FK）：keyChecks 生成裸 row.getOk()
+    await generateWith('task');
+    const init = read('raw/CfgMapperInit.java');
+    expect(init).toContain('if (row.getOk() && row.getOkRef() == null) {');
+    // boolean 与 int 不可比较——非法表达式不得出现
+    expect(init).not.toContain('row.getOk() != 0');
+
+    // raw 行类 ref getter 正常生成（委托 getByKey(ok)）
+    const raw = read('raw/RawGateusers.java');
+    expect(raw).toContain('getOkRef()');
+    expect(raw).toContain('return RawGates.getInstance().getByKey(ok);');
   });
 
   it('impl POJO type() returns enum table int constant; interface declares abstract type()', async () => {
@@ -338,11 +413,13 @@ describe('JavaMapperGenerator', () => {
     expect(init).not.toContain('getLootIdRef');
   });
 
-  it('CfgMapperInit: initAll in sortedTables order, child init uses child FQN; verifyRefs checks non-null FKs', async () => {
+  it('CfgMapperInit: static initAll in sortedTables order, child init uses child FQN; verifyRefs checks non-null FKs', async () => {
     await generateWith('task');
     const init = read('raw/CfgMapperInit.java');
     expect(init).toContain(`package ${RAW_PKG};`);
     expect(init).toContain('public class CfgMapperInit {');
+    // M-1：initAll 是 static（spec §3.4），无实例 Holder
+    expect(init).toContain('    public static void initAll() {');
 
     // initAll：sortedTables 顺序（completeconditiontype < lootitem < monster < task < taskextraexp）
     const order = [
@@ -364,13 +441,18 @@ describe('JavaMapperGenerator', () => {
     expect(init).not.toContain('getNexttaskRef() == null');
   });
 
-  it('cfg/Tasks.java child class with prepareData hook', async () => {
+  it('cfg/Tasks.java child class with init() override + prepareData hook (F-1)', async () => {
     await generateWith('task');
     const child = read('cfg/Tasks.java');
     expect(child).toContain(`package ${CFG_PKG};`);
     expect(child).toContain(`public class Tasks extends ${RAW_PKG}.RawTasks {`);
     expect(child).toContain('public void prepareData() {');
     expect(child).toContain('public static Tasks getInstance() { return Holder.INSTANCE; }');
+    // init() override：super.init() 后调 prepareData
+    expect(child).toContain('    @Override');
+    expect(child).toContain('    public void init() {');
+    expect(child).toContain('        super.init();');
+    expect(child).toContain('        prepareData();');
   });
 
   it('second run does not overwrite existing child file', async () => {

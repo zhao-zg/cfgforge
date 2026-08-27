@@ -62,7 +62,16 @@ export class ExcelTableFile implements TableFile {
     }
 
     const wb = new ExcelJS.Workbook();
-    await wb.xlsx.readFile(filePath);
+    if (dfs.isSyncSupported) {
+      // Node environment: ExcelJS can use fs directly
+      await wb.xlsx.readFile(filePath);
+    } else {
+      // Tauri/WebView/browser environment: fs is externalized (empty stub),
+      // so read file bytes via CfgFileSystem then load into ExcelJS
+      const buf = await dfs.readFile(filePath);
+      const nodeBuf = Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength);
+      await wb.xlsx.load(nodeBuf as any);
+    }
 
     const sheet = wb.getWorksheet(sheetName);
     if (!sheet) {

@@ -5,6 +5,17 @@ export { GeneratorWithTag } from './GeneratorWithTag';
 export { Generators } from './Generators';
 export type { GeneratorProvider } from './Generators';
 export { JsonGenerator } from './JsonGenerator';
+export { SqlGenerator } from './SqlGenerator';
+export {
+  renderTableSql,
+  renderTablesSql,
+  sqlTableName,
+  camelToSnake,
+  escapeSqlString,
+  sqlColumnType,
+  defaultSqlRenderOptions,
+} from './SqlRender';
+export type { SqlRenderOptions } from './SqlRender';
 export { TsCodeGenerator } from './TsCodeGenerator';
 export { CsCodeGenerator } from './CsCodeGenerator';
 export { GoCodeGenerator } from './GoCodeGenerator';

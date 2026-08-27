@@ -142,8 +142,8 @@ export function relative(from: string, to: string): string {
     return toNorm;
   }
 
-  const fromParts = fromDrive ? fromNorm.substring(2).split('/').filter(Boolean) : fromNorm.split('/').filter(Boolean);
-  const toParts = toDrive ? toNorm.substring(2).split('/').filter(Boolean) : toNorm.split('/').filter(Boolean);
+  const fromParts = fromDrive ? fromNorm.substring(2).split('/').filter(p => p && p !== '.') : fromNorm.split('/').filter(p => p && p !== '.');
+  const toParts = toDrive ? toNorm.substring(2).split('/').filter(p => p && p !== '.') : toNorm.split('/').filter(p => p && p !== '.');
 
   // 找到公共前缀
   let commonLen = 0;

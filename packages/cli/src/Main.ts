@@ -24,6 +24,7 @@ import {
   GdCodeGenerator,
   TsSchemaGenerator,
   JsonGenerator,
+  SqlGenerator,
   I18nByValueGenerator,
   I18nByIdGenerator,
   ByAIGenerator,
@@ -74,6 +75,7 @@ export function registerAllProviders(): void {
   Generators.addProvider('gd', (p) => new GdCodeGenerator(p));
   Generators.addProvider('tsschema', (p) => new TsSchemaGenerator(p));
   Generators.addProvider('json', (p) => new JsonGenerator(p));
+  Generators.addProvider('sql', (p) => new SqlGenerator(p));
   Generators.addProvider('i18n', (p) => new I18nByValueGenerator(p));
   Generators.addProvider('i18nbyid', (p) => new I18nByIdGenerator(p));
   Generators.addProvider('byai', (p) => new ByAIGenerator(p));

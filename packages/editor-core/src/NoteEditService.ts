@@ -8,8 +8,7 @@
  *   - updateNote: 新增/更新/删除备注，并写回 CSV
  */
 
-import * as fs from 'fs';
-import { readCSV, writeCSVToFile, writeCSVToFileAsync, type CSVRow } from '@cfgforge/shared';
+import { writeCSVToFile, writeCSVToFileAsync, type CSVRow } from '@cfgforge/shared';
 import { getDefaultFileSystem } from '@cfgforge/shared';
 
 export interface Note {
@@ -41,16 +40,6 @@ export class NoteEditService {
   constructor(noteCsvPath: string) {
     this.noteCsvPath = noteCsvPath;
     this.noteMap = new Map<string, string>();
-
-    if (fs.existsSync(noteCsvPath)) {
-      const rows = readCSV(noteCsvPath, 'utf8');
-      for (const row of rows) {
-        if (row.length === 2) {
-          this.noteMap.set(row[0], row[1]);
-        }
-        // else: field count not 2, ignore (与 Java 一致)
-      }
-    }
   }
 
   /**
@@ -59,8 +48,6 @@ export class NoteEditService {
    */
   static async create(noteCsvPath: string): Promise<NoteEditService> {
     const svc = new NoteEditService(noteCsvPath);
-    // Clear the sync-loaded data and re-load async
-    svc.noteMap.clear();
     const dfs = getDefaultFileSystem();
     if (await dfs.exists(noteCsvPath)) {
       const bytes = await dfs.readFile(noteCsvPath);

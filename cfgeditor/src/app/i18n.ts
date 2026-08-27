@@ -43,6 +43,7 @@ i18n.use(LanguageDetector)
                     toPng: 'save relation png',
                     exportCsv: 'Export CSV',
                     exportSql: 'Export SQL',
+                    exportAllSql: 'Export All SQL',
                     exportSuccess: 'Exported {table} to {file}',
                     exportFail: 'Export failed: {error}',
 
@@ -340,6 +341,7 @@ i18n.use(LanguageDetector)
                     toPng: '保存图片',
                     exportCsv: '导出 CSV',
                     exportSql: '导出 SQL',
+                    exportAllSql: '导出全部 SQL',
                     exportSuccess: '已导出 {table} 到 {file}',
                     exportFail: '导出失败: {error}',
 

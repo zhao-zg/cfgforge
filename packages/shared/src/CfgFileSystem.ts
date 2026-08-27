@@ -155,9 +155,15 @@ import { NodeFileSystem } from './NodeFileSystem';
 
 export function ensureDefaultFileSystem(): void {
   if (defaultFileSystem !== null) return;
+  // 检测是否为真正的 Node.js 环境。
+  // 浏览器构建可能注入 process polyfill，但 process.versions.node 不存在。
+  // 在非 Node 环境中保持未初始化，由入口（main.tsx）显式 setDefaultFileSystem。
+  if (typeof process === 'undefined' || process.versions?.node === undefined) {
+    return;
+  }
   try {
     defaultFileSystem = new NodeFileSystem();
   } catch {
-    // 非 Node 环境：保持未初始化，由 Tauri 入口 setDefaultFileSystem
+    // 非 Node 环境：保持未初始化，由 Tauri/Web 入口 setDefaultFileSystem
   }
 }

@@ -20,21 +20,25 @@ RUN pnpm -r run build
 RUN cd cfgeditor && pnpm build
 
 # ============================================================
-# Stage 2: Runtime image (Nginx only — serves static files)
+# Stage 2: Runtime image (Node HTTP server)
 # ============================================================
-FROM nginx:alpine
-
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
-
-# Copy custom nginx config
-COPY .docker/nginx.conf /etc/nginx/nginx.conf
+FROM node:24-alpine
 
 # Copy built frontend
 COPY --from=builder /build/cfgeditor/dist /app/web
 
+# Copy server script
+COPY server/server.mjs /app/server/server.mjs
+
 WORKDIR /app
+
+# Environment defaults
+ENV CFGFORGE_DATA_DIR=/data
+ENV CFGFORGE_WEB_ROOT=/app/web
+ENV CFGFORGE_PORT=80
+ENV CFGFORGE_HOST=0.0.0.0
 
 EXPOSE 80
 
-CMD ["nginx", "-g", "daemon off;"]
+# Zero-dependency Node server: serves SPA + /api/fs/* REST API
+CMD ["node", "server/server.mjs"]

@@ -15,7 +15,7 @@
  *   ColumnModeCsvTableFile.java (98 lines)
  */
 
-import { readAndNormalizeCSV, writeCSVToFile, type CSVRow } from '@cfgforge/shared';
+import { readAndNormalizeCSVAsync, writeCSVToFileAsync, type CSVRow } from '@cfgforge/shared';
 import type { RecordBlockTransformed } from '../RecordBlock';
 import type { TableFile } from '../TableFile';
 
@@ -27,30 +27,44 @@ export class CsvTableFile implements TableFile {
   private _fixedMaxColumnCount: number;
   private _modified = false;
 
-  constructor(
+  private constructor(
+    filePath: string,
+    rows: CSVRow[],
+    headRow: number,
+    isColumnMode: boolean,
+  ) {
+    this._filePath = filePath;
+    this._rows = rows;
+    this._headRow = headRow;
+    this._isColumnMode = isColumnMode;
+    this._fixedMaxColumnCount = rows.length === 0 ? 0 : rows[0].length;
+  }
+
+  /**
+   * Static async factory: reads the CSV file via CfgFileSystem
+   * (browser/WebView compatible) and returns a CsvTableFile.
+   */
+  static async create(
     filePath: string,
     defaultEncoding: string,
     headRow: number,
     isColumnMode: boolean,
-  ) {
+  ): Promise<CsvTableFile> {
     if (headRow < 0) {
       throw new Error('headRow must be non-negative');
     }
 
-    this._filePath = filePath;
-    this._headRow = headRow;
-    this._isColumnMode = isColumnMode;
-
+    let rows: CSVRow[];
     try {
-      this._rows = readAndNormalizeCSV(filePath, defaultEncoding);
+      rows = await readAndNormalizeCSVAsync(filePath, defaultEncoding);
     } catch (e) {
       throw new Error('Failed to read CSV file: ' + filePath + ' — ' + (e as Error).message);
     }
 
-    if (this._rows.length === 0) {
+    if (rows.length === 0) {
       throw new Error('CSV file has no data: ' + filePath);
     }
-    this._fixedMaxColumnCount = this._rows[0].length;
+    return new CsvTableFile(filePath, rows, headRow, isColumnMode);
   }
 
   // -------------------------------------------------------------------------
@@ -114,7 +128,7 @@ export class CsvTableFile implements TableFile {
       return;
     }
     try {
-      writeCSVToFile(this._filePath, this._rows);
+      await writeCSVToFileAsync(this._filePath, this._rows);
       this._modified = false;
     } catch (e) {
       throw new Error('Failed to save CSV file: ' + this._filePath + ' — ' + (e as Error).message);

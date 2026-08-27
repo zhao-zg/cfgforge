@@ -79,6 +79,8 @@ export class CfgUtil {
    * For empty namespace: returns absoluteTopDst itself (root config.cfg path).
    * For "equip": parent(equip) → /output/equip/equip.cfg
    * For "equip.weapon": /output/equip/weapon/weapon.cfg
+   *
+   * Sync version — uses fs directly. For Tauri/WebView use getCfgFilePathByNamespaceAsync.
    */
   static getCfgFilePathByNamespace(ns: string, absoluteTopDst: string): string {
     if (ns.length === 0) {
@@ -97,9 +99,29 @@ export class CfgUtil {
   }
 
   /**
+   * Async variant of getCfgFilePathByNamespace.
+   * Uses CfgFileSystem abstraction instead of fs directly.
+   */
+  static async getCfgFilePathByNamespaceAsync(ns: string, absoluteTopDst: string): Promise<string> {
+    if (ns.length === 0) {
+      return absoluteTopDst;
+    }
+
+    let cur = pathDirname(absoluteTopDst);
+    let lastName = 'config';
+    for (const name of ns.split('.')) {
+      cur = await CfgUtil.subDirAsync(name, cur);
+      lastName = name;
+    }
+    return pathJoin(cur, lastName + '.cfg');
+  }
+
+  /**
    * Find a subdirectory by name, or by matching getCodeName if exact name doesn't exist.
    * This allows Chinese-named directories (e.g. "ai_行为") to be matched by their
    * code name (e.g. "ai").
+   *
+   * Sync version — uses fs directly. For Tauri/WebView use subDirAsync.
    */
   private static subDir(name: string, cur: string): string {
     const p = path.join(cur, name);
@@ -113,6 +135,33 @@ export class CfgUtil {
       for (const fn of entries) {
         const fullPath = path.join(cur, fn);
         if (!fs.statSync(fullPath).isDirectory()) continue;
+        const codeName = getCodeName(fn);
+        if (codeName !== null && codeName === name) {
+          return fullPath;
+        }
+      }
+    }
+
+    return p;
+  }
+
+  /**
+   * Async variant of subDir.
+   * Uses CfgFileSystem abstraction instead of fs directly.
+   */
+  private static async subDirAsync(name: string, cur: string): Promise<string> {
+    const dfs = getDefaultFileSystem();
+    const p = pathJoin(cur, name);
+    if (await dfs.isDirectory(p)) {
+      return p;
+    }
+
+    // Try to find a directory whose getCodeName matches
+    if (await dfs.isDirectory(cur)) {
+      const entries = await dfs.readDir(cur);
+      for (const fn of entries) {
+        const fullPath = pathJoin(cur, fn);
+        if (!(await dfs.isDirectory(fullPath))) continue;
         const codeName = getCodeName(fn);
         if (codeName !== null && codeName === name) {
           return fullPath;

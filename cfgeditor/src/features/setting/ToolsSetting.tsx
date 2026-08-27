@@ -12,7 +12,7 @@ import {Schema} from "@/domain/schema.ts";
 import {STable} from "@/api/schemaModel.ts";
 import {useMutation} from "@tanstack/react-query";
 import {RecordEditResult} from "@/api/recordModel.ts";
-import {deleteRecord, exportTable} from "@/api/apiClient.ts";
+import {deleteRecord, exportTable, exportAllSql} from "@/api/apiClient.ts";
 import type {ExportFormat} from '@cfgforge/editor-core';
 import {toBlob} from "html-to-image";
 import {saveAs} from "file-saver";
@@ -119,6 +119,21 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         }
     }, [curTableId, notification, t]);
 
+    const onExportAllSql = useCallback(async () => {
+        try {
+            const result = await exportAllSql();
+            const filename = 'config.sql';
+            const blob = new Blob([result.content], {type: 'text/plain;charset=utf-8'});
+            saveAs(blob, filename);
+            notification.info({
+                title: t('exportSuccess', {table: '*', file: filename}),
+                duration: 3,
+            });
+        } catch (e) {
+            notification.error({title: t('exportFail', {error: (e as Error).message}), duration: 4});
+        }
+    }, [notification, t]);
+
     const options = [
         {label: t('table'), value: 'table'},
         {label: t('tableRef'), value: 'tableRef'},
@@ -155,6 +170,7 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         <Space>
             <Button onClick={() => onExport('csv')}>{t('exportCsv')}</Button>
             <Button onClick={() => onExport('sql')}>{t('exportSql')}</Button>
+            <Button onClick={onExportAllSql}>{t('exportAllSql')}</Button>
         </Space>
 
         {schema && curTable && schema.isEditable &&

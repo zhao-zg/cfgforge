@@ -38,6 +38,7 @@ import type {
     PromptResult,
     SearchResult,
     ExportResult,
+    ExportAllResult,
     ExportFormat,
 } from '@cfgforge/editor-core';
 
@@ -335,4 +336,8 @@ export async function exportTable(
     _signal?: AbortSignal,
 ): Promise<ExportResult> {
     return ExportService.export(getEditor(), tableId, format);
+}
+
+export async function exportAllSql(_signal?: AbortSignal): Promise<ExportAllResult> {
+    return ExportService.exportAllSql(getEditor());
 }

@@ -15,6 +15,12 @@ if (isTauri()) {
     // 动态导入避免非 Tauri 环境（纯 web dev）加载 plugin-fs
     const { TauriFileSystem } = await import('./services/TauriFileSystem.ts');
     setDefaultFileSystem(new TauriFileSystem());
+} else {
+    // 纯浏览器环境（Docker 网页版）：注入 BrowserFsApi，通过 HTTP API 读写后端文件系统。
+    // Logger 同样需要替换为 console.log 版本（浏览器无 process.stdout）。
+    Logger.setPrinter(createPrinter({ write: (s: string) => console.log(s) }));
+    const { BrowserFsApi } = await import('./services/BrowserFsApi.ts');
+    setDefaultFileSystem(new BrowserFsApi());
 }
 
 import React, { useState, useEffect } from 'react'

@@ -53,20 +53,20 @@ describe('CsvTableFile — Row Mode', () => {
     }
   });
 
-  it('reads a CSV file with normalized columns', () => {
+  it('reads a CSV file with normalized columns', async () => {
     const filePath = writeCsvFile('row-read.csv', 'a,b,c\r\n1,2,3\r\n4,5,6\r\n');
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     expect(tf).toBeDefined();
   });
 
-  it('throws on empty CSV file', () => {
+  it('throws on empty CSV file', async () => {
     const filePath = writeCsvFile('row-empty.csv', '');
-    expect(() => new CsvTableFile(filePath, 'UTF-8', 2, false)).toThrow('no data');
+    await expect(CsvTableFile.create(filePath, 'UTF-8', 2, false)).rejects.toThrow('no data');
   });
 
   it('emptyRows clears specified rows fully when fieldIndices is null', async () => {
     const filePath = writeCsvFile('row-empty-rows.csv', 'a,b,c\r\n1,2,3\r\n4,5,6\r\n7,8,9\r\n');
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     tf.emptyRows(2, 2, null);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -76,7 +76,7 @@ describe('CsvTableFile — Row Mode', () => {
 
   it('emptyRows clears only specified fieldIndices on first row', async () => {
     const filePath = writeCsvFile('row-empty-fields.csv', 'a,b,c\r\n1,2,3\r\n4,5,6\r\n7,8,9\r\n');
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     tf.emptyRows(2, 1, [0, 2]);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -88,7 +88,7 @@ describe('CsvTableFile — Row Mode', () => {
 
   it('emptyRows does nothing when startRow is out of range', async () => {
     const filePath = writeCsvFile('row-oob.csv', 'a,b,c\r\n1,2,3\r\n');
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     tf.emptyRows(99, 1, null);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -103,7 +103,7 @@ describe('CsvTableFile — Row Mode', () => {
     block.setCell(0, 2, 'z');
     const transformed = new RecordBlockTransformed(block, [0, 1, 2]);
 
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     tf.insertRecordBlock(-1, 0, transformed);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -117,7 +117,7 @@ describe('CsvTableFile — Row Mode', () => {
     block.setCell(0, 1, 'bb');
     const transformed = new RecordBlockTransformed(block, [0, 1]);
 
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     tf.insertRecordBlock(2, 1, transformed);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -135,7 +135,7 @@ describe('CsvTableFile — Row Mode', () => {
     const transformed = new RecordBlockTransformed(block, [0, 1]);
 
     // startRow=2, emptyRowCount=0 → insert 2 gap rows at position 2, shifting 9,9,9 down
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     tf.insertRecordBlock(2, 0, transformed);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -147,7 +147,7 @@ describe('CsvTableFile — Row Mode', () => {
   it('saveAndClose does nothing when not modified', async () => {
     const filePath = writeCsvFile('row-nomod.csv', 'a,b\r\n1,2\r\n');
     const original = readCsvFile(filePath);
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     await tf.saveAndClose();
     expect(readCsvFile(filePath)).toBe(original);
   });
@@ -160,7 +160,7 @@ describe('CsvTableFile — Row Mode', () => {
     block.setCell(0, 1, 'third');
     const transformed = new RecordBlockTransformed(block, [0, 2]);
 
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, false);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, false);
     tf.insertRecordBlock(2, 1, transformed);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -186,16 +186,16 @@ describe('CsvTableFile — Column Mode', () => {
   //   - writeLine(column, lineData) writes lineData[row] → rows[row][column]
   //   - So content.getRow(lineOffset) returns an array indexed by row
 
-  it('reads a column-mode CSV', () => {
+  it('reads a column-mode CSV', async () => {
     const filePath = writeCsvFile('col-read.csv', 'field0,field1,field2\r\nA,B,C\r\n1,2,3\r\n');
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, true);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, true);
     expect(tf).toBeDefined();
   });
 
   it('emptyRows clears columns (not rows) when fieldIndices is null', async () => {
     // Column mode: startLine=column index, count=number of columns
     const filePath = writeCsvFile('col-empty.csv', 'f0,f1,f2\r\nA,B,C\r\n1,2,3\r\n');
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, true);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, true);
     // Clear columns 0 and 1
     tf.emptyRows(0, 2, null);
     await tf.saveAndClose();
@@ -208,7 +208,7 @@ describe('CsvTableFile — Column Mode', () => {
   it('emptyRows clears only specified fieldIndices (row indices) on first column', async () => {
     // Column mode: fieldIndices = row indices within the first column
     const filePath = writeCsvFile('col-empty-fields.csv', 'f0,f1,f2\r\nA,B,C\r\n1,2,3\r\n');
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, true);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, true);
     // Clear column 0, rows 1 and 2 (fieldIndices)
     tf.emptyRows(0, 1, [1, 2]);
     await tf.saveAndClose();
@@ -230,7 +230,7 @@ describe('CsvTableFile — Column Mode', () => {
     block.setCell(0, 1, '3');  // line 0 (column 0), field 1 → row 2
     const transformed = new RecordBlockTransformed(block, [1, 2]);
 
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, true);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, true);
     tf.insertRecordBlock(-1, 0, transformed);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -248,7 +248,7 @@ describe('CsvTableFile — Column Mode', () => {
     block.setCell(0, 1, 'Y');  // field 1 → row 2
     const transformed = new RecordBlockTransformed(block, [1, 2]);
 
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, true);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, true);
     tf.insertRecordBlock(2, 1, transformed);
     await tf.saveAndClose();
     const lines = readCsvLines(filePath);
@@ -264,7 +264,7 @@ describe('CsvTableFile — Column Mode', () => {
     block.setCell(0, 1, 'Y');  // field 1 → row 2
     const transformed = new RecordBlockTransformed(block, [1, 2]);
 
-    const tf = new CsvTableFile(filePath, 'UTF-8', 2, true);
+    const tf = await CsvTableFile.create(filePath, 'UTF-8', 2, true);
     // startColumn=2, emptyColumnCount=1, contentColumnCount=1
     // 1 > 1 is false → no gap insertion, just overwrite
     tf.insertRecordBlock(2, 1, transformed);

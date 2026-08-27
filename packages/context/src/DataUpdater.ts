@@ -13,9 +13,9 @@
  * Java source: configgen.ctx.DataUpdater.java (79 lines)
  */
 
-import * as path from 'path';
+import { join as pathJoin } from '@cfgforge/shared';
 import type { Context } from './Context';
-import { DTable, FileFmt, getFileFormat, getTableNameIndex, HeadParser, CellParser, CfgDataStat, readExcel } from '@cfgforge/data';
+import { DTable, FileFmt, getFileFormat, getTableNameIndex, HeadParser, CellParser, CfgDataStat, readExcel, readCsvAsync } from '@cfgforge/data';
 import { CfgSchemaErrs } from '@cfgforge/schema';
 
 export class DataUpdater {
@@ -42,7 +42,7 @@ export class DataUpdater {
     const rootDir = context.rootDir();
 
     for (const sheet of dTable.rawSheets) {
-      const absPath = path.join(rootDir, sheet.relativeFilePath);
+      const absPath = pathJoin(rootDir, sheet.relativeFilePath);
       const relativePath = sheet.relativeFilePath;
       const fmt = getFileFormat(absPath);
       if (fmt === null) {
@@ -55,12 +55,16 @@ export class DataUpdater {
           throw new Error(`Not legal path: ${relativePath}`);
         }
         const fieldSeparator = fmt === FileFmt.CSV ? ',' : '\t';
-        const result = context.csvReader()(
+        // Use async readCsvAsync (CfgFileSystem) instead of sync csvReader(),
+        // so that after VTableStorage writes to the CSV file, DataUpdater reads
+        // the latest content rather than stale cached data.
+        const result = await readCsvAsync(
           absPath,
           relativePath,
           ti.tableName,
           ti.index,
           fieldSeparator,
+          context.contextCfg().csvOrTsvDefaultEncoding,
           dTable.nullableAddTag,
         );
         for (const oneSheet of result.sheets) {

@@ -1,9 +1,15 @@
 services:
   cfgforge:
-    # 纯静态前端只读预览（TS 重写架构）。
-    # 注意：新架构下编辑功能由本地 Tauri 桌面应用直接读写本机文件系统完成，
-    # 浏览器/Docker 环境无法读写配表，仅作只读预览部署。
+    # 网页版编辑器：Node HTTP 后端托管前端 + 文件系统 REST API。
+    # 数据目录通过 volume 挂载进容器，支持浏览/编辑/保存配表全流程。
     image: ghcr.io/zhao-zg/cfgforge:latest
     ports:
       - "8181:80"
+    volumes:
+      - ./config:/data
+    environment:
+      - CFGFORGE_DATA_DIR=/data
+      - CFGFORGE_WEB_ROOT=/app/web
+      - CFGFORGE_PORT=80
+      - CFGFORGE_HOST=0.0.0.0
     restart: unless-stopped

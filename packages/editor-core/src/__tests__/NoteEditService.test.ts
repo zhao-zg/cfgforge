@@ -41,18 +41,18 @@ describe('NoteEditService', () => {
   // getNotes
   // -------------------------------------------------------------------------
 
-  it('getNotes returns empty when file does not exist', () => {
-    const svc = new NoteEditService(noteCsvPath);
+  it('getNotes returns empty when file does not exist', async () => {
+    const svc = await NoteEditService.create(noteCsvPath);
     const result = svc.getNotes();
 
     expect(result.notes).toEqual([]);
   });
 
-  it('getNotes reads existing notes from CSV', () => {
+  it('getNotes reads existing notes from CSV', async () => {
     // Write a test CSV first
     fs.writeFileSync(noteCsvPath, 'key1,这是备注1\r\nkey2,这是备注2\r\n', 'utf8');
 
-    const svc = new NoteEditService(noteCsvPath);
+    const svc = await NoteEditService.create(noteCsvPath);
     const result = svc.getNotes();
 
     expect(result.notes.length).toBe(2);
@@ -66,8 +66,8 @@ describe('NoteEditService', () => {
   // updateNote — add
   // -------------------------------------------------------------------------
 
-  it('updateNote adds a new note', () => {
-    const svc = new NoteEditService(noteCsvPath);
+  it('updateNote adds a new note', async () => {
+    const svc = await NoteEditService.create(noteCsvPath);
     const result = svc.updateNote('newKey', 'new note') as NoteEditResult;
 
     expect(result.resultCode).toBe('addOk');
@@ -79,9 +79,9 @@ describe('NoteEditService', () => {
     expect(fs.existsSync(noteCsvPath)).toBe(true);
   });
 
-  it('updateNote updates an existing note', () => {
+  it('updateNote updates an existing note', async () => {
     fs.writeFileSync(noteCsvPath, 'key1,old note\r\n', 'utf8');
-    const svc = new NoteEditService(noteCsvPath);
+    const svc = await NoteEditService.create(noteCsvPath);
     const result = svc.updateNote('key1', 'new note') as NoteEditResult;
 
     expect(result.resultCode).toBe('updateOk');
@@ -93,9 +93,9 @@ describe('NoteEditService', () => {
   // updateNote — delete
   // -------------------------------------------------------------------------
 
-  it('updateNote with empty note deletes existing note', () => {
+  it('updateNote with empty note deletes existing note', async () => {
     fs.writeFileSync(noteCsvPath, 'key1,note1\r\nkey2,note2\r\n', 'utf8');
-    const svc = new NoteEditService(noteCsvPath);
+    const svc = await NoteEditService.create(noteCsvPath);
     const result = svc.updateNote('key1', '') as NoteEditResult;
 
     expect(result.resultCode).toBe('deleteOk');
@@ -103,8 +103,8 @@ describe('NoteEditService', () => {
     expect(result.notes[0].key).toBe('key2');
   });
 
-  it('updateNote with empty note on non-existent key returns keyNotFoundOnDelete', () => {
-    const svc = new NoteEditService(noteCsvPath);
+  it('updateNote with empty note on non-existent key returns keyNotFoundOnDelete', async () => {
+    const svc = await NoteEditService.create(noteCsvPath);
     const result = svc.updateNote('nonexistent', '') as NoteEditResult;
 
     expect(result.resultCode).toBe('keyNotFoundOnDelete');
@@ -115,15 +115,15 @@ describe('NoteEditService', () => {
   // updateNote — error cases
   // -------------------------------------------------------------------------
 
-  it('updateNote with empty key returns keyNotSet', () => {
-    const svc = new NoteEditService(noteCsvPath);
+  it('updateNote with empty key returns keyNotSet', async () => {
+    const svc = await NoteEditService.create(noteCsvPath);
     const result = svc.updateNote('', 'some note') as NoteEditResult;
 
     expect(result.resultCode).toBe('keyNotSet');
   });
 
-  it('updateNote with null key returns keyNotSet', () => {
-    const svc = new NoteEditService(noteCsvPath);
+  it('updateNote with null key returns keyNotSet', async () => {
+    const svc = await NoteEditService.create(noteCsvPath);
     const result = svc.updateNote(null as unknown as string, 'some note') as NoteEditResult;
 
     expect(result.resultCode).toBe('keyNotSet');
@@ -133,12 +133,12 @@ describe('NoteEditService', () => {
   // Persistence
   // -------------------------------------------------------------------------
 
-  it('notes persist across instances', () => {
-    const svc1 = new NoteEditService(noteCsvPath);
+  it('notes persist across instances', async () => {
+    const svc1 = await NoteEditService.create(noteCsvPath);
     svc1.updateNote('persistKey', 'persist note');
 
     // Create a new instance reading from the same file
-    const svc2 = new NoteEditService(noteCsvPath);
+    const svc2 = await NoteEditService.create(noteCsvPath);
     const result = svc2.getNotes();
 
     expect(result.notes.length).toBe(1);
@@ -146,8 +146,8 @@ describe('NoteEditService', () => {
     expect(result.notes[0].note).toBe('persist note');
   });
 
-  it('multiple notes maintain insertion order', () => {
-    const svc = new NoteEditService(noteCsvPath);
+  it('multiple notes maintain insertion order', async () => {
+    const svc = await NoteEditService.create(noteCsvPath);
     svc.updateNote('c', 'note c');
     svc.updateNote('a', 'note a');
     svc.updateNote('b', 'note b');

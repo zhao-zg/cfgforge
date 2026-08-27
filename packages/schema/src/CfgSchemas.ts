@@ -91,7 +91,7 @@ export class CfgSchemas {
     const absoluteDst = getDefaultFileSystem().resolvePath(destination);
     const modules = CfgUtil.separate(root);
     for (const [ns, cfg] of modules) {
-      const dst = CfgUtil.getCfgFilePathByNamespace(ns, absoluteDst);
+      const dst = await CfgUtil.getCfgFilePathByNamespaceAsync(ns, absoluteDst);
       await CfgSchemas.writeToOneFileAsync(dst, cfg);
     }
   }

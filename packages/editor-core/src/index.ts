@@ -73,4 +73,6 @@ export type {
   ExportFormat,
   ExportResultCode,
   ExportResult,
+  ExportAllResultCode,
+  ExportAllResult,
 } from './ExportService';

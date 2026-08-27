@@ -83,7 +83,7 @@ export class TableFileLocator {
     if (toLower.endsWith('.xlsx') || toLower.endsWith('.xls')) {
       return ExcelTableFile.create(fullPath, sheetName, headRow, isColumnMode);
     } else if (toLower.endsWith('.csv') || toLower.endsWith('.tsv')) {
-      return new CsvTableFile(fullPath, csvEncoding, headRow, isColumnMode);
+      return CsvTableFile.create(fullPath, csvEncoding, headRow, isColumnMode);
     } else {
       throw new Error('Unsupported file type: ' + fileName);
     }

@@ -121,7 +121,7 @@ export class DeleteService {
 
         nr = await ValueUpdater.updateByReloadTableData(context, cfgValue, vTable);
 
-        context.sourceStructure().updateExcelFileLastModified(
+        await context.sourceStructure().updateExcelFileLastModifiedAsync(
           dTable.rawSheets[0].relativeFilePath,
         );
       }

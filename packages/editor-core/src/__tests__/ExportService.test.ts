@@ -175,52 +175,70 @@ describe('ExportService SQL', () => {
     return EditorService.create(tempDir);
   }
 
-  it('exports SQL with CREATE TABLE and INSERT statements', async () => {
+  it('exports SQL with DROP/CREATE TABLE and INSERT statements', async () => {
     const svc = await createService(ITEM_CFG, { 'item.csv': ITEM_CSV });
     const result = await ExportService.export(svc, 'item', 'sql');
 
     expect(result.resultCode).toBe('ok');
     expect(result.table).toBe('item');
 
-    // Table name: cfg_item (camelToSnake)
-    expect(result.content).toContain('CREATE TABLE IF NOT EXISTS "cfg_item"');
-    // Field definitions with types
-    expect(result.content).toContain('"id" INTEGER');
-    expect(result.content).toContain('"name" TEXT');
-    expect(result.content).toContain('"damage" INTEGER');
-    // INSERT statements
-    expect(result.content).toContain('INSERT INTO "cfg_item" VALUES');
-    expect(result.content).toContain('100');
-    expect(result.content).toContain("'剑'");
-    expect(result.content).toContain('10');
-    expect(result.content).toContain('101');
-    expect(result.content).toContain("'盾'");
-    expect(result.content).toContain('20');
+    // Table name: cfg_item (camelToSnake), backtick-quoted MySQL dialect
+    expect(result.content).toContain('DROP TABLE IF EXISTS `cfg_item`;');
+    expect(result.content).toContain('CREATE TABLE IF NOT EXISTS `cfg_item` (');
+    // Field definitions with MySQL types
+    expect(result.content).toContain('`id` int(11)');
+    expect(result.content).toContain('`name` text');
+    expect(result.content).toContain('`damage` int(11)');
+    // Primary key from schema
+    expect(result.content).toContain('PRIMARY KEY (`id`)');
+    // Engine/charset suffix
+    expect(result.content).toContain('ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
+    // Batched INSERT with column list
+    expect(result.content).toContain('INSERT INTO `cfg_item` (`id`, `name`, `damage`) VALUES');
+    expect(result.content).toContain("('100', '剑', '10')");
+    expect(result.content).toContain("('101', '盾', '20')");
   });
 
-  it('uses correct SQL type for bool, float, list fields', async () => {
-    const TYPE_CFG = `table mixed[id] {
-  id:int;
+  it('exports field comments as MySQL COMMENT', async () => {
+    const COMMENT_CFG = `table item[id] {
+  id:int (comment='唯一id');
+  name:str;
+}
+`;
+    const COMMENT_CSV = `ID,名称
+id,name
+1,a
+`;
+    const svc = await createService(COMMENT_CFG, { 'item.csv': COMMENT_CSV });
+    const result = await ExportService.export(svc, 'item', 'sql');
+
+    expect(result.resultCode).toBe('ok');
+    expect(result.content).toContain("COMMENT='唯一id'");
+  });
+
+  it('uses varchar(255) for string primary key, tinyint for bool, double for float', async () => {
+    const TYPE_CFG = `table mixed[name] {
   name:str;
   active:bool;
   rate:float;
   tags:list<str> (sep=';');
 }
 `;
-    const TYPE_CSV = `ID,名称,激活,比率,标签
-id,name,active,rate,tags
-1,test,true,1.5,"a,b,c"
+    const TYPE_CSV = `ID,激活,比率,标签
+name,active,rate,tags
+1,true,1.5,"a,b,c"
 `;
     const svc = await createService(TYPE_CFG, { 'mixed.csv': TYPE_CSV });
     const result = await ExportService.export(svc, 'mixed', 'sql');
 
     expect(result.resultCode).toBe('ok');
-    expect(result.content).toContain('"active" INTEGER');
-    expect(result.content).toContain('"rate" REAL');
-    expect(result.content).toContain('"tags" TEXT');
+    expect(result.content).toContain('`name` varchar(255) NOT NULL');
+    expect(result.content).toContain('`active` tinyint(1)');
+    expect(result.content).toContain('`rate` double');
+    expect(result.content).toContain('`tags` text');
   });
 
-  it('escapes single quotes in SQL string values', async () => {
+  it('escapes single quotes and backslashes in SQL string values', async () => {
     const ESC_CFG = `table message[id] {
   id:int;
   text:str;
@@ -228,17 +246,37 @@ id,name,active,rate,tags
 `;
     const ESC_CSV = `ID,文本
 id,text
-1,It's a test
+1,It's a \ test
 `;
     const svc = await createService(ESC_CFG, { 'message.csv': ESC_CSV });
     const result = await ExportService.export(svc, 'message', 'sql');
 
     expect(result.resultCode).toBe('ok');
-    // Single quote should be escaped as ''
-    expect(result.content).toContain("'It''s a test'");
+    // Single quote escaped as '', backslash doubled
+    expect(result.content).toContain("'It''s a \\ test'");
   });
 
-  it('exports empty table with only CREATE TABLE', async () => {
+  it('exports multi-field primary key and unique keys', async () => {
+    const MULTI_CFG = `table lootitem[lootid,itemid] (unique='itemid') {
+  lootid:int;
+  itemid:int;
+  count:int;
+}
+`;
+    const MULTI_CSV = `ID,物品,数量
+lootid,itemid,count
+1,100,5
+1,101,3
+`;
+    const svc = await createService(MULTI_CFG, { 'lootitem.csv': MULTI_CSV });
+    const result = await ExportService.export(svc, 'lootitem', 'sql');
+
+    expect(result.resultCode).toBe('ok');
+    expect(result.content).toContain('PRIMARY KEY (`lootid`, `itemid`)');
+    expect(result.content).toContain('UNIQUE KEY `uk_cfg_lootitem_itemid` (`itemid`)');
+  });
+
+  it('exports empty table with only DROP/CREATE, no INSERT', async () => {
     const EMPTY_CSV = `ID,名称,伤害
 id,name,damage
 `;
@@ -250,22 +288,44 @@ id,name,damage
     expect(result.content).not.toContain('INSERT INTO');
   });
 
-  it('uses correct table name for CamelCase tables', async () => {
-    // CFG requires lowercase table names, but camelToSnake is still applied
-    // to produce the SQL table name prefix cfg_
-    const CC_CFG = `table herorecruitlist[id] {
-  id:int;
-  name:str;
-}
+  it('batches multiple rows into one INSERT statement', async () => {
+    const BATCH_CSV = `ID,名称,伤害
+id,name,damage
+1,a,1
+2,b,2
+3,c,3
 `;
-    const CC_CSV = `ID,名称
-id,name
-1,Hero
-`;
-    const svc = await createService(CC_CFG, { 'herorecruitlist.csv': CC_CSV });
-    const result = await ExportService.export(svc, 'herorecruitlist', 'sql');
+    const svc = await createService(ITEM_CFG, { 'item.csv': BATCH_CSV });
+    const result = await ExportService.export(svc, 'item', 'sql');
 
     expect(result.resultCode).toBe('ok');
-    expect(result.content).toContain('"cfg_herorecruitlist"');
+    const insertCount = (result.content.match(/INSERT INTO/g) || []).length;
+    expect(insertCount).toBe(1);
+    expect(result.content).toContain("('1', 'a', '1')");
+    expect(result.content).toContain("('3', 'c', '3')");
+  });
+
+  it('exports all tables as one script via exportAllSql (sorted by name)', async () => {
+    const ALL_CFG = `table aaa[id] {
+  id:int;
+}
+table bbb[id] {
+  id:int;
+}
+`;
+    const A_CSV = `ID
+id
+1
+`;
+    const svc = await createService(ALL_CFG, { 'aaa.csv': A_CSV, 'bbb.csv': A_CSV });
+    const result = await ExportService.exportAllSql(svc);
+
+    expect(result.resultCode).toBe('ok');
+    expect(result.content).toContain('`cfg_aaa`');
+    expect(result.content).toContain('`cfg_bbb`');
+    const idxA = result.content.indexOf('cfg_aaa');
+    const idxB = result.content.indexOf('cfg_bbb');
+    expect(idxA).toBeGreaterThan(-1);
+    expect(idxB).toBeGreaterThan(idxA);
   });
 });

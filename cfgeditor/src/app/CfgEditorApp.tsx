@@ -179,7 +179,7 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
     }, []);
 
     let content;
-    if (!dataDir) {
+    if (!dataDir && dragPanel !== 'setting') {
         // 桌面端首次启动 / 未配置数据目录：引导用户选择目录
         const isDesktop = isTauri();
         content = <Flex justify="center" align="center" vertical gap="middle" style={fullDivStyle}>
@@ -191,6 +191,14 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
                 : <Button type="primary" onClick={handleGoToSetting}>{t('goToSetting')}</Button>
             }
         </Flex>;
+    } else if (!dataDir && dragPanel === 'setting') {
+        // Web 端未配置 dataDir 但用户点了「前往设置」：直接渲染 Setting 面板
+        // schema/curTable 为 undefined/null，FixPages/ToolsSetting 等 tab 内容不完整但不影响 ConnectionSetting
+        content = <div style={fullDivStyle}>
+            <Suspense fallback={null}>
+                <Setting schema={undefined} curTable={null} flowRef={ref}/>
+            </Suspense>
+        </div>;
     } else if (isLoading && !schema) {
         // 加载中：居中 Spin
         content = <Flex justify="center" align="center" style={fullDivStyle}>

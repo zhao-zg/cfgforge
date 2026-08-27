@@ -15,7 +15,9 @@ import type { Parameter } from '../Parameter';
  * fixture 覆盖（brief Step 1）：
  * - 单主键表 task（非空 FK taskid->taskextraexp、nullable FK nexttask->task、
  *   struct 字段 range、interface 字段 completecondition + enum 列）
- * - 多主键表 lootitem[lootid,itemid] + 单字段 uniqueKey [itemid]
+ * - 多主键表 lootitem[lootid,itemid] + 单字段 uniqueKey [itemid] +
+ *   双字段 uniqueKey [itemid,count]（monster 的 MergedLoot FK 指向它 →
+ *   raw 与 CfgMapperInit 两侧都必须跳过，shouldGenRef 共用谓词）
  * - 枚举表 completeconditiontype (enum='name')：数据行给出 name + 主键值
  * - child 参数：task → cfg/Tasks.java
  *
@@ -87,6 +89,7 @@ const CFG = [
  '\titemid:int;',
  '\tcount:int;',
  '\t[itemid];',
+ '\t[itemid,count];',
  '}',
  '',
  'table monster[id] {',
@@ -94,6 +97,7 @@ const CFG = [
  '\tlootId:int;',
  '\tlootItemId:int;',
  '\t->Loot:[lootId,lootItemId] ->lootitem;',
+ '\t->MergedLoot:[lootId,lootItemId] ->lootitem[itemid,count];',
  '}',
  '',
 ].join('\n');
@@ -109,10 +113,12 @@ const TASK_CSV = [
 
 const TASKEXTRAEXP_CSV = ['任务id,额外经验', 'taskid,extraexp', '1,50', '2,60'].join('\n') + '\n';
 
-const LOOTITEM_CSV = ['掉落id,掉落物品,数量', 'lootid,itemid,count', '1,1001,5', '1,1002,3', '2,2001,8'].join('\n') + '\n';
+// lootitem 数据：前 3 行供 Loot FK（按主键 [lootid,itemid] 查）与单字段 UK 断言；
+// 后 2 行供 MergedLoot FK（按双字段 UK [itemid,count] 查，row1=1/1001→(itemid=1,count=1001)，
+// row2=2/2001→(itemid=2,count=2001)）——UK 数据必须真实存在，否则值校验报 ForeignValueNotFound
+const LOOTITEM_CSV = ['掉落id,掉落物品,数量', 'lootid,itemid,count', '1,1001,5', '1,1002,3', '2,2001,8', '3,1,1001', '4,2,2001'].join('\n') + '\n';
 
 const MONSTER_CSV = ['怪物id,掉落,物品', 'id,lootId,lootItemId', '1,1,1001', '2,2,2001'].join('\n') + '\n';
-
 // pkg 参数用固定前缀，方便断言 FQN
 const PKG = 'com.test.mapper';
 const BEAN_PKG = `${PKG}.bean`;
@@ -389,6 +395,42 @@ describe('JavaMapperGenerator', () => {
   it('unknown child table name rejects with all valid names listed', async () => {
     await expect(generateWith('no_such_table')).rejects.toThrow(/no_such_table/);
     await expect(generateWith('no_such_table')).rejects.toThrow(/lootitem/);
+  });
+
+  it('FK to multi-field uniqueKey: no ref getter in raw class AND no check in CfgMapperInit', async () => {
+    // monster 表 FK ->ItemRef:[lootId,itemId] ->lootitem[itemid,count] 指向
+    // 双字段 uniqueKey → raw 侧跳过 ref getter（getByKey 委托类型不符）。
+    // 复审 Fix：verify 侧（CfgMapperInit）必须同步跳过，否则引用不存在的
+    // getter 直接编译失败——两侧共用 shouldGenRef 过滤谓词保证一致。
+    await generateWith('task');
+
+    const raw = read('raw/RawMonsters.java');
+    // 单字段 uniqueKey 的 getLootRef 仍在（RefPrimary → getByKey）
+    expect(raw).toContain('getLootRef()');
+    // 多字段 uniqueKey 的 getMergedLootRef 不生成
+    expect(raw).not.toContain('getMergedLootRef');
+
+    const init = read('raw/CfgMapperInit.java');
+    expect(init).not.toContain('getMergedLootRef()');
+    expect(init).not.toContain('fk=MergedLoot');
+    // getLootRef 的校验仍在（同一表中其余合法 FK 不受影响）
+    expect(init).toContain('getLootRef() == null');
+  });
+
+  it('impl enum const missing from enum table data rows rejects generate (M-4 hard error)', async () => {
+    // 接口声明抽象 type() 后，impl 缺常量会生成不可编译代码（impl 未实现抽象
+    // 方法）→ 硬错误中止（与 child 非法名同语义：数据不全应立即修正而非生成坏代码）。
+    // 数据行故意删掉 KillMonster（接口 impl 仍在 schema/task 数据里）。
+    fs.writeFileSync(
+      path.join(tempDir, 'completeconditiontype类型.csv'),
+      COMPLETECONDITIONTYPE_CSV.replace('1,KillMonster\n', ''),
+      'utf-8',
+    );
+
+    const gen = new JavaMapperGenerator(mockParameter({ dir: outDir, pkg: PKG, child: 'task' }));
+    // 错误信息含 impl 名与枚举表名
+    await expect(gen.generate(await makeContext())).rejects.toThrow(/KillMonster/);
+    await expect(gen.generate(await makeContext())).rejects.toThrow(/completeconditiontype/);
   });
 
   it('defaults: pkg=com.jedi.gameServer.mapper, child=empty; dir honored', async () => {

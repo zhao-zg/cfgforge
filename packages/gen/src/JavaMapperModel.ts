@@ -55,7 +55,12 @@ export interface InterfacePojoModel {
   className: string; // Completecondition
   /** fullName=schema fullName，$type 精确匹配用 */
   impls: { className: string; fullName: string; namespacePath: string }[];
-  enumRefTableFqn: string | null; // 枚举表 raw 类（type() 返回类型，impl 模型用）
+  /**
+   * type() 返回类型的推导来源：非 null 表示接口的 enumRef 指向生成集合内的
+   * 枚举表——由其常量种类推导返回类型（int 常量表 → 'int'，str 常量表 → 'String'），
+   * 接口据此声明抽象 type()，impl 的 @Override 返回类型必须一致。
+   */
+  enumRefTableFqn: string | null;
   hasEnumRef: boolean;
 }
 

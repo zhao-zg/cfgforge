@@ -18,7 +18,9 @@
  *   （同一 resolveNameable 闭包同时供 POJO _parse 与 raw 行字段引用，保证一致）
  * - 枚举常量来源 vTable.enumNameToIntegerValueMap（数据行）；为 null 且
  *   enumNames 非空时 enumStrConstants（name→name 自身）
- * - FK 仅当目标表在生成集合中才加入 fks；isRefUniq 的目标方法名 getBy + upper1(字段名)
+ * - FK 仅当目标表在生成集合中才加入 fks；ref getter/校验共用 shouldGenRef
+ *   过滤谓词（RefPrimary/RefUniq + key 全 primitive + RefUniq 单字段 uniqueKey），
+ *   RefUniq 目标方法名 getBy + upper1(字段名)
  */
 
 import * as path from 'path';
@@ -114,7 +116,8 @@ export class JavaMapperGenerator extends GeneratorWithTag {
     const tableNames = new Set(sortedTables.map((t) => t.name()));
     // 枚举表常量名集合（大写化）：enumNameToIntegerValueMap / enumNames 的 key
     // 经 enumFieldNameOf(name,false) 烘焙成常量 → impl 的 enumRefConstName 必须在
-    // 其中存在，否则 type() 引用不存在的常量（M-4：数据行缺 impl 名时不生成 type()）。
+    // 其中存在，否则 type() 引用不存在的常量（M-4：数据行缺 impl 名时硬错误中止，
+    // 与 child 非法名同语义——数据不全应立即修正而非生成坏代码）。
     // 值 = 常量种类（'int' / 'str'），决定 type() 返回类型。
     const enumConstNamesOf = new Map<string, { names: Set<string>; kind: 'int' | 'str' }>();
     for (const t of sortedTables) {
@@ -178,16 +181,18 @@ export class JavaMapperGenerator extends GeneratorWithTag {
       if (isImpl) {
         const enumRefTable = nullableIface!.nullableEnumRefTable();
         if (enumRefTable !== null && tableNames.has(enumRefTable.name())) {
-          // M-4：常量名必须存在于枚举表常量集（数据行），否则 type() 引用
-          // 不存在的常量 → 不生成 type()（enumRefType 置 null）
+          // M-4：常量名必须存在于枚举表常量集（数据行）。缺失时硬错误中止生成
+          // ——接口侧已声明抽象 type()，impl 缺 type() 会编译失败；与 child
+          // 非法名同语义：数据不全应立即修正而非生成坏代码
           const constName = enumFieldNameOf(struct.name(), false);
-          if (enumConstNamesOf.get(enumRefTable.name())?.names.has(constName)) {
-            enumRefType = enumReturnTypeOf(enumRefTable.name(), enumConstNamesOf);
-            enumRefConstName = constName;
-            enumConstOwnerFqn = `${rawPkg}.${mapperNames(enumRefTable.name()).rawClass}`;
-          } else {
-            Logger.log(`javamapper skip type() for impl ${struct.fullName()}: enum const ${constName} not in table ${enumRefTable.name()} data rows`);
+          if (!enumConstNamesOf.get(enumRefTable.name())?.names.has(constName)) {
+            throw new Error(
+              `javamapper: impl ${struct.fullName()} enum const ${constName} not in table ${enumRefTable.name()} data rows (add a data row whose enum-name field is '${struct.name()}')`,
+            );
           }
+          enumRefType = enumReturnTypeOf(enumRefTable.name(), enumConstNamesOf);
+          enumRefConstName = constName;
+          enumConstOwnerFqn = `${rawPkg}.${mapperNames(enumRefTable.name()).rawClass}`;
         }
       }
       pojos.push({
@@ -246,7 +251,7 @@ export class JavaMapperGenerator extends GeneratorWithTag {
 
     // CfgMapperInit：initAll 按 sortedTables 顺序（child 存在时 init 调子类）；
     // verifyRefs 按 FK 构建校验目标（ref getter 名来自 FK 名，与 raw 模板一致；
-    // 多字段 key 各字段判空 AND 连接；含非基础类型 key 字段的 FK 跳过，与 ref getter 侧一致）
+    // 多字段 key 各字段判空 AND 连接；FK 过滤与 ref getter 侧共用 shouldGenRef）
     const rawFqnOfTable = new Map(sortedTables.map((t) => [t.name(), `${rawPkg}.${mapperNames(t.name()).rawClass}`]));
     {
       const rows = sortedTables.map((t) => {
@@ -262,17 +267,17 @@ export class JavaMapperGenerator extends GeneratorWithTag {
         }[] = [];
         for (const fk of t.schema.foreignKeys()) {
           const refTableSchema = fk.refTableSchema();
-          if (refTableSchema === null || !tableNames.has(refTableSchema.name())) continue;
-          if (!(isRefPrimary(fk.refKey) || isRefUniq(fk.refKey))) continue; // RefList 不校验
+          // 与 ref getter 生成侧（rawModelOf）共用 shouldGenRef：目标在集合、
+          // RefPrimary/RefUniq、key 全 primitive、RefUniq 单字段 uniqueKey——
+          // 否则 CfgMapperInit 会引用 raw 行类不存在的 getter（编译失败）
+          if (!this.shouldGenRef(fk, tableNames)) continue;
           const keyFields = fk.key.fieldSchemas() ?? [];
-          // 与 ref getter 生成侧（rawModelOf）的跳过条件一致：含非基础类型 key 的 FK 不校验
-          if (!keyFields.every((kf) => isPrimitive(kf.type))) continue;
           // 按 FK 构建（而非按 key 字段）：ref getter 名来自 FK 名（与 raw 模板一致，
           // 命名 FK 如 ->Loot:[lootId,lootItemId] 的 getter 是 getLootRef 而非 getLootIdRef）
           fields.push({
             field: fk.name,
             refGetter: 'get' + upper1(fk.name) + 'Ref',
-            refSqlTable: sqlTableName(refTableSchema.name(), 'cfg_'),
+            refSqlTable: sqlTableName(refTableSchema!.name(), 'cfg_'),
             nullable: (fk.refKey as { nullable: boolean }).nullable,
             // 每个 key 字段各自的判空表达式（'num:<字段名>' / 'str:<字段名>'，
             // 模板按字段名拼 getter 后 AND 连接）
@@ -334,6 +339,25 @@ export class JavaMapperGenerator extends GeneratorWithTag {
     if (isFList(t) && isStructRef(t.item) && t.item.obj) targets.push(t.item.obj);
     if (isFMap(t) && isStructRef(t.value) && t.value.obj) targets.push(t.value.obj);
     return targets;
+  }
+
+  /**
+   * FK ref getter / verifyRefs 共用过滤谓词（复审 Fix：两侧必须同步，否则
+   * CfgMapperInit 引用 raw 行类不存在的 getter，编译失败）：
+   * - 目标表在生成集合中（refTableSchema 已解析且名字命中）
+   * - RefPrimary 或 RefUniq（RefList v1 不支持——getByKey 传 List 不合法）
+   * - 本表 key 字段全部 primitive（容器/引用 key 跳过）
+   * - RefUniq 的目标 uniqueKey 单字段（raw 侧只索引单字段 uniqueKey，
+   *   多字段 getByKey 委托会类型不符，v1 不支持）
+   */
+  private shouldGenRef(fk: ForeignKeySchema, tableNames: Set<string>): boolean {
+    const refTableSchema = fk.refTableSchema();
+    if (refTableSchema === null || !tableNames.has(refTableSchema.name())) return false;
+    if (!(isRefPrimary(fk.refKey) || isRefUniq(fk.refKey))) return false;
+    const keyFields = fk.key.fieldSchemas() ?? [];
+    if (!keyFields.every((kf) => isPrimitive(kf.type))) return false;
+    if (isRefUniq(fk.refKey) && fk.refKey.keyNames().length !== 1) return false;
+    return true;
   }
 
   /** FieldSchema → PojoFieldModel（fieldKind 谓词判定） */
@@ -415,8 +439,9 @@ export class JavaMapperGenerator extends GeneratorWithTag {
       });
     }
 
-    // FK：目标表在生成集合中才加；仅 RefPrimary/RefUniq 且 key 为标量
-    // （RefList/容器 key 的 ref getter v1 不支持——getByKey 传 List 类型不合法）
+    // FK：与 verifyRefs 侧共用 shouldGenRef 过滤（目标在集合、RefPrimary/RefUniq、
+    // key 全 primitive、RefUniq 单字段 uniqueKey——RefList/容器 key/多字段
+    // uniqueKey 的 ref getter v1 不支持）
     const fks: RawFkModel[] = [];
     for (const fk of schema.foreignKeys()) {
       const refTableSchema = fk.refTableSchema();
@@ -424,21 +449,17 @@ export class JavaMapperGenerator extends GeneratorWithTag {
         Logger.log(`javamapper ignore fk ${schema.name()}.${fk.name}: ref table not in gen set`);
         continue;
       }
-      if (!(isRefPrimary(fk.refKey) || isRefUniq(fk.refKey))) continue; // RefList：v1 不支持
-      const keyFields = fk.key.fieldSchemas() ?? [];
-      if (!keyFields.every((kf) => isPrimitive(kf.type))) continue; // 容器/引用 key：跳过
+      if (!this.shouldGenRef(fk, tableNames)) {
+        if (isRefUniq(fk.refKey) && (fk.key.fieldSchemas() ?? []).every((kf) => isPrimitive(kf.type))) {
+          Logger.log(`javamapper ignore fk ${schema.name()}.${fk.name}: multi-field uniqueKey ref not supported (v1)`);
+        }
+        continue;
+      }
       const refNames = mapperNames(refTableSchema.name());
       let refMethod = 'getByKey';
       if (isRefUniq(fk.refKey)) {
-        // 目标 uniqueKey 查询方法：getBy + upper1(字段名)；多字段 uniqueKey
-        // 不生成（raw 侧只索引单字段 uniqueKey，getByKey 委托会类型不符）
-        const keyNames = fk.refKey.keyNames();
-        if (keyNames.length === 1) {
-          refMethod = 'getBy' + upper1(keyNames[0]);
-        } else {
-          Logger.log(`javamapper ignore fk ${schema.name()}.${fk.name}: multi-field uniqueKey ref not supported (v1)`);
-          continue;
-        }
+        // 目标 uniqueKey 查询方法：getBy + upper1(字段名)（shouldGenRef 已保证单字段）
+        refMethod = 'getBy' + upper1(fk.refKey.keyNames()[0]);
       }
       fks.push({
         fieldName: fk.name,
@@ -446,7 +467,7 @@ export class JavaMapperGenerator extends GeneratorWithTag {
         refRawFqn: `${rawPkg}.${refNames.rawClass}.${refNames.rowClass}`,
         refMethod,
         nullable: (fk.refKey as { nullable: boolean }).nullable,
-        argExprs: keyFields.map((kf) => kf.name),
+        argExprs: (fk.key.fieldSchemas() ?? []).map((kf) => kf.name),
       });
     }
 

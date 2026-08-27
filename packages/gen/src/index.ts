@@ -20,6 +20,8 @@ export { TsCodeGenerator } from './TsCodeGenerator';
 export { CsCodeGenerator } from './CsCodeGenerator';
 export { GoCodeGenerator } from './GoCodeGenerator';
 export { JavaCodeGenerator } from './JavaCodeGenerator';
+export { JavaMapperGenerator } from './JavaMapperGenerator';
+export type { ChildModel, InitAllModel } from './JavaMapperTemplates';
 export { LuaCodeGenerator } from './LuaCodeGenerator';
 export { GdCodeGenerator } from './GdCodeGenerator';
 export { BytesGenerator } from './BytesGenerator';

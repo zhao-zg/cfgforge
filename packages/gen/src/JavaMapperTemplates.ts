@@ -57,6 +57,42 @@ import type {
 } from './JavaMapperModel';
 
 // ---------------------------------------------------------------------------
+// Task 5：child 子类 / CfgMapperInit 模型
+// ---------------------------------------------------------------------------
+
+/** cfg/ 下手写扩展子类：永不清理永不覆盖（存在即跳过） */
+export interface ChildModel {
+  pkg: string; // ...mapper.cfg
+  className: string; // Tasks
+  rawClassFqn: string; // ...mapper.raw.RawTasks
+}
+
+export interface InitAllModel {
+  pkg: string; // ...mapper.raw
+  /** sortedTables 顺序；initFqn=child 存在时用 child */
+  rows: { rawFqn: string; initFqn: string }[];
+  /** 每表一块 verifyRefs 校验目标 */
+  verifyTargets: {
+    rawFqn: string;
+    rowFqn: string;
+    /** 本表 sql 表名（错误消息前缀 cfg_task） */
+    sqlTable: string;
+    fields: {
+      /** FK 字段名 */
+      field: string;
+      /** ref getter 方法名（get<Xxx>Ref） */
+      refGetter: string;
+      /** 目标表 sql 名（错误消息 -> missing） */
+      refSqlTable: string;
+      /** nullable FK 不校验（null 合法） */
+      nullable: boolean;
+      /** 非空判断语义：'num'（int/long/float != 0）或 'str'（!= null && !isEmpty()） */
+      keyExpr: string;
+    }[];
+  }[];
+}
+
+// ---------------------------------------------------------------------------
 // genPojoClass — struct bean / interface impl bean
 // ---------------------------------------------------------------------------
 
@@ -594,6 +630,79 @@ function refFqnOf(f: PojoFieldModel, opts: TypeOpts): string | null {
     return opts.resolveNameable(t.obj);
   }
   return null;
+}
+
+// ---------------------------------------------------------------------------
+// genChildClass — cfg/ 下手写扩展子类（Task 5）
+// ---------------------------------------------------------------------------
+
+/**
+ * child 子类骨架：extends RawXxx，Holder 单例 + 空 prepareData() 钩子。
+ * 生成后归用户所有（再跑生成器不覆盖），prepareData 是手写加工数据的入口。
+ */
+export function genChildClass(m: ChildModel): string {
+  const L: string[] = [];
+  L.push(`package ${m.pkg};`);
+  L.push('');
+  L.push(`public class ${m.className} extends ${m.rawClassFqn} {`);
+  L.push(`    private static class Holder { static final ${m.className} INSTANCE = new ${m.className}(); }`);
+  L.push(`    public static ${m.className} getInstance() { return Holder.INSTANCE; }`);
+  L.push('');
+  L.push(`    public void prepareData() {`);
+  L.push(`    }`);
+  L.push(`}`);
+  return L.join('\n');
+}
+
+// ---------------------------------------------------------------------------
+// genInitAll — CfgMapperInit（Task 5）
+// ---------------------------------------------------------------------------
+
+/**
+ * CfgMapperInit：initAll 按 sortedTables 顺序调各表 init（child 存在时调子类），
+ * verifyRefs 校验非空 FK 引用完整性（int/long/float `!= 0`、str `!= null && !isEmpty()`，
+ * nullable FK 不校验）。
+ */
+export function genInitAll(m: InitAllModel): string {
+  const L: string[] = [];
+  L.push(`package ${m.pkg};`);
+  L.push('');
+  L.push(`public class CfgMapperInit {`);
+  L.push(`    private static class Holder { static final CfgMapperInit INSTANCE = new CfgMapperInit(); }`);
+  L.push(`    public static CfgMapperInit getInstance() { return Holder.INSTANCE; }`);
+  L.push('');
+  L.push(`    public void initAll() {`);
+  for (const row of m.rows) {
+    L.push(`        ${row.initFqn}.getInstance().init();`);
+  }
+  L.push(`    }`);
+  L.push('');
+  L.push(`    public static java.util.List<String> verifyRefs() {`);
+  L.push(`        java.util.List<String> errs = new java.util.ArrayList<>();`);
+  for (const target of m.verifyTargets) {
+    if (target.fields.length === 0) continue;
+    L.push(`        for (${target.rowFqn} row : ${target.rawFqn}.getInstance().tableMap.values()) {`);
+    for (const f of target.fields) {
+      if (f.nullable) continue; // nullable FK：null 合法，不校验
+      L.push(`            if (${nonEmptyCheck(f.field, f.keyExpr)} && row.${f.refGetter}() == null) {`);
+      L.push(`                errs.add("${target.sqlTable} key=" + row.key() + " field=${f.field} -> ${f.refSqlTable} missing");`);
+      L.push(`            }`);
+    }
+    L.push(`        }`);
+  }
+  L.push(`        return errs;`);
+  L.push(`    }`);
+  L.push(`}`);
+  return L.join('\n');
+}
+
+/**
+ * 非空判断表达式：数值 `getF() != 0`；str `getF() != null && !getF().isEmpty()`。
+ * keyExpr 传 'str'（字符串语义）或 'num'（数值语义）。
+ */
+function nonEmptyCheck(field: string, keyExpr: string): string {
+  const getter = `row.get${upper1(field)}()`;
+  return keyExpr === 'str' ? `${getter} != null && !${getter}.isEmpty()` : `${getter} != 0`;
 }
 
 /** 统计字段解析用到的 fastjson2 符号（JSONObject 由 _parse 签名恒引用，模板无条件 import；此处只管 JSON 按需） */

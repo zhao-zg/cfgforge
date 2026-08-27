@@ -46,6 +46,7 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 - `public Map<Object, RawTask> tableMap`（`new HashMap<>()` 钻石操作符）。
 - `init()`：`DataStoreCompat.queryStaticList("select * from \`cfg_<snake>\`")` → 构造行对象填 tableMap → PBData 列定义/记录推送（照抄 Python 逻辑，基于 JDBC 原始 JSONObject：Integer→value_int，Float→value_float，其余→value_string）→ `CfgVersions.getInstance().AddCfgPBInfo(...)`。
 - `getByKey(...)`：单主键直接 get；多主键构造 Key 查询。
+- **静态便捷访问**（同 cfggen）：`public static RawTask get(<keyType> key)` → `getInstance().getByKey(key)`；`public static java.util.Collection<RawTask> all()` → `getInstance().tableMap.values()`。
 - **枚举表增强**（`(enum='...')` 的表）：`init()` 额外构建 name→行 map，生成 `getByName(String)`。枚举字段本身即主键时跳过（与 getByKey 重复）。
 - **枚举/Entry 常量**（数据在生成期已知，烘焙进代码）：`enumNameToIntegerValueMap` 非空时生成 `public static final int KILL_MONSTER = 1;`；无整数值的枚举生成 `public static final String XXX = "xxx";`；EEntry（`(entry='...')`）表按 entry 字段值生成常量。常量名复用 `enumFieldName()`。
   - **新鲜度风险**：常量是生成期快照，DB 数据后续单独变更会漂移。缓解：`init()` 末尾校验常量集合与 DB 行一致性，不一致 Logger.error（不抛异常，避免阻断启动）。
@@ -55,7 +56,7 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 ### 3.2 struct/interface POJO（强类型，同 cfggen 风格）
 
 - 表字段可达的每个 struct 生成 POJO 类：字段 + getter/setter + 静态 `_parse(JSONObject)` 逐字段解析（对应 cfggen 的 `_create(ConfigInput)`，数据源换成 JSON）。
-- interface：POJO 接口 + 每个 impl 一个类（`_parse` 各自实现）+ 静态工厂 `Xxx._parse(JSONObject)` 读 `"$type"` 字符串 switch 分发（对应 cfggen 的 tag 分发；`$type` 是 SQL 导出时 `ValueToJson` 写入 JSON 的判别字段）。
+- interface：POJO 接口 + 每个 impl 一个类（`_parse` 各自实现）+ 静态工厂 `Xxx._parse(JSONObject)` 读 `"$type"` 字符串 switch 分发（对应 cfggen 的 tag 分发；`$type` 是 SQL 导出时 `ValueToJson` 写入 JSON 的判别字段）。有 `enumRef` 的 interface，每个 impl 生成 `type()` 方法返回对应枚举常量（同 cfggen）。
 - 基础类型 list/map 用 fastjson2 `JSON.parseArray(s, X.class)` / `JSON.parseObject(s, new TypeReference<...>(){})`；元素为 struct/interface 的容器在 `_parse` 内逐元素递归。不依赖 fastjson 字段反射，行为可控。
 - `text` 类型多语言模式下仍生成 `String`（例外：mapper 无 `Text` 运行时类），构造器 `getString`。
 - POJO 输出路径：`dir/pkg/bean/<schema 命名空间>/`（如 `pkg/bean/Position.java`、`pkg/bean/task/TestDefaultBean.java`、`pkg/bean/task/completecondition/Completecondition.java`）。用独立的 `bean` 子包，避免与 `raw`/`cfg` 保留目录及表命名空间冲突；bean 目录由 `CachedFiles` 自动清理过期文件（纯生成物，无手写内容）。

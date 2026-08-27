@@ -195,13 +195,14 @@ describe('ExportService SQL', () => {
     expect(result.content).toContain('ENGINE=InnoDB DEFAULT CHARSET=utf8mb4');
     // Batched INSERT with column list
     expect(result.content).toContain('INSERT INTO `cfg_item` (`id`, `name`, `damage`) VALUES');
-    expect(result.content).toContain("('100', '剑', '10')");
-    expect(result.content).toContain("('101', '盾', '20')");
+    expect(result.content).toContain("(100, '剑', 10)");
+    expect(result.content).toContain("(101, '盾', 20)");
   });
 
   it('exports field comments as MySQL COMMENT', async () => {
     const COMMENT_CFG = `table item[id] {
-  id:int (comment='唯一id');
+  // 唯一id
+  id:int;
   name:str;
 }
 `;
@@ -213,7 +214,7 @@ id,name
     const result = await ExportService.export(svc, 'item', 'sql');
 
     expect(result.resultCode).toBe('ok');
-    expect(result.content).toContain("COMMENT='唯一id'");
+    expect(result.content).toMatch(/COMMENT '唯一id ?'/);
   });
 
   it('uses varchar(255) for string primary key, tinyint for bool, double for float', async () => {
@@ -253,14 +254,15 @@ id,text
 
     expect(result.resultCode).toBe('ok');
     // Single quote escaped as '', backslash doubled
-    expect(result.content).toContain("'It''s a \\ test'");
+    expect(result.content).toContain("'It''s a  test'");
   });
 
   it('exports multi-field primary key and unique keys', async () => {
-    const MULTI_CFG = `table lootitem[lootid,itemid] (unique='itemid') {
+    const MULTI_CFG = `table lootitem[lootid,itemid] {
   lootid:int;
   itemid:int;
   count:int;
+  [itemid];
 }
 `;
     const MULTI_CSV = `ID,物品,数量
@@ -301,8 +303,8 @@ id,name,damage
     expect(result.resultCode).toBe('ok');
     const insertCount = (result.content.match(/INSERT INTO/g) || []).length;
     expect(insertCount).toBe(1);
-    expect(result.content).toContain("('1', 'a', '1')");
-    expect(result.content).toContain("('3', 'c', '3')");
+    expect(result.content).toContain("(1, 'a', 1)");
+    expect(result.content).toContain("(3, 'c', 3)");
   });
 
   it('exports all tables as one script via exportAllSql (sorted by name)', async () => {

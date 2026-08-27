@@ -104,7 +104,7 @@ export class DeleteService {
       let nr: { newCfgValue: CfgValue; newCfgData: import('@cfgforge/data').CfgData; errStrList: string[] };
 
       if (vTable.schema.isJson()) {
-        const relativeJsonPath = VTableJsonStorage.deleteRecord(
+        const relativeJsonPath = await VTableJsonStorage.deleteRecordAsync(
           tableName, recordId,
           context.rootDir(), context.sourceStructure(),
         );

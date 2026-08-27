@@ -111,12 +111,12 @@ export class AddOrUpdateService {
       let nr: { newCfgValue: CfgValue; newCfgData: import('@cfgforge/data').CfgData; errStrList: string[] };
 
       if (tableSchema.isJson()) {
-        const relativeJsonPath = VTableJsonStorage.addOrUpdateRecord(
+        const relativeJsonPath = await VTableJsonStorage.addOrUpdateRecordAsync(
           thisValue, tableName, id,
           context.rootDir(), context.sourceStructure(),
         );
 
-        nr = ValueUpdater.updateByJsonFileAddOrUpdate(
+        nr = await ValueUpdater.updateByJsonFileAddOrUpdateAsync(
           context, cfgValue, vTable, relativeJsonPath,
         );
 

@@ -24,9 +24,6 @@
 
 import {
   isPrimitive,
-  isFList,
-  isFMap,
-  isStructRef,
   type FieldSchema,
   type FieldType,
   type KeySchema,
@@ -167,7 +164,7 @@ interface KeyInfo {
   isPrimary: boolean;
 }
 
-function primaryKeyInfo(table: TableSchema, prefix: string): KeyInfo | null {
+function primaryKeyInfo(table: TableSchema): KeyInfo | null {
   const fields = table.primaryKey.fields();
   if (fields.length === 0) return null;
   return {
@@ -262,7 +259,7 @@ export function renderTableSql(
   }
 
   // ---- Keys ----
-  const pk = primaryKeyInfo(table, opts.tablePrefix);
+  const pk = primaryKeyInfo(table);
   if (pk !== null) {
     columnDefs.push(`  PRIMARY KEY (${pk.columns.join(', ')})`);
   }

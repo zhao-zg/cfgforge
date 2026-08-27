@@ -1,9 +1,10 @@
 import {memo, RefObject, useCallback} from "react";
 import {useNavigate} from "react-router";
 import {useTranslation} from "react-i18next";
-import {App, Button, Divider, Form, InputNumber, Popconfirm, Radio, Space} from "antd";
+import {App, Button, Divider, Form, Input, InputNumber, Popconfirm, Radio, Space} from "antd";
 import {
     setImageSizeScale,
+    setExportFilePattern,
     useMyStore,
 } from "@/store/store.ts";
 import {invalidateAllQueries} from "@/services/queryClient.ts";
@@ -27,7 +28,7 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
     flowRef: RefObject<HTMLDivElement | null>;
 }) {
     const {t} = useTranslation();
-    const {imageSizeScale} = useMyStore();
+    const {imageSizeScale, exportFilePattern} = useMyStore();
 
     const {curPage, curTableId, curId} = useLocationData();
     const {notification} = App.useApp();
@@ -95,6 +96,27 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         // eslint-disable-next-line react-hooks/exhaustive-deps -- flowRef 在 body 中经解构使用（const {current} = flowRef），oxlint exhaustive-deps 未追踪解构引用而误报
     }, [flowRef, imageSizeScale, curPage, notification, curTableId, curId]);
 
+    // 导出文件名模板：{table}=表名（全库导出用 *），{date}=yyyyMMdd。空=默认名（<table>.csv/sql、config.sql）
+    const buildExportFilename = useCallback((format: ExportFormat, table: string): string => {
+        const ext = format === 'csv' ? 'csv' : 'sql';
+        const pattern = exportFilePattern.trim();
+        if (pattern.length === 0) {
+            return format === 'csv' || table !== '*'
+                ? `${table}.${ext}`
+                : `config.${ext}`;
+        }
+        const date = new Date();
+        const y = date.getFullYear();
+        const m = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const name = pattern
+            .replaceAll('{table}', table)
+            .replaceAll('{date}', `${y}${m}${d}`);
+        // 清掉模板里不合法的文件名字符；结果为空则回退默认名
+        const safe = name.replace(/[\\/:*?"<>|]/g, '').trim();
+        return safe.length > 0 ? (safe.includes('.') ? safe : `${safe}.${ext}`) : `${table}.${ext}`;
+    }, [exportFilePattern]);
+
     const onExport = useCallback(async (format: ExportFormat) => {
         if (!curTableId) {
             notification.error({title: t('selectTableHint'), duration: 3});
@@ -103,8 +125,7 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         try {
             const result = await exportTable(curTableId, format);
             if (result.resultCode === 'ok') {
-                const ext = format === 'csv' ? 'csv' : 'sql';
-                const filename = `${curTableId}.${ext}`;
+                const filename = buildExportFilename(format, curTableId);
                 const blob = new Blob([result.content], {type: 'text/plain;charset=utf-8'});
                 saveAs(blob, filename);
                 notification.info({
@@ -117,12 +138,12 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         } catch (e) {
             notification.error({title: t('exportFail', {error: (e as Error).message}), duration: 4});
         }
-    }, [curTableId, notification, t]);
+    }, [curTableId, notification, t, buildExportFilename]);
 
     const onExportAllSql = useCallback(async () => {
         try {
             const result = await exportAllSql();
-            const filename = 'config.sql';
+            const filename = buildExportFilename('sql', '*');
             const blob = new Blob([result.content], {type: 'text/plain;charset=utf-8'});
             saveAs(blob, filename);
             notification.info({
@@ -132,7 +153,7 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         } catch (e) {
             notification.error({title: t('exportFail', {error: (e as Error).message}), duration: 4});
         }
-    }, [notification, t]);
+    }, [notification, t, buildExportFilename]);
 
     const options = [
         {label: t('table'), value: 'table'},
@@ -167,6 +188,14 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         </Form>
 
         <Divider/>
+        <Form layout={'vertical'} initialValues={{exportFilePattern}}>
+            <Form.Item name='exportFilePattern'
+                       label={t('exportFilePattern')}
+                       extra={t('exportFilePatternTip')}>
+                <Input placeholder="{table}_{date}" allowClear
+                       onChange={(e) => setExportFilePattern(e.target.value)}/>
+            </Form.Item>
+        </Form>
         <Space>
             <Button onClick={() => onExport('csv')}>{t('exportCsv')}</Button>
             <Button onClick={() => onExport('sql')}>{t('exportSql')}</Button>

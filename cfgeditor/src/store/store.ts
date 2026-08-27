@@ -52,6 +52,8 @@ export type StoreState = {
     query: string;
     searchMax: number;
     imageSizeScale: number;
+    /** 导出文件名模板：{table}=表名，{date}=yyyyMMdd。空=用默认。 */
+    exportFilePattern: string;
 
     dragPanel: string;  // 'recordRef', 'setting', 'none', 'finder', 'add',  page.label（page的label前面的）
     pageConf: FixedPagesConf;
@@ -156,6 +158,7 @@ const selfPrefState = {
     isEditMode: DEFAULT_IS_EDIT_MODE,
     imageSizeScale: 4,
     dragPanel: 'none',
+    exportFilePattern: '',
 };
 
 // 不持久化（运行时）
@@ -279,6 +282,16 @@ function boolPrefSetter(key: BoolPrefKey) {
     };
 }
 
+type StrPrefKey = {[K in keyof StoreState]: StoreState[K] extends string ? K : never}[keyof StoreState];
+
+// 字符串 pref setter 工厂：写 store + 持久化
+function strPrefSetter(key: StrPrefKey) {
+    return (value: string): void => {
+        store[key] = value;
+        setPref(key, value);
+    };
+}
+
 export const setMaxImpl = numPrefSetter('maxImpl');
 export const setRefIn = boolPrefSetter('refIn');
 export const setRefOutDepth = numPrefSetter('refOutDepth');
@@ -293,6 +306,7 @@ export const setRefIdsOutDepth = numPrefSetter('refIdsOutDepth');
 export const setRefIdsMaxNode = numPrefSetter('refIdsMaxNode');
 export const setSearchMax = numPrefSetter('searchMax');
 export const setImageSizeScale = numPrefSetter('imageSizeScale');
+export const setExportFilePattern = strPrefSetter('exportFilePattern');
 
 export function setDragPanel(value: string) {
     store.dragPanel = value;

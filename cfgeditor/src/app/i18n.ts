@@ -44,6 +44,8 @@ i18n.use(LanguageDetector)
                     exportCsv: 'Export CSV',
                     exportSql: 'Export SQL',
                     exportAllSql: 'Export All SQL',
+                    exportFilePattern: 'Export filename pattern',
+                    exportFilePatternTip: '{table} = table name (* for all), {date} = yyyyMMdd. Empty = default names.',
                     exportSuccess: 'Exported {table} to {file}',
                     exportFail: 'Export failed: {error}',
 
@@ -342,6 +344,8 @@ i18n.use(LanguageDetector)
                     exportCsv: '导出 CSV',
                     exportSql: '导出 SQL',
                     exportAllSql: '导出全部 SQL',
+                    exportFilePattern: '导出文件名模板',
+                    exportFilePatternTip: '{table}=表名（全库导出为 *），{date}=yyyyMMdd。留空使用默认名。',
                     exportSuccess: '已导出 {table} 到 {file}',
                     exportFail: '导出失败: {error}',
 

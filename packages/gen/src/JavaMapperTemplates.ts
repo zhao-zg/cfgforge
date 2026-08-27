@@ -48,6 +48,7 @@ export function genPojoClass(m: PojoModel, opts: TypeOpts): string {
   const uses = analyzeFieldUsage(m.fields);
   L.push('import com.alibaba.fastjson2.JSONObject;');
   if (uses.json) L.push('import com.alibaba.fastjson2.JSON;');
+  L.push('');
 
   // class decl
   if (m.isInterfaceImpl) {

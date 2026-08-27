@@ -1,9 +1,12 @@
 /**
  * JavaMapperTemplates — javamapper 生成器的纯函数模板（输入输出均为字符串，不碰 IO）。
  *
- * Task 3 只含 POJO 部分：
+ * Task 3 POJO 部分：
  * - genPojoClass      struct bean / interface impl bean
  * - genInterfacePojo  interface bean（$type 静态工厂分发）
+ *
+ * Task 4 raw 表类：
+ * - genRawClass       每表一个 RawXxx 单例（行类嵌套 + tableMap + init/PBData + 查询）
  *
  * 与 java generator（javaTemplates.ts）不共用模板层，但都只调公共层
  * （JavaMapperName/JavaTypeUtil）。
@@ -22,15 +25,36 @@
  *   JSON（基础 list，按需）/JSONObject（_parse 签名恒引用，无条件输出）。
  * - $type 匹配用 schema fullName 精确相等（防同名 impl 嵌套歧义），常量在前的
  *   equals 保证 $type 缺失（null）不 NPE，不匹配抛 IllegalArgumentException。
+ *
+ * genRawClass 契约：
+ * - 模板零 schema 类依赖：只调 rowReadExpr/mapperFieldType 两个纯函数（接收
+ *   FieldType 值，无 schema import）；其余类型信息由模型烘焙。
+ * - 行类 `public static class RawXxx` 嵌套：final 字段、包私有构造器读 `recored`
+ *   （SQL 列语义：bool=tinyint!=0；list/map/引用列为 JSON 文本）、仅 getter、
+ *   toString "()" 拼接；单主键有 `key()`，多主键用嵌套 Key 类（Objects.hash +
+ *   instanceof equals，数值 ==、对象 .equals()）。
+ * - 外层单例（Holder）持有 tableMap（Map<Object, Row>）；枚举常量烘焙为
+ *   public static final int/String；getByName 仅当模型 enumGetByName=true；
+ *   uniqueKey 索引为单字段 Map<Object, Row> + 类型化 getByXxx（v1 契约）。
+ * - init()：DataStoreCompat.queryStaticList + for 循环装配 + PBData 列定义/记录
+ *   推送 + CfgVersions.AddCfgPBInfo；有枚举常量时末尾行数校验（enum drift）。
+ * - 查询：getByKey(…)/静态 get（仅单主键）/all()；FK ref getter get<Xxx>Ref
+ *   委托目标 raw 单例。
  */
 
 import type { FieldType } from '@cfgforge/schema';
-import { Primitive } from '@cfgforge/schema';
+import { Primitive, isStructRef } from '@cfgforge/schema';
 import { upper1 } from '@cfgforge/shared';
 
-import { mapperFieldType, parseExpr } from './JavaMapperName';
-import type { TypeOpts } from './JavaTypeUtil';
-import type { PojoFieldModel, PojoModel, InterfacePojoModel } from './JavaMapperModel';
+import { mapperFieldType, parseExpr, rowReadExpr } from './JavaMapperName';
+import { boxTypeOf, type TypeOpts } from './JavaTypeUtil';
+import type {
+  PojoFieldModel,
+  PojoModel,
+  InterfacePojoModel,
+  RawTableModel,
+  RawFieldModel,
+} from './JavaMapperModel';
 
 // ---------------------------------------------------------------------------
 // genPojoClass — struct bean / interface impl bean
@@ -150,6 +174,259 @@ export function genInterfacePojo(m: InterfacePojoModel, opts: TypeOpts): string 
 }
 
 // ---------------------------------------------------------------------------
+// genRawClass — 每表一个 raw 单例类（Task 4）
+// ---------------------------------------------------------------------------
+
+export function genRawClass(m: RawTableModel, opts: TypeOpts): string {
+  requireResolveNameable(opts);
+  const row = m.names.rowClass;
+  const raw = m.names.rawClass;
+  const multiPk = m.pkFields.length > 1;
+  // 行构造器内找不到的读取（list-of-ref/map-of-ref 的 refFqns 兜底）需要 refFqns
+  const f = asPojoFields(m, opts);
+
+  const L: string[] = [];
+  L.push(`package ${m.pkg};`);
+  L.push('');
+  for (const imp of rawImports(m, f, opts)) L.push(`import ${imp};`);
+  L.push('');
+  L.push(`public class ${raw} {`);
+
+  genRowClass(L, m, f, opts);
+  if (multiPk) genKeyClass(L, m);
+
+  // 枚举常量（int 优先，str 兜底；模板不猜命名，模型烘焙）
+  for (const c of m.enumConstants ?? []) L.push(`    public static final int ${c.name} = ${c.value};`);
+  for (const c of m.enumStrConstants ?? []) L.push(`    public static final String ${c.name} = "${c.value}";`);
+  if ((m.enumConstants ?? []).length > 0 || (m.enumStrConstants ?? []).length > 0) L.push('');
+
+  // tableMap + 单例 Holder
+  L.push(`    public Map<Object, ${row}> tableMap;`);
+  L.push(`    private static class Holder { static final ${raw} INSTANCE = new ${raw}(); }`);
+  L.push(`    public static ${raw} getInstance() { return Holder.INSTANCE; }`);
+  L.push('');
+
+  // getByName（枚举名字段非主键时，模型 enumGetByName 标志）
+  if (m.enumGetByName) {
+    L.push(`    private Map<String, ${row}> nameMap;`);
+    L.push(`    public ${row} getByName(String name) { return nameMap.get(name); }`);
+    L.push('');
+  }
+
+  // uniqueKey 索引（v1 单字段契约：Map<Object, Row> + 类型化 getByXxx）
+  for (const uk of m.uniqueKeys) {
+    L.push(`    private Map<Object, ${row}> ${uk.mapField};`);
+    L.push(`    public ${row} ${uk.getBy}(${uk.keyJavaType} ${uk.fields[0]}) { return ${uk.mapField}.get(${uk.fields[0]}); }`);
+  }
+  if (m.uniqueKeys.length > 0) L.push('');
+
+  genRawInit(L, m);
+
+  // getByKey / 静态 get（仅单主键）/ all
+  L.push('');
+  if (multiPk) {
+    const params = m.pkFields.map((p) => `${rowScalarType(p)} ${p.name}`).join(', ');
+    L.push(`    public ${row} getByKey(${params}) {`);
+    L.push(`        return tableMap.get(new ${m.names.keyClass}(${m.pkFields.map((p) => p.name).join(', ')}));`);
+    L.push(`    }`);
+  } else {
+    const pk = m.pkFields[0];
+    L.push(`    public ${row} getByKey(${rowScalarType(pk)} ${pk.name}) {`);
+    L.push(`        return tableMap.get(${pk.name});`);
+    L.push(`    }`);
+    L.push('');
+    L.push(`    public static ${row} get(${rowScalarType(pk)} ${pk.name}) { return getInstance().getByKey(${pk.name}); }`);
+  }
+  L.push('');
+  L.push(`    public static java.util.Collection<${row}> all() { return getInstance().tableMap.values(); }`);
+
+  // FK ref getter：委托目标 raw 单例（目标表不在生成集合时 Generator 已过滤）
+  if (m.fks.length > 0) {
+    L.push('');
+    for (const fk of m.fks) {
+      const method = 'get' + upper1(fk.fieldName) + 'Ref';
+      const target = fk.refRawFqn.substring(fk.refRawFqn.lastIndexOf('.') + 1);
+      L.push(`    public ${fk.refRawFqn} ${method}() {`);
+      L.push(`        return ${target}.getInstance().${fk.refMethod}(${fk.argExprs.join(', ')});`);
+      L.push(`    }`);
+    }
+  }
+
+  L.push('}');
+  return L.join('\n');
+}
+
+/** 行类：public static 嵌套，final 字段 + 包私有构造器读 recored + key()/getter/toString */
+function genRowClass(L: string[], m: RawTableModel, f: PojoFieldModel[], opts: TypeOpts): void {
+  const row = m.names.rowClass;
+  const multiPk = m.pkFields.length > 1;
+  L.push(`    public static class ${row} {`);
+  for (const fd of f) {
+    if (fd.comment.length > 0) {
+      L.push(`        /**`);
+      for (const line of fd.comment.split('\n')) L.push(`         * ${line}`);
+      L.push(`         */`);
+    }
+    L.push(`        private final ${fieldDeclType(fd, opts)} ${fd.name};`);
+  }
+  L.push('');
+  L.push(`        ${row}(JSONObject recored) {`);
+  for (const fd of f) {
+    // list-of-ref / map-of-ref 经 refFqns 兜底注入 refClassName（生成器未填时）
+    const patched = patchRefFqn(fd, m, opts);
+    genJsonContainerLocal(L, fd.name, patched, 'recored', '            ', opts, true);
+  }
+  L.push(`        }`);
+  L.push('');
+  if (!multiPk) {
+    L.push(`        public ${rowScalarType(m.pkFields[0])} key() {`);
+    L.push(`            return ${m.pkFields[0].name};`);
+    L.push(`        }`);
+    L.push('');
+  }
+  for (const fd of f) {
+    L.push(`        public ${fieldDeclType(fd, opts)} get${upper1(fd.name)}() {`);
+    L.push(`            return ${fd.name};`);
+    L.push(`        }`);
+    L.push('');
+  }
+  L.push(`        @Override`);
+  L.push(`        public String toString() {`);
+  if (f.length === 0) {
+    L.push(`            return "()";`);
+  } else {
+    L.push(`            return "(" + ${f.map((fd) => fd.name).join(' + "," + ')} + ")";`);
+  }
+  L.push(`        }`);
+  L.push(`    }`);
+  L.push('');
+}
+
+/** 多主键 Key 类：final 字段、包私有构造器、Objects.hash、instanceof equals */
+function genKeyClass(L: string[], m: RawTableModel): void {
+  const key = m.names.keyClass;
+  const pks = m.pkFields;
+  L.push(`    public static class ${key} {`);
+  for (const p of pks) L.push(`        private final ${rowScalarType(p)} ${p.name};`);
+  L.push('');
+  L.push(`        ${key}(${pks.map((p) => `${rowScalarType(p)} ${p.name}`).join(', ')}) {`);
+  for (const p of pks) L.push(`            this.${p.name} = ${p.name};`);
+  L.push(`        }`);
+  L.push('');
+  L.push(`        @Override`);
+  L.push(`        public int hashCode() { return java.util.Objects.hash(${pks.map((p) => p.name).join(', ')}); }`);
+  L.push('');
+  L.push(`        @Override`);
+  L.push(`        public boolean equals(Object other) {`);
+  L.push(`            if (!(other instanceof ${key})) return false;`);
+  L.push(`            ${key} o = (${key}) other;`);
+  L.push(`            return ${pks.map((p) => keyFieldEqual(p)).join(' && ')};`);
+  L.push(`        }`);
+  L.push(`    }`);
+  L.push('');
+}
+
+/** init()：MySQL 加载 + 行装配（tableMap/枚举 nameMap/uniqueKey map）+ PBData 推送 */
+function genRawInit(L: string[], m: RawTableModel): void {
+  const row = m.names.rowClass;
+  const multiPk = m.pkFields.length > 1;
+  const enumCount = m.enumConstants?.length ?? 0;
+  L.push(`    public void init() {`);
+  L.push(`        PBData.table_info.Builder infoBuilder = PBData.table_info.newBuilder();`);
+  L.push(`        try {`);
+  L.push(`            List<JSONObject> recoreds = DataStoreCompat.queryStaticList("select * from \`${m.names.sqlTable}\`");`);
+  L.push(`            tableMap = new HashMap<>();`);
+  if (m.enumGetByName) L.push(`            nameMap = new HashMap<>();`);
+  for (const uk of m.uniqueKeys) L.push(`            ${uk.mapField} = new HashMap<>();`);
+  L.push(`            for (JSONObject recored : recoreds) {`);
+  L.push(`                ${row} newOne = new ${row}(recored);`);
+  if (multiPk) {
+    L.push(`                tableMap.put(new ${m.names.keyClass}(${m.pkFields.map((p) => `newOne.get${upper1(p.name)}()`).join(', ')}), newOne);`);
+  } else {
+    L.push(`                tableMap.put(newOne.key(), newOne);`);
+  }
+  if (m.enumGetByName) L.push(`                nameMap.put(recored.getString("${m.enumField}"), newOne);`);
+  for (const uk of m.uniqueKeys) {
+    L.push(`                ${uk.mapField}.put(newOne.get${upper1(uk.fields[0])}(), newOne);`);
+  }
+  if (enumCount > 0) {
+    L.push(`                if (tableMap.size() != ${enumCount}) JLogger.error("${m.names.sqlTable} enum drift: rows=" + tableMap.size() + " expected=" + ${enumCount});`);
+  }
+  L.push(`                if (infoBuilder.getColoumsCount() == 0) {`);
+  L.push(`                    for (Map.Entry<String, Object> entry : recored.entrySet()) {`);
+  L.push(`                        PBData.coloum_value_type valueType = PBData.coloum_value_type.value_string;`);
+  L.push(`                        if (entry.getValue() instanceof Integer) valueType = PBData.coloum_value_type.value_int;`);
+  L.push(`                        else if (entry.getValue() instanceof Float) valueType = PBData.coloum_value_type.value_float;`);
+  L.push(`                        infoBuilder.addColoums(PBData.coloum_define.newBuilder().setName(entry.getKey()).setType(valueType));`);
+  L.push(`                    }`);
+  L.push(`                }`);
+  L.push(`                PBData.one_record.Builder recordBuilder = PBData.one_record.newBuilder();`);
+  L.push(`                for (int i = 0; i < infoBuilder.getColoumsCount(); i++) {`);
+  L.push(`                    String name = infoBuilder.getColoums(i).getName();`);
+  L.push(`                    recordBuilder.addRecords(recored.getString(name));`);
+  L.push(`                }`);
+  L.push(`                infoBuilder.addRecords(recordBuilder);`);
+  L.push(`            }`);
+  L.push(`        } catch (Exception e) {`);
+  L.push(`            JLogger.error(e.getMessage(), e);`);
+  L.push(`        }`);
+  L.push(`        CfgVersions.getInstance().AddCfgPBInfo("${m.names.sqlTable}", infoBuilder);`);
+  L.push(`    }`);
+}
+
+// ---------------------------------------------------------------------------
+// raw 专用 internal helpers
+// ---------------------------------------------------------------------------
+
+/** 固定 import（HashMap/List/Map/JSONObject/CfgVersions/DataStoreCompat/JLogger/PBData）+ 按需 JSON */
+function rawImports(m: RawTableModel, fields: PojoFieldModel[], opts: TypeOpts): string[] {
+  const cfgPkg = m.pkg.substring(0, m.pkg.lastIndexOf('.')) + '.cfg';
+  const imports = [
+    'java.util.HashMap',
+    'java.util.List',
+    'java.util.Map',
+    'com.alibaba.fastjson2.JSONObject',
+    `${cfgPkg}.CfgVersions`,
+    'com.jedi.serverEngine.datastore.DataStoreCompat',
+    'com.jedi.serverEngine.Logs.JLogger',
+    'com.jedi.serverEngine.message.PBData',
+  ];
+  if (fields.some((f) => f.fieldKind === 'list' && !refFqnOf(f, opts))) {
+    imports.push('com.alibaba.fastjson2.JSON'); // 基础 list：JSON.parseArray
+  }
+  return imports;
+}
+
+/** RawFieldModel 视为 PojoFieldModel（结构兼容，仅借用 fieldKind 分派） */
+function asPojoFields(m: RawTableModel, _opts: TypeOpts): PojoFieldModel[] {
+  void _opts;
+  return m.fields as unknown as PojoFieldModel[];
+}
+
+/** list-of-ref / map-of-ref 的 refClassName 兜底：经 refFqns 查表注入（生成器可省填） */
+function patchRefFqn(f: PojoFieldModel, m: RawTableModel, opts: TypeOpts): PojoFieldModel {
+  if (f.refClassName || !m.refFqns || m.refFqns.size === 0) return f;
+  if (f.fieldKind !== 'list' && f.fieldKind !== 'map') return f;
+  const t = f.fieldKind === 'list' ? f.elemType : f.valueType;
+  if (t === undefined || t === null || !isStructRef(t) || !t.obj) return f;
+  const fqn = m.refFqns.get(t.obj.fullName()) ?? refFqnOf(f, opts);
+  return fqn ? { ...f, refClassName: fqn } : f;
+}
+
+/** 行字段标量声明类型（与 genPojoClass 的 rawScalarType 同语义，raw 侧独立引用） */
+function rowScalarType(f: RawFieldModel): string {
+  return rawScalarType(f.type);
+}
+
+/** Key 字段相等判断：数值原始类型 ==，对象（String 等）.equals() */
+function keyFieldEqual(p: RawFieldModel): string {
+  const t = p.type;
+  const useEq =
+    t === Primitive.INT || t === Primitive.LONG || t === Primitive.FLOAT || t === Primitive.BOOL;
+  return useEq ? `${p.name} == o.${p.name}` : `${p.name}.equals(o.${p.name})`;
+}
+
+// ---------------------------------------------------------------------------
 // internal helpers
 // ---------------------------------------------------------------------------
 
@@ -233,44 +510,90 @@ function scalarReadExpr(jsonVar: string, fieldName: string, t: FieldType): strin
 
 /** 生成"局部变量 = 解析表达式"（或 $entry/struct 元素循环块），push 到 L */
 function genParseLocal(L: string[], f: PojoFieldModel, opts: TypeOpts): void {
+  genJsonContainerLocal(L, f.name, f, 'o', '        ', opts);
+}
+
+/**
+ * 生成 JSON 容器字段的"局部变量 = 解析表达式"（或循环块）。
+ * Task 3 的 _parse 局部与 Task 4 的行类构造器共用：jsonVar 为 `o`（_parse，缩进 8）
+ * 或 `recored`（行构造器，SQL 结果集行，缩进 12）。scalar 在 jsonVar=recored 时走
+ * rowReadExpr（SQL 列语义，bool=tinyint!=0），否则走 parseExpr（JSON 值语义）；
+ * 基础 list 与 $entry/引用元素循环两者读取语义一致（列值均为 JSON 文本）。
+ * assignToThis=true（行构造器，Python golden 形态）：简单字段直接 `this.x = expr`，
+ * 循环容器先局部变量再 `this.x = x`；false（_parse）保持局部变量形态。
+ */
+function genJsonContainerLocal(
+  L: string[],
+  name: string,
+  f: PojoFieldModel,
+  jsonVar: string,
+  indent: string,
+  opts: TypeOpts,
+  assignToThis = false,
+): void {
   const decl = fieldDeclType(f, opts);
+  const fromRecord = jsonVar === 'recored';
+  const inner = indent + '    ';
   switch (f.fieldKind) {
-    case 'scalar':
-      // 基础标量走 parseExpr（`o.` 前缀正确）
-      L.push(`        ${decl} ${f.name} = ${parseExpr(f.name, f.type, opts)};`);
-      return;
-    case 'struct':
-    case 'interface':
-      // struct/interface 单引用：`Xxx._parse(o.getJSONObject(...))` 用模型给的 FQN
-      // （bean 互相引用不 import，parseExpr 的裸类名仅同包可用；golden 同接口分发用 FQN）
-      L.push(`        ${decl} ${f.name} = ${f.refClassName}._parse(o.getJSONObject("${f.name}"));`);
-      return;
-    case 'list': {
-      if (f.refClassName) {
-        // struct/interface 元素 list：手写循环 + Xxx._parse(e)
-        L.push(`        java.util.ArrayList<${f.refClassName}> ${f.name} = new java.util.ArrayList<>();`);
-        L.push(`        for (JSONObject e : o.getJSONArray("${f.name}").toJavaList(JSONObject.class)) {`);
-        L.push(`            ${f.name}.add(${f.refClassName}._parse(e));`);
-        L.push(`        }`);
+    case 'scalar': {
+      const expr = fromRecord ? rowReadExpr(name, f.type) : parseExpr(name, f.type, opts);
+      if (assignToThis) {
+        L.push(`${indent}this.${name} = ${expr};`);
       } else {
-        // 基础 list：JSON.parseArray
-        L.push(`        ${decl} ${f.name} = ${parseExpr(f.name, f.type, opts)};`);
+        L.push(`${indent}${decl} ${name} = ${expr};`);
+      }
+      return;
+    }
+    case 'struct':
+    case 'interface': {
+      // struct/interface 单引用：`Fqn._parse(jsonVar.getJSONObject(...))`
+      const fqn = refFqnOf(f, opts);
+      const target = assignToThis ? `this.${name}` : `${decl} ${name}`;
+      L.push(`${indent}${target} = ${fqn}._parse(${jsonVar}.getJSONObject("${name}"));`);
+      return;
+    }
+    case 'list': {
+      const fqn = refFqnOf(f, opts);
+      if (fqn) {
+        // struct/interface 元素 list：手写循环 + Fqn._parse(e)（顶层元素无 $entry 包装）
+        L.push(`${indent}java.util.ArrayList<${fqn}> ${name} = new java.util.ArrayList<>();`);
+        L.push(`${indent}for (JSONObject e : ${jsonVar}.getJSONArray("${name}").toJavaList(JSONObject.class)) {`);
+        L.push(`${inner}${name}.add(${fqn}._parse(e));`);
+        L.push(`${indent}}`);
+        if (assignToThis) L.push(`${indent}this.${name} = ${name};`);
+      } else {
+        // 基础 list：JSON.parseArray（元素为包装类；行字段也是 JSON 文本列）
+        const target = assignToThis ? `this.${name}` : `${decl} ${name}`;
+        L.push(`${indent}${target} = JSON.parseArray(${jsonVar}.getString("${name}"), ${boxTypeOf(f.elemType!, opts)}.class);`);
       }
       return;
     }
     case 'map': {
+      const fqn = refFqnOf(f, opts);
       // $entry 数组契约：手写循环（key/value 标量读取用内联 scalarReadExpr）
-      L.push(`        java.util.LinkedHashMap<${scalarBoxType(f.keyType!, opts)}, ${simpleElemType(f, opts)}> ${f.name} = new java.util.LinkedHashMap<>();`);
-      L.push(`        for (JSONObject e : o.getJSONArray("${f.name}").toJavaList(JSONObject.class)) {`);
+      L.push(`${indent}java.util.LinkedHashMap<${scalarBoxType(f.keyType!, opts)}, ${simpleElemType(f, opts)}> ${name} = new java.util.LinkedHashMap<>();`);
+      L.push(`${indent}for (JSONObject e : ${jsonVar}.getJSONArray("${name}").toJavaList(JSONObject.class)) {`);
       const keyExpr = scalarReadExpr('e', 'key', f.keyType!);
-      const valueExpr = f.refClassName
-        ? `${f.refClassName}._parse(e.getJSONObject("value"))` // value 为 struct/interface：对象在 $entry 的 "value" 字段下
+      const valueExpr = fqn
+        ? `${fqn}._parse(e.getJSONObject("value"))` // value 为 struct/interface：对象在 $entry 的 "value" 字段下
         : scalarReadExpr('e', 'value', f.valueType!);
-      L.push(`            ${f.name}.put(${keyExpr}, ${valueExpr});`);
-      L.push(`        }`);
+      L.push(`${inner}${name}.put(${keyExpr}, ${valueExpr});`);
+      L.push(`${indent}}`);
+      if (assignToThis) L.push(`${indent}this.${name} = ${name};`);
       return;
     }
   }
+}
+
+/** struct/interface 引用 FQN：字段自带 refClassName 优先，否则经 opts.resolveNameable 解析 */
+function refFqnOf(f: PojoFieldModel, opts: TypeOpts): string | null {
+  if (f.refClassName) return f.refClassName;
+  const t =
+    f.fieldKind === 'list' ? f.elemType : f.fieldKind === 'map' ? f.valueType : f.type;
+  if (t !== undefined && t !== null && isStructRef(t) && t.obj && opts.resolveNameable) {
+    return opts.resolveNameable(t.obj);
+  }
+  return null;
 }
 
 /** 统计字段解析用到的 fastjson2 符号（JSONObject 由 _parse 签名恒引用，模板无条件 import；此处只管 JSON 按需） */

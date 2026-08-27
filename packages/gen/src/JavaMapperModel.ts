@@ -13,6 +13,7 @@
  */
 
 import type { FieldType } from '@cfgforge/schema';
+import type { MapperNames } from './JavaMapperName';
 
 /** 字段语义（模型层判定，模板仅按此分派） */
 export type PojoFieldKind = 'scalar' | 'struct' | 'interface' | 'list' | 'map';
@@ -54,4 +55,76 @@ export interface InterfacePojoModel {
   impls: { className: string; fullName: string; namespacePath: string }[];
   enumRefTableFqn: string | null; // 枚举表 raw 类（type() 返回类型，impl 模型用）
   hasEnumRef: boolean;
+}
+
+// ---------------------------------------------------------------------------
+// Task 4：raw 表类模型（每表一个 RawXxx 单例，行类嵌套）
+// ---------------------------------------------------------------------------
+
+/** raw 行字段沿用 POJO 的 fieldKind 模式（模型层判定，模板仅按此分派） */
+export type RawFieldKind = PojoFieldKind;
+
+export interface RawFieldModel {
+  name: string;
+  type: FieldType;
+  comment: string;
+  fieldKind: RawFieldKind;
+  /** list 元素类型（fieldKind='list' 时必有） */
+  elemType?: FieldType | null;
+  /** map key/value 类型（fieldKind='map' 时必有） */
+  keyType?: FieldType | null;
+  valueType?: FieldType | null;
+  /**
+   * struct/interface 引用的 bean FQN（Generator 从 refFqns 查表注入；
+   * 模板也可经 refFqns 自行查表，两处来源一致）。list/map 元素为引用时必有。
+   */
+  refClassName?: string | null;
+}
+
+/** 单字段 uniqueKey 索引（v1 契约：多字段由 Generator 过滤，模板假设单字段） */
+export interface RawUniqueKeyModel {
+  /** uniqueKey 字段名（单元素） */
+  fields: string[];
+  /** 索引 map 字段名（如 rankMap） */
+  mapField: string;
+  /** 查询方法名（如 getByRank） */
+  getBy: string;
+  /** 索引字段 Java 参数类型（如 int/String） */
+  keyJavaType: string;
+  /** 自定义 map key 表达式模板（预留，v1 未用） */
+  keyExprTemplate?: string;
+}
+
+/** FK ref getter：跨表引用便捷访问（目标表不在生成集合时 Generator 过滤掉） */
+export interface RawFkModel {
+  /** 本表 FK 字段名（决定 getter 名 get<Xxx>Ref） */
+  fieldName: string;
+  /** 目标表 raw 类 FQN（如 ...mapper.raw.RawTaskextraexps） */
+  refRawFqn: string;
+  /** 目标查询方法名：'getByKey' 或其 uniqueKey 的 getByXxx */
+  refMethod: string;
+  /** 可空 FK（生成侧暂未区分，模型元数据） */
+  nullable: boolean;
+  /** 已算好的传参表达式（通常就是 [本表字段名]） */
+  argExprs: string[];
+}
+
+export interface RawTableModel {
+  names: MapperNames; // Task 2
+  pkg: string; // ...mapper.raw
+  beanPkg: string; // ...mapper.bean（POJO 引用前缀）
+  fields: RawFieldModel[]; // schema 字段序（含主键字段）
+  pkFields: RawFieldModel[]; // 主键字段（1..n）
+  uniqueKeys: RawUniqueKeyModel[];
+  fks: RawFkModel[];
+  /** schema 名 → bean FQN（struct/interface 引用查表；Generator 注入） */
+  refFqns: Map<string, string>;
+  isEnumTable: boolean; // entry 是 EEnum
+  enumField: string | null; // 枚举名字段名
+  /** 枚举名字段非主键时才生成 getByName（主键判断 Generator 做） */
+  enumGetByName: boolean;
+  /** enumNameToIntegerValueMap 烘焙（有整数值时） */
+  enumConstants: { name: string; value: number }[] | null;
+  /** 无整数值时（name→name） */
+  enumStrConstants: { name: string; value: string }[] | null;
 }

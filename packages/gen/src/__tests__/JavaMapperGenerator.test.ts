@@ -82,13 +82,20 @@ const CFG = [
   '\textraexp:int;',
   '}',
   '',
-  'table lootitem[lootid,itemid] {',
-  '\tlootid:int;',
-  '\titemid:int;',
-  '\tcount:int;',
-  '\t[itemid];',
-  '}',
-  '',
+ 'table lootitem[lootid,itemid] {',
+ '\tlootid:int;',
+ '\titemid:int;',
+ '\tcount:int;',
+ '\t[itemid];',
+ '}',
+ '',
+ 'table monster[id] {',
+ '\tid:int;',
+ '\tlootId:int;',
+ '\tlootItemId:int;',
+ '\t->Loot:[lootId,lootItemId] ->lootitem;',
+ '}',
+ '',
 ].join('\n');
 
 const COMPLETECONDITIONTYPE_CSV = ['id表,程序用名字', 'id,name', '1,KillMonster', '2,TalkNpc'].join('\n') + '\n';
@@ -103,6 +110,8 @@ const TASK_CSV = [
 const TASKEXTRAEXP_CSV = ['任务id,额外经验', 'taskid,extraexp', '1,50', '2,60'].join('\n') + '\n';
 
 const LOOTITEM_CSV = ['掉落id,掉落物品,数量', 'lootid,itemid,count', '1,1001,5', '1,1002,3', '2,2001,8'].join('\n') + '\n';
+
+const MONSTER_CSV = ['怪物id,掉落,物品', 'id,lootId,lootItemId', '1,1,1001', '2,2,2001'].join('\n') + '\n';
 
 // pkg 参数用固定前缀，方便断言 FQN
 const PKG = 'com.test.mapper';
@@ -143,9 +152,11 @@ describe('genInitAll', () => {
         rowFqn: `${RAW_PKG}.RawTasks.RawTask`,
         sqlTable: 'cfg_task',
         fields: [
-          { field: 'nexttask', refGetter: 'getNexttaskRef', refSqlTable: 'cfg_task', nullable: true, keyExpr: 'num' },
-          { field: 'taskid', refGetter: 'getTaskidRef', refSqlTable: 'cfg_taskextraexp', nullable: false, keyExpr: 'num' },
-          { field: 'ename', refGetter: 'getEnameRef', refSqlTable: 'cfg_loot', nullable: false, keyExpr: 'str' },
+          { field: 'nexttask', refGetter: 'getNexttaskRef', refSqlTable: 'cfg_task', nullable: true, keyChecks: ['num:nexttask'] },
+          { field: 'taskid', refGetter: 'getTaskidRef', refSqlTable: 'cfg_taskextraexp', nullable: false, keyChecks: ['num:taskid'] },
+          { field: 'ename', refGetter: 'getEnameRef', refSqlTable: 'cfg_loot', nullable: false, keyChecks: ['str:ename'] },
+          // 命名 FK 多字段 key：每个字段各自判空 AND 连接（C-1）
+          { field: 'Loot', refGetter: 'getLootRef', refSqlTable: 'cfg_lootitem', nullable: false, keyChecks: ['num:lootId', 'str:ename'] },
         ],
       },
     ],
@@ -171,9 +182,20 @@ describe('genInitAll', () => {
     expect(out).toContain('public static java.util.List<String> verifyRefs() {');
     expect(out).toContain(`for (${RAW_PKG}.RawTasks.RawTask row : ${RAW_PKG}.RawTasks.getInstance().tableMap.values()) {`);
     expect(out).toContain('if (row.getTaskid() != 0 && row.getTaskidRef() == null) {');
-    expect(out).toContain('errs.add("cfg_task key=" + row.key() + " field=taskid -> cfg_taskextraexp missing");');
+    // 错误明细用 row.toString()（key() 仅单主键行有，多主键行没有 → toString 恒生成）
+    expect(out).toContain('errs.add("cfg_task row=" + row.toString() + " fk=taskid -> cfg_taskextraexp missing");');
     // str FK 判空：getter 复用（合法 Java 表达式）
     expect(out).toContain('if (row.getEname() != null && !row.getEname().isEmpty() && row.getEnameRef() == null) {');
+  });
+
+  it('verifyRefs: multi-field named FK joins per-field non-empty checks with AND, getter from FK name (C-1)', () => {
+    // ->Loot:[lootId, ename] 两字段 key：数值 != 0 与 str 判空 AND 连接；
+    // ref getter 名来自 FK 名（getLootRef），不是 key 字段名（getLootIdRef）
+    expect(out).toContain(
+      'if (row.getLootId() != 0 && row.getEname() != null && !row.getEname().isEmpty() && row.getLootRef() == null) {',
+    );
+    expect(out).toContain('errs.add("cfg_task row=" + row.toString() + " fk=Loot -> cfg_lootitem missing");');
+    expect(out).not.toContain('getLootIdRef');
   });
 });
 
@@ -194,6 +216,7 @@ describe('JavaMapperGenerator', () => {
     fs.writeFileSync(path.join(tempDir, 'task任务.csv'), TASK_CSV);
     fs.writeFileSync(path.join(tempDir, 'taskextraexp.csv'), TASKEXTRAEXP_CSV);
     fs.writeFileSync(path.join(tempDir, 'lootitem.csv'), LOOTITEM_CSV);
+    fs.writeFileSync(path.join(tempDir, 'monster.csv'), MONSTER_CSV);
   });
 
   afterEach(() => {
@@ -223,9 +246,11 @@ describe('JavaMapperGenerator', () => {
   it('generates raw/bean/cfg files for all tables sorted by name', async () => {
     await generateWith('task');
 
-    // raw/：每表一个 RawXxx + CfgMapperInit（completeconditiontype < lootitem < task < taskextraexp）
+    // raw/：每表一个 RawXxx + CfgMapperInit
+    // （completeconditiontype < lootitem < monster < task < taskextraexp）
     expect(fs.existsSync(path.join(baseDir(), 'raw', 'RawCompleteconditiontypes.java'))).toBe(true);
     expect(fs.existsSync(path.join(baseDir(), 'raw', 'RawLootitems.java'))).toBe(true);
+    expect(fs.existsSync(path.join(baseDir(), 'raw', 'RawMonsters.java'))).toBe(true);
     expect(fs.existsSync(path.join(baseDir(), 'raw', 'RawTasks.java'))).toBe(true);
     expect(fs.existsSync(path.join(baseDir(), 'raw', 'RawTaskextraexps.java'))).toBe(true);
     expect(fs.existsSync(path.join(baseDir(), 'raw', 'CfgMapperInit.java'))).toBe(true);
@@ -250,15 +275,18 @@ describe('JavaMapperGenerator', () => {
     expect(raw).toContain('public RawCompleteconditiontype getByName(String name) {');
   });
 
-  it('impl POJO type() returns enum table raw constant; interface dispatches by fullName', async () => {
+  it('impl POJO type() returns enum table int constant; interface declares abstract type()', async () => {
     await generateWith('task');
     const kill = read('bean/completecondition/KillMonster.java');
     expect(kill).toContain(`public class KillMonster implements ${BEAN_PKG}.completecondition.Completecondition {`);
-    expect(kill).toContain(`    public ${RAW_PKG}.RawCompleteconditiontypes type() {`);
+    // int 常量表（enumNameToIntegerValueMap）→ type() 返回 int（与常量声明类型一致）
+    expect(kill).toContain('    public int type() {');
     expect(kill).toContain(`        return ${RAW_PKG}.RawCompleteconditiontypes.KILLMONSTER;`);
 
     const iface = read('bean/completecondition/Completecondition.java');
     expect(iface).toContain(`package ${BEAN_PKG}.completecondition;`);
+    // hasEnumRef 接口声明抽象 type()（impl 的 @Override 必须有接口声明，C-2）
+    expect(iface).toContain('    int type();');
     expect(iface).toContain('if ("completecondition.KillMonster".equals(type)) return');
     expect(iface).toContain('if ("completecondition.TalkNpc".equals(type)) return');
   });
@@ -270,10 +298,11 @@ describe('JavaMapperGenerator', () => {
     expect(raw).toContain(`this.range = ${BEAN_PKG}.Range._parse(recored.getJSONObject("range"));`);
     // interface 字段（completecondition → bean/completecondition/Completecondition，与 impl 同包）
     expect(raw).toContain(`this.completecondition = ${BEAN_PKG}.completecondition.Completecondition._parse(recored.getJSONObject("completecondition"));`);
-    // FK ref getter：taskid -> taskextraexp（getByKey），nexttask -> task（getByKey）
-    expect(raw).toContain(`public ${RAW_PKG}.RawTaskextraexps getTaskidRef() {`);
+    // FK ref getter：taskid -> taskextraexp（getByKey），nexttask -> task（getByKey）；
+    // 返回类型 = 目标行类 FQN（getByKey 返回行类）
+    expect(raw).toContain(`public ${RAW_PKG}.RawTaskextraexps.RawTaskextraexp getTaskidRef() {`);
     expect(raw).toContain('return RawTaskextraexps.getInstance().getByKey(taskid);');
-    expect(raw).toContain(`public ${RAW_PKG}.RawTasks getNexttaskRef() {`);
+    expect(raw).toContain(`public ${RAW_PKG}.RawTasks.RawTask getNexttaskRef() {`);
     expect(raw).toContain('return RawTasks.getInstance().getByKey(nexttask);');
   });
 
@@ -285,16 +314,35 @@ describe('JavaMapperGenerator', () => {
     expect(raw).toContain('public RawLootitem getByItemid(int itemid) { return itemidMap.get(itemid); }');
   });
 
+  it('named FK: row ref getter named by FK, verifyRefs calls getLootRef (C-1)', async () => {
+    await generateWith('task');
+    // raw 行类：ref getter 名来自 FK 名（getLootRef），委托 getByKey(lootId, lootItemId)
+    // （命名 FK 的 fk.name='Loot' != key 字段名 lootId，旧代码会错生成 getLootIdRef）
+    const raw = read('raw/RawMonsters.java');
+    expect(raw).toContain(`public ${RAW_PKG}.RawLootitems.RawLootitem getLootRef() {`);
+    expect(raw).toContain('return RawLootitems.getInstance().getByKey(lootId, lootItemId);');
+    expect(raw).not.toContain('getLootIdRef');
+
+    // CfgMapperInit.verifyRefs：按 FK 一条校验（getLootRef），两字段 key 各自判空 AND 连接
+    const init = read('raw/CfgMapperInit.java');
+    expect(init).toContain(
+      'if (row.getLootId() != 0 && row.getLootItemId() != 0 && row.getLootRef() == null) {',
+    );
+    expect(init).toContain('errs.add("cfg_monster row=" + row.toString() + " fk=Loot -> cfg_lootitem missing");');
+    expect(init).not.toContain('getLootIdRef');
+  });
+
   it('CfgMapperInit: initAll in sortedTables order, child init uses child FQN; verifyRefs checks non-null FKs', async () => {
     await generateWith('task');
     const init = read('raw/CfgMapperInit.java');
     expect(init).toContain(`package ${RAW_PKG};`);
     expect(init).toContain('public class CfgMapperInit {');
 
-    // initAll：sortedTables 顺序（completeconditiontype < lootitem < task < taskextraexp）
+    // initAll：sortedTables 顺序（completeconditiontype < lootitem < monster < task < taskextraexp）
     const order = [
       init.indexOf('RawCompleteconditiontypes.getInstance().init();'),
       init.indexOf('RawLootitems.getInstance().init();'),
+      init.indexOf('RawMonsters.getInstance().init();'),
       init.indexOf('Tasks.getInstance().init();'), // child 表 init 调子类 FQN（cfg.Tasks）
       init.indexOf('RawTaskextraexps.getInstance().init();'),
     ];
@@ -302,10 +350,11 @@ describe('JavaMapperGenerator', () => {
     expect(order[0]).toBeLessThan(order[1]);
     expect(order[1]).toBeLessThan(order[2]);
     expect(order[2]).toBeLessThan(order[3]);
+    expect(order[3]).toBeLessThan(order[4]);
 
     // verifyRefs：task 表非空 FK（taskid→taskextraexp）校验；nullable nexttask 不校验
     expect(init).toContain('if (row.getTaskid() != 0 && row.getTaskidRef() == null) {');
-    expect(init).toContain('errs.add("cfg_task key=" + row.key() + " field=taskid -> cfg_taskextraexp missing");');
+    expect(init).toContain('errs.add("cfg_task row=" + row.toString() + " fk=taskid -> cfg_taskextraexp missing");');
     expect(init).not.toContain('getNexttaskRef() == null');
   });
 

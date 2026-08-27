@@ -112,6 +112,22 @@ export class JavaMapperGenerator extends GeneratorWithTag {
     };
 
     const tableNames = new Set(sortedTables.map((t) => t.name()));
+    // 枚举表常量名集合（大写化）：enumNameToIntegerValueMap / enumNames 的 key
+    // 经 enumFieldNameOf(name,false) 烘焙成常量 → impl 的 enumRefConstName 必须在
+    // 其中存在，否则 type() 引用不存在的常量（M-4：数据行缺 impl 名时不生成 type()）。
+    // 值 = 常量种类（'int' / 'str'），决定 type() 返回类型。
+    const enumConstNamesOf = new Map<string, { names: Set<string>; kind: 'int' | 'str' }>();
+    for (const t of sortedTables) {
+      const names = new Set<string>();
+      let kind: 'int' | 'str' = 'str';
+      if (t.enumNameToIntegerValueMap !== null) {
+        kind = 'int';
+        for (const name of t.enumNameToIntegerValueMap.keys()) names.add(enumFieldNameOf(name, false));
+      } else if (t.enumNames !== null) {
+        for (const name of t.enumNames) names.add(enumFieldNameOf(name, false));
+      }
+      if (names.size > 0) enumConstNamesOf.set(t.name(), { names, kind });
+    }
     const rawModels: RawTableModel[] = [];
     // 可达 POJO 收集（WorkSet 防重防环；interface 收集全部 impl）
     const pojos: PojoModel[] = [];
@@ -125,11 +141,12 @@ export class JavaMapperGenerator extends GeneratorWithTag {
 
       if (nameable instanceof InterfaceSchemaClass) {
         const iface = nameable as InterfaceSchema;
-        // enumRef 指向的枚举表 raw FQN（type() 返回类型）
+        // enumRef 指向的枚举表 raw FQN 与 type() 返回类型（与常量类型一致：
+        // int 常量表 → int；str 常量表（enumNames 兜底）→ String）
         let enumRefTableFqn: string | null = null;
         const enumRefTable = iface.nullableEnumRefTable();
         if (enumRefTable !== null && tableNames.has(enumRefTable.name())) {
-          enumRefTableFqn = `${rawPkg}.${mapperNames(enumRefTable.name()).rawClass}`;
+          enumRefTableFqn = enumReturnTypeOf(enumRefTable.name(), enumConstNamesOf);
         }
         // interface 与 impl 同包：bean/<interface fullName>/（impl 的 fullName 命名空间
         // = interface fullName，见 StructSchema.fullName；Task 3 模板契约 implFqn 同包分发）
@@ -157,12 +174,20 @@ export class JavaMapperGenerator extends GeneratorWithTag {
       const isImpl = nullableIface !== null;
       let enumRefType: string | null = null;
       let enumRefConstName: string | null = null;
+      let enumConstOwnerFqn: string | null = null;
       if (isImpl) {
         const enumRefTable = nullableIface!.nullableEnumRefTable();
         if (enumRefTable !== null && tableNames.has(enumRefTable.name())) {
-          enumRefType = `${rawPkg}.${mapperNames(enumRefTable.name()).rawClass}`;
-          // 常量名 = impl 的 schema 名大写化（enumFieldNameOf(implName, false)）
-          enumRefConstName = enumFieldNameOf(struct.name(), false);
+          // M-4：常量名必须存在于枚举表常量集（数据行），否则 type() 引用
+          // 不存在的常量 → 不生成 type()（enumRefType 置 null）
+          const constName = enumFieldNameOf(struct.name(), false);
+          if (enumConstNamesOf.get(enumRefTable.name())?.names.has(constName)) {
+            enumRefType = enumReturnTypeOf(enumRefTable.name(), enumConstNamesOf);
+            enumRefConstName = constName;
+            enumConstOwnerFqn = `${rawPkg}.${mapperNames(enumRefTable.name()).rawClass}`;
+          } else {
+            Logger.log(`javamapper skip type() for impl ${struct.fullName()}: enum const ${constName} not in table ${enumRefTable.name()} data rows`);
+          }
         }
       }
       pojos.push({
@@ -176,6 +201,7 @@ export class JavaMapperGenerator extends GeneratorWithTag {
         enumRefType,
         enumRefFieldName: isImpl ? struct.name() : null,
         enumRefConstName,
+        enumConstOwnerFqn,
         namespacePath: nsPathOf(struct),
       });
       // 递归收集字段引用的 struct/interface（防环：seenSchemas 已登记）
@@ -219,7 +245,8 @@ export class JavaMapperGenerator extends GeneratorWithTag {
     }
 
     // CfgMapperInit：initAll 按 sortedTables 顺序（child 存在时 init 调子类）；
-    // verifyRefs 校验非空简单 FK（int/long/float `!= 0`、str `!= null && !isEmpty()`）
+    // verifyRefs 按 FK 构建校验目标（ref getter 名来自 FK 名，与 raw 模板一致；
+    // 多字段 key 各字段判空 AND 连接；含非基础类型 key 字段的 FK 跳过，与 ref getter 侧一致）
     const rawFqnOfTable = new Map(sortedTables.map((t) => [t.name(), `${rawPkg}.${mapperNames(t.name()).rawClass}`]));
     {
       const rows = sortedTables.map((t) => {
@@ -231,23 +258,26 @@ export class JavaMapperGenerator extends GeneratorWithTag {
         const rawFqn = rawFqnOfTable.get(t.name())!;
         const names = mapperNames(t.name());
         const fields: {
-          field: string; refGetter: string; refSqlTable: string; nullable: boolean; keyExpr: string;
+          field: string; refGetter: string; refSqlTable: string; nullable: boolean; keyChecks: string[];
         }[] = [];
         for (const fk of t.schema.foreignKeys()) {
           const refTableSchema = fk.refTableSchema();
           if (refTableSchema === null || !tableNames.has(refTableSchema.name())) continue;
           if (!(isRefPrimary(fk.refKey) || isRefUniq(fk.refKey))) continue; // RefList 不校验
-          const nullable = (fk.refKey as { nullable: boolean }).nullable;
-          for (const kf of fk.key.fieldSchemas() ?? []) {
-            if (!isPrimitive(kf.type)) continue; // 容器/引用 key 不校验
-            fields.push({
-              field: kf.name,
-              refGetter: 'get' + upper1(kf.name) + 'Ref',
-              refSqlTable: sqlTableName(refTableSchema.name(), 'cfg_'),
-              nullable,
-              keyExpr: kf.type === Primitive.STRING || kf.type === Primitive.TEXT ? 'str' : 'num',
-            });
-          }
+          const keyFields = fk.key.fieldSchemas() ?? [];
+          // 与 ref getter 生成侧（rawModelOf）的跳过条件一致：含非基础类型 key 的 FK 不校验
+          if (!keyFields.every((kf) => isPrimitive(kf.type))) continue;
+          // 按 FK 构建（而非按 key 字段）：ref getter 名来自 FK 名（与 raw 模板一致，
+          // 命名 FK 如 ->Loot:[lootId,lootItemId] 的 getter 是 getLootRef 而非 getLootIdRef）
+          fields.push({
+            field: fk.name,
+            refGetter: 'get' + upper1(fk.name) + 'Ref',
+            refSqlTable: sqlTableName(refTableSchema.name(), 'cfg_'),
+            nullable: (fk.refKey as { nullable: boolean }).nullable,
+            // 每个 key 字段各自的判空表达式（'num:<字段名>' / 'str:<字段名>'，
+            // 模板按字段名拼 getter 后 AND 连接）
+            keyChecks: keyFields.map((kf) => (kf.type === Primitive.STRING || kf.type === Primitive.TEXT ? 'str:' + kf.name : 'num:' + kf.name)),
+          });
         }
         return { rawFqn, rowFqn: `${rawFqn}.${names.rowClass}`, sqlTable: names.sqlTable, fields };
       });
@@ -400,15 +430,20 @@ export class JavaMapperGenerator extends GeneratorWithTag {
       const refNames = mapperNames(refTableSchema.name());
       let refMethod = 'getByKey';
       if (isRefUniq(fk.refKey)) {
-        // 目标 uniqueKey 查询方法：getBy + upper1(字段名)
+        // 目标 uniqueKey 查询方法：getBy + upper1(字段名)；多字段 uniqueKey
+        // 不生成（raw 侧只索引单字段 uniqueKey，getByKey 委托会类型不符）
         const keyNames = fk.refKey.keyNames();
         if (keyNames.length === 1) {
           refMethod = 'getBy' + upper1(keyNames[0]);
+        } else {
+          Logger.log(`javamapper ignore fk ${schema.name()}.${fk.name}: multi-field uniqueKey ref not supported (v1)`);
+          continue;
         }
       }
       fks.push({
         fieldName: fk.name,
-        refRawFqn: `${rawPkg}.${refNames.rawClass}`,
+        // 行类 FQN（getByKey 返回行类，ref getter 返回类型必须是行类）
+        refRawFqn: `${rawPkg}.${refNames.rawClass}.${refNames.rowClass}`,
         refMethod,
         nullable: (fk.refKey as { nullable: boolean }).nullable,
         argExprs: keyFields.map((kf) => kf.name),
@@ -502,6 +537,19 @@ function nsOf(fullName: string): string {
 /** 命名空间路径 → 包后缀（'' 或 '.task.completecondition'） */
 function pkgSuffixOf(nsPath: string): string {
   return nsPath === '' ? '' : '.' + nsPath;
+}
+
+/**
+ * type() 返回类型：int 常量表（enumNameToIntegerValueMap）→ 'int'
+ * （常量是 `public static final int`）；str 常量表（enumNames 兜底）→ 'String'。
+ * 返回类型必须与常量声明类型一致，否则 int 无法转换为 RawXxx 编译错误。
+ */
+function enumReturnTypeOf(
+  tableName: string,
+  enumConstNamesOf: Map<string, { names: Set<string>; kind: 'int' | 'str' }>,
+): string {
+  const entry = enumConstNamesOf.get(tableName);
+  return entry?.kind === 'int' ? 'int' : 'String';
 }
 
 /** 基础标量的原始 Java 类型（uniqueKey 参数用） */

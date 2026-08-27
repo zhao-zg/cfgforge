@@ -453,6 +453,10 @@ describe('genInterfacePojo: $type dispatch + hasEnumRef', () => {
     expect(out).toContain('    static Completecondition _parse(JSONObject o) {');
   });
 
+  it('hasEnumRef: abstract type() declaration present (impl @Override target, C-2)', () => {
+    expect(out).toContain(`    ${BEAN_PKG}.raw.RawTaskCompleteconditiontypes type();`);
+  });
+
   it('$type matched by exact fullName equality (constant-first, null-safe) with throw fallback', () => {
     expect(out).toContain('        String type = o.getString("$type");');
     expect(out).toContain(
@@ -494,6 +498,8 @@ describe('genInterfacePojo: without enumRef', () => {
     expect(out).toContain('public interface Reward {');
     expect(out).toContain('if ("reward.ItemReward".equals(type)) return');
     expect(out).toContain('throw new IllegalArgumentException("Reward unknown $type: " + type);');
+    // 无 enumRef：不声明抽象 type()（无 @Override 目标）
+    expect(out).not.toContain(' type();');
   });
 });
 

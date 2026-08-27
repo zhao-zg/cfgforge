@@ -82,7 +82,7 @@ const SINGLE_PK_MODEL: RawTableModel = {
   fks: [
     {
       fieldName: 'taskextraexp',
-      refRawFqn: `${RAW_PKG}.RawTaskextraexps`,
+      refRawFqn: `${RAW_PKG}.RawTaskextraexps.RawTaskextraexp`,
       refMethod: 'getByKey',
       nullable: false,
       argExprs: ['taskid'],
@@ -200,7 +200,8 @@ describe('genRawClass: single pk + enum constants + FK ref', () => {
   });
 
   it('FK ref getter is a row-class instance method delegating to target raw singleton', () => {
-    expect(out).toContain(`        public ${RAW_PKG}.RawTaskextraexps getTaskextraexpRef() {`);
+    // 返回类型 = 目标行类 FQN（getByKey 返回行类）；委托目标 = 外层单例类
+    expect(out).toContain(`        public ${RAW_PKG}.RawTaskextraexps.RawTaskextraexp getTaskextraexpRef() {`);
     expect(out).toContain('            return RawTaskextraexps.getInstance().getByKey(taskid);');
   });
 

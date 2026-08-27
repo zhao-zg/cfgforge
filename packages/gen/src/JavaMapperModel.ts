@@ -42,9 +42,11 @@ export interface PojoModel {
   fields: PojoFieldModel[];
   isInterfaceImpl: boolean; // false=独立 struct；true=interface impl
   interfaceFqn: string | null; // impl 时的接口全名
-  enumRefType: string | null; // interface enumRef 的枚举表 raw 类全名（type() 返回类型）
+  enumRefType: string | null; // type() 返回类型（'int'/'String'，与枚举常量声明类型一致）
   enumRefFieldName: string | null; // impl 的 schema 名（常量名推导依据，仅模型元数据）
   enumRefConstName: string | null; // type() 返回的常量名（模型算好，如 KILLMONSTER）
+  /** 常量所在枚举表 raw 类 FQN（return 语句的常量限定符；缺省回退 enumRefType——模板单测手写模型用） */
+  enumConstOwnerFqn?: string | null;
   namespacePath: string; // 相对 bean 包的子包路径 'task' / ''
 }
 
@@ -99,7 +101,10 @@ export interface RawUniqueKeyModel {
 export interface RawFkModel {
   /** 本表 FK 字段名（决定 getter 名 get<Xxx>Ref） */
   fieldName: string;
-  /** 目标表 raw 类 FQN（如 ...mapper.raw.RawTaskextraexps） */
+  /**
+   * 目标表行类 FQN（如 ...mapper.raw.RawTaskextraexps.RawTaskextraexp）——
+   * ref getter 的返回类型（getByKey 返回行类，非外层单例类）
+   */
   refRawFqn: string;
   /** 目标查询方法名：'getByKey' 或其 uniqueKey 的 getByXxx */
   refMethod: string;

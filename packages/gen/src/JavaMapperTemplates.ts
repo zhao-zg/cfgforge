@@ -78,7 +78,7 @@ export interface InitAllModel {
     /** 本表 sql 表名（错误消息前缀 cfg_task） */
     sqlTable: string;
     fields: {
-      /** FK 字段名 */
+      /** FK 名（决定 ref getter 名 get<Xxx>Ref；与 raw 模板一致） */
       field: string;
       /** ref getter 方法名（get<Xxx>Ref） */
       refGetter: string;
@@ -86,8 +86,11 @@ export interface InitAllModel {
       refSqlTable: string;
       /** nullable FK 不校验（null 合法） */
       nullable: boolean;
-      /** 非空判断语义：'num'（int/long/float != 0）或 'str'（!= null && !isEmpty()） */
-      keyExpr: string;
+      /**
+       * 每个 key 字段各自的判空语义：'num:<字段名>'（!= 0）或
+       * 'str:<字段名>'（!= null && !isEmpty()）。多字段 AND 连接。
+       */
+      keyChecks: string[];
     }[];
   }[];
 }
@@ -120,9 +123,11 @@ export function genPojoClass(m: PojoModel, opts: TypeOpts): string {
 
   // type()：仅 hasEnumRef 的 interface 的 impl 生成（enumRefType 非空即视为需要）
   if (m.isInterfaceImpl && m.enumRefType !== null && m.enumRefConstName !== null) {
+    // 常量限定符 = 枚举表 raw 类 FQN（enumRefType 是声明类型 'int'/'String'/raw 类名）
+    const owner = m.enumConstOwnerFqn ?? m.enumRefType;
     L.push(`    @Override`);
     L.push(`    public ${m.enumRefType} type() {`);
-    L.push(`        return ${m.enumRefType}.${m.enumRefConstName};`);
+    L.push(`        return ${owner}.${m.enumRefConstName};`);
     L.push(`    }`);
     L.push('');
   }
@@ -191,9 +196,15 @@ export function genInterfacePojo(m: InterfacePojoModel, opts: TypeOpts): string 
   L.push('');
   L.push(`import com.alibaba.fastjson2.JSONObject;`);
   L.push('');
-
   L.push(`public interface ${m.className} {`);
   L.push('');
+
+  // hasEnumRef 时声明抽象 type()：impl 的 @Override type() 必须有接口声明
+  // （否则 method does not override 编译错误）；无 enumRef 的接口不声明
+  if (m.hasEnumRef && m.enumRefTableFqn !== null) {
+    L.push(`    ${m.enumRefTableFqn} type();`);
+    L.push('');
+  }
 
   L.push(`    static ${m.className} _parse(JSONObject o) {`);
   L.push(`        String type = o.getString("$type");`);
@@ -267,11 +278,12 @@ export function genRawClass(m: RawTableModel, opts: TypeOpts): string {
     L.push(`    }`);
   } else {
     const pk = m.pkFields[0];
-    L.push(`    public ${row} getByKey(${rowScalarType(pk)} ${pk.name}) {`);
+    const pkType = fieldDeclType(pk, opts); // struct 主键 → bean FQN
+    L.push(`    public ${row} getByKey(${pkType} ${pk.name}) {`);
     L.push(`        return tableMap.get(${pk.name});`);
     L.push(`    }`);
     L.push('');
-    L.push(`    public static ${row} get(${rowScalarType(pk)} ${pk.name}) { return getInstance().getByKey(${pk.name}); }`);
+    L.push(`    public static ${row} get(${pkType} ${pk.name}) { return getInstance().getByKey(${pk.name}); }`);
   }
   L.push('');
   L.push(`    public static java.util.Collection<${row}> all() { return getInstance().tableMap.values(); }`);
@@ -303,9 +315,10 @@ function genRowClass(L: string[], m: RawTableModel, f: PojoFieldModel[], opts: T
   L.push(`        }`);
   L.push('');
   if (!multiPk) {
-    L.push(`        public ${rowScalarType(m.pkFields[0])} key() {`);
+    // 主键类型按字段声明（struct 主键 → bean FQN；jewelryrandom 的 LvlRank）
+    L.push(`        public ${fieldDeclType(m.pkFields[0], opts)} key() {`);
     L.push(`            return ${m.pkFields[0].name};`);
-    L.push(`        }`);
+    L.push('        }');
     L.push('');
   }
   for (const fd of f) {
@@ -316,10 +329,12 @@ function genRowClass(L: string[], m: RawTableModel, f: PojoFieldModel[], opts: T
   }
 
   // FK ref getter：行类实例方法（argExprs 引用 taskid 等行字段，外层单例作用域不可解析）；
-  // 委托目标 raw 单例（目标表不在生成集合时 Generator 已过滤）
+  // 委托目标 raw 单例（目标表不在生成集合时 Generator 已过滤）。
+  // refRawFqn 是目标行类 FQN（返回类型）；委托目标 = 去掉最后一段的外层单例类。
   for (const fk of m.fks) {
     const method = 'get' + upper1(fk.fieldName) + 'Ref';
-    const target = fk.refRawFqn.substring(fk.refRawFqn.lastIndexOf('.') + 1);
+    const outerFqn = fk.refRawFqn.substring(0, fk.refRawFqn.lastIndexOf('.'));
+    const target = outerFqn.substring(outerFqn.lastIndexOf('.') + 1);
     L.push(`        public ${fk.refRawFqn} ${method}() {`);
     L.push(`            return ${target}.getInstance().${fk.refMethod}(${fk.argExprs.join(', ')});`);
     L.push(`        }`);
@@ -660,8 +675,10 @@ export function genChildClass(m: ChildModel): string {
 
 /**
  * CfgMapperInit：initAll 按 sortedTables 顺序调各表 init（child 存在时调子类），
- * verifyRefs 校验非空 FK 引用完整性（int/long/float `!= 0`、str `!= null && !isEmpty()`，
- * nullable FK 不校验）。
+ * verifyRefs 校验非空 FK 引用完整性：按 FK 一条校验（ref getter 名来自 FK 名，
+ * 与 raw 行类模板一致），多字段 key 各字段判空 AND 连接（int/long/float `!= 0`、
+ * str `!= null && !isEmpty()`），nullable FK 不校验；错误明细用 row.toString()
+ * （key() 仅单主键行有）。
  */
 export function genInitAll(m: InitAllModel): string {
   const L: string[] = [];
@@ -684,8 +701,10 @@ export function genInitAll(m: InitAllModel): string {
     L.push(`        for (${target.rowFqn} row : ${target.rawFqn}.getInstance().tableMap.values()) {`);
     for (const f of target.fields) {
       if (f.nullable) continue; // nullable FK：null 合法，不校验
-      L.push(`            if (${nonEmptyCheck(f.field, f.keyExpr)} && row.${f.refGetter}() == null) {`);
-      L.push(`                errs.add("${target.sqlTable} key=" + row.key() + " field=${f.field} -> ${f.refSqlTable} missing");`);
+      if (f.keyChecks.length === 0) continue;
+      // 错误明细用 row.toString()（key() 仅单主键生成，多主键行没有 key()）
+      L.push(`            if (${nonEmptyCheck(f.keyChecks)} && row.${f.refGetter}() == null) {`);
+      L.push(`                errs.add("${target.sqlTable} row=" + row.toString() + " fk=${f.field} -> ${f.refSqlTable} missing");`);
       L.push(`            }`);
     }
     L.push(`        }`);
@@ -697,12 +716,18 @@ export function genInitAll(m: InitAllModel): string {
 }
 
 /**
- * 非空判断表达式：数值 `getF() != 0`；str `getF() != null && !getF().isEmpty()`。
- * keyExpr 传 'str'（字符串语义）或 'num'（数值语义）。
+ * 非空判断表达式：全部 key 字段 AND 连接。数值 `getF() != 0`；
+ * str `getF() != null && !getF().isEmpty()`。keyChecks 元素为
+ * 'num:<字段名>'（数值语义）或 'str:<字段名>'（字符串语义）。
  */
-function nonEmptyCheck(field: string, keyExpr: string): string {
-  const getter = `row.get${upper1(field)}()`;
-  return keyExpr === 'str' ? `${getter} != null && !${getter}.isEmpty()` : `${getter} != 0`;
+function nonEmptyCheck(keyChecks: string[]): string {
+  return keyChecks.map((c) => {
+    const sep = c.indexOf(':');
+    const kind = sep === -1 ? c : c.substring(0, sep);
+    const field = sep === -1 ? '' : c.substring(sep + 1);
+    const getter = `row.get${upper1(field)}()`;
+    return kind === 'str' ? `${getter} != null && !${getter}.isEmpty()` : `${getter} != 0`;
+  }).join(' && ');
 }
 
 /** 统计字段解析用到的 fastjson2 符号（JSONObject 由 _parse 签名恒引用，模板无条件 import；此处只管 JSON 按需） */

@@ -163,7 +163,7 @@ class CachedFilesImpl {
   }
 
   private fileKey(filePath: string): string {
-    return path.resolve(filePath).toLowerCase();
+    return getDefaultFileSystem().resolvePath(filePath).toLowerCase();
   }
 
   private doRemoveFile(file: string, keepMeta: boolean): void {

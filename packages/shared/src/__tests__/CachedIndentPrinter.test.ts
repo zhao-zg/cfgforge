@@ -3,12 +3,15 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { CachedIndentPrinter } from '../CachedIndentPrinter';
+import { setDefaultFileSystem } from '../CfgFileSystem';
+import { NodeFileSystem } from '../NodeFileSystem';
 
 describe('CachedIndentPrinter', () => {
   let tmpDir: string;
 
   beforeEach(() => {
     tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'cfgforge-test-'));
+    setDefaultFileSystem(new NodeFileSystem());
   });
 
   afterEach(() => {

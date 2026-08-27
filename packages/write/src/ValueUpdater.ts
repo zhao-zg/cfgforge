@@ -21,7 +21,6 @@
  */
 
 import * as fs from 'fs';
-import * as path from 'path';
 import type { Context } from '@cfgforge/context';
 import { DataUpdater } from '@cfgforge/context';
 import type { CfgData } from '@cfgforge/data';
@@ -112,7 +111,7 @@ export class ValueUpdater {
       throw new Error('update only supports full value');
     }
 
-    const fullPath = path.resolve(context.rootDir(), relativeJsonPath);
+    const fullPath = getDefaultFileSystem().resolvePath(context.rootDir(), relativeJsonPath);
     const jsonStr = fs.readFileSync(fullPath, 'utf8');
 
     const parseErrs = CfgValueErrs.of();
@@ -149,7 +148,7 @@ export class ValueUpdater {
       throw new Error('update only supports full value');
     }
 
-    const fullPath = path.resolve(context.rootDir(), relativeJsonPath);
+    const fullPath = getDefaultFileSystem().resolvePath(context.rootDir(), relativeJsonPath);
     const dfs = getDefaultFileSystem();
     const bytes = await dfs.readFile(fullPath);
     const jsonStr = Buffer.from(bytes).toString('utf8');

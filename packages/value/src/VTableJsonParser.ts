@@ -8,12 +8,12 @@
  * Java source: configgen.value.VTableJsonParser.java (66 lines)
  */
 
-import * as fs from 'fs';
 import {
   DFile,
   type JsonTableFiles,
   type JsonFileInfo,
 } from '@cfgforge/data';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import type { TableSchema } from '@cfgforge/schema';
 import {
   type CfgValueErrs,
@@ -63,7 +63,47 @@ export class VTableJsonParser {
       let jsonStr: string | null = null;
       let modified = 0;
       try {
-        jsonStr = fs.readFileSync(jf.path, 'utf-8');
+        const bytes = getDefaultFileSystem().readFileSync(jf.path);
+        jsonStr = new TextDecoder().decode(bytes);
+        modified = jf.lastModified;
+      } catch (e) {
+        this.errs.addErr(jsonFileReadErr(jf.path, (e as Error).message));
+      }
+      if (jsonStr !== null) {
+        const vStruct = this.parser.fromJson(
+          jsonStr,
+          DFile.of(jf.relativePath, tableName),
+        );
+
+        valueList.push(vStruct);
+        const pkValue: Value = ValueUtil.extractPrimaryKeyValue(vStruct, this.subTableSchema);
+        const id = pkValue.packStr();
+        idMap.set(id, BigInt(Math.trunc(modified)));
+      }
+    }
+
+    this.valueStat.newTableLastModified(tableName, idMap);
+    return new VTableCreator(this.subTableSchema, this.errs).create(valueList);
+  }
+
+  /**
+   * Async variant of parseTable (via CfgFileSystem abstraction, for Tauri/WebView).
+   * Reads JSON files asynchronously, otherwise identical logic.
+   */
+  async parseTableAsync(): Promise<VTable> {
+    const valueList: VStruct[] = [];
+    const tableName = this.tableSchema.name();
+    const idMap = new Map<string, bigint>();
+    const jsonFiles: JsonFileInfo[] = this.jsonTableFiles.jsonFilesOf(tableName);
+
+    const dfs = getDefaultFileSystem();
+
+    for (const jf of jsonFiles) {
+      let jsonStr: string | null = null;
+      let modified = 0;
+      try {
+        const bytes = await dfs.readFile(jf.path);
+        jsonStr = new TextDecoder().decode(bytes);
         modified = jf.lastModified;
       } catch (e) {
         this.errs.addErr(jsonFileReadErr(jf.path, (e as Error).message));

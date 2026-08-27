@@ -86,7 +86,7 @@ export async function hasFilesAsync(dir: string): Promise<boolean> {
 
 export function assureFileExist(filePath: string | null | undefined): void {
   if (filePath != null) {
-    const resolved = path.resolve(filePath);
+    const resolved = getDefaultFileSystem().resolvePath(filePath);
     if (!fs.existsSync(resolved)) {
       throw new Error(`${filePath} not exist`);
     }
@@ -98,8 +98,9 @@ export function assureFileExist(filePath: string | null | undefined): void {
  */
 export async function assureFileExistAsync(filePath: string | null | undefined): Promise<void> {
   if (filePath != null) {
-    const resolved = path.resolve(filePath);
-    if (!(await getDefaultFileSystem().exists(resolved))) {
+    const dfs = getDefaultFileSystem();
+    const resolved = dfs.resolvePath(filePath);
+    if (!(await dfs.exists(resolved))) {
       throw new Error(`${filePath} not exist`);
     }
   }

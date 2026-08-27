@@ -4,7 +4,7 @@
  * Provides static methods to generate CSV and SQL strings from a VTable.
  */
 
-import type { CfgValue, VTable, VStruct } from '@cfgforge/value';
+import type { CfgValue, VTable } from '@cfgforge/value';
 import { ValueToJson } from '@cfgforge/value';
 import type { EditorService } from './EditorService';
 import type { FieldType, Primitive } from '@cfgforge/schema';

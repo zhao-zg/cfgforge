@@ -19,6 +19,7 @@ import { HeadRows } from './HeadRows';
 // Minimal CfgSchemaErrs interface to avoid schema dependency
 interface CfgSchemaErrsLike {
   addErr(err: unknown): void;
+  addWarn(warn: unknown): void;
 }
 
 export class HeadParser {
@@ -42,7 +43,10 @@ export class HeadParser {
   ): void {
     const hr: HeadRow = headRow ?? HeadRows.A2_Default;
     const cm: boolean = isColumnMode ?? false;
-    const errHandler: CfgSchemaErrsLike = errs ?? { addErr(_err: unknown): void { /* no-op */ } };
+    const errHandler: CfgSchemaErrsLike = errs ?? {
+      addErr(_err: unknown): void { /* no-op */ },
+      addWarn(_warn: unknown): void { /* no-op */ },
+    };
 
     let header: DField[] | null = null;
     let names: string[] | null = null;
@@ -67,13 +71,24 @@ export class HeadParser {
         header = h;
         headerSheet = sheet;
       } else if (curNames !== names && !arrayEquals(curNames, names!)) {
-        // Multiple sheets with different headers → error but continue
-        errHandler.addErr({
-          sheetId: sheet.id(),
-          curNames,
-          headerSheetId: headerSheet!.id(),
-          names: names!,
-        });
+        // Multiple sheets with different headers → warn but continue.
+        // Use addWarn instead of addErr so that checkErrors does not throw
+        // and autoFix can proceed. The first sheet's header is used as
+        // table.fields; subsequent sheets keep their own fieldIndices
+        // (set in parseFields above) for CellParser.
+        // Must include _tag and msg() to satisfy CfgSchemaErrs (Msg interface).
+        const sheet1 = headerSheet!.id();
+        const sheet2 = sheet.id();
+        const warn = {
+          _tag: 'SplitDataHeaderNotEqual',
+          sheet1,
+          header1: names!,
+          sheet2,
+          header2: curNames,
+        };
+        (warn as any).msg = () =>
+          `SplitDataHeaderNotEqual(${sheet1}, [${(names!).join(', ')}], ${sheet2}, [${curNames.join(', ')}])`;
+        errHandler.addWarn(warn);
       }
     }
 

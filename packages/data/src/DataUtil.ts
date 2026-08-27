@@ -67,8 +67,18 @@ export function getTableNameIndex(filePath: string, sheetName?: string): TableNa
   // If sheetName provided, resolve relative to filePath's parent
   let targetPath: string;
   if (sheetName !== undefined) {
-    const dir = path.dirname(filePath);
-    targetPath = path.join(dir, sheetName);
+    // When the sheet name is a generic Excel default (Sheet1, Sheet2, ...),
+    // use the file's base name (without extension) as the table name instead.
+    // This supports projects where each xlsx file is one table with default sheet names.
+    // Only Sheet1 is processed; Sheet2/Sheet3 etc. are skipped (return null).
+    if (/^Sheet1$/i.test(sheetName)) {
+      targetPath = filePath;
+    } else if (/^Sheet\d+$/i.test(sheetName)) {
+      return null; // Skip Sheet2, Sheet3, etc.
+    } else {
+      const dir = path.dirname(filePath);
+      targetPath = path.join(dir, sheetName);
+    }
   } else {
     targetPath = filePath;
   }

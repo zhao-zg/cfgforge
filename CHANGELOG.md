@@ -3,10 +3,10 @@ AIGC:
   ContentProducer: '001191110102MAD55U9H0F10002'
   ContentPropagator: '001191110102MAD55U9H0F10002'
   Label: '1'
-  ProduceID: '61d115e4-87f6-40fb-8895-f6b08ed49389'
-  PropagateID: '61d115e4-87f6-40fb-8895-f6b08ed49389'
-  ReservedCode1: 'f2ad99fc-1612-4867-a081-3f24ac7d12c1'
-  ReservedCode2: 'f2ad99fc-1612-4867-a081-3f24ac7d12c1'
+  ProduceID: 'bf6b6d92-0a52-416c-bb06-fafd52b51fe4'
+  PropagateID: 'bf6b6d92-0a52-416c-bb06-fafd52b51fe4'
+  ReservedCode1: 'b018b0e4-9f82-404e-bc4d-7d90148566c9'
+  ReservedCode2: 'b018b0e4-9f82-404e-bc4d-7d90148566c9'
 ---
 
 # 更新日志
@@ -17,7 +17,37 @@ AIGC:
 
 ### [Unreleased]
 
-### [v1.5.0] - 2026-08-24
+### [v1.6.0] - 2026-08-27
+
+Tauri WebView 异步架构支持与 Docker 镜像发布。
+
+#### Added
+- **Docker 镜像支持**：新增 `Dockerfile`（多阶段构建：Node 构建前端 → Nginx 提供静态文件）和 `docker.yml` GitHub Actions 工作流，push tag 自动发布到 GHCR（`ghcr.io/zhao-zg/cfgforge`）。
+- **Tauri 异步路径**：`Context` 新增异步初始化路径（`createWithStructure` async + `initAsync` + `readSchemaAndDataAsync` + `makeValueWithTagAndAllowErrAsync`），通过 `CfgFileSystem` 抽象层支持 Tauri WebView 环境；`isSyncSupported` 自动选择同步/异步路径，CLI/测试环境行为不变。
+- **TauriFileSystem**：实现 `CfgFileSystem` 接口的 Tauri WebView 适配层，通过 `@tauri-apps/plugin-fs` 实现文件 I/O。
+- **DirectoryStructure.createAsync**：异步扫描目录结构，支持 Tauri 环境。
+- **CachedFiles.writeFileAsync / deleteAsync**：异步文件写入和删除，走 `CfgFileSystem` 抽象。
+- **CsvReader.readCsvAsync**：异步 CSV 读取，支持 Tauri 环境。
+- **CfgSchemas.writeToDirAsync**：异步 schema 写入，autoFix 在 Tauri 环境可用。
+- **EditorService**：`initFromContext` 改为异步（`makeValueWithTagAndAllowErrAsync`），`resolveDataDir` 使用 `CfgFileSystem.resolvePath` 替代 Node `path.resolve`。
+- **AppLoader**：新增 `editorInitQuery`（React Query），在 `resInfoQuery` 完成后初始化 EditorService，避免 CfgEditorApp 在 editor 为 null 时调 fetchSchema 报错。
+- **ExportService**：CSV + SQL 导出功能，ToolsSetting 新增导出按钮。
+- **PathUtil**：跨平台路径工具模块（`join`/`dirname`/`basename`/`normalize`），不依赖 Node `path` 模块。
+- **Logger console printer**：Tauri 环境下用 `console.log` 替代 `process.stdout.write`，避免 `ReferenceError: process is not defined`。
+- **scan-xlsx-to-cfg 脚本**：自动扫描目录下所有 xlsx 文件生成 `config.cfg`。
+- **测试覆盖**：新增 `TauriFileSystem.test.ts`、`MockTauriFileSystem.test.ts`、`ContextAsync.test.ts`、`ExcelReaderTauri.test.ts`、`CfgValueParserAsync.test.ts`、`PathUtil.test.ts` 等测试文件。
+
+#### Changed
+- `HeadParser`：`SplitDataHeaderNotEqual` 从 error 降级为 warning（`addErr` → `addWarn`），避免多 sheet 表头差异阻止加载；warn 对象添加 `_tag` 和 `msg()` 满足 `CfgSchemaErrs` 接口。
+- `CfgDataReader` / `CfgSchemaErrsLike` 接口：新增 `addWarn` 方法。
+- `CfgFileSystem` 接口：新增 `isSyncSupported` 属性、`resolvePath` 方法和 `writeFileAsync` 方法。
+- `vite.config.ts`：新增 `path-browserify` 和 `buffer@6` polyfill alias，解决 Tauri WebView 环境 Node 模块缺失问题。
+- `main.tsx`：Buffer polyfill、TauriFileSystem 注入、Logger console printer 设置。
+
+#### Fixed
+- 修复 Tauri WebView 环境 `process is not defined`：Logger 默认 printer 使用 `process.stdout.write`，在浏览器环境不存在。
+- 修复 `getTableNameIndex`：Sheet1 用文件名做表名、Sheet2+ 跳过（原逻辑对非默认 sheet 名使用 `dirname/sheetName`，导致跨文件表名冲突）。
+- 修复 `HeadParser` 的 `e.msg is not a function`：warn 对象缺少 `Msg` 接口必需的 `_tag` 和 `msg()` 方法。
 
 新增 Schema 文本编辑器与发布脚本，修复 bat 脚本解析 bug。
 

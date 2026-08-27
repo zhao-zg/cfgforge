@@ -122,7 +122,7 @@ export class CfgValueParser {
   }
 
   /**
-   * Parse a single table from JSON data.
+   * Parse a single table from JSON data (sync, for Node/CLI).
    */
   private _parseJsonTable(
     subTable: TableSchema,
@@ -141,5 +141,67 @@ export class CfgValueParser {
     const vTable = parser.parseTable();
     TextValue.setTranslatedForTable(vTable, this._env.nullableLangTextFinder);
     return { vTable, errs };
+  }
+
+  /**
+   * Parse a single table from JSON data (async, for Tauri/WebView).
+   */
+  private async _parseJsonTableAsync(
+    subTable: TableSchema,
+    table: TableSchema,
+    valueStat: CfgValueStat,
+  ): Promise<OneTableParserResult> {
+    const errs = CfgValueErrs.of();
+    const parser = new VTableJsonParser(
+      subTable,
+      this._subSchema.isPartial(),
+      this._env.jsonTableFiles,
+      table,
+      errs,
+      valueStat,
+    );
+    const vTable = await parser.parseTableAsync();
+    TextValue.setTranslatedForTable(vTable, this._env.nullableLangTextFinder);
+    return { vTable, errs };
+  }
+
+  /**
+   * Parse all tables and return the assembled CfgValue (async, for Tauri/WebView).
+   * JSON tables are read asynchronously; Excel/CSV tables use the same sync readers
+   * (CSV content is pre-read in Context async factory).
+   */
+  async parseCfgValueAsync(): Promise<CfgValue> {
+    const cfgValue = CfgValue.of(this._subSchema);
+    const tableMap = this._subSchema.tableMap();
+
+    if (tableMap) {
+      for (const subTable of tableMap.values()) {
+        const name = subTable.name();
+        const table = this._env.fullSchema.findTable(name);
+        if (!table) {
+          throw new Error(`Table "${name}" not found in fullSchema`);
+        }
+
+        const dTable = this._env.cfgData.getDTable(name);
+
+        let result: OneTableParserResult;
+
+        if (dTable != null) {
+          // Excel/CSV path (sync — CSV content pre-read in Context)
+          result = this._parseExcelTable(subTable, dTable, table);
+        } else {
+          // JSON path (async)
+          result = await this._parseJsonTableAsync(subTable, table, cfgValue.valueStat);
+        }
+
+        cfgValue.vTableMap.set(result.vTable.schema.name(), result.vTable);
+        this._errs.merge(result.errs);
+      }
+    }
+
+    // Validate foreign key references
+    new RefValidator(cfgValue, this._errs).validate();
+
+    return cfgValue;
   }
 }

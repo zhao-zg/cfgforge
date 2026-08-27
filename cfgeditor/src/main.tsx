@@ -1,7 +1,21 @@
-// Buffer polyfill: editor-core 服务层（NoteEditService 等）使用 Node.js Buffer.from()，
-// 浏览器环境无此全局变量，需在入口注入 polyfill。
-import { Buffer } from 'buffer';
-(globalThis as any).Buffer = (globalThis as any).Buffer ?? Buffer;
+// Buffer polyfill: editor-core 服务层和 ExcelJS 使用 Node.js Buffer API（from/allocUnsafe/alloc 等），
+// 浏览器环境无此全局变量。Vite/rolldown 可能注入简化版 Buffer（仅有 from/isBuffer/concat），
+// 缺少 allocUnsafe/alloc 等 ExcelJS 需要的方法，因此必须强制覆盖为完整的 buffer@6 polyfill。
+import { Buffer as FullBuffer } from 'buffer';
+(globalThis as any).Buffer = FullBuffer;
+
+// Tauri 环境下注入 TauriFileSystem 作为 CfgFileSystem 默认实现。
+// 必须在 EditorService.create 被调用之前完成（AppLoader/selectDataDir 时才调用，这里足够早）。
+import { setDefaultFileSystem, Logger, createPrinter } from '@cfgforge/shared';
+import { isTauri } from '@tauri-apps/api/core';
+if (isTauri()) {
+    // Logger 默认 printer 使用 process.stdout.write，Tauri WebView 无 process 全局变量。
+    // 替换为 console.log 版本，避免 ReferenceError: process is not defined。
+    Logger.setPrinter(createPrinter({ write: (s: string) => console.log(s) }));
+    // 动态导入避免非 Tauri 环境（纯 web dev）加载 plugin-fs
+    const { TauriFileSystem } = await import('./services/TauriFileSystem.ts');
+    setDefaultFileSystem(new TauriFileSystem());
+}
 
 import React, { useState, useEffect } from 'react'
 import ReactDOM from 'react-dom/client'
@@ -15,7 +29,6 @@ import './app/i18n.js'
 import {createBrowserRouter} from "react-router";
 import {RouterProvider} from "react-router/dom";
 import {AppLoader} from "./app/AppLoader.tsx";
-import {isTauri} from "@tauri-apps/api/core";
 import {flushAllPrefsAsync} from "./store/storage.ts";
 import {Window} from "@tauri-apps/api/window";
 import {useMyStore} from "./store/store.ts";

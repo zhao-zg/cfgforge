@@ -18,6 +18,19 @@
 
 /** 文件系统抽象接口。 */
 export interface CfgFileSystem {
+  // ---- 环境检测 ----
+
+  /**
+   * 是否支持同步文件操作。
+   * - NodeFileSystem: true（Node fs 同步 API 可用）
+   * - TauriFileSystem: false（浏览器无同步 fs）
+   *
+   * Context.createWithCfg 用此标志决定走同步路径还是异步路径，
+   * 避免 TauriFileSystem 被误判为可同步使用而走 createWithStructureSync
+   * 导致同步方法抛错。
+   */
+  readonly isSyncSupported: boolean;
+
   // ---- 异步方法（所有环境可用） ----
 
   /** 读取整个文件为字节（文件不存在时 reject）。 */
@@ -93,6 +106,17 @@ export interface CfgFileSystem {
 
   /** 同步获取文件最后修改时间（毫秒 epoch）。文件不存在时返回 0。 */
   lastModifiedSync(path: string): number;
+
+  // ---- 路径解析（所有环境可用，纯字符串操作） ----
+
+  /**
+   * 将路径解析为绝对路径并规范化。
+   * - NodeFileSystem: 等价 path.resolve(...paths)（依赖 process.cwd()）
+   * - TauriFileSystem: 等价 path.join + path.normalize（路径已是绝对路径）
+   *
+   * 用于替代浏览器环境不可用的 path.resolve。
+   */
+  resolvePath(...paths: string[]): string;
 }
 
 /** 全局默认文件系统实例。 */

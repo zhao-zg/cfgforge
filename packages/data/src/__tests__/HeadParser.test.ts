@@ -249,7 +249,7 @@ describe('HeadParser', () => {
       const sheet1 = makeSheet('test_0.csv', '', 0, rows1);
       const table = DTable.of('test', [sheet2, sheet1]);
       const stat = new CfgDataStat();
-      const errs = { addErr: () => {} } as any;
+      const errs = { addErr: () => {}, addWarn: () => {} } as any;
 
       HeadParser.parse(table, stat, HeadRows.A2_Default, false, errs);
 
@@ -257,21 +257,22 @@ describe('HeadParser', () => {
       expect(table.fields[0].name).toBe('Field1');
     });
 
-    it('reports error when headers differ between sheets', () => {
+    it('reports warning when headers differ between sheets', () => {
       const rows1 = [['c1'], ['Field1']];
       const rows2 = [['c2'], ['DifferentName']];
       const sheet1 = makeSheet('test_0.csv', '', 0, rows1);
       const sheet2 = makeSheet('test_1.csv', '', 1, rows2);
       const table = DTable.of('test', [sheet1, sheet2]);
       const stat = new CfgDataStat();
-      let addErrCalled = false;
+      let addWarnCalled = false;
       const errs = {
-        addErr: () => { addErrCalled = true; },
+        addErr: () => {},
+        addWarn: () => { addWarnCalled = true; },
       } as any;
 
       HeadParser.parse(table, stat, HeadRows.A2_Default, false, errs);
 
-      expect(addErrCalled).toBe(true);
+      expect(addWarnCalled).toBe(true);
       // Uses first sheet's header
       expect(table.fields[0].name).toBe('Field1');
     });

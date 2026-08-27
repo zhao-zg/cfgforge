@@ -10,6 +10,16 @@ import * as path from 'path';
 import type { CfgFileSystem } from './CfgFileSystem';
 
 export class NodeFileSystem implements CfgFileSystem {
+  // ---- 环境检测 ----
+
+  readonly isSyncSupported = true;
+
+  // ---- 路径解析 ----
+
+  resolvePath(...paths: string[]): string {
+    return path.resolve(...paths);
+  }
+
   // ---- 异步方法 ----
 
   async readFile(filePath: string): Promise<Uint8Array> {

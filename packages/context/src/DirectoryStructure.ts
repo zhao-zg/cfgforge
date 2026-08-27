@@ -28,6 +28,7 @@ import {
   getSubTableNameIfJsonSubDir,
 } from '@cfgforge/data';
 import { getCodeName, getDefaultFileSystem } from '@cfgforge/shared';
+import { join as pathJoin, relative as pathRelative, basename as pathBasename } from '@cfgforge/shared';
 import type { ExplicitDir } from './ExplicitDir';
 
 // ---------------------------------------------------------------------------
@@ -144,7 +145,7 @@ export class DirectoryStructure implements JsonTableFiles {
 
     // Phase 1: Discover config files (async)
     await CfgUtil.findConfigFilesRecursivelyAsync(
-      path.join(rootDir, DirectoryStructure.ROOT_CONFIG_FILENAME),
+      pathJoin(rootDir, DirectoryStructure.ROOT_CONFIG_FILENAME),
       explicitDir !== null ? explicitDir.excelFileDirs : null,
       DirectoryStructure.CONFIG_EXT,
       '',
@@ -157,13 +158,13 @@ export class DirectoryStructure implements JsonTableFiles {
       await ds.findExcelFilesRecursivelyAsync(rootDir);
     } else {
       for (const [dirName, addTag] of explicitDir.txtAsTsvFileInThisDirAsInRoot_To_AddTag_Map) {
-        const dir = path.join(rootDir, dirName);
+        const dir = pathJoin(rootDir, dirName);
         if (await ds.isDirectory(dir)) {
           await ds.findTxtAsTsvFilesAsync(dir, addTag);
         }
       }
       for (const p of explicitDir.excelFileDirs) {
-        const dir = path.join(rootDir, p);
+        const dir = pathJoin(rootDir, p);
         if (await ds.isDirectory(dir)) {
           await ds.findExcelFilesRecursivelyAsync(dir);
         }
@@ -175,7 +176,7 @@ export class DirectoryStructure implements JsonTableFiles {
       await ds.findTableToJsonFilesAsync();
     } else {
       for (const p of explicitDir.jsonFileDirs) {
-        await ds.findOneTableJsonFilesInDirAsync(path.join(rootDir, p));
+        await ds.findOneTableJsonFilesInDirAsync(pathJoin(rootDir, p));
       }
     }
 
@@ -467,7 +468,7 @@ export class DirectoryStructure implements JsonTableFiles {
       }
 
       const relativePath = path.relative(this.rootDir, fullPath);
-      const absPath = path.resolve(fullPath);
+      const absPath = getDefaultFileSystem().resolvePath(fullPath);
       list.addFile(JsonFileInfo.of(absPath, relativePath));
     }
     list.sort();
@@ -483,7 +484,7 @@ export class DirectoryStructure implements JsonTableFiles {
     const dfs = getDefaultFileSystem();
     const entries = await dfs.readDir(dir);
     for (const entry of entries) {
-      const fullPath = path.join(dir, entry);
+      const fullPath = pathJoin(dir, entry);
       if (isFileIgnored(fullPath)) {
         continue;
       }
@@ -499,7 +500,7 @@ export class DirectoryStructure implements JsonTableFiles {
         if (fmt === null) {
           continue;
         }
-        const relativePath = path.relative(this.rootDir, fullPath);
+        const relativePath = pathRelative(this.rootDir, fullPath);
         const lastModified = await dfs.lastModified(fullPath);
         switch (fmt) {
           case FileFmt.CSV: {
@@ -537,7 +538,7 @@ export class DirectoryStructure implements JsonTableFiles {
     const dfs = getDefaultFileSystem();
     const entries = await dfs.readDir(dir);
     for (const entry of entries) {
-      const fullPath = path.join(dir, entry);
+      const fullPath = pathJoin(dir, entry);
       if (isFileIgnored(fullPath)) {
         continue;
       }
@@ -569,7 +570,7 @@ export class DirectoryStructure implements JsonTableFiles {
 
     const entries = await dfs.readDir(this.rootDir);
     for (const entry of entries) {
-      const fullPath = path.join(this.rootDir, entry);
+      const fullPath = pathJoin(this.rootDir, entry);
       if (isFileIgnored(fullPath)) {
         continue;
       }
@@ -614,7 +615,7 @@ export class DirectoryStructure implements JsonTableFiles {
     const dfs = getDefaultFileSystem();
     const entries = await dfs.readDir(moduleDir);
     for (const entry of entries) {
-      const subPath = path.join(moduleDir, entry);
+      const subPath = pathJoin(moduleDir, entry);
       if (isFileIgnored(subPath)) {
         continue;
       }
@@ -659,7 +660,7 @@ export class DirectoryStructure implements JsonTableFiles {
       return;
     }
 
-    const dirName = path.basename(dirPath);
+    const dirName = pathBasename(dirPath);
     const tableName = getTableNameIfTableDirForJson(dirName);
     if (tableName === null) {
       return;
@@ -675,10 +676,10 @@ export class DirectoryStructure implements JsonTableFiles {
 
   private async findOneTableJsonFilesAsync(tableDir: string, list: JsonFileList): Promise<void> {
     const dfs = getDefaultFileSystem();
-    list.tableDirRelativePath = path.relative(this.rootDir, tableDir);
+    list.tableDirRelativePath = pathRelative(this.rootDir, tableDir);
     const entries = await dfs.readDir(tableDir);
     for (const entry of entries) {
-      const fullPath = path.join(tableDir, entry);
+      const fullPath = pathJoin(tableDir, entry);
       if (isFileIgnored(fullPath)) {
         continue;
       }
@@ -690,8 +691,8 @@ export class DirectoryStructure implements JsonTableFiles {
         continue;
       }
 
-      const relativePath = path.relative(this.rootDir, fullPath);
-      const absPath = path.resolve(fullPath);
+      const relativePath = pathRelative(this.rootDir, fullPath);
+      const absPath = getDefaultFileSystem().resolvePath(fullPath);
       list.addFile(await JsonFileInfo.ofAsync(absPath, relativePath));
     }
     list.sort();
@@ -704,7 +705,7 @@ export class DirectoryStructure implements JsonTableFiles {
       list = new JsonFileList();
       tmp.set(tableName, list);
     }
-    const fullPath = path.resolve(this.rootDir, relativeJsonPath);
+    const fullPath = getDefaultFileSystem().resolvePath(this.rootDir, relativeJsonPath);
     const jf = JsonFileInfo.of(fullPath, relativeJsonPath);
     list.addFile(jf);
     list.sort();

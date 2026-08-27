@@ -9,12 +9,11 @@
  * so we parse sequentially. Worker threads can be added later if needed.
  */
 
-import * as path from 'path';
 import { CfgSchema } from './CfgSchema';
 import { CfgReader } from './cfg/CfgReader';
 import { CfgWriter } from './cfg/CfgWriter';
 import { CfgUtil } from './cfg/CfgUtil';
-import { CachedFiles } from '@cfgforge/shared';
+import { CachedFiles, getDefaultFileSystem } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------
 // CfgFileInfo — TypeScript port of Java record CfgFileInfo
@@ -70,7 +69,7 @@ export class CfgSchemas {
    * unchanged). TS uses the same CachedFiles mechanism.
    */
   static writeToDir(destination: string, root: CfgSchema): void {
-    const absoluteDst = path.resolve(destination);
+    const absoluteDst = getDefaultFileSystem().resolvePath(destination);
     const modules = CfgUtil.separate(root);
     for (const [ns, cfg] of modules) {
       const dst = CfgUtil.getCfgFilePathByNamespace(ns, absoluteDst);
@@ -84,4 +83,22 @@ export class CfgSchemas {
     CachedFiles.writeFile(dst, data);
   }
 
+  /**
+   * Write a CfgSchema to a directory, splitting by namespace (async, via CfgFileSystem).
+   * Async variant of writeToDir for Tauri/WebView environment.
+   */
+  static async writeToDirAsync(destination: string, root: CfgSchema): Promise<void> {
+    const absoluteDst = getDefaultFileSystem().resolvePath(destination);
+    const modules = CfgUtil.separate(root);
+    for (const [ns, cfg] of modules) {
+      const dst = CfgUtil.getCfgFilePathByNamespace(ns, absoluteDst);
+      await CfgSchemas.writeToOneFileAsync(dst, cfg);
+    }
+  }
+
+  private static async writeToOneFileAsync(dst: string, cfg: CfgSchema): Promise<void> {
+    const content = CfgWriter.stringifyWithOptions(cfg, true, false);
+    const data = Buffer.from(content, 'utf-8');
+    await CachedFiles.writeFileAsync(dst, data);
+  }
 }

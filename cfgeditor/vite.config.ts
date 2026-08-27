@@ -20,6 +20,14 @@ export default defineConfig({
     resolve: {
         alias: {
             '@': fileURLToPath(new URL('./src', import.meta.url)),
+            // 将 Node.js 'path' 模块映射到 path-browserify（纯 JS 实现），
+            // 避免 Vite 错误地解析到 d3-path（SVG 路径库）。
+            // path-browserify 支持 join/dirname/relative/normalize/resolve 等。
+            // 必须使用绝对路径，否则 rolldown 报 "was not an absolute path" 警告并最终无法加载。
+            path: fileURLToPath(new URL('./node_modules/path-browserify/index.js', import.meta.url)),
+            // 将 Node.js 'buffer' 模块映射到 buffer@6 npm 包（浏览器 polyfill），
+            // ExcelJS 内部使用 Buffer.allocUnsafe 等 API，Vite 默认外部化为空 stub 会导致运行时错误。
+            buffer: fileURLToPath(new URL('./node_modules/buffer/index.js', import.meta.url)),
         },
     },
 

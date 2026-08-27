@@ -26,6 +26,7 @@ import { CfgSchemaErrs } from '@cfgforge/schema';
 // Minimal CfgSchemaErrs interface to avoid tight coupling
 export interface CfgSchemaErrsLike {
   addErr(err: unknown): void;
+  addWarn(warn: unknown): void;
   merge(other: CfgSchemaErrsLike): void;
 }
 

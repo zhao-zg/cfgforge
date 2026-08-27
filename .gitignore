@@ -48,3 +48,9 @@
 # TS monorepo build artifacts
 packages/*/dist/
 packages/*/tsconfig.tsbuildinfo
+
+# Tauri build artifacts and debug binaries
+cfgeditor/src-tauri/target/
+cfgeditor/cfgeditor-d.exe
+cfgeditor/cfgeditor.yml
+cfgeditor/cfgeditorSelf.yml

@@ -17,6 +17,7 @@ import { DRawSheet } from './DRawSheet';
 import { ReadResult, OneSheet } from './ReadResult';
 import { CfgDataStat } from './CfgDataStat';
 import { getTableNameIndex } from './DataUtil';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------
 // DRawExcelRow — ExcelJS-backed implementation of DRawRow
@@ -63,7 +64,19 @@ export async function readExcel(
   stat.excelCount++;
 
   const wb = new ExcelJS.Workbook();
-  await wb.xlsx.readFile(filePath);
+  const dfs = getDefaultFileSystem();
+  if (dfs.isSyncSupported) {
+    // Node environment: ExcelJS can use fs directly
+    await wb.xlsx.readFile(filePath);
+  } else {
+    // Tauri/WebView environment: fs is externalized (empty stub),
+    // so read file bytes via CfgFileSystem then load into ExcelJS
+    const buf = await dfs.readFile(filePath);
+    // ExcelJS.xlsx.load expects a Node Buffer; wrap the Uint8Array bytes.
+    // Cast to any: ExcelJS type defs expect Buffer, but at runtime Uint8Array works.
+    const nodeBuf = Buffer.from(buf.buffer, buf.byteOffset, buf.byteLength);
+    await wb.xlsx.load(nodeBuf as any);
+  }
 
   for (const worksheet of wb.worksheets) {
     const sheetName = worksheet.name.trim();

@@ -17,9 +17,8 @@
  * Java source: configgen.editorserver.EditorServer.java (533 lines)
  */
 
-import * as path from 'path';
-
 import { Context } from '@cfgforge/context';
+import { getDefaultFileSystem } from '@cfgforge/shared';
 import type { CfgValue } from '@cfgforge/value';
 import { TableSchemaRefGraph } from '@cfgforge/schema';
 import type { TableSchemaRefGraph as TableSchemaRefGraphType } from '@cfgforge/schema';
@@ -31,7 +30,7 @@ import type { TableSchemaRefGraph as TableSchemaRefGraphType } from '@cfgforge/s
 const contextCache = new Map<string, Context>();
 
 function resolveDataDir(dataDir: string): string {
-  return path.resolve(dataDir);
+  return getDefaultFileSystem().resolvePath(dataDir);
 }
 
 // ---------------------------------------------------------------------------
@@ -44,9 +43,8 @@ export class EditorService {
   private _cfgValue!: CfgValue;
   private _graph!: TableSchemaRefGraphType;
 
-  private constructor(dataDir: string, context: Context) {
+  private constructor(dataDir: string) {
     this._dataDir = dataDir;
-    this.initFromContext(context);
   }
 
   /**
@@ -60,18 +58,20 @@ export class EditorService {
       ctx = await Context.create(resolved);
       contextCache.set(resolved, ctx);
     }
-    return new EditorService(resolved, ctx);
+    const svc = new EditorService(resolved);
+    await svc.initFromContext(ctx);
+    return svc;
   }
 
   /**
    * Rebuild the context + cfgValue snapshot from a fresh Context.
    * Called after schema/data changes to pick up the new state.
    */
-  private initFromContext(newContext: Context): void {
+  private async initFromContext(newContext: Context): Promise<void> {
     this._context = newContext;
     // Use allowErr=true like the Java server: partial schemas produce
     // values with errors, and edit operations will report serverNotEditable.
-    this._cfgValue = newContext.makeValueWithTagAndAllowErr(null, true);
+    this._cfgValue = await newContext.makeValueWithTagAndAllowErrAsync(null, true);
     this._graph = new TableSchemaRefGraph(this._cfgValue.schema);
   }
 
@@ -82,7 +82,7 @@ export class EditorService {
   async reload(): Promise<void> {
     const fresh = await Context.create(this._dataDir);
     contextCache.set(this._dataDir, fresh);
-    this.initFromContext(fresh);
+    await this.initFromContext(fresh);
   }
 
   // -------------------------------------------------------------------------

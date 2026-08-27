@@ -20,6 +20,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 import { CfgSchema } from '../CfgSchema';
 import { getCodeName, getDefaultFileSystem } from '@cfgforge/shared';
+import { join as pathJoin, dirname as pathDirname, relative as pathRelative } from '@cfgforge/shared';
 import type { CfgFileInfo } from '../CfgSchemas';
 
 export class CfgUtil {
@@ -223,7 +224,7 @@ export class CfgUtil {
 
     // Step 1: If source file exists, add it
     if (await dfs.isFile(source)) {
-      const relativizedSource = path.relative(rootDir, source);
+      const relativizedSource = pathRelative(rootDir, source);
       const content = await dfs.readFile(source);
       const lastModified = await dfs.lastModified(source);
       cfgFiles.set(relativizedSource, {
@@ -236,14 +237,14 @@ export class CfgUtil {
     }
 
     // Step 2: List parent directory and find subdirectories
-    const parentDir = path.dirname(source);
+    const parentDir = pathDirname(source);
     if (!(await dfs.isDirectory(parentDir))) {
       return;
     }
 
     const entries = await dfs.readDir(parentDir);
     for (const fn of entries) {
-      const fullPath = path.join(parentDir, fn);
+      const fullPath = pathJoin(parentDir, fn);
 
       if (!(await dfs.isDirectory(fullPath))) {
         continue;
@@ -263,7 +264,7 @@ export class CfgUtil {
       }
 
       // Look for {subPkgName}.{ext} inside the subdirectory
-      const subSource = path.join(fullPath, subPkgName + '.' + ext);
+      const subSource = pathJoin(fullPath, subPkgName + '.' + ext);
       const subPkgNameDot = pkgNameDot + subPkgName + '.';
 
       // Recurse with null whiteListSubDirs (only first level uses filter)

@@ -9,7 +9,7 @@
  * - Java CsvRecord.getField(c) → array[c]
  */
 
-import { readCSV, type CSVRow } from '@cfgforge/shared';
+import { readCSV, readCSVAsync, type CSVRow } from '@cfgforge/shared';
 import { type DRawRow } from './DRawRow';
 import { DRawSheet } from './DRawSheet';
 import { ReadResult, OneSheet } from './ReadResult';
@@ -66,6 +66,33 @@ export function readCsv(
   const rows: DRawRow[] = [];
 
   const csvRows: CSVRow[] = readCSV(filePath, defaultEncoding, fieldSeparator);
+
+  for (const csvRow of csvRows) {
+    rows.push(new DRawCsvRow(csvRow));
+    stat.cellCsvCount += csvRow.length;
+  }
+
+  const sheet = new DRawSheet(relativePath, '', index, rows, []);
+  return new ReadResult([new OneSheet(tableName, sheet)], stat, nullableAddTag);
+}
+
+/**
+ * Read a .csv file asynchronously (Tauri/WebView environment).
+ * Produces the same ReadResult as the sync {@link readCsv}.
+ */
+export async function readCsvAsync(
+  filePath: string,
+  relativePath: string,
+  tableName: string,
+  index: number = 0,
+  fieldSeparator: string = ',',
+  defaultEncoding: string = 'gbk',
+  nullableAddTag: string | null = null,
+): Promise<ReadResult> {
+  const stat = new CfgDataStat();
+  const rows: DRawRow[] = [];
+
+  const csvRows: CSVRow[] = await readCSVAsync(filePath, defaultEncoding, fieldSeparator);
 
   for (const csvRow of csvRows) {
     rows.push(new DRawCsvRow(csvRow));

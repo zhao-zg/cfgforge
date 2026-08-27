@@ -7,7 +7,7 @@
  * Java source: configgen.write.TableFileLocator.java (89 lines)
  */
 
-import * as path from 'path';
+import { join as pathJoin } from '@cfgforge/shared';
 import type { DRowId, DTable, DRawSheet } from '@cfgforge/data';
 import { DCell, DCellList, DFile } from '@cfgforge/data';
 import type { TableFile } from './TableFile';
@@ -78,7 +78,7 @@ export class TableFileLocator {
     csvEncoding: string,
     isColumnMode: boolean,
   ): Promise<TableFile> {
-    const fullPath = path.join(dataDir, fileName);
+    const fullPath = pathJoin(dataDir, fileName);
     const toLower = fileName.toLowerCase();
     if (toLower.endsWith('.xlsx') || toLower.endsWith('.xls')) {
       return ExcelTableFile.create(fullPath, sheetName, headRow, isColumnMode);

@@ -17,6 +17,7 @@ import { ValueToJson } from '@cfgforge/value';
 import type { DirectoryStructure } from '@cfgforge/context';
 import { getJsonTableDirName } from '@cfgforge/data';
 import { getCodeName, CachedFiles, getDefaultFileSystem } from '@cfgforge/shared';
+import { join as pathJoin } from '@cfgforge/shared';
 
 export class VTableJsonStorage {
   /**
@@ -73,8 +74,8 @@ export class VTableJsonStorage {
       jsonDirRelPath = await VTableJsonStorage.resolveJsonDirRelativePathAsync(table, dataDir);
     }
 
-    const relativePath = path.join(jsonDirRelPath, id + '.json');
-    const recordPath = path.join(dataDir, relativePath);
+    const relativePath = pathJoin(jsonDirRelPath, id + '.json');
+    const recordPath = pathJoin(dataDir, relativePath);
 
     const jsonString = ValueToJson.toJsonStr(record);
     await CachedFiles.writeFileAsync(recordPath, Buffer.from(jsonString, 'utf8'));
@@ -133,8 +134,8 @@ export class VTableJsonStorage {
       jsonDirRelPath = await VTableJsonStorage.resolveJsonDirRelativePathAsync(table, dataDir);
     }
 
-    const relativePath = path.join(jsonDirRelPath, id + '.json');
-    const recordPath = path.join(dataDir, relativePath);
+    const relativePath = pathJoin(jsonDirRelPath, id + '.json');
+    const recordPath = pathJoin(dataDir, relativePath);
 
     await getDefaultFileSystem().remove(recordPath);
 
@@ -209,12 +210,12 @@ export class VTableJsonStorage {
           found = false;
           break;
         }
-        relativePath = path.join(relativePath, matchedDirName);
-        currentDir = path.join(dataDir, relativePath);
+        relativePath = pathJoin(relativePath, matchedDirName);
+        currentDir = pathJoin(dataDir, relativePath);
       }
 
       if (found) {
-        return path.join(relativePath, '_' + subPart);
+        return pathJoin(relativePath, '_' + subPart);
       }
     }
 
@@ -260,7 +261,7 @@ export class VTableJsonStorage {
     try {
       const entries = await dfs.readDir(dir);
       for (const entry of entries) {
-        const fullPath = path.join(dir, entry);
+        const fullPath = pathJoin(dir, entry);
         if (!(await dfs.isDirectory(fullPath))) {
           continue;
         }

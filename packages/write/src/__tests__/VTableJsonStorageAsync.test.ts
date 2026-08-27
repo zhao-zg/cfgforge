@@ -15,6 +15,9 @@ import { VTableJsonStorage } from '../storages/VTableJsonStorage';
 import { ValueToJson } from '@cfgforge/value';
 import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 
+/** Normalize path separators to forward slash for cross-platform test assertions. */
+const norm = (p: string): string => p.replace(/\\/g, '/');
+
 const TEMP_DIR = path.join(__dirname, '..', '..', '..', '..', '.temp', 'write-vtablejsonstorage-async-tests');
 
 function ensureTempDir(): void {
@@ -66,7 +69,7 @@ describe('VTableJsonStorage async', () => {
 
       const result = await VTableJsonStorage.resolveJsonDirRelativePathAsync('buff.skill', TEMP_DIR);
 
-      expect(result).toBe(path.join('buff', '_skill'));
+      expect(norm(result)).toBe(norm(path.join('buff', '_skill')));
     });
 
     it('should use nested path when module dir has Chinese suffix', async () => {
@@ -74,7 +77,7 @@ describe('VTableJsonStorage async', () => {
 
       const result = await VTableJsonStorage.resolveJsonDirRelativePathAsync('skill.buff', TEMP_DIR);
 
-      expect(result).toBe(path.join('skill_技能', '_buff'));
+      expect(norm(result)).toBe(norm(path.join('skill_技能', '_buff')));
     });
 
     it('should fallback to root-level when module dir does not exist', async () => {
@@ -88,7 +91,7 @@ describe('VTableJsonStorage async', () => {
 
       const result = await VTableJsonStorage.resolveJsonDirRelativePathAsync('a.b.c', TEMP_DIR);
 
-      expect(result).toBe(path.join('a', 'b', '_c'));
+      expect(norm(result)).toBe(norm(path.join('a', 'b', '_c')));
     });
 
     it('should fallback when partial module chain is missing', async () => {
@@ -110,7 +113,7 @@ describe('VTableJsonStorage async', () => {
 
       const result = await VTableJsonStorage.resolveJsonDirRelativePathAsync('a.b.c', TEMP_DIR);
 
-      expect(result).toBe(path.join('a', 'b_数据', '_c'));
+      expect(norm(result)).toBe(norm(path.join('a', 'b_数据', '_c')));
     });
   });
 
@@ -127,7 +130,7 @@ describe('VTableJsonStorage async', () => {
         record, 'skill', 'fireball', dataDir, null,
       );
 
-      expect(relPath).toBe(path.join('_skill', 'fireball.json'));
+      expect(norm(relPath)).toBe(norm(path.join('_skill', 'fireball.json')));
 
       const fullPath = path.join(dataDir, relPath);
       expect(fs.existsSync(fullPath)).toBe(true);
@@ -147,7 +150,7 @@ describe('VTableJsonStorage async', () => {
         record, 'buff.skill', 'rec001', dataDir, null,
       );
 
-      expect(relPath).toBe(path.join('buff', '_skill', 'rec001.json'));
+      expect(norm(relPath)).toBe(norm(path.join('buff', '_skill', 'rec001.json')));
 
       const fullPath = path.join(dataDir, relPath);
       expect(fs.existsSync(fullPath)).toBe(true);
@@ -183,7 +186,7 @@ describe('VTableJsonStorage async', () => {
         record, 'effect', 'e001', dataDir, dirStruct,
       );
 
-      expect(relPath).toBe(path.join('custom', 'path', 'e001.json'));
+      expect(norm(relPath)).toBe(norm(path.join('custom', 'path', 'e001.json')));
       const fullPath = path.join(dataDir, relPath);
       expect(fs.existsSync(fullPath)).toBe(true);
     });

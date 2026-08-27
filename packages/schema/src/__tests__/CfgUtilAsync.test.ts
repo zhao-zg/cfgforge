@@ -10,6 +10,9 @@ import { CfgUtil } from '../cfg/CfgUtil';
 import type { CfgFileInfo } from '../CfgSchemas';
 import { setDefaultFileSystem, NodeFileSystem } from '@cfgforge/shared';
 
+/** Normalize path separators to forward slash for cross-platform test assertions. */
+const norm = (p: string): string => p.replace(/\\/g, '/');
+
 describe('CfgUtil.findConfigFilesRecursivelyAsync', () => {
   let tempDir: string;
 
@@ -56,11 +59,11 @@ describe('CfgUtil.findConfigFilesRecursivelyAsync', () => {
 
     expect(cfgFiles.size).toBe(3);
     expect(cfgFiles.has('config.cfg')).toBe(true);
-    expect(cfgFiles.has(path.join('equip', 'equip.cfg'))).toBe(true);
-    expect(cfgFiles.has(path.join('task', 'task.cfg'))).toBe(true);
+    expect(cfgFiles.has(norm(path.join('equip', 'equip.cfg')))).toBe(true);
+    expect(cfgFiles.has(norm(path.join('task', 'task.cfg')))).toBe(true);
 
-    expect(cfgFiles.get(path.join('equip', 'equip.cfg'))!.pkgNameDot).toBe('equip.');
-    expect(cfgFiles.get(path.join('task', 'task.cfg'))!.pkgNameDot).toBe('task.');
+    expect(cfgFiles.get(norm(path.join('equip', 'equip.cfg')))!.pkgNameDot).toBe('equip.');
+    expect(cfgFiles.get(norm(path.join('task', 'task.cfg')))!.pkgNameDot).toBe('task.');
   });
 
   it('finds deeply nested cfg files (a/b/b.cfg)', async () => {
@@ -77,7 +80,7 @@ describe('CfgUtil.findConfigFilesRecursivelyAsync', () => {
     );
 
     expect(cfgFiles.size).toBe(3);
-    expect(cfgFiles.get(path.join('equip', 'weapon', 'weapon.cfg'))!.pkgNameDot).toBe('equip.weapon.');
+    expect(cfgFiles.get(norm(path.join('equip', 'weapon', 'weapon.cfg')))!.pkgNameDot).toBe('equip.weapon.');
   });
 
   it('respects whiteListSubDirs filter', async () => {
@@ -97,8 +100,8 @@ describe('CfgUtil.findConfigFilesRecursivelyAsync', () => {
 
     expect(cfgFiles.size).toBe(2);
     expect(cfgFiles.has('config.cfg')).toBe(true);
-    expect(cfgFiles.has(path.join('equip', 'equip.cfg'))).toBe(true);
-    expect(cfgFiles.has(path.join('task', 'task.cfg'))).toBe(false);
+    expect(cfgFiles.has(norm(path.join('equip', 'equip.cfg')))).toBe(true);
+    expect(cfgFiles.has(norm(path.join('task', 'task.cfg')))).toBe(false);
   });
 
   it('produces same results as sync version', async () => {
@@ -115,7 +118,7 @@ describe('CfgUtil.findConfigFilesRecursivelyAsync', () => {
 
     expect(asyncFiles.size).toBe(syncFiles.size);
     for (const [key, syncInfo] of syncFiles) {
-      const asyncInfo = asyncFiles.get(key);
+      const asyncInfo = asyncFiles.get(norm(key));
       expect(asyncInfo).toBeDefined();
       expect(asyncInfo!.pkgNameDot).toBe(syncInfo.pkgNameDot);
       expect(asyncInfo!.content).toBe(syncInfo.content);

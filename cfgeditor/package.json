@@ -32,6 +32,7 @@
     "i18next": "^26.3.5",
     "i18next-browser-languagedetector": "^8.2.1",
     "openai": "^6.45.0",
+    "path-browserify": "^1.0.1",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
     "react-hotkeys-hook": "^5.3.3",

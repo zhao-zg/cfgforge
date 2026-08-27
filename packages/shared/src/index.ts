@@ -19,6 +19,7 @@ export * from './XorCipher';
 export * from './FileUtil';
 export * from './DOMUtil';
 export * from './LocaleUtil';
+export * from './PathUtil';
 
 // 在 Node 环境（CLI/MCP/测试）下自动初始化默认文件系统为 NodeFileSystem，
 // 使 readCSVAsync / CachedFiles.writeFileAsync 等异步 fs 工具开箱即用。

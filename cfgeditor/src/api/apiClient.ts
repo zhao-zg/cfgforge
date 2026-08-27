@@ -20,6 +20,7 @@ import {
     PromptService,
     NoteEditService,
     SearchService,
+    ExportService,
 } from '@cfgforge/editor-core';
 
 import type {
@@ -36,6 +37,8 @@ import type {
     CheckJsonResult,
     PromptResult,
     SearchResult,
+    ExportResult,
+    ExportFormat,
 } from '@cfgforge/editor-core';
 
 // Re-export types needed by UI components ( CreateTableForm 等)
@@ -320,4 +323,16 @@ export async function createDataFile(
 ): Promise<CreateResult> {
     const editor = getEditor();
     return TableCreateService.createDataFileAsync(editor, tableName);
+}
+
+// ---------------------------------------------------------------------------
+// Export API
+// ---------------------------------------------------------------------------
+
+export async function exportTable(
+    tableId: string,
+    format: ExportFormat,
+    _signal?: AbortSignal,
+): Promise<ExportResult> {
+    return ExportService.export(getEditor(), tableId, format);
 }

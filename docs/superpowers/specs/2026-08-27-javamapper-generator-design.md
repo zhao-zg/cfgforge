@@ -95,12 +95,18 @@ npx cfgforge -datadir example/config -gen javamapper,dir:output,pkg:com.jedi.gam
 
 ## 6. 公共代码重构（用户明确要求：与现有 cfggen 共用一份代码）
 
-1. **`camelToSnake` 提升到 `@cfgforge/shared`**（StringUtils），`editor-core/ExportService` 改为引用。SQL 表名推导单一来源。
+1. **SQL 命名复用 `gen/SqlRender.ts`**（调查发现 gen 包已有 `SqlGenerator`/`SqlRender`，`-gen sql` 已注册）：表名用 `sqlTableName(name, 'cfg_')`、类型用 `sqlColumnType`、标识符用 `escapeIdentifier`，不再新建映射，也不动 editor-core 里 `ExportService` 的旧副本（不在本任务范围）。
 2. **`JavaName.ts` 纯函数拆出**：
    - `JavaTypeUtil.ts`：`type`/`boxType`（参数化 langSwitch 与 codeTopPkg 选项）、`enumFieldName`、`pascalName`、`keyClassName`、`uniqueKeyMapName` 等命名/类型函数。
    - `JavaMethodStr.ts`：`formalParams`/`actualParams`/`hashCodes`/`equalsExpr` 等方法签名片段函数。
    - `JavaName.ts` re-export 全部——现有 java generator 与全部现有测试**零改动**，两个 generator 跑同一份转换代码。
 3. 模板层不共用（`javaTemplates.ts` 与 `JavaMapperTemplates.ts` 输出风格本质不同），但都只调公共层。
+4. **POJO `_parse` 的 JSON 契约**（与 `-gen sql` 写库格式严格对齐，来源 `ValueToJson`）：
+   - struct 字段：JSON object，`"$type"` 为 schema fullName（带命名空间），数据字段按字段名；解析按字段名取值，忽略 `$type`/`$note`/`$fold` 等元数据键。
+   - interface 字段：读 `"$type"`（fullName）匹配 impl（后缀匹配，兼容包名前缀不同），不匹配抛 `IllegalArgumentException`。
+   - map 字段：JSON **数组** `[{"$type":"$entry","key":...,"value":...}]`，不是 object。
+   - bool 字段：SQL 列是 `tinyint(1)`，JDBC/JSONObject 取回 0/1 → `getIntValue(...) != 0`；但 JSON 文本嵌套内的 bool 是 `true/false` → POJO 解析用 `getBooleanValue`。两处不同，按上下文分别处理。
+   - text 字段：VText 存 original 字符串。
 
 ## 7. 文件结构
 

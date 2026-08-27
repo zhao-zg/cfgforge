@@ -12,7 +12,8 @@ import {Schema} from "@/domain/schema.ts";
 import {STable} from "@/api/schemaModel.ts";
 import {useMutation} from "@tanstack/react-query";
 import {RecordEditResult} from "@/api/recordModel.ts";
-import {deleteRecord} from "@/api/apiClient.ts";
+import {deleteRecord, exportTable} from "@/api/apiClient.ts";
+import type {ExportFormat} from '@cfgforge/editor-core';
 import {toBlob} from "html-to-image";
 import {saveAs} from "file-saver";
 import {PageType, navTo, useLocationData} from "@/store/store.ts";
@@ -94,6 +95,30 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         // eslint-disable-next-line react-hooks/exhaustive-deps -- flowRef 在 body 中经解构使用（const {current} = flowRef），oxlint exhaustive-deps 未追踪解构引用而误报
     }, [flowRef, imageSizeScale, curPage, notification, curTableId, curId]);
 
+    const onExport = useCallback(async (format: ExportFormat) => {
+        if (!curTableId) {
+            notification.error({title: t('selectTableHint'), duration: 3});
+            return;
+        }
+        try {
+            const result = await exportTable(curTableId, format);
+            if (result.resultCode === 'ok') {
+                const ext = format === 'csv' ? 'csv' : 'sql';
+                const filename = `${curTableId}.${ext}`;
+                const blob = new Blob([result.content], {type: 'text/plain;charset=utf-8'});
+                saveAs(blob, filename);
+                notification.info({
+                    title: t('exportSuccess', {table: curTableId, file: filename}),
+                    duration: 3,
+                });
+            } else {
+                notification.error({title: t('exportFail', {error: result.resultCode}), duration: 4});
+            }
+        } catch (e) {
+            notification.error({title: t('exportFail', {error: (e as Error).message}), duration: 4});
+        }
+    }, [curTableId, notification, t]);
+
     const options = [
         {label: t('table'), value: 'table'},
         {label: t('tableRef'), value: 'tableRef'},
@@ -125,6 +150,12 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
                 </Space>
             </Form.Item>
         </Form>
+
+        <Divider/>
+        <Space>
+            <Button onClick={() => onExport('csv')}>{t('exportCsv')}</Button>
+            <Button onClick={() => onExport('sql')}>{t('exportSql')}</Button>
+        </Space>
 
         {schema && curTable && schema.isEditable &&
             <Popconfirm title={t('deleteCurRecord')}

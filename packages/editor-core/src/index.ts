@@ -51,6 +51,12 @@ export type {
   FKListResult,
   FKMutateResult,
 } from './SchemaRelationService.js';
+export { SchemaFieldService } from './SchemaFieldService.js';
+export type {
+  FieldAddRequest,
+  FieldUpdateRequest,
+  FieldMutateResult,
+} from './SchemaFieldService.js';
 export { CheckJsonService } from './CheckJsonService.js';
 export type {
   CheckJsonResult,

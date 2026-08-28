@@ -16,6 +16,7 @@ import {
     RecordRefIdsService,
     SchemaWriteService,
     SchemaRelationService,
+    SchemaFieldService,
     TableCreateService,
     CheckJsonService,
     PromptService,
@@ -35,6 +36,9 @@ import type {
     SchemaWriteResult,
     FKAddRequest,
     FKMutateResult,
+    FieldAddRequest,
+    FieldUpdateRequest,
+    FieldMutateResult,
     CreateResult,
     TableCreateRequest,
     CheckJsonResult,
@@ -396,6 +400,53 @@ export async function removeForeignKey(
 ): Promise<FKMutateResult> {
     const editor = getEditor();
     const result = await SchemaRelationService.removeForeignKeyAsync(editor, table, fkName);
+    if (result.ok) {
+        await editor.reload();
+    }
+    return result;
+}
+
+// ---------------------------------------------------------------------------
+// Field (Schema Field) API
+// ---------------------------------------------------------------------------
+
+/** 新增字段：写回 config.cfg 后 reload（与 createTable 一致）。 */
+export async function addField(
+    table: string,
+    req: FieldAddRequest,
+    _signal?: AbortSignal,
+): Promise<FieldMutateResult> {
+    const editor = getEditor();
+    const result = await SchemaFieldService.addFieldAsync(editor, table, req);
+    if (result.ok) {
+        await editor.reload();
+    }
+    return result;
+}
+
+/** 更新字段（含改名/改类型/改注释）：写回 config.cfg 后 reload。 */
+export async function updateField(
+    table: string,
+    oldName: string,
+    req: FieldUpdateRequest,
+    _signal?: AbortSignal,
+): Promise<FieldMutateResult> {
+    const editor = getEditor();
+    const result = await SchemaFieldService.updateFieldAsync(editor, table, oldName, req);
+    if (result.ok) {
+        await editor.reload();
+    }
+    return result;
+}
+
+/** 删除字段：写回 config.cfg 后 reload。 */
+export async function removeField(
+    table: string,
+    fieldName: string,
+    _signal?: AbortSignal,
+): Promise<FieldMutateResult> {
+    const editor = getEditor();
+    const result = await SchemaFieldService.removeFieldAsync(editor, table, fieldName);
     if (result.ok) {
         await editor.reload();
     }

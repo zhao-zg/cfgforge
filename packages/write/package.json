@@ -22,5 +22,8 @@
       "default": "./dist/index.js"
     },
     "./package.json": "./package.json"
+  },
+  "devDependencies": {
+    "@types/node": "^26.0.0"
   }
 }

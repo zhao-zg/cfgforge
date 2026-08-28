@@ -7,6 +7,9 @@
     "clean": "rimraf dist",
     "build": "tsc"
   },
+  "devDependencies": {
+    "@types/node": "^26.0.0"
+  },
   "dependencies": {
     "@cfgforge/shared": "workspace:*",
     "fast-xml-parser": "^5.11.0"

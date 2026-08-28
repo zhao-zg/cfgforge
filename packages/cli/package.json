@@ -20,5 +20,8 @@
     "@cfgforge/write": "workspace:*"
   },
   "main": "./src/index.ts",
-  "private": true
+  "private": true,
+  "devDependencies": {
+    "@types/node": "^26.0.0"
+  }
 }

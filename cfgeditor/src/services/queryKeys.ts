@@ -22,6 +22,7 @@ export const queryKeys = {
 
     // 全局低频
     schema: () => ['schema'],
+    schemaText: () => ['schemaText'],
     notes: () => ['notes'],
 
     // 单条记录

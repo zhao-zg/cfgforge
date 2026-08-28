@@ -1,4 +1,4 @@
-import {memo, useCallback, useEffect, useRef, useState} from "react";
+import {memo, useCallback, useEffect, useMemo, useRef} from "react";
 import {Button, Flex, Space, Tabs, TabsProps, Tooltip} from "antd";
 import {convertFileSrc} from "@tauri-apps/api/core";
 import {Command} from "@tauri-apps/plugin-shell";
@@ -53,16 +53,20 @@ export const VideoAudioSyncer = memo(function VideoAudioSyncer({resInfo}: { resI
         queryFn: () => getSrt2Vtts(resInfo)
     })
 
-    // 由 VTT 文本创建 blob URL 并在卸载/文本变化时 revoke，修复"blob URL 永不释放"泄漏。
-    // 在 effect（非 useMemo）里 createObjectURL：本应用开了 React.StrictMode，useMemo 会被
-    // dev 双调用产生孤儿 blob；effect + cleanup 保证创建即登记、卸载即释放。
-    const [vttUrls, setVttUrls] = useState<string[] | undefined>();
-    useEffect(() => {
-        if (!vttTexts) return;
-        const urls = vttTexts.map(t => URL.createObjectURL(new Blob([t], {type: 'text/vtt'})));
-        setVttUrls(urls);
-        return () => urls.forEach(u => URL.revokeObjectURL(u));
+    // 由 VTT 文本创建 blob URL（useMemo 派生，随 vttTexts 变化重建）。
+    // StrictMode 下 useMemo 可能双调用产生孤儿 blob，由下方 effect 的 cleanup 统一 revoke 兜底。
+    // 渲染必须拿到同步的 url（<track src> 需要），因此不能放 effect。
+    const vttUrls = useMemo(() => {
+        if (!vttTexts) return undefined;
+        return vttTexts.map(t => URL.createObjectURL(new Blob([t], {type: 'text/vtt'})));
     }, [vttTexts]);
+
+    // 仅负责登记清理：vttUrls 变化或卸载时 revoke 上一批 URL，防止 blob 泄漏
+    useEffect(() => {
+        if (!vttUrls) return;
+        const urls = vttUrls;
+        return () => urls.forEach(u => URL.revokeObjectURL(u));
+    }, [vttUrls]);
 
     const onPlay = useCallback(() => {
         if (ref.current) {

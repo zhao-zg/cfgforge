@@ -138,6 +138,20 @@ export function getLastNavToInLocalStore(): string | undefined {
     return navTo(page ?? 'record', tableId, id, isEditMode);
 }
 
+/** 从 pref 重建当前 pathname（与 getLastNavToInLocalStore 同源，但无"空 tableId 早退"与任何副作用）。
+ *  事件回调期调用（onStructureChange 清 layout 缓存等）：读 pref 是纯函数、不涉及渲染期闭包/ref、
+ *  也不写 pref/持久化（navTo 会 setPref，这里直接拼接 URL），规避 React Compiler 对惰性
+ *  useState 初始化器捕获 ref 的拦截。 */
+export function getCurrentPathname(): string {
+    const page = getPrefEnumStr<PageType>('curPage', pageEnums) ?? 'record';
+    const tableId = getPrefStr('curTableId', '');
+    const id = getPrefStr('curId', '');
+    const isEditMode = getPrefBool('isEditMode', DEFAULT_IS_EDIT_MODE);
+    // 与 navTo 的 URL 拼装规则保持一致（仅 record 页且编辑态带 /edit 前缀）
+    const url = `/${page}/${tableId}/${id}`;
+    return (page == 'record' && isEditMode) ? '/edit' + url : url;
+}
+
 export function useLocationData() {
     const location = useLocation();
     const pathname = location.pathname;

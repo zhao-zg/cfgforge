@@ -7,13 +7,13 @@ import {RecordEditEntityCreator} from "./recordEditEntityCreator.ts";
 import {EditingSession, getCurrentEditingSession, setCurrentEditingSession} from "@/services/editingSession.ts";
 import {isCopiedFitAllowedType, structCopy} from "@/services/clipboard.ts";
 import {useTranslation} from "react-i18next";
-import {navTo, setIsEditMode, setEditingState, useMyStore, useLocationData} from "@/store/store.ts";
+import {navTo, setIsEditMode, setEditingState, useMyStore, useLocationData, getCurrentPathname} from "@/store/store.ts";
 import {useNavigate, useOutletContext} from "react-router";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {addOrUpdateRecord, fetchRecord} from "@/api/apiClient.ts";
 import {MenuItem} from "@/flow/FlowContextMenu.tsx";
 import {fillHandles} from "@/flow/layout/entityToNodeAndEdge.ts";
-import {memo, useCallback, useEffect, useMemo, useRef, useSyncExternalStore} from "react";
+import {memo, useCallback, useEffect, useMemo, useState, useSyncExternalStore} from "react";
 import {useHotkeys} from "react-hotkeys-hook";
 
 
@@ -74,20 +74,16 @@ function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
     const mutateRecord = addOrUpdateRecordMutation.mutate;
 
     // 编辑会话 store（每条记录编辑态一个实例，取代旧的模块级 editState 单例）。
-    // lazy ref：首次渲染构造，构造函数纯（仅初始化字段，不 notify）。recordResult 变化由下方 effect 的 maybeReset 同步。
-    // pathname 走 ref：edit↔view 切换会改 pathname 但 key 不变、session 不重建，闭包需读到最新 pathname。
-    const pathnameRef = useRef(pathname);
-    pathnameRef.current = pathname;
-    const sessionRef = useRef<EditingSession | null>(null);
-    if (sessionRef.current === null) {
-        sessionRef.current = new EditingSession(recordResult, {
-            // 结构变更时事件期同步清编辑态 layout 缓存（remove 非 invalidate、不可挪 effect，理由见 helper JSDoc）
-            onStructureChange: () => removeEditLayoutCache(pathnameRef.current),
-            mutate: mutateRecord,
-            onEditingStateChange: (table, id, isEdited) => setEditingState(table, id, isEdited),
-        });
-    }
-    const session = sessionRef.current;
+    // 惰性 useState 初始化（构造纯：仅初始化字段不 notify）：首次渲染创建一次，后续稳定；
+    // recordResult 变化由下方 effect 的 maybeReset 同步。替代旧的手写 sessionRef + 渲染期写 ref（react(refs) 警告）。
+    // onStructureChange 事件期从 pref 重建 pathname（getCurrentPathname 纯函数）：不依赖渲染期闭包/ref，
+    // 规避 React Compiler 对惰性初始化器捕获 ref 的拦截；edit↔view 切换改 pref 但 key 不变、session 不重建。
+    const [session] = useState(() => new EditingSession(recordResult, {
+        // 结构变更时事件期同步清编辑态 layout 缓存（remove 非 invalidate、不可挪 effect，理由见 helper JSDoc）
+        onStructureChange: () => removeEditLayoutCache(getCurrentPathname()),
+        mutate: mutateRecord,
+        onEditingStateChange: (table, id, isEdited) => setEditingState(table, id, isEdited),
+    }));
     // 只订阅结构版本号（number）：值类编辑不 bump → 不重渲（性能契约1）；结构类编辑 bump → 重渲重算 entityMap。
     const structureVersion = useSyncExternalStore(session.subscribe, session.getStructureVersion);
     // ctrl+z/y per-session。回调实时判 canUndo/canRedo：栈空/非编辑态直接放行（不 preventDefault）→

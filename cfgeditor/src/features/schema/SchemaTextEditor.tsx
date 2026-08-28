@@ -2,7 +2,7 @@ import {memo, useCallback, useEffect, useRef, useState} from "react";
 import {Alert, Button, Flex, Modal, Spin, Typography} from "antd";
 import {useTranslation} from "react-i18next";
 import {fetchSchemaText, writeSchemaText} from "@/api/apiClient.ts";
-import {useQueryClient} from "@tanstack/react-query";
+import {useQuery, useQueryClient} from "@tanstack/react-query";
 import {queryKeys} from "@/services/queryKeys.ts";
 
 const {Text} = Typography;
@@ -15,36 +15,33 @@ export const SchemaTextEditor = memo(function SchemaTextEditor({open, onClose}: 
     const queryClient = useQueryClient();
     const [text, setText] = useState('');
     const [originalText, setOriginalText] = useState('');
-    const [loading, setLoading] = useState(false);
     const [saving, setSaving] = useState(false);
     const [errors, setErrors] = useState<string[]>([]);
-    const [loadError, setLoadError] = useState('');
     const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-    // 打开时加载 schema 文本
+    // schema 文本由 React Query 管理加载态（isLoading/isError 由 hook 派生，不在 effect 里 setState）。
+    // 打开时 refetch 拉最新磁盘内容，结果在异步 .then 里写入编辑态（异步 setState，非 effect 同步 setState）。
+    const {isLoading: loading, isError, error, refetch} = useQuery({
+        queryKey: queryKeys.schemaText(),
+        queryFn: () => fetchSchemaText(),
+        enabled: open,
+        staleTime: 0,
+        retry: false,
+    });
+
     useEffect(() => {
         if (!open) return;
         let cancelled = false;
-        setLoading(true);
-        setLoadError('');
-        setErrors([]);
-        fetchSchemaText()
-            .then(result => {
-                if (!cancelled) {
-                    setText(result.text);
-                    setOriginalText(result.text);
-                }
-            })
-            .catch(err => {
-                if (!cancelled) {
-                    setLoadError(err instanceof Error ? err.message : String(err));
-                }
-            })
-            .finally(() => {
-                if (!cancelled) setLoading(false);
-            });
+        void refetch().then(res => {
+            if (!cancelled && res.data) {
+                setText(res.data.text);
+                setOriginalText(res.data.text);
+            }
+        });
         return () => { cancelled = true; };
-    }, [open]);
+    }, [open, refetch]);
+
+    const loadError = isError ? (error instanceof Error ? error.message : String(error)) : '';
 
     const isDirty = text !== originalText;
 

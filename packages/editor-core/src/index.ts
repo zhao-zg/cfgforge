@@ -92,3 +92,4 @@ export { SingleTableReloadService } from './SingleTableReloadService.js';
 export type {
   SingleTableReloadResult,
 } from './SingleTableReloadService.js';
+export { AutoReloadService } from './AutoReloadService.js';

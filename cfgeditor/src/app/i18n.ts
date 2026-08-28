@@ -182,6 +182,8 @@ i18n.use(LanguageDetector)
                     deleteAllUnref: "Delete all unreferenced",
                     deleteAllUnrefConfirm: "Delete all {count} unreferenced records? This cannot be undone.",
                     deleteAllUnrefDone: "Deleted {ok} records, {fail} failed",
+                    autoReload: "Auto reload",
+                    autoReloadTip: "Poll every 2s to reload all data",
 
                     showDescription: "Description",
                     show: "Show",
@@ -424,6 +426,8 @@ i18n.use(LanguageDetector)
                     deleteAllUnref: '删除全部未引用',
                     deleteAllUnrefConfirm: '确定删除全部 {count} 条未引用记录？此操作不可撤销。',
                     deleteAllUnrefDone: '已删除 {ok} 条，失败 {fail} 条',
+                    autoReload: '自动刷新',
+                    autoReloadTip: '每 2 秒轮询重载全部数据',
 
                     showDescription: '描述',
                     show: '显示',

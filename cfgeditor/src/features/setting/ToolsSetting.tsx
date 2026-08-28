@@ -1,7 +1,7 @@
-import {memo, RefObject, useCallback, useState} from "react";
+import {memo, RefObject, useCallback, useEffect, useState} from "react";
 import {useNavigate} from "react-router";
 import {useTranslation} from "react-i18next";
-import {App, Button, Form, Input, InputNumber, Popconfirm, Radio, Space} from "antd";
+import {App, Button, Form, Input, InputNumber, Popconfirm, Radio, Space, Switch, Tooltip} from "antd";
 import {
     setImageSizeScale,
     setExportFilePattern,
@@ -13,7 +13,7 @@ import {Schema} from "@/domain/schema.ts";
 import {STable} from "@/api/schemaModel.ts";
 import {useMutation} from "@tanstack/react-query";
 import {RecordEditResult} from "@/api/recordModel.ts";
-import {deleteRecord, exportTable, exportAllSql, reloadTable} from "@/api/apiClient.ts";
+import {deleteRecord, exportTable, exportAllSql, reloadTable, startAutoReload, stopAutoReload} from "@/api/apiClient.ts";
 import type {ExportFormat} from '@cfgforge/editor-core';
 import {toBlob} from "html-to-image";
 import {saveAs} from "file-saver";
@@ -36,6 +36,14 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
     const {notification} = App.useApp();
     const navigate = useNavigate();
     const [fieldManageOpen, setFieldManageOpen] = useState(false);
+    const [autoReloadOn, setAutoReloadOn] = useState(false);
+
+    // 组件卸载时停止自动刷新，避免泄漏定时器
+    useEffect(() => {
+        return () => {
+            stopAutoReload();
+        };
+    }, []);
 
     const deleteRecordMutation = useMutation<RecordEditResult, Error>({
         mutationFn: () => deleteRecord(curTableId, curId),
@@ -142,6 +150,15 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
             notification.error({title: t('exportFail', {error: (e as Error).message}), duration: 4});
         }
     }, [curTableId, notification, t, buildExportFilename]);
+
+    const onToggleAutoReload = useCallback((checked: boolean) => {
+        setAutoReloadOn(checked);
+        if (checked) {
+            startAutoReload(2000);
+        } else {
+            stopAutoReload();
+        }
+    }, []);
 
     const onReloadTable = useCallback(async () => {
         if (!curTableId) {
@@ -252,6 +269,12 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
                         onClick={onReloadTable}>
                     {t('reloadTable')}
                 </Button>
+                <Tooltip title={t('autoReloadTip')}>
+                    <Space size={4}>
+                        {t('autoReload')}
+                        <Switch checked={autoReloadOn} onChange={onToggleAutoReload}/>
+                    </Space>
+                </Tooltip>
             </Space>
         </SettingCard>
 

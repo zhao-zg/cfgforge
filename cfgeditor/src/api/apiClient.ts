@@ -24,6 +24,7 @@ import {
     SearchService,
     ExportService,
     SingleTableReloadService,
+    AutoReloadService,
 } from '@cfgforge/editor-core';
 
 import type {
@@ -487,4 +488,30 @@ export async function reloadTable(
     _signal?: AbortSignal,
 ): Promise<SingleTableReloadResult> {
     return SingleTableReloadService.reloadTable(getEditor(), tableName);
+}
+
+// ---------------------------------------------------------------------------
+// Auto Reload API (P2-11)
+// ---------------------------------------------------------------------------
+
+let autoReloadService: AutoReloadService | null = null;
+
+/** 启动自动刷新轮询（默认 2s 间隔）。已运行则忽略。 */
+export function startAutoReload(intervalMs = 2000): void {
+    if (autoReloadService === null) {
+        autoReloadService = new AutoReloadService();
+    }
+    autoReloadService.start(getEditor(), intervalMs);
+}
+
+/** 停止自动刷新轮询。 */
+export function stopAutoReload(): void {
+    if (autoReloadService !== null) {
+        autoReloadService.stop();
+    }
+}
+
+/** 查询自动刷新是否在运行。 */
+export function isAutoReloadRunning(): boolean {
+    return autoReloadService !== null && autoReloadService.isRunning;
 }

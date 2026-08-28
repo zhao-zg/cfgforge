@@ -16,11 +16,21 @@ if (isTauri()) {
     const { TauriFileSystem } = await import('./services/TauriFileSystem.ts');
     setDefaultFileSystem(new TauriFileSystem());
 } else {
-    // 纯浏览器环境（Docker 网页版）：注入 BrowserFsApi，通过 HTTP API 读写后端文件系统。
-    // Logger 同样需要替换为 console.log 版本（浏览器无 process.stdout）。
+    // 纯浏览器环境（Docker 网页版 / 本地 dev）：
+    // 尝试从 IndexedDB 恢复上次选择的目录句柄。
+    // 成功则注入 LocalFsApi（基于 File System Access API 直接读写本地文件）；
+    // 失败则不初始化，由 ConnectionSetting 引导用户选择目录。
     Logger.setPrinter(createPrinter({ write: (s: string) => console.log(s) }));
-    const { BrowserFsApi } = await import('./services/BrowserFsApi.ts');
-    setDefaultFileSystem(new BrowserFsApi());
+    try {
+        const { loadDirHandle, ensurePermission, LocalFsApi } = await import('./services/LocalFsApi.ts');
+        const savedHandle = await loadDirHandle();
+        if (savedHandle && await ensurePermission(savedHandle)) {
+            setDefaultFileSystem(new LocalFsApi(savedHandle));
+        }
+    } catch (e) {
+        // IndexedDB 或权限获取失败：保持未初始化，由 UI 引导用户重新选择
+        console.warn('[main] Failed to restore directory handle:', e);
+    }
 }
 
 import React, { useState, useEffect } from 'react'

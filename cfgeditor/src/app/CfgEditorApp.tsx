@@ -30,6 +30,8 @@ import {SidePanelShell} from "./SidePanelShell";
 import {getCurrentEditingSession} from "@/services/editingSession";
 import {isTauri} from "@tauri-apps/api/core";
 import {open as openDialog} from "@tauri-apps/plugin-dialog";
+import {setDefaultFileSystem} from "@cfgforge/shared";
+import {saveDirHandle, ensurePermission, LocalFsApi} from "@/services/LocalFsApi.ts";
 
 // Chat / Setting 仅在 dragPanel 切换到对应面板时才渲染，懒加载以推迟
 // @ant-design/x* + openai + marked + dompurify 等重依赖的解析（不进首屏）
@@ -157,23 +159,39 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
         onSetDataDir(dataDir);
     }, [dataDir]);
 
-    // 桌面端空 dataDir：直接打开系统目录选择器
+    // 空数据目录时的「选择目录」按钮：桌面端和 Web 端统一入口
     const handleSelectDir = useCallback(async () => {
         try {
-            const selected = await openDialog({
-                directory: true,
-                multiple: false,
-                title: t('selectDataDir'),
-            });
-            if (selected && typeof selected === 'string') {
-                await setDataDir(selected);
+            if (isTauri()) {
+                // 桌面端：打开系统目录选择器
+                const selected = await openDialog({
+                    directory: true,
+                    multiple: false,
+                    title: t('selectDataDir'),
+                });
+                if (selected && typeof selected === 'string') {
+                    await setDataDir(selected);
+                }
+            } else {
+                // Web 端：调用 File System Access API
+                if (typeof (window as any).showDirectoryPicker !== 'function') {
+                    return;
+                }
+                const handle = await (window as any).showDirectoryPicker({mode: 'readwrite'});
+                if (!handle) return;
+                if (!(await ensurePermission(handle))) return;
+                await saveDirHandle(handle);
+                const localFs = new LocalFsApi(handle);
+                setDefaultFileSystem(localFs);
+                await setDataDir(localFs.displayDir);
             }
         } catch (e) {
+            if (e instanceof DOMException && e.name === 'AbortError') return;
             console.error('Directory selection failed:', e);
         }
     }, [t]);
 
-    // Web 端空 dataDir：切到设置面板
+    // Web 端空 dataDir 的 fallback：切到设置面板手动配置
     const handleGoToSetting = useCallback(() => {
         setDragPanel('setting');
     }, []);
@@ -188,7 +206,10 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
             <Typography.Text type="secondary">{t('noDataDirDesc')}</Typography.Text>
             {isDesktop
                 ? <Button type="primary" onClick={handleSelectDir}>{t('selectDataDir')}</Button>
-                : <Button type="primary" onClick={handleGoToSetting}>{t('goToSetting')}</Button>
+                : <>
+                    <Button type="primary" onClick={handleSelectDir}>{t('selectDataDir')}</Button>
+                    <Button onClick={handleGoToSetting}>{t('goToSetting')}</Button>
+                </>
             }
         </Flex>;
     } else if (!dataDir && dragPanel === 'setting') {

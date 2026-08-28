@@ -38,6 +38,7 @@ i18n.use(LanguageDetector)
                     dataDirConnected: 'Data directory connected',
                     dataDirConnectFailed: 'Failed to connect to data directory',
                     dataDirTip: 'Select a data directory containing config.cfg to start editing.',
+                    fsApiNotSupported: 'Your browser does not support local file system access. Please use Chrome or Edge 86+.',
 
                     deleteCurRecord: 'delete cur record',
                     toPng: 'save relation png',
@@ -291,6 +292,7 @@ i18n.use(LanguageDetector)
                     dataDirConnected: '数据目录已连接',
                     dataDirConnectFailed: '连接数据目录失败',
                     dataDirTip: '选择包含 config.cfg 的数据目录即可开始编辑。',
+                    fsApiNotSupported: '当前浏览器不支持本地文件系统访问，请使用 Chrome 或 Edge 86+ 版本。',
 
                     recordShowSetting: '显示',
                     behavior: '行为',

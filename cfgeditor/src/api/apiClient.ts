@@ -15,6 +15,7 @@ import {
     RecordEditService,
     RecordRefIdsService,
     SchemaWriteService,
+    SchemaRelationService,
     TableCreateService,
     CheckJsonService,
     PromptService,
@@ -32,6 +33,8 @@ import type {
     RecordEditResult,
     SchemaTextResult,
     SchemaWriteResult,
+    FKAddRequest,
+    FKMutateResult,
     CreateResult,
     TableCreateRequest,
     CheckJsonResult,
@@ -52,6 +55,7 @@ export type {
 
 import type {Notes, NoteEditResult as LocalNoteEditResult} from './noteModel';
 import type {JSONObject} from './recordModel';
+import type {SForeignKey} from './schemaModel';
 
 // ---------------------------------------------------------------------------
 // EditorService instance management
@@ -268,7 +272,7 @@ export async function getPrompt(
     table: string,
     _signal?: AbortSignal,
 ): Promise<PromptResult> {
-    return PromptService.gen(getEditor(), table);
+    return PromptService.genAsync(getEditor(), table);
 }
 
 // ---------------------------------------------------------------------------
@@ -337,6 +341,65 @@ export async function createDataFile(
 ): Promise<CreateResult> {
     const editor = getEditor();
     return TableCreateService.createDataFileAsync(editor, tableName);
+}
+
+// ---------------------------------------------------------------------------
+// Relation (FK) API
+// ---------------------------------------------------------------------------
+
+/** 列出 table 的全部外键。失败（表不存在/读 cfg 失败）时 throw。 */
+export async function fetchTableFks(
+    table: string,
+    _signal?: AbortSignal,
+): Promise<SForeignKey[]> {
+    const editor = getEditor();
+    const res = SchemaRelationService.listFks(editor, table);
+    if (!res.ok) {
+        throw new Error(res.errors.join('; '));
+    }
+    return res.fks;
+}
+
+/** 新增外键：写回 config.cfg 后 reload（与 createTable 一致）。 */
+export async function addForeignKey(
+    req: FKAddRequest,
+    _signal?: AbortSignal,
+): Promise<FKMutateResult> {
+    const editor = getEditor();
+    const result = await SchemaRelationService.addForeignKeyAsync(editor, req);
+    if (result.ok) {
+        await editor.reload();
+    }
+    return result;
+}
+
+/** 更新（含改名）外键：写回 config.cfg 后 reload。 */
+export async function updateForeignKey(
+    table: string,
+    fkName: string,
+    req: FKAddRequest,
+    _signal?: AbortSignal,
+): Promise<FKMutateResult> {
+    const editor = getEditor();
+    const result = await SchemaRelationService.updateForeignKeyAsync(editor, table, fkName, req);
+    if (result.ok) {
+        await editor.reload();
+    }
+    return result;
+}
+
+/** 删除外键：写回 config.cfg 后 reload。 */
+export async function removeForeignKey(
+    table: string,
+    fkName: string,
+    _signal?: AbortSignal,
+): Promise<FKMutateResult> {
+    const editor = getEditor();
+    const result = await SchemaRelationService.removeForeignKeyAsync(editor, table, fkName);
+    if (result.ok) {
+        await editor.reload();
+    }
+    return result;
 }
 
 // ---------------------------------------------------------------------------

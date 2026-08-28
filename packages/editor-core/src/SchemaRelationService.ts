@@ -159,7 +159,7 @@ export class SchemaRelationService {
         return;
       }
       SchemaRelationService.removeFk(structural, old);
-      const newName = SchemaRelationService.pickFkName(req, structural, errors);
+      const newName = SchemaRelationService.pickFkName(req, structural, errors, old.name);
       if (newName === null) return;
       const fk = SchemaRelationService.buildForeignKey(newName, req, structural, errors);
       if (fk !== null) {
@@ -181,7 +181,7 @@ export class SchemaRelationService {
         return;
       }
       SchemaRelationService.removeFk(structural, old);
-      const newName = SchemaRelationService.pickFkName(req, structural, errors);
+      const newName = SchemaRelationService.pickFkName(req, structural, errors, old.name);
       if (newName === null) return;
       const fk = SchemaRelationService.buildForeignKey(newName, req, structural, errors);
       if (fk !== null) {
@@ -393,11 +393,16 @@ export class SchemaRelationService {
    * Resolve FK name: explicit fkName, or auto-generated keys[0]_refTable
    * with _2/_3 suffixes to avoid conflicts. Returns null if the requested
    * name conflicts with a field or existing FK.
+   *
+   * @param exemptName 豁免名（update 时传旧 FK 名）：旧 FK 已删除，允许新 FK
+   *   沿用旧名——包括内联 FK 的「FK 名 == 字段名」场景（改 refTable 等属性时
+   *   保留字段内联形式，否则 update 会被当作名字冲突拒绝）。
    */
   private static pickFkName(
     req: FKAddRequest,
     structural: Structural,
     errors: string[],
+    exemptName?: string,
   ): string | null {
     let name: string;
     if (req.fkName && req.fkName.trim().length > 0) {
@@ -416,7 +421,10 @@ export class SchemaRelationService {
       name = candidate;
     }
 
-    if (structural.findField(name) !== null || structural.findForeignKey(name) !== null) {
+    if (
+      structural.findForeignKey(name) !== null ||
+      (structural.findField(name) !== null && name !== exemptName)
+    ) {
       errors.push(`Foreign key name conflict: ${name}`);
       return null;
     }

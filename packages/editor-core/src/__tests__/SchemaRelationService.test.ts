@@ -322,6 +322,52 @@ describe('SchemaRelationService', () => {
     expect(cfg).toContain('->newFk:[id] ->item;');
   });
 
+  it('updateForeignKey preserves inline FK name (FK name == field name)', async () => {
+    // Inline FK: `owner:int ->item;` — the FK name equals the field name.
+    // Updating its attributes must NOT be rejected as a field-name conflict.
+    const CFG_INLINE = `table item[id] {
+  id:int;
+  name:str;
+  level:int;
+  [name];
+  [name,level];
+}
+table weapon[id] {
+  id:int;
+  name:str;
+  damage:int;
+  owner:int ->item;
+}
+`;
+    writeFile(tempDir, 'config.cfg', CFG_INLINE);
+    // weapon now has an owner column — CSV must match or the table is dropped.
+    writeFile(
+      tempDir,
+      'weapon.csv',
+      `武器ID,名称,伤害,所属
+id,name,damage,owner
+1,sword,10,1
+`,
+    );
+    const svc = await EditorService.create(tempDir);
+
+    // Change only the ref target; keep the inline FK name 'owner' explicitly.
+    const update = SchemaRelationService.updateForeignKey(svc, 'weapon', 'owner', {
+      table: 'weapon',
+      fkName: 'owner',
+      keys: ['owner'],
+      refTable: 'item',
+      nullable: true,
+    }) as FKMutateResult;
+
+    expect(update.ok).toBe(true);
+    expect(update.errors).toEqual([]);
+
+    const cfg = readFileSync(tempDir, 'config.cfg');
+    // Inline form retained with updated nullable tag: owner:int ->item (nullable);
+    expect(cfg).toContain('owner:int ->item');
+  });
+
   // -------------------------------------------------------------------------
   // removeForeignKey
   // -------------------------------------------------------------------------

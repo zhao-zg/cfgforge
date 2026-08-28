@@ -405,6 +405,119 @@ describe('apiClient', () => {
     });
 
     // -----------------------------------------------------------------
+    // Relation (FK) API
+    // -----------------------------------------------------------------
+    describe('fetchTableFks', () => {
+        it('返回表的全部外键', async () => {
+            const {fetchTableFks} = await import('./apiClient');
+            const fks = await fetchTableFks('item');
+            expect(fks.length).toBe(1);
+            // fixture 中 owner:int ->user 是内联 FK（FK 名 == 字段名）
+            expect(fks[0].name).toBe('owner');
+            expect(fks[0].keys).toStrictEqual(['owner']);
+            expect(fks[0].refTable).toBe('user');
+        });
+
+        it('无外键表返回空数组', async () => {
+            const {fetchTableFks} = await import('./apiClient');
+            expect(await fetchTableFks('user')).toStrictEqual([]);
+        });
+
+        it('未知表 throw', async () => {
+            const {fetchTableFks} = await import('./apiClient');
+            await expect(fetchTableFks('ghost')).rejects.toThrow('Table not found');
+        });
+    });
+
+    describe('addForeignKey', () => {
+        it('新增外键并持久化', async () => {
+            const {addForeignKey, fetchTableFks} = await import('./apiClient');
+            const result = await addForeignKey({
+                table: 'user',
+                keys: ['age'],
+                refTable: 'user',
+            });
+            expect(result.ok).toBe(true);
+            const fks = await fetchTableFks('user');
+            const added = fks.find(f => f.keys.includes('age'));
+            expect(added).toBeDefined();
+        });
+
+        it('返回错误（目标表不存在）且不写入', async () => {
+            const {addForeignKey} = await import('./apiClient');
+            const before = fs.readFileSync(path.join(tempDir, 'config.cfg'), 'utf8');
+            const result = await addForeignKey({
+                table: 'user',
+                keys: ['age'],
+                refTable: 'ghost',
+            });
+            expect(result.ok).toBe(false);
+            expect(result.errors.length).toBeGreaterThan(0);
+            const after = fs.readFileSync(path.join(tempDir, 'config.cfg'), 'utf8');
+            expect(after).toBe(before);
+        });
+    });
+
+    describe('updateForeignKey', () => {
+        it('改目标表并持久化（未传 fkName 时按新 refTable 自动改名）', async () => {
+            const {updateForeignKey, fetchTableFks} = await import('./apiClient');
+            const result = await updateForeignKey('item', 'owner', {
+                table: 'item',
+                keys: ['owner'],
+                refTable: 'item',
+            });
+            expect(result.ok).toBe(true);
+            const fks = await fetchTableFks('item');
+            // 未传 fkName → 后端按 keys[0]_refTable 自动改名 owner_item
+            const updated = fks.find(f => f.name === 'owner_item');
+            expect(updated).toBeDefined();
+            expect(updated!.refTable).toBe('item');
+        });
+
+        it('显式 fkName 保留原名', async () => {
+            const {updateForeignKey, fetchTableFks} = await import('./apiClient');
+            const result = await updateForeignKey('item', 'owner', {
+                table: 'item',
+                fkName: 'owner',
+                keys: ['owner'],
+                refTable: 'item',
+            });
+            expect(result.ok).toBe(true);
+            const fks = await fetchTableFks('item');
+            const updated = fks.find(f => f.name === 'owner');
+            expect(updated).toBeDefined();
+            expect(updated!.refTable).toBe('item');
+        });
+
+        it('未知 FK 返回错误', async () => {
+            const {updateForeignKey} = await import('./apiClient');
+            const result = await updateForeignKey('item', 'ghost_fk', {
+                table: 'item',
+                keys: ['owner'],
+                refTable: 'user',
+            });
+            expect(result.ok).toBe(false);
+            expect(result.errors.join('; ')).toContain('Foreign key not found');
+        });
+    });
+
+    describe('removeForeignKey', () => {
+        it('删除外键并持久化', async () => {
+            const {removeForeignKey, fetchTableFks} = await import('./apiClient');
+            const result = await removeForeignKey('item', 'owner');
+            expect(result.ok).toBe(true);
+            expect(await fetchTableFks('item')).toStrictEqual([]);
+        });
+
+        it('未知 FK 返回错误', async () => {
+            const {removeForeignKey} = await import('./apiClient');
+            const result = await removeForeignKey('item', 'ghost_fk');
+            expect(result.ok).toBe(false);
+            expect(result.errors.join('; ')).toContain('Foreign key not found');
+        });
+    });
+
+    // -----------------------------------------------------------------
     // createDataFile
     // -----------------------------------------------------------------
     describe('createDataFile', () => {

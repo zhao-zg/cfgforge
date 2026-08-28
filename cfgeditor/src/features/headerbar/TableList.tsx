@@ -4,6 +4,7 @@ import {getLastOpenIdByTable, navTo, useMyStore, useLocationData} from "@/store/
 import {useNavigate} from "react-router";
 import {Schema} from "@/domain/schema.ts";
 import {memo, useMemo, useCallback, CSSProperties} from "react";
+import {useTranslation} from "react-i18next";
 
 interface TableWithLastName {
     tableId: string;
@@ -59,6 +60,7 @@ function parseTableId(tableId: string): [string, string] {
 }
 
 export const TableList = memo(function ({schema}: { schema: Schema }) {
+    const {t} = useTranslation();
     const {curPage, curTableId} = useLocationData();
     const navigate = useNavigate();
     const {isEditMode} = useMyStore();
@@ -87,7 +89,7 @@ export const TableList = memo(function ({schema}: { schema: Schema }) {
                 options={options}
                 style={SELECT_STYLE}
                 value={curTableId}
-                placeholder="search a table"
+                placeholder={t('searchTablePlaceholder')}
                 onChange={handleChange}
         />
     );

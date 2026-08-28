@@ -36,9 +36,9 @@ export const SearchValue = memo(function SearchValue() {
 
     let content;
     if (!value) {
-        content = <Empty/>;
+        content = <Empty description={t('searchNoResult')}/>;
     } else if (searchResult == null) {
-        content = isFetching ? <Skeleton/> : <Empty/>;
+        content = isFetching ? <Skeleton/> : <Empty description={t('searchNoResult')}/>;
     } else if (searchResult.resultCode != 'ok') {
         content = <Result status="error" title={searchResult.resultCode}/>;
     } else {
@@ -54,7 +54,7 @@ export const SearchValue = memo(function SearchValue() {
     }
 
     return <>
-        <Input.Search placeholder='search value' defaultValue={query}
+        <Input.Search placeholder={t('searchPlaceholder')} defaultValue={query}
                       enterButton={t('search')}
                       size='large'
                       loading={isFetching}

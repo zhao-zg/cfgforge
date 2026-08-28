@@ -1,5 +1,5 @@
 import {describe, it, expect} from 'vitest'
-import {getLabel, getId, createRefs, createRefEntities} from './recordRefUtils.ts'
+import {getLabel, getId, getDisplayLabel, createRefs, createRefEntities} from './recordRefUtils.ts'
 import {getLastSegment} from '@/domain/strUtils.ts'
 import {Entity, EntityEdgeType, EntitySourceEdge, EntityType} from '@/domain/entityModel.ts'
 import {BriefRecord, Refs} from '@/api/recordModel.ts'
@@ -23,8 +23,8 @@ describe('getLastSegment / getLabel / getId', () => {
     })
 
     it('getLabel 对 getLabel 再取getId 的典型用法', () => {
-        // createRefEntities 中 label = getId(getLabel(table), id)
-        expect(getId(getLabel('game.Hero'), '1')).toBe('Hero_1')
+        // createRefEntities 中 label = getDisplayLabel(table, id)
+        expect(getDisplayLabel('game.Hero', '1')).toBe('Hero #1')
     })
 })
 
@@ -109,8 +109,8 @@ describe('createRefEntities', () => {
         expect(weapon).toBeDefined()
         expect(hero.entityType).toBe(EntityType.Normal)
         expect(weapon.entityType).toBe(EntityType.Ref)
-        // label = getId(getLabel(table), id)
-        expect(hero.label).toBe('Hero_1')
+        // label = getDisplayLabel(table, id)
+        expect(hero.label).toBe('Hero #1')
     })
 
     it('depth>1 标记为 Ref2，depth<0 标记为 RefIn', () => {

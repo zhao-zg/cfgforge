@@ -144,9 +144,9 @@ export const HeaderBar = memo(function ({schema, curTable}: {
                 </Tooltip>
                 {curTable ? <UnreferencedButton curTable={curTable}/> : null}
                 <Space.Compact>
-                    <Button size="small" icon={prevIcon} onClick={prev} title="alt+c"
+                    <Button size="small" icon={prevIcon} onClick={prev} title={t('historyPrev')}
                             disabled={!historyCanPrev(curTableId, curId, history)}/>
-                    <Button size="small" icon={nextIcon} onClick={next} title="alt+v" disabled={!history.canNext()}/>
+                    <Button size="small" icon={nextIcon} onClick={next} title={t('historyNext')} disabled={!history.canNext()}/>
                 </Space.Compact>
             </Space>
         </Flex>

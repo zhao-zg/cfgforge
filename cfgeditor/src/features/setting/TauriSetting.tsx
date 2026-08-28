@@ -54,23 +54,27 @@ export const TauriSetting = memo(function ({schema}: {
                   autoComplete="off">
 
                 <Form.Item name='assetDir' label={t('assetDir')}>
-                    <Input placeholder="asset dir"/>
+                    <Input placeholder={t('assetDir')}/>
                 </Form.Item>
 
                 <Form.Item name='assetRefTable' label={t('assetRefTable')}>
-                    <Input placeholder="asset ref table"/>
+                    <Input placeholder={t('assetRefTable')}/>
+                </Form.Item>
+
+                <Form.Item name='assetRefTable' label={t('assetRefTable')}>
+                    <Input placeholder={t('assetRefTable')}/>
                 </Form.Item>
 
                 <FormRowList name="resDirs" label={t('resDirs')} addText={t('addResDir')}>
                     {(name) => <>
                         <Form.Item name={[name, 'dir']} noStyle>
-                            <Input placeholder="dir"/>
+                            <Input placeholder={t('resDirPlaceholder')}/>
                         </Form.Item>
                         <Form.Item name={[name, 'txtAsSrt']} valuePropName='checked' noStyle>
                             <Checkbox>txtAsSrt</Checkbox>
                         </Form.Item>
                         <Form.Item name={[name, 'lang']} noStyle>
-                            <Input placeholder="lang"/>
+                            <Input placeholder={t('resLangPlaceholder')}/>
                         </Form.Item>
                     </>}
                 </FormRowList>

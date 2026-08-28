@@ -163,6 +163,7 @@ export function RecordRef({ schema, notes, curTable, curTableId, curPage, curId,
     // 用 curPage 判定模式（唯一标识页面），而非 curId 是否为空——
     // 这样 recordUnref 页可携带上次 record 的 curId 用于切回，不会被误判成 recordRef 模式
     const isUnrefMode = curPage === 'recordUnref';
+    const { t } = useTranslation();
 
     // 根据模式选择不同的API
     const recordRefQuery = useQuery({
@@ -181,7 +182,7 @@ export function RecordRef({ schema, notes, curTable, curTableId, curPage, curId,
     })
 
 
-    return <QueryGate query={recordRefQuery} loading={null} emptyTitle={'recordRef result empty'}>
+    return <QueryGate query={recordRefQuery} loading={null} emptyTitle={t('refIdListEmpty')}>
         {(recordRefResult) => <RecordRefWithResult schema={schema} notes={notes} curTable={curTable} curId={curId}
             nodeShow={nodeShow} recordRefResult={recordRefResult}
             inDragPanelAndFix={inDragPanelAndFix}

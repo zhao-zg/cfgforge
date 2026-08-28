@@ -20,6 +20,12 @@ export function getId(table: string, id: string): string {
     return table + "_" + id;
 }
 
+// Display label: uses '# ' separator for better readability (e.g. "Hero #1" instead of "Hero_1").
+// getId stays '_' for entity ID lookup keys; this is only for visual node titles.
+export function getDisplayLabel(table: string, id: string): string {
+    return getLabel(table) + ' #' + id;
+}
+
 function isRefIdInBriefRecords(toTable: string, toId: string, briefRecords: BriefRecord[]): boolean {
     for (const {id, table} of briefRecords) {
         if (table == toTable && id == toId) {
@@ -123,7 +129,8 @@ export function createRefEntities({
         }
 
 
-        const label = getId(getLabel(table), id);
+        const label = getDisplayLabel(table, id);
+        const resKey = getId(getLabel(table), id);
 
         const entity: Entity<RefId> = {
             id: eid,
@@ -138,7 +145,7 @@ export function createRefEntities({
             entityType: entityType,
             userData: refId,
             assets: findAllResInfos({
-                label,
+                label: resKey,
                 refs: briefRecord,
                 tauriConf,
                 resourceDir,

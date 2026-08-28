@@ -7,6 +7,7 @@ import {fetchRecordRefIds} from "@/api/apiClient.ts";
 import {queryKeys} from "@/services/queryKeys.ts";
 import {RecordRefId, RecordRefIdsResult, RefId} from "@/api/recordModel.ts";
 import {QueryGate} from "@/app/QueryGate.tsx";
+import {useTranslation} from "react-i18next";
 
 
 function rowKey(item: RecordRefId) {
@@ -17,6 +18,7 @@ function RefIdListResult({refIdsResult}: {
     refIdsResult: RecordRefIdsResult
 }) {
 
+    const {t} = useTranslation();
     const {isEditMode} = useMyStore();
     const navigate = useNavigate();
     const {curPage} = useCurPageRecordOrRecordRef();
@@ -58,7 +60,8 @@ function RefIdListResult({refIdsResult}: {
                   pagination={false}
                   virtual={refIdsResult.recordRefIds.length > 30}
                   scroll={{y: 300}}
-                  rowKey={rowKey}/>
+                  rowKey={rowKey}
+                  locale={{emptyText: t('refIdListEmpty')}}/>
 
 }
 
@@ -66,6 +69,7 @@ function RefIdListResult({refIdsResult}: {
 export const RefIdList = memo(function ({lockedId}: {
     lockedId: RefId | undefined
 }) {
+    const {t} = useTranslation();
     const {refIdsInDepth, refIdsOutDepth, refIdsMaxNode} = useMyStore();
     const {curTableId, curId} = useLocationData();
 
@@ -82,7 +86,7 @@ export const RefIdList = memo(function ({lockedId}: {
         enabled: thisTable.length > 0 && thisId.length > 0,
     })
 
-    return <QueryGate query={recordQuery} emptyTitle={'record result empty'}>
+    return <QueryGate query={recordQuery} emptyTitle={t('refIdListEmpty')}>
         {(recordResult) => <RefIdListResult refIdsResult={recordResult}/>}
     </QueryGate>;
 });

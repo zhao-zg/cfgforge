@@ -5,10 +5,12 @@ import { useNavigate } from "react-router";
 import { STable } from "@/api/schemaModel.ts";
 import { memo, useMemo, useCallback } from "react";
 import {getIdOptionsWithNew} from "@/flow/edit/shared/idOptions.tsx";
+import {useTranslation} from "react-i18next";
 
 export const IdList = memo(function ({ curTable }: {
     curTable: STable,
 }) {
+    const {t} = useTranslation();
     const navigate = useNavigate();
     const { curPage } = useCurPageRecordOrRecordRef();
     const { curTableId, curId } = useLocationData();
@@ -36,6 +38,6 @@ export const IdList = memo(function ({ curTable }: {
         options={options}
         style={{ width: 240 }}
         value={defaultCurId}
-        placeholder="search a record"
+        placeholder={t('searchRecordPlaceholder')}
         onChange={handleChange} />;
 });

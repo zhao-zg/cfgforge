@@ -48,4 +48,22 @@ export class PromptService {
     const prompt: Prompt = PromptGen.genPrompt(editor.context(), editor.cfgValue(), vTable);
     return { resultCode: 'ok', prompt: prompt.prompt, init: prompt.init };
   }
+
+  /**
+   * Async variant of gen.
+   * Uses CfgFileSystem abstraction (Tauri/WebView compatible) via PromptGen.genPromptAsync.
+   */
+  static async genAsync(editor: EditorService, table: string): Promise<PromptResult> {
+    if (!table || table.length === 0) {
+      return { resultCode: 'tableNotSet', prompt: '', init: '' };
+    }
+
+    const vTable = editor.cfgValue().getTable(table);
+    if (vTable === undefined) {
+      return { resultCode: 'tableNotFound', prompt: '', init: '', table };
+    }
+
+    const prompt: Prompt = await PromptGen.genPromptAsync(editor.context(), editor.cfgValue(), vTable);
+    return { resultCode: 'ok', prompt: prompt.prompt, init: prompt.init };
+  }
 }

@@ -2,13 +2,15 @@ import {ReadOnlyEntity} from "@/domain/entityModel.ts";
 import {TableEntityCreator, UserData} from "./tableEntityCreator.ts";
 import {navTo, useLocationData, useMyStore} from "@/store/store.ts";
 import {useNavigate, useOutletContext} from "react-router";
-// import {useReactFlow} from "reactflow";
 import {MenuItem} from "@/flow/FlowContextMenu.tsx";
 import {useTranslation} from "react-i18next";
 import {fillHandles} from "@/flow/layout/entityToNodeAndEdge.ts";
 import {getDefaultIdInTable, SchemaTableType} from "@/domain/schema.ts";
 import {useEntityToGraph} from "@/flow/useEntityToGraph.ts";
 import {EntityNode} from "@/flow/FlowGraph.tsx";
+import {edgeToFkRequest} from "@/domain/edgeToFk.ts";
+import {addForeignKey} from "@/api/apiClient.ts";
+import {invalidateAllQueries} from "@/services/queryClient.ts";
 import {memo, useCallback, useMemo, useState} from "react";
 import {RelationEditModal} from "./RelationEditModal.tsx";
 
@@ -66,7 +68,17 @@ export const Table = memo(function Table() {
         return menuItems;
     }, [curTable.name, t, navigate, getTableDefaultId]);
 
-    useEntityToGraph({type: 'table', pathname, entityMap, notes, nodeMenuFunc, paneMenu});
+    const onConnectFunc = useCallback((connection: import('@xyflow/react').Connection) => {
+        const req = edgeToFkRequest(connection, entityMap, schema);
+        if (!req) return;
+        void addForeignKey(req).then((result) => {
+            if (result.ok) {
+                invalidateAllQueries();
+            }
+        });
+    }, [entityMap, schema]);
+
+    useEntityToGraph({type: 'table', pathname, entityMap, notes, nodeMenuFunc, paneMenu, onConnectFunc});
     return (
         <>
             {relationTable !== null && (

@@ -6,6 +6,9 @@ import {MenuItem} from "@/flow/FlowContextMenu.tsx";
 import {useTranslation} from "react-i18next";
 import {SItem} from "@/api/schemaModel.ts";
 import {fillHandles} from "@/flow/layout/entityToNodeAndEdge.ts";
+import {edgeToFkRequest} from "@/domain/edgeToFk.ts";
+import {addForeignKey} from "@/api/apiClient.ts";
+import {invalidateAllQueries} from "@/services/queryClient.ts";
 import {memo, useCallback, useMemo, useState} from "react";
 import {useEntityToGraph} from "@/flow/useEntityToGraph.ts";
 import {EntityEdge, EntityNode} from "@/flow/FlowGraph.tsx";
@@ -72,6 +75,16 @@ export const TableRef = memo(function TableRef() {
         }];
     }, [t]);
 
+    const onConnectFunc = useCallback((connection: import('@xyflow/react').Connection) => {
+        const req = edgeToFkRequest(connection, entityMap, schema);
+        if (!req) return;
+        void addForeignKey(req).then((result) => {
+            if (result.ok) {
+                invalidateAllQueries();
+            }
+        });
+    }, [entityMap, schema]);
+
     useEntityToGraph({
         type: 'tableRef',
         pathname,
@@ -81,6 +94,7 @@ export const TableRef = memo(function TableRef() {
         paneMenu,
         nodeDoubleClickFunc,
         edgeMenuFunc,
+        onConnectFunc,
     });
 
     return (

@@ -1,14 +1,17 @@
 import {MenuItem} from "./FlowContextMenu.tsx";
 import {createContext} from "react";
+import type {Connection} from "@xyflow/react";
 import type {EntityEdge, NodeDoubleClickFunc, NodeMenuFunc} from "./FlowGraph.tsx";
 
 export type EdgeMenuFunc = (edge: EntityEdge) => MenuItem[];
+export type OnConnectFunc = (connection: Connection) => void;
 
 export interface FlowGraphContextType {
     setPaneMenu: (menu: MenuItem[]) => void;
     setNodeMenuFunc: (func: NodeMenuFunc) => void;
     setNodeDoubleClickFunc: (func: NodeDoubleClickFunc) => void;
     setEdgeMenuFunc: (func: EdgeMenuFunc | undefined) => void;
+    setOnConnectFunc: (func: OnConnectFunc | undefined) => void;
     // 布局失败反馈：消费端(useEntityToGraph)把 layout error 透传上来 + 登记 retry 回调，
     // FlowGraph 据此渲染 Result 覆盖层。undefined = 正常，清掉覆盖层。
     setLayoutError: (e: Error | undefined) => void;

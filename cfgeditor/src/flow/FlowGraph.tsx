@@ -7,6 +7,7 @@ import {Dispatch, memo, MouseEvent as ReactMouseEvent, ReactNode, SetStateAction
 import {FlowContextMenu, MenuItem, MenuStyle} from "./FlowContextMenu.tsx";
 import {FlowNode} from "./FlowNode.tsx";
 import {FlowGraphContext} from "./FlowGraphContext.ts";
+import type {Connection} from "@xyflow/react";
 
 // EntityNode.data 是「呈现层下发袋」：entity 是纯 domain（不可变、memo-safe），
 // nodeShow/notes 是呈现层数据，由 useEntityToGraph 经 convertNodeAndEdges 写入 node.data，
@@ -26,6 +27,7 @@ export type EntityEdge = Edge;
 export type NodeMenuFunc = (entityNode: EntityNode) => MenuItem[];
 export type NodeDoubleClickFunc = (entityNode: EntityNode) => void;
 export type EdgeMenuFunc = (edge: EntityEdge) => MenuItem[];
+export type OnConnectFunc = (connection: Connection) => void;
 
 const nodeTypes: NodeTypes = {
     node: FlowNode,
@@ -66,6 +68,7 @@ export const FlowGraph = memo(function FlowGraph({children}: {
     const [nodeMenuFunc, setNodeMenuFunc] = useState<NodeMenuFunc>();
     const [nodeDoubleClickFunc, setNodeDoubleClickFunc] = useState<NodeDoubleClickFunc>();
     const [edgeMenuFunc, setEdgeMenuFunc] = useState<EdgeMenuFunc | undefined>(undefined);
+    const [onConnectFunc, setOnConnectFunc] = useState<OnConnectFunc | undefined>(undefined);
 
     // 布局失败覆盖层：layoutError 由 useEntityToGraph 透传，retryLayout 为 invalidate 该图 layout 缓存的回调。
     const [layoutError, setLayoutError] = useState<Error | undefined>(undefined);
@@ -100,6 +103,11 @@ export const FlowGraph = memo(function FlowGraph({children}: {
         },
         [nodeDoubleClickFunc],
     );
+    const onConnect = useCallback((connection: Connection) => {
+            onConnectFunc?.(connection);
+        },
+        [onConnectFunc],
+    );
 
     const closeMenu = useCallback(() => {
         setMenuStyle(undefined)
@@ -115,10 +123,11 @@ export const FlowGraph = memo(function FlowGraph({children}: {
             setNodeMenuFunc: thisSetNodeMenuFunc,
             setNodeDoubleClickFunc: thisSetNodeDoubleClickFunc,
             setEdgeMenuFunc,
+            setOnConnectFunc,
             setLayoutError,
             setRetryLayout: thisSetRetryLayout,
         }
-    }, [setPaneMenu, thisSetNodeMenuFunc, thisSetNodeDoubleClickFunc, setEdgeMenuFunc, setLayoutError, thisSetRetryLayout]);
+    }, [setPaneMenu, thisSetNodeMenuFunc, thisSetNodeDoubleClickFunc, setEdgeMenuFunc, setOnConnectFunc, setLayoutError, thisSetRetryLayout]);
 
 
     return <ReactFlowProvider>
@@ -132,6 +141,8 @@ export const FlowGraph = memo(function FlowGraph({children}: {
                     minZoom={0.1}
                     maxZoom={2}
                     deleteKeyCode={null}
+                    nodesConnectable={!!onConnectFunc}
+                    onConnect={onConnect}
                     onNodeDoubleClick={onNodeDoubleClick}
                     onNodeContextMenu={onNodeContextMenu}
                     onEdgeContextMenu={onEdgeContextMenu}

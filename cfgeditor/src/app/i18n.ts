@@ -300,7 +300,18 @@ i18n.use(LanguageDetector)
                     fkSave: 'Save',
                     fkDeleteConfirm: 'Delete relationship "{name}"?',
                     fkEmpty: 'No relationships yet',
-                    fkLoadFail: 'Failed to load relationships'
+                    fkLoadFail: 'Failed to load relationships',
+
+                    // 字段管理（P0-2）
+                    fieldManage: 'Manage Fields',
+                    fieldManageTitle: 'Manage Fields',
+                    fieldList: 'Fields',
+                    fieldAdd: 'Add Field',
+                    fieldName: 'Field Name',
+                    fieldType: 'Type',
+                    fieldComment: 'Comment',
+                    fieldNameRequired: 'Field name is required',
+                    fieldDeleteConfirm: 'Delete field "{name}"?'
                 }
             },
             zh: {
@@ -543,6 +554,17 @@ i18n.use(LanguageDetector)
                     fkDeleteConfirm: '确定删除关系 "{name}"？',
                     fkEmpty: '暂无关系',
                     fkLoadFail: '加载关系失败',
+
+                    // 字段管理（P0-2）
+                    fieldManage: '字段管理',
+                    fieldManageTitle: '字段管理',
+                    fieldList: '字段列表',
+                    fieldAdd: '添加字段',
+                    fieldName: '字段名',
+                    fieldType: '类型',
+                    fieldComment: '注释',
+                    fieldNameRequired: '字段名不能为空',
+                    fieldDeleteConfirm: '确定删除字段 "{name}"？',
 
                     themeSetting: '主题',
                     themeMode: '外观',

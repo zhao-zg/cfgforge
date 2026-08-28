@@ -55,6 +55,9 @@ export type {
     FieldRequest,
     EnumValueRequest,
     CreateResult,
+    FieldAddRequest,
+    FieldUpdateRequest,
+    FieldMutateResult,
 } from '@cfgforge/editor-core';
 
 import type {Notes, NoteEditResult as LocalNoteEditResult} from './noteModel';

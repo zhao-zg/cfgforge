@@ -13,6 +13,7 @@ import {addForeignKey} from "@/api/apiClient.ts";
 import {invalidateAllQueries} from "@/services/queryClient.ts";
 import {memo, useCallback, useMemo, useState} from "react";
 import {RelationEditModal} from "./RelationEditModal.tsx";
+import {FieldEditModal} from "./FieldEditModal.tsx";
 
 
 export const Table = memo(function Table() {
@@ -22,6 +23,7 @@ export const Table = memo(function Table() {
     const {t} = useTranslation();
     const navigate = useNavigate();
     const [relationTable, setRelationTable] = useState<string | null>(null);
+    const [fieldTable, setFieldTable] = useState<string | null>(null);
 
     const getTableDefaultId = useCallback((tableName: string) =>
         getDefaultIdInTable(schema, tableName, curId), [schema, curId]);
@@ -65,6 +67,14 @@ export const Table = memo(function Table() {
             key: 'editRelations',
             handler: () => setRelationTable(userData.table)
         });
+        // 当前表节点：字段级编辑入口（增/删/改）
+        if (userData.table === curTable.name) {
+            menuItems.push({
+                label: `${userData.table}\n${t('fieldManage')}`,
+                key: 'editFields',
+                handler: () => setFieldTable(userData.table)
+            });
+        }
         return menuItems;
     }, [curTable.name, t, navigate, getTableDefaultId]);
 
@@ -88,6 +98,15 @@ export const Table = memo(function Table() {
                     schema={schema}
                     open
                     onClose={() => setRelationTable(null)}
+                />
+            )}
+            {fieldTable !== null && (
+                <FieldEditModal
+                    key={fieldTable}
+                    table={schema.getSTable(fieldTable)!}
+                    schema={schema}
+                    open
+                    onClose={() => setFieldTable(null)}
                 />
             )}
         </>

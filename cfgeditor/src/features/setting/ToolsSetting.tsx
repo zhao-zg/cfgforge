@@ -1,4 +1,4 @@
-import {memo, RefObject, useCallback} from "react";
+import {memo, RefObject, useCallback, useState} from "react";
 import {useNavigate} from "react-router";
 import {useTranslation} from "react-i18next";
 import {App, Button, Form, Input, InputNumber, Popconfirm, Radio, Space} from "antd";
@@ -21,6 +21,7 @@ import {PageType, navTo, useLocationData} from "@/store/store.ts";
 import {KeyShortcut} from "./KeyShortcut.tsx";
 import {toggleFullScreen} from "@/services/windowUtils.ts";
 import {SettingCard} from "./SettingCard.tsx";
+import {FieldEditModal} from "@/features/table/FieldEditModal.tsx";
 
 
 export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRef}: {
@@ -34,6 +35,7 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
     const {curPage, curTableId, curId} = useLocationData();
     const {notification} = App.useApp();
     const navigate = useNavigate();
+    const [fieldManageOpen, setFieldManageOpen] = useState(false);
 
     const deleteRecordMutation = useMutation<RecordEditResult, Error>({
         mutationFn: () => deleteRecord(curTableId, curId),
@@ -224,6 +226,23 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         <SettingCard icon={<ThunderboltOutlined/>} title={t('otherTools')}>
             <Button onClick={toggleFullScreen}> {t('toggleFullScreen')}</Button>
         </SettingCard>
+
+        {schema && curTable && schema.isEditable &&
+            <SettingCard icon={<DatabaseOutlined/>} title={t('fieldManage')}>
+                <Space>
+                    <Button onClick={() => setFieldManageOpen(true)}>{t('fieldManage')}</Button>
+                </Space>
+                {fieldManageOpen && (
+                    <FieldEditModal
+                        key={curTable.name}
+                        table={curTable}
+                        schema={schema}
+                        open
+                        onClose={() => setFieldManageOpen(false)}
+                    />
+                )}
+            </SettingCard>
+        }
 
         <SettingCard title={t('keyCode')}>
             <KeyShortcut/>

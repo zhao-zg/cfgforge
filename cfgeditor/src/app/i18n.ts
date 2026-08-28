@@ -179,6 +179,9 @@ i18n.use(LanguageDetector)
                     reloadTable: "Reload this table",
                     reloadTableSuccess: "Table {table} reloaded",
                     reloadTableFail: "Reload failed: {error}",
+                    deleteAllUnref: "Delete all unreferenced",
+                    deleteAllUnrefConfirm: "Delete all {count} unreferenced records? This cannot be undone.",
+                    deleteAllUnrefDone: "Deleted {ok} records, {fail} failed",
 
                     showDescription: "Description",
                     show: "Show",
@@ -418,6 +421,9 @@ i18n.use(LanguageDetector)
                     reloadTable: '重载此表',
                     reloadTableSuccess: '表 {table} 已重载',
                     reloadTableFail: '重载失败: {error}',
+                    deleteAllUnref: '删除全部未引用',
+                    deleteAllUnrefConfirm: '确定删除全部 {count} 条未引用记录？此操作不可撤销。',
+                    deleteAllUnrefDone: '已删除 {ok} 条，失败 {fail} 条',
 
                     showDescription: '描述',
                     show: '显示',

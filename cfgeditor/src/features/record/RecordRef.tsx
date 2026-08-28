@@ -17,6 +17,11 @@ import { useCallback, useMemo, useState } from "react";
 import { useEntityToGraph } from "@/flow/useEntityToGraph.ts";
 import { EntityNode } from "@/flow/FlowGraph.tsx";
 import { QueryGate } from "@/app/QueryGate.tsx";
+import {App, Button, Popconfirm, Space} from "antd";
+import {DeleteOutlined} from "@ant-design/icons";
+import {useMutation} from "@tanstack/react-query";
+import {deleteRecord} from "@/api/apiClient.ts";
+import {invalidateAllQueries} from "@/services/queryClient.ts";
 
 
 export function RecordRefWithResult({ schema, notes, curTable, curId, nodeShow, recordRefResult, inDragPanelAndFix, isUnrefMode }: {
@@ -32,6 +37,32 @@ export function RecordRefWithResult({ schema, notes, curTable, curId, nodeShow, 
     const [t] = useTranslation();
     const navigate = useNavigate();
     const { recordRefInShowLinkMaxNode, tauriConf, resourceDir, resMap, isEditMode } = useMyStore();
+    const { notification } = App.useApp();
+
+    // 未引用模式：批量删除全部未引用记录（串行 for...of，收集失败数）
+    const deleteAllUnrefMutation = useMutation({
+        mutationFn: async () => {
+            const refs = isUnrefMode ? (recordRefResult.refs ?? []) : [];
+            let ok = 0;
+            let fail = 0;
+            for (const ref of refs) {
+                const r = await deleteRecord(ref.table, ref.id);
+                if (r.resultCode === 'deleteOk') {
+                    ok++;
+                } else {
+                    fail++;
+                }
+            }
+            return { ok, fail };
+        },
+        onError: (error: Error) => {
+            notification.error({title: `deleteAllUnref err: ${error.message}`, placement: 'topRight', duration: 4});
+        },
+        onSuccess: ({ok, fail}) => {
+            notification.info({title: t('deleteAllUnrefDone', {ok, fail}), placement: 'topRight', duration: 3});
+            invalidateAllQueries();
+        },
+    });
 
     // Memoize checkTable function
     const checkTable = useMemo(() => {
@@ -142,7 +173,23 @@ export function RecordRefWithResult({ schema, notes, curTable, curId, nodeShow, 
         nodeShow,
     });
 
-    return null;
+    return isUnrefMode
+        ? <div style={{position: 'absolute', top: 8, right: 8, zIndex: 10}}>
+            <Space>
+                <Popconfirm
+                    title={t('deleteAllUnrefConfirm', {count: (recordRefResult.refs ?? []).length})}
+                    okText={t('delete')}
+                    cancelText={t('cancel')}
+                    okButtonProps={{danger: true}}
+                    onConfirm={() => deleteAllUnrefMutation.mutate()}
+                >
+                    <Button type="primary" danger icon={<DeleteOutlined/>}>
+                        {t('deleteAllUnref')}
+                    </Button>
+                </Popconfirm>
+            </Space>
+        </div>
+        : null;
 }
 
 const keepViewport: EditingObjectRes = { fitView: EFitView.NoChange, isEdited: false }

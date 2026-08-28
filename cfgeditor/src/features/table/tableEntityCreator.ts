@@ -160,6 +160,7 @@ export class TableEntityCreator {
                     target: eid(fk.refTable),
                     targetHandle: this.schema.getFkTargetHandle(fk),
                     type: EntityEdgeType.Ref,
+                    fkName: fk.name,
                 });
             });
         }

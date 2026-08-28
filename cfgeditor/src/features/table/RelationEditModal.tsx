@@ -42,11 +42,13 @@ const REF_TYPE_LABELS: Record<SForeignKey['refType'], string> = {
  *  用 fkName 是否为空区分新增/编辑（编辑时原名传给 validateFkDraft 豁免内联冲突）。 */
 type EditingTarget = null | { fkName: string };
 
-export const RelationEditModal = memo(function RelationEditModal({table, schema, open, onClose}: {
+export const RelationEditModal = memo(function RelationEditModal({table, schema, open, onClose, initialEditFkName}: {
     table: STable;
     schema: Schema;
     open: boolean;
     onClose: () => void;
+    /** 传入 FK 名则打开时直接进入该 FK 的编辑态（而非列表态）。 */
+    initialEditFkName?: string;
 }) {
     const {t} = useTranslation();
     const queryClient = useQueryClient();
@@ -65,7 +67,17 @@ export const RelationEditModal = memo(function RelationEditModal({table, schema,
         let cancelled = false;
         fetchTableFks(table.name)
             .then(res => {
-                if (!cancelled) setFks(res);
+                if (!cancelled) {
+                    setFks(res);
+                    // 如果传入 initialEditFkName，加载完成后直接进入该 FK 的编辑态
+                    if (initialEditFkName) {
+                        const targetFk = res.find(fk => fk.name === initialEditFkName);
+                        if (targetFk) {
+                            setDraft({...fkToDraft(targetFk)});
+                            setEditing({fkName: targetFk.name});
+                        }
+                    }
+                }
             })
             .catch((err: unknown) => {
                 if (!cancelled) setLoadError([err instanceof Error ? err.message : String(err)]);
@@ -73,7 +85,7 @@ export const RelationEditModal = memo(function RelationEditModal({table, schema,
         return () => {
             cancelled = true;
         };
-    }, [open, table.name]);
+    }, [open, table.name, initialEditFkName]);
 
     // 候选目标表：schema 全部表（除自己），供 refTable 下拉
     const refTableOptions = useMemo(

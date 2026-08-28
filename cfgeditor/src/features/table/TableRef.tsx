@@ -8,7 +8,7 @@ import {SItem} from "@/api/schemaModel.ts";
 import {fillHandles} from "@/flow/layout/entityToNodeAndEdge.ts";
 import {memo, useCallback, useMemo, useState} from "react";
 import {useEntityToGraph} from "@/flow/useEntityToGraph.ts";
-import {EntityNode} from "@/flow/FlowGraph.tsx";
+import {EntityEdge, EntityNode} from "@/flow/FlowGraph.tsx";
 import {getDefaultIdInTable, SchemaTableType} from "@/domain/schema.ts";
 import {RelationEditModal} from "./RelationEditModal.tsx";
 
@@ -19,6 +19,7 @@ export const TableRef = memo(function TableRef() {
     const {t} = useTranslation();
     const navigate = useNavigate();
     const [relationTable, setRelationTable] = useState<string | null>(null);
+    const [editFkName, setEditFkName] = useState<string | undefined>(undefined);
     // entityMap 构建含 fillHandles 副作用，React Compiler 不会 memo，需手动 useMemo
     const entityMap = useMemo(() => {
         const map = new Map<string, Entity>();
@@ -58,6 +59,19 @@ export const TableRef = memo(function TableRef() {
         }];
     }, [navigate, getTableDefaultId, t]);
 
+    const edgeMenuFunc = useCallback((edge: EntityEdge): MenuItem[] => {
+        const fkName = (edge.data as {fkName?: string} | undefined)?.fkName;
+        if (!fkName) return [];
+        return [{
+            label: `${t('fkEdit')} ${fkName}`,
+            key: 'editFk',
+            handler: () => {
+                setRelationTable(edge.source);
+                setEditFkName(fkName);
+            }
+        }];
+    }, [t]);
+
     useEntityToGraph({
         type: 'tableRef',
         pathname,
@@ -65,18 +79,23 @@ export const TableRef = memo(function TableRef() {
         notes,
         nodeMenuFunc,
         paneMenu,
-        nodeDoubleClickFunc
+        nodeDoubleClickFunc,
+        edgeMenuFunc,
     });
 
     return (
         <>
             {relationTable !== null && (
                 <RelationEditModal
-                    key={relationTable}
+                    key={`${relationTable}:${editFkName ?? ''}`}
                     table={schema.getSTable(relationTable)!}
                     schema={schema}
                     open
-                    onClose={() => setRelationTable(null)}
+                    onClose={() => {
+                        setRelationTable(null);
+                        setEditFkName(undefined);
+                    }}
+                    initialEditFkName={editFkName}
                 />
             )}
         </>

@@ -21,15 +21,15 @@ function addRefEdgesToExisting(entities: CardEntity<SItem>[], entityMap: Map<str
     for (const oldEntity of entities) {
         const item = oldEntity.userData;
         if (!item) continue; // createEntity 必设 userData，守卫仅为类型收窄
-        const directRefs = schema.getAllRefTablesByItem(item);
-        for (const ref of directRefs) {
-            if (entityMap.has(ref)) {
+        const refFks = schema.getRefFksByItem(item);
+        for (const {refTable, fkName} of refFks) {
+            if (entityMap.has(refTable)) {
                 oldEntity.sourceEdges.push({
                     sourceHandle: HANDLE_OUT,
-                    target: ref,
+                    target: refTable,
                     targetHandle: HANDLE_IN,
                     type: EntityEdgeType.Ref,
-
+                    fkName,
                 })
             }
         }
@@ -59,11 +59,15 @@ export function includeRefTables(entityMap: Map<string, Entity>, curTable: STabl
 
             refInEntity = createEntity(refInTable, ref, EntityType.RefIn);
             entityMap.set(ref, refInEntity);
+            // 从 refInTable 的 FK 列表中找到指向 curTable 的 FK 名
+            const refInFkName = refInTable.foreignKeys
+                ?.find(fk => fk.refTable === curTable.name)?.name ?? '';
             refInEntity.sourceEdges.push({
                 sourceHandle: HANDLE_OUT,
                 target: curTable.name,
                 targetHandle: HANDLE_IN,
                 type: EntityEdgeType.Ref,
+                fkName: refInFkName,
             })
 
             if (entityMap.size > maxNode / 2) {

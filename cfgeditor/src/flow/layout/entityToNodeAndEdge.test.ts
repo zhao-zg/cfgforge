@@ -133,4 +133,20 @@ describe('convertNodeAndEdges', () => {
         expect(nodes[0].data.nodeShow?.edgeColor).toBe('#CCC')
         expect(nodes[0].data.entity).toBe(a)
     })
+
+    it('edge.fkName 透传到 ReactFlow edge.data.fkName', () => {
+        const a = makeReadOnly({id: 'A', label: 'a', fields: [], sourceEdges: [
+            {sourceHandle: '@out', target: 'B', targetHandle: '@in', type: EntityEdgeType.Ref, fkName: 'fk_hero'},
+        ]})
+        const {edges} = convertNodeAndEdges({entityMap: new Map([['A', a]])})
+        expect(edges[0].data).toEqual({fkName: 'fk_hero'})
+    })
+
+    it('无 fkName 的边不产出 data 字段', () => {
+        const a = makeReadOnly({id: 'A', label: 'a', fields: [], sourceEdges: [
+            {sourceHandle: '@out', target: 'B', targetHandle: '@in', type: EntityEdgeType.Normal},
+        ]})
+        const {edges} = convertNodeAndEdges({entityMap: new Map([['A', a]])})
+        expect(edges[0].data).toBeUndefined()
+    })
 })

@@ -106,6 +106,9 @@ export function convertNodeAndEdges({entityMap, nodeShow, notes}: {
             if (edge.type == EntityEdgeType.Ref) {
                 fe.animated = true;
             }
+            if (edge.fkName) {
+                fe.data = {fkName: edge.fkName};
+            }
             edges.push(fe);
         }
     }

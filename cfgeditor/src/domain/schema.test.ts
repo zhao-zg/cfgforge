@@ -271,6 +271,59 @@ describe('getAllRefTablesByItem', () => {
     })
 })
 
+describe('getRefFksByItem', () => {
+    it('返回自身及依赖链上每个 FK 的 {refTable, fkName}', () => {
+        const weapon = makeTable('Weapon', [field('id', 'int')], {recordIds: [{id: '1'}]})
+        const cost = makeStruct('Cost', [field('w', 'int')], {
+            foreignKeys: [fk('fk_w', ['w'], 'Weapon')],
+        })
+        const hero = makeTable('Hero', [field('id', 'int'), field('c', 'Cost')], {})
+        const schema = new Schema(makeRawSchema([weapon, cost, hero]))
+        // Hero → Cost →(FK fk_w) Weapon
+        expect(schema.getRefFksByItem(hero)).toEqual(
+            expect.arrayContaining([{refTable: 'Weapon', fkName: 'fk_w'}])
+        )
+    })
+
+    it('interface 的 enumRef 以空 fkName 收集', () => {
+        const enumTbl = makeTable('EnumTbl', [field('id', 'int')], {recordIds: [{id: '1'}]})
+        const ie = makeInterface('IE', [makeStruct('A', [])], {enumRef: 'EnumTbl'})
+        const schema = new Schema(makeRawSchema([enumTbl, ie]))
+        expect(schema.getRefFksByItem(ie)).toEqual(
+            expect.arrayContaining([{refTable: 'EnumTbl', fkName: ''}])
+        )
+    })
+
+    it('无 FK 的依赖链返回空数组', () => {
+        const other = makeStruct('Other', [field('v', 'int')])
+        const s = makeStruct('S', [field('o', 'Other')])
+        const schema = new Schema(makeRawSchema([other, s]))
+        expect(schema.getRefFksByItem(s)).toEqual([])
+    })
+
+    it('多个 FK 全部收集', () => {
+        const weapon = makeTable('Weapon', [field('id', 'int')], {recordIds: [{id: '1'}]})
+        const armor = makeTable('Armor', [field('id', 'int')], {recordIds: [{id: '1'}]})
+        const hero = makeTable('Hero', [
+            field('id', 'int'),
+            field('weaponId', 'int'),
+            field('armorId', 'int'),
+        ], {
+            foreignKeys: [
+                fk('fk_weapon', ['weaponId'], 'Weapon'),
+                fk('fk_armor', ['armorId'], 'Armor'),
+            ],
+        })
+        const schema = new Schema(makeRawSchema([weapon, armor, hero]))
+        expect(schema.getRefFksByItem(hero)).toEqual(
+            expect.arrayContaining([
+                {refTable: 'Weapon', fkName: 'fk_weapon'},
+                {refTable: 'Armor', fkName: 'fk_armor'},
+            ])
+        )
+    })
+})
+
 // ---------------------------------------------------------------------------
 // 默认值
 // ---------------------------------------------------------------------------

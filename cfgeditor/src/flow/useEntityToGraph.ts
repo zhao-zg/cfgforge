@@ -5,7 +5,7 @@ import {convertNodeAndEdges} from "./layout/entityToNodeAndEdge.ts";
 import {useQuery} from "@tanstack/react-query";
 import {invalidateLayoutCache, queryKeys} from "@/services/queryKeys.ts";
 import {layoutAsync} from "./layout/layoutAsync.ts";
-import {EntityNode, NodeDoubleClickFunc, NodeMenuFunc} from "./FlowGraph.tsx";
+import {EntityNode, NodeDoubleClickFunc, NodeMenuFunc, EdgeMenuFunc} from "./FlowGraph.tsx";
 import {Entity, EditingObjectRes} from "@/domain/entityModel";
 import {MenuItem} from "./FlowContextMenu.tsx";
 import {NodePlacementStrategyType, NodeShowType} from "@/domain/storageJson";
@@ -26,6 +26,7 @@ interface FlowGraphInput {
     nodeMenuFunc: NodeMenuFunc;
     paneMenu: MenuItem[];
     nodeDoubleClickFunc?: NodeDoubleClickFunc;
+    edgeMenuFunc?: EdgeMenuFunc;
     editingObjectRes?: EditingObjectRes;
 
     setFitViewForPathname?: (pathname: string) => void;
@@ -67,6 +68,7 @@ function applyRectToNodes(nodes: EntityNode[], rectMap?: Map<string, Rect>) {
 export function useEntityToGraph({
                                      type, pathname, entityMap, notes,
                                      nodeMenuFunc, paneMenu, nodeDoubleClickFunc,
+                                     edgeMenuFunc,
                                      editingObjectRes,
                                      setFitViewForPathname, nodeShow,
                                  }: FlowGraphInput) {
@@ -150,6 +152,7 @@ export function useEntityToGraph({
             if (nodeDoubleClickFunc) {
                 flowGraph.setNodeDoubleClickFunc(nodeDoubleClickFunc)
             }
+            flowGraph.setEdgeMenuFunc(edgeMenuFunc);
             setNodes(newNodes);
             setEdges(edges);
         } else if (layoutError) {
@@ -161,7 +164,7 @@ export function useEntityToGraph({
             setNodes(spreadFallbackNodes(nodes));
             setEdges(edges);
         }
-    }, [newNodes, edges, nodeMenuFunc, paneMenu, nodeDoubleClickFunc, flowGraph,
+    }, [newNodes, edges, nodeMenuFunc, paneMenu, nodeDoubleClickFunc, edgeMenuFunc, flowGraph,
         setNodes, setEdges, layoutError, nodes]);
 
     // Effect 3：布局失败反馈。把 error 透传给 FlowGraph（渲染 Result 覆盖层 + retry 按钮），

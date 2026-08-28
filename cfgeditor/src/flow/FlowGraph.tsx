@@ -25,6 +25,7 @@ export type EntityNode = Node<EntityNodeData, "node">;
 export type EntityEdge = Edge;
 export type NodeMenuFunc = (entityNode: EntityNode) => MenuItem[];
 export type NodeDoubleClickFunc = (entityNode: EntityNode) => void;
+export type EdgeMenuFunc = (edge: EntityEdge) => MenuItem[];
 
 const nodeTypes: NodeTypes = {
     node: FlowNode,
@@ -64,6 +65,7 @@ export const FlowGraph = memo(function FlowGraph({children}: {
     const [paneMenu, setPaneMenu] = useState<MenuItem[]>([]);
     const [nodeMenuFunc, setNodeMenuFunc] = useState<NodeMenuFunc>();
     const [nodeDoubleClickFunc, setNodeDoubleClickFunc] = useState<NodeDoubleClickFunc>();
+    const [edgeMenuFunc, setEdgeMenuFunc] = useState<EdgeMenuFunc | undefined>(undefined);
 
     // 布局失败覆盖层：layoutError 由 useEntityToGraph 透传，retryLayout 为 invalidate 该图 layout 缓存的回调。
     const [layoutError, setLayoutError] = useState<Error | undefined>(undefined);
@@ -85,6 +87,14 @@ export const FlowGraph = memo(function FlowGraph({children}: {
         },
         [nodeMenuFunc, setMenuStyle, setMenuItems],
     );
+    const onEdgeContextMenu = useCallback((event: ReactMouseEvent, flowEdge: EntityEdge) => {
+            event.stopPropagation();
+            event.preventDefault();
+            setMenuStyle({top: event.clientY - 30, left: event.clientX - 30,});
+            setMenuItems(edgeMenuFunc ? edgeMenuFunc(flowEdge) : undefined);
+        },
+        [edgeMenuFunc, setMenuStyle, setMenuItems],
+    );
     const onNodeDoubleClick = useCallback((_event: ReactMouseEvent, flowNode: EntityNode) => {
             nodeDoubleClickFunc?.(flowNode);
         },
@@ -104,10 +114,11 @@ export const FlowGraph = memo(function FlowGraph({children}: {
             setPaneMenu,
             setNodeMenuFunc: thisSetNodeMenuFunc,
             setNodeDoubleClickFunc: thisSetNodeDoubleClickFunc,
+            setEdgeMenuFunc,
             setLayoutError,
             setRetryLayout: thisSetRetryLayout,
         }
-    }, [setPaneMenu, thisSetNodeMenuFunc, thisSetNodeDoubleClickFunc, setLayoutError, thisSetRetryLayout]);
+    }, [setPaneMenu, thisSetNodeMenuFunc, thisSetNodeDoubleClickFunc, setEdgeMenuFunc, setLayoutError, thisSetRetryLayout]);
 
 
     return <ReactFlowProvider>
@@ -123,6 +134,7 @@ export const FlowGraph = memo(function FlowGraph({children}: {
                     deleteKeyCode={null}
                     onNodeDoubleClick={onNodeDoubleClick}
                     onNodeContextMenu={onNodeContextMenu}
+                    onEdgeContextMenu={onEdgeContextMenu}
                     onPaneClick={closeMenu}
                     onNodeClick={closeMenu}
                     onMoveStart={closeMenu}

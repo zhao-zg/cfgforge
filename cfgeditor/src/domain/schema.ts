@@ -284,6 +284,28 @@ export class Schema {
         return res;
     }
 
+    /** 返回 item（含子结构）的所有 FK 边信息：{refTable, fkName}。
+     *  供 TableRef 视图建边时携带 fkName，使边右键菜单能定位到具体 FK。 */
+    getRefFksByItem(item: SItem): { refTable: string; fkName: string }[] {
+        const allDepIds = this.getAllDepStructs(item);
+        const allDepStructs = this.ids2items(allDepIds);
+        const res: { refTable: string; fkName: string }[] = [];
+        for (const si of allDepStructs) {
+            if (si.type === 'interface') {
+                if (si.enumRef) {
+                    res.push({refTable: si.enumRef, fkName: ''});
+                }
+            } else {
+                if (si.foreignKeys) {
+                    for (const fk of si.foreignKeys) {
+                        res.push({refTable: fk.refTable, fkName: fk.name});
+                    }
+                }
+            }
+        }
+        return res;
+    }
+
     defaultValue(sFieldable: SStruct | SInterface, visited: Set<string> = new Set()): JSONObject {
         if ('impls' in sFieldable) {
             return this.defaultValueOfInterface(sFieldable, visited);

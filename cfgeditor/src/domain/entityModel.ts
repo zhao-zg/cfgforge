@@ -266,6 +266,8 @@ export interface EntitySourceEdge {
     targetHandle: string;
     type: EntityEdgeType;
     label?: string;
+    /** FK 名（仅 Ref 边）：供边右键菜单定位到具体外键，null/undefined 表示非 FK 边。 */
+    fkName?: string;
 }
 
 /**

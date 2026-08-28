@@ -8,12 +8,12 @@ import {
     useMyStore,
 } from "@/store/store.ts";
 import {invalidateAllQueries} from "@/services/queryClient.ts";
-import {CloseOutlined, CompassOutlined, DatabaseOutlined, FileOutlined, ThunderboltOutlined} from "@ant-design/icons";
+import {CloseOutlined, CompassOutlined, DatabaseOutlined, FileOutlined, ReloadOutlined, ThunderboltOutlined} from "@ant-design/icons";
 import {Schema} from "@/domain/schema.ts";
 import {STable} from "@/api/schemaModel.ts";
 import {useMutation} from "@tanstack/react-query";
 import {RecordEditResult} from "@/api/recordModel.ts";
-import {deleteRecord, exportTable, exportAllSql} from "@/api/apiClient.ts";
+import {deleteRecord, exportTable, exportAllSql, reloadTable} from "@/api/apiClient.ts";
 import type {ExportFormat} from '@cfgforge/editor-core';
 import {toBlob} from "html-to-image";
 import {saveAs} from "file-saver";
@@ -143,6 +143,27 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         }
     }, [curTableId, notification, t, buildExportFilename]);
 
+    const onReloadTable = useCallback(async () => {
+        if (!curTableId) {
+            notification.error({title: t('selectTableHint'), duration: 3});
+            return;
+        }
+        try {
+            const result = await reloadTable(curTableId);
+            if (result.ok) {
+                notification.info({title: t('reloadTableSuccess', {table: curTableId}), duration: 3});
+                invalidateAllQueries();
+            } else {
+                notification.error({
+                    title: t('reloadTableFail', {error: result.errors.join('; ')}),
+                    duration: 4,
+                });
+            }
+        } catch (e) {
+            notification.error({title: t('reloadTableFail', {error: (e as Error).message}), duration: 4});
+        }
+    }, [curTableId, notification, t]);
+
     const onExportAllSql = useCallback(async () => {
         try {
             const result = await exportAllSql();
@@ -224,7 +245,14 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
         </SettingCard>
 
         <SettingCard icon={<ThunderboltOutlined/>} title={t('otherTools')}>
-            <Button onClick={toggleFullScreen}> {t('toggleFullScreen')}</Button>
+            <Space>
+                <Button onClick={toggleFullScreen}> {t('toggleFullScreen')}</Button>
+                <Button icon={<ReloadOutlined/>}
+                        disabled={!curTableId}
+                        onClick={onReloadTable}>
+                    {t('reloadTable')}
+                </Button>
+            </Space>
         </SettingCard>
 
         {schema && curTable && schema.isEditable &&

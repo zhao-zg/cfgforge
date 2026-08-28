@@ -88,3 +88,7 @@ export type {
   ExportAllResultCode,
   ExportAllResult,
 } from './ExportService.js';
+export { SingleTableReloadService } from './SingleTableReloadService.js';
+export type {
+  SingleTableReloadResult,
+} from './SingleTableReloadService.js';

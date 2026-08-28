@@ -23,6 +23,7 @@ import {
     NoteEditService,
     SearchService,
     ExportService,
+    SingleTableReloadService,
 } from '@cfgforge/editor-core';
 
 import type {
@@ -47,6 +48,7 @@ import type {
     ExportResult,
     ExportAllResult,
     ExportFormat,
+    SingleTableReloadResult,
 } from '@cfgforge/editor-core';
 
 // Re-export types needed by UI components ( CreateTableForm 等)
@@ -470,4 +472,19 @@ export async function exportTable(
 
 export async function exportAllSql(_signal?: AbortSignal): Promise<ExportAllResult> {
     return ExportService.exportAllSql(getEditor());
+}
+
+// ---------------------------------------------------------------------------
+// Single Table Reload API (P1-5)
+// ---------------------------------------------------------------------------
+
+/**
+ * 单表数据重载：重新读取该表的源文件（CSV/Excel），刷新该表数据。
+ * 成功后 CfgValue 快照已由服务内部更新，无需 editor.reload()。
+ */
+export async function reloadTable(
+    tableName: string,
+    _signal?: AbortSignal,
+): Promise<SingleTableReloadResult> {
+    return SingleTableReloadService.reloadTable(getEditor(), tableName);
 }

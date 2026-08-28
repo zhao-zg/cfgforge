@@ -176,6 +176,9 @@ i18n.use(LanguageDetector)
                     dataExport: "Data export",
                     imageExport: "Image export",
                     otherTools: "Other tools",
+                    reloadTable: "Reload this table",
+                    reloadTableSuccess: "Table {table} reloaded",
+                    reloadTableFail: "Reload failed: {error}",
 
                     showDescription: "Description",
                     show: "Show",
@@ -412,6 +415,9 @@ i18n.use(LanguageDetector)
                     dataExport: '数据导出',
                     imageExport: '图片导出',
                     otherTools: '其他工具',
+                    reloadTable: '重载此表',
+                    reloadTableSuccess: '表 {table} 已重载',
+                    reloadTableFail: '重载失败: {error}',
 
                     showDescription: '描述',
                     show: '显示',

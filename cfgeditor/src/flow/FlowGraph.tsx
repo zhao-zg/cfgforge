@@ -52,9 +52,9 @@ const FORM_THEME = {
 };
 
 // 「把回调函数存进 state」的同构样板收敛：必须套 () => fn，否则 React 会把 fn 当 functional updater 调用执行。
-// （nodeMenuFunc/nodeDoubleClickFunc/retryLayout 三处共用。）
-function useFnSetter<F>(setState: Dispatch<SetStateAction<F | undefined>>): (fn: F) => void {
-    return useCallback((fn: F) => setState(() => fn), [setState]);
+// （nodeMenuFunc/nodeDoubleClickFunc/edgeMenuFunc/onConnectFunc/retryLayout 五处共用。）
+function useFnSetter<F>(setState: Dispatch<SetStateAction<F | undefined>>): (fn: F | undefined) => void {
+    return useCallback((fn: F | undefined) => setState(() => fn), [setState]);
 }
 
 export const FlowGraph = memo(function FlowGraph({children}: {
@@ -115,6 +115,8 @@ export const FlowGraph = memo(function FlowGraph({children}: {
 
     const thisSetNodeMenuFunc = useFnSetter(setNodeMenuFunc);
     const thisSetNodeDoubleClickFunc = useFnSetter(setNodeDoubleClickFunc);
+    const thisSetEdgeMenuFunc = useFnSetter(setEdgeMenuFunc);
+    const thisSetOnConnectFunc = useFnSetter(setOnConnectFunc);
     const thisSetRetryLayout = useFnSetter(setRetryLayout);
 
     const ctx = useMemo(() => {
@@ -122,12 +124,12 @@ export const FlowGraph = memo(function FlowGraph({children}: {
             setPaneMenu,
             setNodeMenuFunc: thisSetNodeMenuFunc,
             setNodeDoubleClickFunc: thisSetNodeDoubleClickFunc,
-            setEdgeMenuFunc,
-            setOnConnectFunc,
+            setEdgeMenuFunc: thisSetEdgeMenuFunc,
+            setOnConnectFunc: thisSetOnConnectFunc,
             setLayoutError,
             setRetryLayout: thisSetRetryLayout,
         }
-    }, [setPaneMenu, thisSetNodeMenuFunc, thisSetNodeDoubleClickFunc, setEdgeMenuFunc, setOnConnectFunc, setLayoutError, thisSetRetryLayout]);
+    }, [setPaneMenu, thisSetNodeMenuFunc, thisSetNodeDoubleClickFunc, thisSetEdgeMenuFunc, thisSetOnConnectFunc, setLayoutError, thisSetRetryLayout]);
 
 
     return <ReactFlowProvider>

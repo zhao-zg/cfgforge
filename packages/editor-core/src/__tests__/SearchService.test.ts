@@ -183,4 +183,32 @@ describe('SearchService', () => {
     const hasNameMatch = result.items.some(i => i.fieldChain === 'name');
     expect(hasNameMatch).toBe(true);
   });
+
+  // -------------------------------------------------------------------------
+  // P1-4: 数字输入走精确匹配（而非字符串子串）
+  // -------------------------------------------------------------------------
+
+  it('P1-4 search("1001") 走数字精确匹配，不匹配字符串子串', async () => {
+    // fixture：id=1001 的记录 + name 字段包含 "1001" 子串（"x1001x"）
+    const cfg = `table item[id] (title='name') {
+  id:int;
+  name:str;
+}
+`;
+    const csv = `id,name
+id,name
+1001,x1001x
+2,y
+`;
+    writeFile(tempDir, 'config.cfg', cfg);
+    writeFile(tempDir, 'item.csv', csv);
+    const svc = await EditorService.create(tempDir);
+
+    const result = SearchService.search(svc, '1001', 30);
+    expect(result.resultCode).toBe('ok');
+    // 数字分支：只精确命中 int 字段 id=1001；name="x1001x" 不被子串匹配
+    expect(result.items.length).toBe(1);
+    expect(result.items[0].fieldChain).toBe('id');
+    expect(result.items[0].value).toBe('1001');
+  });
 });

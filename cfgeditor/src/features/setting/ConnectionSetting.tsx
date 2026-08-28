@@ -1,6 +1,6 @@
 import {memo, useCallback, useState} from "react";
 import {Button, Form, Input, Space, App} from "antd";
-import {CloudServerOutlined, RobotOutlined} from "@ant-design/icons";
+import {CloudServerOutlined, RobotOutlined, ReloadOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
 import {setDataDir, useMyStore} from "@/store/store.ts";
 import {AiSetting} from "./AiSetting.tsx";
@@ -9,6 +9,8 @@ import {isTauri} from "@tauri-apps/api/core";
 import {setDefaultFileSystem} from "@cfgforge/shared";
 import {saveDirHandle, ensurePermission, LocalFsApi} from "@/services/LocalFsApi.ts";
 import {SettingCard} from "./SettingCard.tsx";
+import {reloadEditor} from "@/api/apiClient.ts";
+import {invalidateAllQueries} from "@/services/queryClient.ts";
 
 /**
  * "数据目录" tab：
@@ -23,6 +25,20 @@ export const ConnectionSetting = memo(function ConnectionSetting() {
     const {message} = App.useApp();
     const isDesktop = isTauri();
     const [connecting, setConnecting] = useState(false);
+    const [reloading, setReloading] = useState(false);
+
+    const handleReload = useCallback(async () => {
+        try {
+            setReloading(true);
+            await reloadEditor();
+            invalidateAllQueries();
+            message.success(t('reloadSuccess'));
+        } catch (e) {
+            message.error(t('reloadFail', {error: (e as Error).message}));
+        } finally {
+            setReloading(false);
+        }
+    }, [t, message]);
 
     const handleSelectDir = useCallback(async () => {
         try {
@@ -91,6 +107,9 @@ export const ConnectionSetting = memo(function ConnectionSetting() {
                             placeholder={t('selectDataDirHint')}
                             style={{flex: 1}}
                         />
+                        <Button onClick={handleReload} loading={reloading}>
+                            <ReloadOutlined/>{t('reload')}
+                        </Button>
                         <Button onClick={handleSelectDir} loading={connecting}>
                             {t('browse')}
                         </Button>

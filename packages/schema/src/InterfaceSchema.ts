@@ -5,14 +5,14 @@
  * Has mutable enumRefTable and nullableDefaultImplStruct pointers.
  */
 
-import { AutoOrPack } from './FieldFormat';
-import type { FieldFormat } from './FieldFormat';
-import type { Metadata } from './Metadata';
-import type { StructSchema } from './StructSchema';
-import type { TableSchema } from './TableSchema';
-import { Primitive } from './FieldType';
-import { defaultNamespace, defaultLastName } from './Nameable';
-import type { Fieldable } from './interfaces';
+import { AutoOrPack } from './FieldFormat.js';
+import type { FieldFormat } from './FieldFormat.js';
+import type { Metadata } from './Metadata.js';
+import type { StructSchema } from './StructSchema.js';
+import type { TableSchema } from './TableSchema.js';
+import { Primitive } from './FieldType.js';
+import { defaultNamespace, defaultLastName } from './Nameable.js';
+import type { Fieldable } from './interfaces.js';
 
 export class InterfaceSchema implements Fieldable {
   private _enumRefTable: TableSchema | null = null;

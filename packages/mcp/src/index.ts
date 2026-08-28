@@ -1,5 +1,5 @@
-export { CfgMcpServer } from './CfgMcpServer';
-export { SchemaTool } from './SchemaTool';
-export { ReadRecordTool } from './ReadRecordTool';
-export { WriteRecordTool } from './WriteRecordTool';
-export { SearchTool } from './SearchTool';
+export { CfgMcpServer } from './CfgMcpServer.js';
+export { SchemaTool } from './SchemaTool.js';
+export { ReadRecordTool } from './ReadRecordTool.js';
+export { WriteRecordTool } from './WriteRecordTool.js';
+export { SearchTool } from './SearchTool.js';

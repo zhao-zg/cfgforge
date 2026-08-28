@@ -19,9 +19,9 @@ import { hasRef, hasRefFieldType } from '@cfgforge/schema';
 import { isEEntry, isEEnum } from '@cfgforge/schema';
 import { RefPrimary, RefUniq, RefList, isRefPrimary, isRefUniq, isRefList } from '@cfgforge/schema';
 import type { VTable } from '@cfgforge/value';
-import type { GdStructModel } from './GdStructModel';
-import type { GdInterfaceModel } from './GdInterfaceModel';
-import type { GdProcessorModel } from './GdProcessorModel';
+import type { GdStructModel } from './GdStructModel.js';
+import type { GdInterfaceModel } from './GdInterfaceModel.js';
+import type { GdProcessorModel } from './GdProcessorModel.js';
 
 // ---------------------------------------------------------------------------
 // genStruct — GenStruct.jte

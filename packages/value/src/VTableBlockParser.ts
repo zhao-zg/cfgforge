@@ -20,8 +20,8 @@ import type { BlockFieldVisitor } from '@cfgforge/schema';
 import { fieldSpan } from '@cfgforge/schema';
 import type { FieldSchema } from '@cfgforge/schema';
 
-import type { BlockParser } from './ValueParser';
-import { CellsWithRowIndex } from './ValueParser';
+import type { BlockParser } from './ValueParser.js';
+import { CellsWithRowIndex } from './ValueParser.js';
 
 // ---------------------------------------------------------------------------
 // BlockFieldInfo

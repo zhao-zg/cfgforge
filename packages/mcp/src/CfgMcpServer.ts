@@ -23,10 +23,10 @@ import { InMemoryTransport } from '@modelcontextprotocol/sdk/inMemory.js';
 import type { Transport } from '@modelcontextprotocol/sdk/shared/transport.js';
 
 import type { EditorService } from '@cfgforge/editor-core';
-import { SchemaTool } from './SchemaTool';
-import { ReadRecordTool } from './ReadRecordTool';
-import { WriteRecordTool } from './WriteRecordTool';
-import { SearchTool } from './SearchTool';
+import { SchemaTool } from './SchemaTool.js';
+import { ReadRecordTool } from './ReadRecordTool.js';
+import { WriteRecordTool } from './WriteRecordTool.js';
+import { SearchTool } from './SearchTool.js';
 
 // ---------------------------------------------------------------------------
 // CfgMcpServer

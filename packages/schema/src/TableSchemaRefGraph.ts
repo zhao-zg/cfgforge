@@ -7,13 +7,13 @@
  * Java source: configgen.schema.TableSchemaRefGraph.java (76 lines)
  */
 
-import type { CfgSchema } from './CfgSchema';
-import { TableSchema } from './TableSchema';
-import type { Nameable } from './Nameable';
-import type { Structural } from './Structural';
-import { InterfaceSchema } from './InterfaceSchema';
-import { StructSchema } from './StructSchema';
-import { findAllIncludedStructs } from './IncludedStructs';
+import type { CfgSchema } from './CfgSchema.js';
+import { TableSchema } from './TableSchema.js';
+import type { Nameable } from './Nameable.js';
+import type { Structural } from './Structural.js';
+import { InterfaceSchema } from './InterfaceSchema.js';
+import { StructSchema } from './StructSchema.js';
+import { findAllIncludedStructs } from './IncludedStructs.js';
 
 // ---------------------------------------------------------------------------
 // Refs — per-table reference info

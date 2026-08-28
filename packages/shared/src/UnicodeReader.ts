@@ -9,7 +9,7 @@
  */
 
 import * as fs from 'fs';
-import { getDefaultFileSystem } from './CfgFileSystem';
+import { getDefaultFileSystem } from './CfgFileSystem.js';
 
 const BOM_SIZE = 4;
 

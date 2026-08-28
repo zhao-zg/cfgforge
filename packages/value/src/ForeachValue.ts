@@ -31,7 +31,7 @@ import {
   VMap,
   VTable,
   CfgValue,
-} from './CfgValue';
+} from './CfgValue.js';
 
 // ---------------------------------------------------------------------------
 // ValueVisitor — full visitor interface

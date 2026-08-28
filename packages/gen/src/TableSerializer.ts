@@ -36,9 +36,9 @@ import {
 } from '@cfgforge/value';
 import { ForeachValue, type ValueVisitor } from '@cfgforge/value';
 
-import { ConfigOutput } from './ConfigOutput';
-import { StringPool } from './StringPool';
-import { LangTextPool } from './LangTextPool';
+import { ConfigOutput } from './ConfigOutput.js';
+import { StringPool } from './StringPool.js';
+import { LangTextPool } from './LangTextPool.js';
 
 export class TableSerializer implements ValueVisitor {
   constructor(

@@ -9,7 +9,7 @@
 
 import type { HeadRow } from '@cfgforge/data';
 import { HeadRows } from '@cfgforge/data';
-import type { ExplicitDir } from './ExplicitDir';
+import type { ExplicitDir } from './ExplicitDir.js';
 
 export class ContextCfg {
   readonly dataDir: string;

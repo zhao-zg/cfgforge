@@ -17,6 +17,12 @@
     "@modelcontextprotocol/sdk": "^1.30.0",
     "zod": "^4.4.3"
   },
-  "main": "./src/index.ts",
-  "private": true
+  "private": true,
+  "exports": {
+    ".": {
+      "cfgforge:src": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  }
 }

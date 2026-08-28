@@ -39,8 +39,8 @@ import type {
 import { isRefList, type RefSimple } from '@cfgforge/schema';
 import { upper1, lower1 } from '@cfgforge/shared';
 import type { VTable } from '@cfgforge/value';
-import type { GoCodeGenerator } from './GoCodeGenerator';
-import { GoName } from './GoName';
+import type { GoCodeGenerator } from './GoCodeGenerator.js';
+import { GoName } from './GoName.js';
 
 export class GoStructModel {
   readonly pkg: string;

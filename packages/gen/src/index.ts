@@ -1,11 +1,11 @@
-export { ParameterParser } from './ParameterParser';
-export type { Parameter } from './Parameter';
-export { Generator } from './Generator';
-export { GeneratorWithTag } from './GeneratorWithTag';
-export { Generators } from './Generators';
-export type { GeneratorProvider } from './Generators';
-export { JsonGenerator } from './JsonGenerator';
-export { SqlGenerator } from './SqlGenerator';
+export { ParameterParser } from './ParameterParser.js';
+export type { Parameter } from './Parameter.js';
+export { Generator } from './Generator.js';
+export { GeneratorWithTag } from './GeneratorWithTag.js';
+export { Generators } from './Generators.js';
+export type { GeneratorProvider } from './Generators.js';
+export { JsonGenerator } from './JsonGenerator.js';
+export { SqlGenerator } from './SqlGenerator.js';
 export {
   renderTableSql,
   renderTablesSql,
@@ -14,30 +14,30 @@ export {
   escapeSqlString,
   sqlColumnType,
   defaultSqlRenderOptions,
-} from './SqlRender';
-export type { SqlRenderOptions } from './SqlRender';
-export { TsCodeGenerator } from './TsCodeGenerator';
-export { CsCodeGenerator } from './CsCodeGenerator';
-export { GoCodeGenerator } from './GoCodeGenerator';
-export { JavaCodeGenerator } from './JavaCodeGenerator';
-export { JavaMapperGenerator } from './JavaMapperGenerator';
-export type { ChildModel, InitAllModel } from './JavaMapperTemplates';
-export { LuaCodeGenerator } from './LuaCodeGenerator';
-export { GdCodeGenerator } from './GdCodeGenerator';
-export { BytesGenerator } from './BytesGenerator';
-export { I18nByValueGenerator } from './I18nByValueGenerator';
-export { I18nByIdGenerator } from './I18nByIdGenerator';
-export { LangText } from './LangText';
-export { SchemaToTs } from './SchemaToTs';
-export { PromptModel, example, exampleToPrompt } from './PromptModel';
-export type { Example } from './PromptModel';
-export { DEFAULT_INIT, FIX_ERROR } from './PromptDefault';
-export { readAICfgFromFile } from './AICfg';
-export type { AICfg } from './AICfg';
-export { TableRelatedInfoFinder } from './TableRelatedInfoFinder';
-export type { RelatedInfo, TableRecordList, TableCount, ModuleRule, TableRule } from './TableRelatedInfoFinder';
-export { PromptGen } from './PromptGen';
-export type { Prompt } from './PromptGen';
-export { ByAIGenerator } from './ByAIGenerator';
-export { TsSchemaGenerator } from './TsSchemaGenerator';
-export { GenPipeline } from './GenPipeline';
+} from './SqlRender.js';
+export type { SqlRenderOptions } from './SqlRender.js';
+export { TsCodeGenerator } from './TsCodeGenerator.js';
+export { CsCodeGenerator } from './CsCodeGenerator.js';
+export { GoCodeGenerator } from './GoCodeGenerator.js';
+export { JavaCodeGenerator } from './JavaCodeGenerator.js';
+export { JavaMapperGenerator } from './JavaMapperGenerator.js';
+export type { ChildModel, InitAllModel } from './JavaMapperTemplates.js';
+export { LuaCodeGenerator } from './LuaCodeGenerator.js';
+export { GdCodeGenerator } from './GdCodeGenerator.js';
+export { BytesGenerator } from './BytesGenerator.js';
+export { I18nByValueGenerator } from './I18nByValueGenerator.js';
+export { I18nByIdGenerator } from './I18nByIdGenerator.js';
+export { LangText } from './LangText.js';
+export { SchemaToTs } from './SchemaToTs.js';
+export { PromptModel, example, exampleToPrompt } from './PromptModel.js';
+export type { Example } from './PromptModel.js';
+export { DEFAULT_INIT, FIX_ERROR } from './PromptDefault.js';
+export { readAICfgFromFile } from './AICfg.js';
+export type { AICfg } from './AICfg.js';
+export { TableRelatedInfoFinder } from './TableRelatedInfoFinder.js';
+export type { RelatedInfo, TableRecordList, TableCount, ModuleRule, TableRule } from './TableRelatedInfoFinder.js';
+export { PromptGen } from './PromptGen.js';
+export type { Prompt } from './PromptGen.js';
+export { ByAIGenerator } from './ByAIGenerator.js';
+export { TsSchemaGenerator } from './TsSchemaGenerator.js';
+export { GenPipeline } from './GenPipeline.js';

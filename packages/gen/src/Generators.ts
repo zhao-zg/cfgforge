@@ -10,9 +10,9 @@
  *   throws at runtime via a frozen copy).
  */
 
-import { ParameterParser } from './ParameterParser';
-import type { Parameter } from './Parameter';
-import type { Generator } from './Generator';
+import { ParameterParser } from './ParameterParser.js';
+import type { Parameter } from './Parameter.js';
+import type { Generator } from './Generator.js';
 import { Logger } from '@cfgforge/shared';
 
 export type GeneratorProvider = (parameter: Parameter) => Generator;

@@ -6,8 +6,8 @@
 
 import type { TableSchema } from '@cfgforge/schema';
 import { isEEnum } from '@cfgforge/schema';
-import type { CsCodeGenerator } from './CsCodeGenerator';
-import { CsName } from './CsName';
+import type { CsCodeGenerator } from './CsCodeGenerator.js';
+import { CsName } from './CsName.js';
 
 export class CsProcessorModel {
   readonly topPkg: string;

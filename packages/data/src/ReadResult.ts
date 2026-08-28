@@ -8,8 +8,8 @@
  * @param nullableAddTag optional tag like "-client" or "-server"
  */
 
-import type { DRawSheet } from './DRawSheet';
-import type { CfgDataStat } from './CfgDataStat';
+import type { DRawSheet } from './DRawSheet.js';
+import type { CfgDataStat } from './CfgDataStat.js';
 
 export class ReadResult {
   readonly sheets: OneSheet[];

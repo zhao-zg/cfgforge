@@ -5,23 +5,23 @@
  * Stored as a `_span` metadata tag.
  */
 
-import type { CfgSchema } from './CfgSchema';
-import type { CfgSchemaErrs } from './CfgSchemaErrs';
-import type { Nameable } from './Nameable';
-import type { Fieldable } from './Fieldable';
-import type { Structural } from './Structural';
-import type { FieldSchema } from './FieldSchema';
-import type { SimpleType } from './FieldType';
-import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType';
-import type { FieldFormat } from './FieldFormat';
-import { AutoOrPack, isSep, isBlock, isFix } from './FieldFormat';
-import { isMetaInt } from './Metadata';
-import { StructSchema } from './StructSchema';
-import { TableSchema } from './TableSchema';
-import { InterfaceSchema } from './InterfaceSchema';
-import { foreachFieldStructRef } from './ForeachSchema';
-import { CfgWriter } from './cfg/CfgWriter';
-import * as Errs from './CfgSchemaErrs';
+import type { CfgSchema } from './CfgSchema.js';
+import type { CfgSchemaErrs } from './CfgSchemaErrs.js';
+import type { Nameable } from './Nameable.js';
+import type { Fieldable } from './Fieldable.js';
+import type { Structural } from './Structural.js';
+import type { FieldSchema } from './FieldSchema.js';
+import type { SimpleType } from './FieldType.js';
+import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType.js';
+import type { FieldFormat } from './FieldFormat.js';
+import { AutoOrPack, isSep, isBlock, isFix } from './FieldFormat.js';
+import { isMetaInt } from './Metadata.js';
+import { StructSchema } from './StructSchema.js';
+import { TableSchema } from './TableSchema.js';
+import { InterfaceSchema } from './InterfaceSchema.js';
+import { foreachFieldStructRef } from './ForeachSchema.js';
+import { CfgWriter } from './cfg/CfgWriter.js';
+import * as Errs from './CfgSchemaErrs.js';
 
 // ---------------------------------------------------------------------------
 // Pre-calculation entry point

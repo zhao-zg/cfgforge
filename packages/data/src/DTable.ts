@@ -9,9 +9,9 @@
  *   - nullableAddTag: optional tag filter (-client, -server)
  */
 
-import type { DField } from './DField';
-import type { DCell, DRowId } from './DCell';
-import type { DRawSheet } from './DRawSheet';
+import type { DField } from './DField.js';
+import type { DCell, DRowId } from './DCell.js';
+import type { DRawSheet } from './DRawSheet.js';
 
 export class DTable {
   readonly tableName: string;

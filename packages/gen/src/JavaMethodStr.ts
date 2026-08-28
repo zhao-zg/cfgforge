@@ -10,7 +10,7 @@
 
 import type { FieldSchema, KeySchema } from '@cfgforge/schema';
 import { upper1, lower1 } from '@cfgforge/shared';
-import { typeOf, boxTypeOf, isJavaPrimitive, type TypeOpts } from './JavaTypeUtil';
+import { typeOf, boxTypeOf, isJavaPrimitive, type TypeOpts } from './JavaTypeUtil.js';
 
 /** actualParamsKey/keyClassName 的宿主类参数只需 fullName（NameableName 结构兼容） */
 export interface KeyClassNameTarget {

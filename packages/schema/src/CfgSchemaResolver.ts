@@ -14,36 +14,36 @@
  * block first-column overlap.
  */
 
-import type { CfgSchema } from './CfgSchema';
-import type { CfgSchemaErrs } from './CfgSchemaErrs';
-import * as Errs from './CfgSchemaErrs';
-import type { Nameable } from './Nameable';
-import { makeName } from './Nameable';
-import type { Fieldable } from './Fieldable';
-import type { Structural } from './Structural';
-import type { FieldType, SimpleType } from './FieldType';
-import { Primitive, FList, FMap, StructRef, isPrimitive, isStructRef, isFList, isFMap } from './FieldType';
-import { AutoOrPack, isSep } from './FieldFormat';
-import type { FieldSchema } from './FieldSchema';
-import type { ForeignKeySchema } from './ForeignKeySchema';
-import { ForeignKeySchema as ForeignKeySchemaClass } from './ForeignKeySchema';
-import { KeySchema } from './KeySchema';
-import { RefPrimary, isRefPrimary, isRefUniq, isRefList } from './RefKey';
-import type { EntryType } from './EntryType';
-import { isEEntry, isEEnum } from './EntryType';
-import { StructSchema } from './StructSchema';
-import { TableSchema } from './TableSchema';
-import { InterfaceSchema } from './InterfaceSchema';
-import { Metadata_of } from './Metadata';
-import { CfgWriter } from './cfg/CfgWriter';
-import { findFieldIndices } from './FindFieldIndex';
-import { foreachStructural, foreachFieldStructRef } from './ForeachSchema';
-import { preCalculateAllNeededSpans } from './Span';
-import { preCalculateAllHasRef } from './HasRef';
-import { preCalculateAllHasBlock } from './HasBlock';
-import { preCalculateAllHasMap } from './HasMap';
-import { preCalculateAllHasText } from './HasText';
-import { checkBlockFirstColOverlap } from './BlockFirstColOverlapChecker';
+import type { CfgSchema } from './CfgSchema.js';
+import type { CfgSchemaErrs } from './CfgSchemaErrs.js';
+import * as Errs from './CfgSchemaErrs.js';
+import type { Nameable } from './Nameable.js';
+import { makeName } from './Nameable.js';
+import type { Fieldable } from './Fieldable.js';
+import type { Structural } from './Structural.js';
+import type { FieldType, SimpleType } from './FieldType.js';
+import { Primitive, FList, FMap, StructRef, isPrimitive, isStructRef, isFList, isFMap } from './FieldType.js';
+import { AutoOrPack, isSep } from './FieldFormat.js';
+import type { FieldSchema } from './FieldSchema.js';
+import type { ForeignKeySchema } from './ForeignKeySchema.js';
+import { ForeignKeySchema as ForeignKeySchemaClass } from './ForeignKeySchema.js';
+import { KeySchema } from './KeySchema.js';
+import { RefPrimary, isRefPrimary, isRefUniq, isRefList } from './RefKey.js';
+import type { EntryType } from './EntryType.js';
+import { isEEntry, isEEnum } from './EntryType.js';
+import { StructSchema } from './StructSchema.js';
+import { TableSchema } from './TableSchema.js';
+import { InterfaceSchema } from './InterfaceSchema.js';
+import { Metadata_of } from './Metadata.js';
+import { CfgWriter } from './cfg/CfgWriter.js';
+import { findFieldIndices } from './FindFieldIndex.js';
+import { foreachStructural, foreachFieldStructRef } from './ForeachSchema.js';
+import { preCalculateAllNeededSpans } from './Span.js';
+import { preCalculateAllHasRef } from './HasRef.js';
+import { preCalculateAllHasBlock } from './HasBlock.js';
+import { preCalculateAllHasMap } from './HasMap.js';
+import { preCalculateAllHasText } from './HasText.js';
+import { checkBlockFirstColOverlap } from './BlockFirstColOverlapChecker.js';
 
 // ---------------------------------------------------------------------------
 // Visitor type for resolve_structural

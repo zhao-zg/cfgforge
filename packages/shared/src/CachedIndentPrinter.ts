@@ -6,7 +6,7 @@
  * 后续 gen 包如需要再补）。
  */
 
-import { CachedFiles } from './CachedFiles';
+import { CachedFiles } from './CachedFiles.js';
 
 export class CachedIndentPrinter {
   private filePath: string;

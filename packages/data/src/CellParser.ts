@@ -13,12 +13,12 @@
  * After parsing, each sheet's raw rows are cleared to free memory.
  */
 
-import type { DTable } from './DTable';
-import type { CfgDataStat } from './CfgDataStat';
-import type { DRawSheet } from './DRawSheet';
-import type { DRawRow } from './DRawRow';
-import { DCell } from './DCell';
-import { DRowId } from './DRowId';
+import type { DTable } from './DTable.js';
+import type { CfgDataStat } from './CfgDataStat.js';
+import type { DRawSheet } from './DRawSheet.js';
+import type { DRawRow } from './DRawRow.js';
+import { DCell } from './DCell.js';
+import { DRowId } from './DRowId.js';
 
 export class CellParser {
 

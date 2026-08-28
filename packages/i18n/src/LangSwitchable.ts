@@ -11,9 +11,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { getDefaultFileSystem } from '@cfgforge/shared';
-import { LangTextFinder } from './LangTextFinder';
-import { TextByValueFinder } from './TextByValueFinder';
-import { TextByIdFinder } from './TextByIdFinder';
+import { LangTextFinder } from './LangTextFinder.js';
+import { TextByValueFinder } from './TextByValueFinder.js';
+import { TextByIdFinder } from './TextByIdFinder.js';
 
 export class LangSwitchable {
   readonly langMap: Map<string, LangTextFinder>;

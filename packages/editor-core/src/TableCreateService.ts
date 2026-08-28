@@ -43,7 +43,7 @@ import {
   fieldSpan,
 } from '@cfgforge/schema';
 import { writeCSVToFile, writeCSVToFileAsync, getDefaultFileSystem } from '@cfgforge/shared';
-import type { EditorService } from './EditorService';
+import type { EditorService } from './EditorService.js';
 
 // ---------------------------------------------------------------------------
 // Types

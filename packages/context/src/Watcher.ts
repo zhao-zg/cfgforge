@@ -19,7 +19,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { getFileFormat, isFileIgnored, FileFmt, getTableNameIfTableDirForJson } from '@cfgforge/data';
-import type { ExplicitDir } from './ExplicitDir';
+import type { ExplicitDir } from './ExplicitDir.js';
 
 export class Watcher {
   private readonly _rootDir: string;

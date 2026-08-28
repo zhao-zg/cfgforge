@@ -18,8 +18,8 @@ import {
   VText,
   type VTable,
   type CfgValue,
-} from './CfgValue';
-import { ValueUtil } from './ValueUtil';
+} from './CfgValue.js';
+import { ValueUtil } from './ValueUtil.js';
 import type { TableSchema } from '@cfgforge/schema';
 import { isEEntry, isEEnum } from '@cfgforge/schema';
 

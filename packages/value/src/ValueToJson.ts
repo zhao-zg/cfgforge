@@ -30,9 +30,9 @@ import {
   VList,
   VMap,
   type CfgValue,
-} from './CfgValue';
-import { ValueDefault } from './ValueDefault';
-import { ValueRefCollector, type RefId, type FieldRef } from './ValueRefCollector';
+} from './CfgValue.js';
+import { ValueDefault } from './ValueDefault.js';
+import { ValueRefCollector, type RefId, type FieldRef } from './ValueRefCollector.js';
 
 export class ValueToJson {
   private readonly cfgValue: CfgValue | null;
@@ -164,7 +164,7 @@ export class ValueToJson {
 // Helpers: Map/Set lookup using valueEquals (TS Map uses ===, not equals/hashCode)
 // ---------------------------------------------------------------------------
 
-import { valueEquals } from './CfgValue';
+import { valueEquals } from './CfgValue.js';
 
 function mapHasKey(map: Map<SimpleValue, unknown>, key: SimpleValue): boolean {
   for (const k of map.keys()) {

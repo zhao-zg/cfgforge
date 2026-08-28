@@ -29,7 +29,7 @@ import {
 } from '@cfgforge/data';
 import { getCodeName, getDefaultFileSystem } from '@cfgforge/shared';
 import { join as pathJoin, relative as pathRelative, basename as pathBasename } from '@cfgforge/shared';
-import type { ExplicitDir } from './ExplicitDir';
+import type { ExplicitDir } from './ExplicitDir.js';
 
 // ---------------------------------------------------------------------------
 // JsonFileList — internal per-table JSON file collection

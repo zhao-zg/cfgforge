@@ -8,10 +8,10 @@
  *           fieldNameSet(), updateFieldType(), addForeignKey()
  */
 
-import type { Nameable } from './Nameable';
-import type { FieldSchema } from './FieldSchema';
-import type { ForeignKeySchema } from './ForeignKeySchema';
-import type { FieldType } from './FieldType';
+import type { Nameable } from './Nameable.js';
+import type { FieldSchema } from './FieldSchema.js';
+import type { ForeignKeySchema } from './ForeignKeySchema.js';
+import type { FieldType } from './FieldType.js';
 
 export interface Structural extends Nameable {
   fields(): FieldSchema[];

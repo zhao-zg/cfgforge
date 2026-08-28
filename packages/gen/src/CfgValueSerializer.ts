@@ -15,10 +15,10 @@ import type { LangSwitchableRuntime } from '@cfgforge/i18n';
 import { CfgValue, VTable } from '@cfgforge/value';
 import { Logger } from '@cfgforge/shared';
 
-import { ConfigOutput } from './ConfigOutput';
-import { StringPool } from './StringPool';
-import { LangTextPool } from './LangTextPool';
-import { TableSerializer } from './TableSerializer';
+import { ConfigOutput } from './ConfigOutput.js';
+import { StringPool } from './StringPool.js';
+import { LangTextPool } from './LangTextPool.js';
+import { TableSerializer } from './TableSerializer.js';
 
 export class CfgValueSerializer {
   constructor(

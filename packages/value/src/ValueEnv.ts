@@ -11,7 +11,7 @@ import type { CfgSchema } from '@cfgforge/schema';
 import type { CfgData } from '@cfgforge/data';
 import type { HeadRow } from '@cfgforge/data';
 import type { JsonTableFiles } from '@cfgforge/data';
-import type { LangTextFinder } from './LangTextFinder';
+import type { LangTextFinder } from './LangTextFinder.js';
 
 export class ValueEnv {
   constructor(

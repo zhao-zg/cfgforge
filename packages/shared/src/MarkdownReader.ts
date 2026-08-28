@@ -6,8 +6,8 @@
  */
 
 import * as fs from 'fs';
-import { readFromBuffer } from './UnicodeReader';
-import { getDefaultFileSystem } from './CfgFileSystem';
+import { readFromBuffer } from './UnicodeReader.js';
+import { getDefaultFileSystem } from './CfgFileSystem.js';
 
 export interface MarkdownDocument {
   frontmatter: Map<string, string>;

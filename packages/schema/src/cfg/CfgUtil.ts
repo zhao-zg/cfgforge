@@ -18,10 +18,10 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { CfgSchema } from '../CfgSchema';
+import { CfgSchema } from '../CfgSchema.js';
 import { getCodeName, getDefaultFileSystem } from '@cfgforge/shared';
 import { join as pathJoin, dirname as pathDirname, relative as pathRelative } from '@cfgforge/shared';
-import type { CfgFileInfo } from '../CfgSchemas';
+import type { CfgFileInfo } from '../CfgSchemas.js';
 
 export class CfgUtil {
 

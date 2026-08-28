@@ -1,12 +1,12 @@
-export * from './cfg/CfgLexer';
-export * from './cfg/AstNode';
-export * from './cfg/CfgParser';
-export * from './FieldType';
-export * from './FieldFormat';
-export type { Fieldable } from './Fieldable';
-export type { Structural } from './Structural';
-export type { Nameable } from './Nameable';
-export { makeName, defaultNamespace, defaultLastName } from './Nameable';
+export * from './cfg/CfgLexer.js';
+export * from './cfg/AstNode.js';
+export * from './cfg/CfgParser.js';
+export * from './FieldType.js';
+export * from './FieldFormat.js';
+export type { Fieldable } from './Fieldable.js';
+export type { Structural } from './Structural.js';
+export type { Nameable } from './Nameable.js';
+export { makeName, defaultNamespace, defaultLastName } from './Nameable.js';
 export {
   Metadata,
   Metadata_of,
@@ -24,7 +24,7 @@ export {
   isMetaStr,
   isMetaComment,
   isMetaEnumValues,
-} from './Metadata';
+} from './Metadata.js';
 export type {
   MetaValue,
   MetaInt,
@@ -36,44 +36,44 @@ export type {
   MetaEnumValuesOfAssigned,
   EnumValueEmpty,
   EnumValueAssigned,
-} from './Metadata';
-export { KeySchema } from './KeySchema';
-export { FieldSchema } from './FieldSchema';
-export { ForeignKeySchema } from './ForeignKeySchema';
-export type { EntryType } from './EntryType';
-export { ENo, EEntry, EEnum, isENo, isEEntry, isEEnum } from './EntryType';
-export type { RefKey, RefSimple } from './RefKey';
-export { RefPrimary, RefUniq, RefList, isRefPrimary, isRefUniq, isRefList } from './RefKey';
-export { StructSchema } from './StructSchema';
-export { TableSchema } from './TableSchema';
-export { InterfaceSchema } from './InterfaceSchema';
-export { CfgSchema } from './CfgSchema';
-export { CommentData } from './CommentData';
-export { CfgReader } from './cfg/CfgReader';
-export { decodeComment } from './cfg/CfgReader';
-export { CfgWriter } from './cfg/CfgWriter';
+} from './Metadata.js';
+export { KeySchema } from './KeySchema.js';
+export { FieldSchema } from './FieldSchema.js';
+export { ForeignKeySchema } from './ForeignKeySchema.js';
+export type { EntryType } from './EntryType.js';
+export { ENo, EEntry, EEnum, isENo, isEEntry, isEEnum } from './EntryType.js';
+export type { RefKey, RefSimple } from './RefKey.js';
+export { RefPrimary, RefUniq, RefList, isRefPrimary, isRefUniq, isRefList } from './RefKey.js';
+export { StructSchema } from './StructSchema.js';
+export { TableSchema } from './TableSchema.js';
+export { InterfaceSchema } from './InterfaceSchema.js';
+export { CfgSchema } from './CfgSchema.js';
+export { CommentData } from './CommentData.js';
+export { CfgReader } from './cfg/CfgReader.js';
+export { decodeComment } from './cfg/CfgReader.js';
+export { CfgWriter } from './cfg/CfgWriter.js';
 // T2.21: re-export CfgSchemaErrs and all error factory functions/interfaces
-export * from './CfgSchemaErrs';
+export * from './CfgSchemaErrs.js';
 // T2.12-T2.17: CfgSchemaResolver and related modules
-export { CfgSchemaResolver } from './CfgSchemaResolver';
-export * from './ForeachSchema';
-export { findFieldIndices, findFieldIndex, findFieldIndexByName } from './FindFieldIndex';
-export { checkAnyOk, findAllIncludedStructs } from './IncludedStructs';
-export type { CheckResult } from './IncludedStructs';
-export type { Checker } from './IncludedStructs';
-export { preCalculateAllNeededSpans, span, fieldSpan, simpleTypeSpan } from './Span';
-export { preCalculateAllHasRef, hasRef, hasRefFieldType } from './HasRef';
-export { preCalculateAllHasBlock, hasBlock } from './HasBlock';
-export { preCalculateAllHasMap, hasMap } from './HasMap';
-export { preCalculateAllHasText, hasText } from './HasText';
-export { walkBlockAncestors } from './BlockAncestorWalker';
-export type { BlockFieldVisitor } from './BlockAncestorWalker';
-export { checkBlockFirstColOverlap } from './BlockFirstColOverlapChecker';
-export { CfgSchemaFilterByTag } from './CfgSchemaFilterByTag';
-export { CfgSchemas } from './CfgSchemas';
-export type { CfgFileInfo } from './CfgSchemas';
-export { XmlReader } from './cfg/XmlReader';
-export type { XmlElement } from './cfg/XmlReader';
-export { CfgUtil } from './cfg/CfgUtil';
-export { TableSchemaRefGraph } from './TableSchemaRefGraph';
-export type { Refs } from './TableSchemaRefGraph';
+export { CfgSchemaResolver } from './CfgSchemaResolver.js';
+export * from './ForeachSchema.js';
+export { findFieldIndices, findFieldIndex, findFieldIndexByName } from './FindFieldIndex.js';
+export { checkAnyOk, findAllIncludedStructs } from './IncludedStructs.js';
+export type { CheckResult } from './IncludedStructs.js';
+export type { Checker } from './IncludedStructs.js';
+export { preCalculateAllNeededSpans, span, fieldSpan, simpleTypeSpan } from './Span.js';
+export { preCalculateAllHasRef, hasRef, hasRefFieldType } from './HasRef.js';
+export { preCalculateAllHasBlock, hasBlock } from './HasBlock.js';
+export { preCalculateAllHasMap, hasMap } from './HasMap.js';
+export { preCalculateAllHasText, hasText } from './HasText.js';
+export { walkBlockAncestors } from './BlockAncestorWalker.js';
+export type { BlockFieldVisitor } from './BlockAncestorWalker.js';
+export { checkBlockFirstColOverlap } from './BlockFirstColOverlapChecker.js';
+export { CfgSchemaFilterByTag } from './CfgSchemaFilterByTag.js';
+export { CfgSchemas } from './CfgSchemas.js';
+export type { CfgFileInfo } from './CfgSchemas.js';
+export { XmlReader } from './cfg/XmlReader.js';
+export type { XmlElement } from './cfg/XmlReader.js';
+export { CfgUtil } from './cfg/CfgUtil.js';
+export { TableSchemaRefGraph } from './TableSchemaRefGraph.js';
+export type { Refs } from './TableSchemaRefGraph.js';

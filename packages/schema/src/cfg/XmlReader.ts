@@ -17,23 +17,23 @@
 import { XMLParser } from 'fast-xml-parser';
 import * as path from 'path';
 import { Logger } from '@cfgforge/shared';
-import { CfgSchema } from '../CfgSchema';
-import { CfgUtil } from './CfgUtil';
-import type { CfgFileInfo } from '../CfgSchemas';
-import { TableSchema } from '../TableSchema';
-import { StructSchema } from '../StructSchema';
-import { InterfaceSchema } from '../InterfaceSchema';
-import { FieldSchema } from '../FieldSchema';
-import { ForeignKeySchema } from '../ForeignKeySchema';
-import { KeySchema } from '../KeySchema';
-import { EntryType, ENo, EEntry, EEnum } from '../EntryType';
-import { RefKey, RefPrimary, RefUniq, RefList } from '../RefKey';
-import { FieldType, Primitive, StructRef, FList, FMap, SimpleType } from '../FieldType';
-import { FieldFormat, AutoOrPack, Sep, Fix, Block } from '../FieldFormat';
-import { Metadata, Metadata_of, metaStr, metaInt } from '../Metadata';
-import { CommentData } from '../CommentData';
-import type { Fieldable } from '../Fieldable';
-import type { Nameable } from '../Nameable';
+import { CfgSchema } from '../CfgSchema.js';
+import { CfgUtil } from './CfgUtil.js';
+import type { CfgFileInfo } from '../CfgSchemas.js';
+import { TableSchema } from '../TableSchema.js';
+import { StructSchema } from '../StructSchema.js';
+import { InterfaceSchema } from '../InterfaceSchema.js';
+import { FieldSchema } from '../FieldSchema.js';
+import { ForeignKeySchema } from '../ForeignKeySchema.js';
+import { KeySchema } from '../KeySchema.js';
+import { EntryType, ENo, EEntry, EEnum } from '../EntryType.js';
+import { RefKey, RefPrimary, RefUniq, RefList } from '../RefKey.js';
+import { FieldType, Primitive, StructRef, FList, FMap, SimpleType } from '../FieldType.js';
+import { FieldFormat, AutoOrPack, Sep, Fix, Block } from '../FieldFormat.js';
+import { Metadata, Metadata_of, metaStr, metaInt } from '../Metadata.js';
+import { CommentData } from '../CommentData.js';
+import type { Fieldable } from '../Fieldable.js';
+import type { Nameable } from '../Nameable.js';
 
 // ---------------------------------------------------------------------------
 // XmlElement — normalized representation of a parsed XML element

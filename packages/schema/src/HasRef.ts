@@ -4,16 +4,16 @@
  * Pre-calculates whether each Nameable has foreign key references.
  */
 
-import type { CfgSchema } from './CfgSchema';
-import type { Nameable } from './Nameable';
-import type { FieldType, SimpleType } from './FieldType';
-import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType';
-import { StructSchema } from './StructSchema';
-import { TableSchema } from './TableSchema';
-import type { Structural } from './Structural';
-import { isMetaInt } from './Metadata';
-import { foreachNameable } from './ForeachSchema';
-import { checkAnyOk, CheckResult } from './IncludedStructs';
+import type { CfgSchema } from './CfgSchema.js';
+import type { Nameable } from './Nameable.js';
+import type { FieldType, SimpleType } from './FieldType.js';
+import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType.js';
+import { StructSchema } from './StructSchema.js';
+import { TableSchema } from './TableSchema.js';
+import type { Structural } from './Structural.js';
+import { isMetaInt } from './Metadata.js';
+import { foreachNameable } from './ForeachSchema.js';
+import { checkAnyOk, CheckResult } from './IncludedStructs.js';
 
 export function preCalculateAllHasRef(schema: CfgSchema): void {
   foreachNameable(calcHasRef, schema);

@@ -51,7 +51,7 @@ import {
   enumFieldNameOf,
   pascalNameOf,
   type TypeOpts,
-} from './JavaTypeUtil';
+} from './JavaTypeUtil.js';
 
 // Pure parameterized utilities re-exported for reuse (e.g. javamapper generator).
 export {
@@ -62,7 +62,7 @@ export {
   upperStartSegments,
   isJavaPrimitive,
   type TypeOpts,
-} from './JavaTypeUtil';
+} from './JavaTypeUtil.js';
 export {
   actualParams,
   actualParamsKeyRaw,
@@ -70,8 +70,8 @@ export {
   hashCodes,
   equalsExpr,
   equal,
-} from './JavaMethodStr';
-import { formalParams as formalParamsOf, actualParamsKey as actualParamsKeyOf, keyClassNameOf } from './JavaMethodStr';
+} from './JavaMethodStr.js';
+import { formalParams as formalParamsOf, actualParamsKey as actualParamsKeyOf, keyClassNameOf } from './JavaMethodStr.js';
 
 // ---------------------------------------------------------------------------
 // Static state — set by JavaCodeGenerator.generate() before rendering

@@ -33,8 +33,8 @@ import {
   span,
   simpleTypeSpan,
 } from '@cfgforge/schema';
-import { RecordBlock } from './RecordBlock';
-import { ValueToSepStr } from './ValueToSepStr';
+import { RecordBlock } from './RecordBlock.js';
+import { ValueToSepStr } from './ValueToSepStr.js';
 
 /**
  * Return type for the internal mapping methods.

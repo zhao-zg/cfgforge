@@ -32,8 +32,8 @@ import {
 } from '@cfgforge/schema';
 import { StructSchema as StructSchemaClass } from '@cfgforge/schema';
 import { removeLineSep, upper1 } from '@cfgforge/shared';
-import { StructModel } from './StructModel';
-import type { TsCodeGenerator } from './TsCodeGenerator';
+import { StructModel } from './StructModel.js';
+import type { TsCodeGenerator } from './TsCodeGenerator.js';
 
 // ---------------------------------------------------------------------------
 // 1. genMapGetBy (GenMapGetBy.jte)

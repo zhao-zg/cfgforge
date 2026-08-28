@@ -9,12 +9,12 @@
  * (header is vertical, transposed).
  */
 
-import type { DTable } from './DTable';
-import { DField } from './DField';
-import type { DRawSheet } from './DRawSheet';
-import type { CfgDataStat } from './CfgDataStat';
-import type { HeadRow } from './HeadRows';
-import { HeadRows } from './HeadRows';
+import type { DTable } from './DTable.js';
+import { DField } from './DField.js';
+import type { DRawSheet } from './DRawSheet.js';
+import type { CfgDataStat } from './CfgDataStat.js';
+import type { HeadRow } from './HeadRows.js';
+import { HeadRows } from './HeadRows.js';
 
 // Minimal CfgSchemaErrs interface to avoid schema dependency
 interface CfgSchemaErrsLike {

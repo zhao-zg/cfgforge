@@ -14,11 +14,11 @@ import * as path from 'path';
 import type { Context } from '@cfgforge/context';
 import type { CfgValue, VTable } from '@cfgforge/value';
 import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfgforge/shared';
-import { SchemaToTs } from './SchemaToTs';
-import { TableRelatedInfoFinder } from './TableRelatedInfoFinder';
-import type { ModuleRule, TableRule } from './TableRelatedInfoFinder';
-import { PromptModel } from './PromptModel';
-import { DEFAULT_INIT } from './PromptDefault';
+import { SchemaToTs } from './SchemaToTs.js';
+import { TableRelatedInfoFinder } from './TableRelatedInfoFinder.js';
+import type { ModuleRule, TableRule } from './TableRelatedInfoFinder.js';
+import { PromptModel } from './PromptModel.js';
+import { DEFAULT_INIT } from './PromptDefault.js';
 
 // ---------------------------------------------------------------------------
 // Prompt result

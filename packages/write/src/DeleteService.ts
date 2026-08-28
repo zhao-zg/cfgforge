@@ -23,7 +23,7 @@
 import type { Context } from '@cfgforge/context';
 import type { CfgValue, Value, VStruct } from '@cfgforge/value';
 import { CfgValueErrs, ValuePack, valueEquals } from '@cfgforge/value';
-import { VTableStorage, VTableJsonStorage, ValueUpdater } from './index';
+import { VTableStorage, VTableJsonStorage, ValueUpdater } from './index.js';
 import { Logger } from '@cfgforge/shared';
 
 export enum DeleteErrorCode {

@@ -8,10 +8,10 @@
 
 import * as path from 'path';
 import type { Context } from '@cfgforge/context';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
 import { CachedIndentPrinter } from '@cfgforge/shared';
-import { SchemaToTs } from './SchemaToTs';
+import { SchemaToTs } from './SchemaToTs.js';
 
 export class TsSchemaGenerator extends GeneratorWithTag {
   private readonly table: string;

@@ -5,15 +5,15 @@
  * list/map field. Passes the set of outer ancestor block start columns.
  */
 
-import type { Structural } from './Structural';
-import type { FieldSchema } from './FieldSchema';
-import type { Fieldable } from './Fieldable';
-import type { SimpleType } from './FieldType';
-import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType';
-import { AutoOrPack, isSep, isBlock } from './FieldFormat';
-import { StructSchema } from './StructSchema';
-import { InterfaceSchema } from './InterfaceSchema';
-import { fieldSpan, simpleTypeSpan } from './Span';
+import type { Structural } from './Structural.js';
+import type { FieldSchema } from './FieldSchema.js';
+import type { Fieldable } from './Fieldable.js';
+import type { SimpleType } from './FieldType.js';
+import { isStructRef, isFList, isFMap, isPrimitive } from './FieldType.js';
+import { AutoOrPack, isSep, isBlock } from './FieldFormat.js';
+import { StructSchema } from './StructSchema.js';
+import { InterfaceSchema } from './InterfaceSchema.js';
+import { fieldSpan, simpleTypeSpan } from './Span.js';
 
 export interface BlockFieldVisitor {
   onBlockField(structural: Structural, field: FieldSchema, startCol: number, outerAncestors: Set<number>): void;

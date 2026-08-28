@@ -16,7 +16,7 @@
 
 import type { Context } from '@cfgforge/context';
 import { CachedFiles, Logger } from '@cfgforge/shared';
-import type { Generator } from './Generator';
+import type { Generator } from './Generator.js';
 
 export const GenPipeline = {
   /**

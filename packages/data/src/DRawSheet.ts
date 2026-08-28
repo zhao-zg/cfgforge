@@ -11,7 +11,7 @@
  * @param fieldIndices      indices of program-use columns (filled by HeadParser)
  */
 
-import type { DRawRow } from './DRawRow';
+import type { DRawRow } from './DRawRow.js';
 
 export class DRawSheet {
   readonly relativeFilePath: string;

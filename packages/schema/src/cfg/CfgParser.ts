@@ -31,14 +31,14 @@
  *   suffix_comment: COMMENT
  */
 
-import { CfgLexer, TokenType, Token } from './CfgLexer';
+import { CfgLexer, TokenType, Token } from './CfgLexer.js';
 import {
   SchemaAst, StructDeclAst, InterfaceDeclAst, TableDeclAst, EnumDeclAst,
   FieldDeclAst, ForeignDeclAst, KeyDeclAst, EnumValueEmptyAst, EnumValueAssignedAst,
   FieldTypeAst, FieldTypeEleAst, MetadataAst, MetaEntryAst, MetaValueAst,
   RefAst, KeyAst,
   commentFromFull, commentFromLeadingTrailing,
-} from './AstNode';
+} from './AstNode.js';
 
 export class ParseError extends Error {
   constructor(message: string, public line: number, public column: number) {

@@ -11,7 +11,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { getDefaultFileSystem } from './CfgFileSystem';
+import { getDefaultFileSystem } from './CfgFileSystem.js';
 
 export function moveDirFilesToAnotherDir(from: string, to: string): void {
   if (fs.existsSync(to) && fs.statSync(to).isDirectory()) {

@@ -19,9 +19,9 @@
  * Java source: configgen.gen.WatchAndPostRun.java (256 lines)
  */
 
-import { Context } from './Context';
-import { Watcher } from './Watcher';
-import { WaitWatcher } from './WaitWatcher';
+import { Context } from './Context.js';
+import { Watcher } from './Watcher.js';
+import { WaitWatcher } from './WaitWatcher.js';
 
 export interface PostRunCallback {
   onNewContextLoaded(newContext: Context): void;

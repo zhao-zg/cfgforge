@@ -9,7 +9,7 @@
  *     RefList (record: key)
  */
 
-import { KeySchema } from './KeySchema';
+import { KeySchema } from './KeySchema.js';
 
 // ---------------------------------------------------------------------------
 // RefPrimary

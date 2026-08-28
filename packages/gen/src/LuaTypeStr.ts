@@ -24,14 +24,14 @@ import { isEEntry } from '@cfgforge/schema';
 import { CfgWriter } from '@cfgforge/schema';
 import { lower1 } from '@cfgforge/shared';
 import type { VTable } from '@cfgforge/value';
-import type { LuaAContext } from './LuaAContext';
-import type { LuaCtx } from './LuaCtx';
+import type { LuaAContext } from './LuaAContext.js';
+import type { LuaCtx } from './LuaCtx.js';
 import {
   luaFullName, luaRefName,
   luaUniqueKeyGetByName, luaUniqueKeyGetByFieldNames,
   luaUniqueKeyMapName,
   primaryKeyMapName, primaryKeyGetName,
-} from './LuaName';
+} from './LuaName.js';
 
 // ---------------------------------------------------------------------------
 // packBool helpers

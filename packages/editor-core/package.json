@@ -17,6 +17,12 @@
     "@cfgforge/context": "workspace:*",
     "@cfgforge/gen": "workspace:*"
   },
-  "main": "./src/index.ts",
-  "private": true
+  "private": true,
+  "exports": {
+    ".": {
+      "cfgforge:src": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  }
 }

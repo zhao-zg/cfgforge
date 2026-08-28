@@ -10,8 +10,8 @@
  *   "absent" (null) from "empty value" ('').
  */
 
-import type { Parameter } from './Parameter';
-import { Generator } from './Generator';
+import type { Parameter } from './Parameter.js';
+import { Generator } from './Generator.js';
 
 export abstract class GeneratorWithTag extends Generator {
   protected tag: string | null;

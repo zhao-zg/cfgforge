@@ -17,6 +17,12 @@
     "@cfgforge/write": "workspace:*",
     "xlsx": "^0.18.5"
   },
-  "main": "./src/index.ts",
-  "private": true
+  "private": true,
+  "exports": {
+    ".": {
+      "cfgforge:src": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  }
 }

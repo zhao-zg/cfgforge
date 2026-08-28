@@ -21,8 +21,8 @@ import {
   VStruct, VInterface, VList, VMap,
 } from '@cfgforge/value';
 import { TextValue } from '@cfgforge/value';
-import type { LuaAContext } from './LuaAContext';
-import { LuaCtxName } from './LuaName';
+import type { LuaAContext } from './LuaAContext.js';
+import { LuaCtxName } from './LuaName.js';
 
 // ---------------------------------------------------------------------------
 // HasSubFieldable — check if a Structural has StructRef fields

@@ -13,7 +13,7 @@
 import { ParameterParser } from '@cfgforge/gen';
 import type { Parameter } from '@cfgforge/gen';
 import { Logger } from '@cfgforge/shared';
-import type { Tool } from './Tool';
+import type { Tool } from './Tool.js';
 
 export type ToolProvider = (parameter: Parameter) => Tool;
 

@@ -8,7 +8,7 @@
  * interface and implementing classes will be implemented in T2.9.
  */
 
-import type { Nameable } from './Nameable';
+import type { Nameable } from './Nameable.js';
 
 /**
  * Fieldable — TypeScript port of Java `configgen.schema.Fieldable`.

@@ -34,9 +34,9 @@ import { Context, ContextCfg, ExplicitDir } from '@cfgforge/context';
 import { HeadRows } from '@cfgforge/data';
 import type { HeadRow } from '@cfgforge/data';
 import { Logger, LocaleUtil, CachedFiles } from '@cfgforge/shared';
-import { printHelp } from './Help';
-import { Tools } from './Tools';
-import type { Tool } from './Tool';
+import { printHelp } from './Help.js';
+import { Tools } from './Tools.js';
+import type { Tool } from './Tool.js';
 
 const MAX_EXCEPTION_DEPTH = 30;
 

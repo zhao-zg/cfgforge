@@ -21,9 +21,9 @@ import type { CfgValue } from '@cfgforge/value';
 import type { CfgSchema } from '@cfgforge/schema';
 import type { Nameable } from '@cfgforge/schema';
 import type { LangSwitchable } from '@cfgforge/i18n';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
-import { genConfig } from './tsTemplates';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
+import { genConfig } from './tsTemplates.js';
 
 export class TsCodeGenerator extends GeneratorWithTag {
   readonly pkg: string;

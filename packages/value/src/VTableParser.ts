@@ -13,13 +13,13 @@ import type { DTable, HeadRow } from '@cfgforge/data';
 import { TableSchema } from '@cfgforge/schema';
 import { hasBlock } from '@cfgforge/schema';
 
-import { CfgValueErrs } from './CfgValueErrs';
-import { ValueParser } from './ValueParser';
-import type { BlockParser } from './ValueParser';
-import { ParseContext } from './ValueParser';
-import { VTableCreator } from './VTableCreator';
-import { VTableBlockParser, getPkColumnIndices, isPkCellAllEmpty } from './VTableBlockParser';
-import type { VStruct, VTable } from './CfgValue';
+import { CfgValueErrs } from './CfgValueErrs.js';
+import { ValueParser } from './ValueParser.js';
+import type { BlockParser } from './ValueParser.js';
+import { ParseContext } from './ValueParser.js';
+import { VTableCreator } from './VTableCreator.js';
+import { VTableBlockParser, getPkColumnIndices, isPkCellAllEmpty } from './VTableBlockParser.js';
+import type { VStruct, VTable } from './CfgValue.js';
 
 export class VTableParser {
   private readonly subTableSchema: TableSchema;

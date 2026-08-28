@@ -20,7 +20,7 @@
 import type { Context } from '@cfgforge/context';
 import type { CfgValue, Value } from '@cfgforge/value';
 import { CfgValueErrs, ValueJsonParser, ValueUtil, valueEquals } from '@cfgforge/value';
-import { VTableStorage, VTableJsonStorage, ValueUpdater } from './index';
+import { VTableStorage, VTableJsonStorage, ValueUpdater } from './index.js';
 import { Logger } from '@cfgforge/shared';
 
 export enum AddOrUpdateErrorCode {

@@ -16,8 +16,8 @@ import { Primitive, StructRef, FList, FMap, isFList } from '@cfgforge/schema';
 import { RefPrimary, RefUniq, RefList } from '@cfgforge/schema';
 import { TableSchema } from '@cfgforge/schema';
 import type { VTable } from '@cfgforge/value';
-import { GdName } from './GdName';
-import type { GdCodeGenerator } from './GdCodeGenerator';
+import { GdName } from './GdName.js';
+import type { GdCodeGenerator } from './GdCodeGenerator.js';
 
 export class GdStructModel {
   readonly name: GdName;

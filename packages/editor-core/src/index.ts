@@ -1,5 +1,5 @@
-export { EditorService } from './EditorService';
-export { SchemaService } from './SchemaService';
+export { EditorService } from './EditorService.js';
+export { SchemaService } from './SchemaService.js';
 export type {
   SField,
   SRefType,
@@ -11,8 +11,8 @@ export type {
   STable,
   SNameable,
   RawSchema,
-} from './SchemaService';
-export { RecordService } from './RecordService';
+} from './SchemaService.js';
+export { RecordService } from './RecordService.js';
 export type {
   ResultCode,
   RequestType,
@@ -22,57 +22,57 @@ export type {
   RecordRefsResult,
   UnreferencedRecordsResult,
   RecordResponse,
-} from './RecordService';
-export { RecordEditService } from './RecordEditService';
+} from './RecordService.js';
+export { RecordEditService } from './RecordEditService.js';
 export type {
   EditResultCode,
   RecordEditResult,
-} from './RecordEditService';
-export { RecordRefIdsService } from './RecordRefIdsService';
+} from './RecordEditService.js';
+export { RecordRefIdsService } from './RecordRefIdsService.js';
 export type {
   RecordRefId,
   RecordRefIdsResult,
-} from './RecordRefIdsService';
-export { SchemaWriteService } from './SchemaWriteService';
+} from './RecordRefIdsService.js';
+export { SchemaWriteService } from './SchemaWriteService.js';
 export type {
   SchemaTextResult,
   SchemaWriteResult,
-} from './SchemaWriteService';
-export { TableCreateService } from './TableCreateService';
+} from './SchemaWriteService.js';
+export { TableCreateService } from './TableCreateService.js';
 export type {
   CreateResult,
   TableCreateRequest,
   FieldRequest,
   EnumValueRequest,
-} from './TableCreateService';
-export { CheckJsonService } from './CheckJsonService';
+} from './TableCreateService.js';
+export { CheckJsonService } from './CheckJsonService.js';
 export type {
   CheckJsonResult,
   CheckJsonResultCode,
-} from './CheckJsonService';
-export { PromptService } from './PromptService';
+} from './CheckJsonService.js';
+export { PromptService } from './PromptService.js';
 export type {
   PromptResult,
   PromptResultCode,
-} from './PromptService';
-export { NoteEditService } from './NoteEditService';
+} from './PromptService.js';
+export { NoteEditService } from './NoteEditService.js';
 export type {
   Note,
   Notes,
   NoteEditResult,
   NoteResultCode,
-} from './NoteEditService';
-export { SearchService } from './SearchService';
+} from './NoteEditService.js';
+export { SearchService } from './SearchService.js';
 export type {
   SearchResult,
   SearchResultItem,
   SearchResultCode,
-} from './SearchService';
-export { ExportService } from './ExportService';
+} from './SearchService.js';
+export { ExportService } from './ExportService.js';
 export type {
   ExportFormat,
   ExportResultCode,
   ExportResult,
   ExportAllResultCode,
   ExportAllResult,
-} from './ExportService';
+} from './ExportService.js';

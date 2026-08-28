@@ -21,8 +21,8 @@
  */
 
 import ExcelJS from 'exceljs';
-import type { RecordBlockTransformed } from '../RecordBlock';
-import type { TableFile } from '../TableFile';
+import type { RecordBlockTransformed } from '../RecordBlock.js';
+import type { TableFile } from '../TableFile.js';
 import { getDefaultFileSystem } from '@cfgforge/shared';
 
 export class ExcelTableFile implements TableFile {

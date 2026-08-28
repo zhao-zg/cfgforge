@@ -12,15 +12,15 @@
  * Dependencies: data → schema (allowed by architecture rules)
  */
 
-import { CfgDataStat } from './CfgDataStat';
-import { CfgData } from './CfgData';
-import { DTable } from './DTable';
-import type { DRawSheet } from './DRawSheet';
-import { HeadParser } from './HeadParser';
-import { CellParser } from './CellParser';
-import type { HeadRow } from './HeadRows';
-import type { ReadResult } from './ReadResult';
-import { FileFmt, getTableNameIndex } from './DataUtil';
+import { CfgDataStat } from './CfgDataStat.js';
+import { CfgData } from './CfgData.js';
+import { DTable } from './DTable.js';
+import type { DRawSheet } from './DRawSheet.js';
+import { HeadParser } from './HeadParser.js';
+import { CellParser } from './CellParser.js';
+import type { HeadRow } from './HeadRows.js';
+import type { ReadResult } from './ReadResult.js';
+import { FileFmt, getTableNameIndex } from './DataUtil.js';
 import { CfgSchemaErrs } from '@cfgforge/schema';
 
 // Minimal CfgSchemaErrs interface to avoid tight coupling

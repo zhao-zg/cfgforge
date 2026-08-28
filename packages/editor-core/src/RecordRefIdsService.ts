@@ -41,8 +41,8 @@ import {
   type FieldRef,
 } from '@cfgforge/value';
 import type { TableSchemaRefGraph } from '@cfgforge/schema';
-import { RecordService } from './RecordService';
-import type { ResultCode } from './RecordService';
+import { RecordService } from './RecordService.js';
+import type { ResultCode } from './RecordService.js';
 
 // ---------------------------------------------------------------------------
 // Types (mirror cfgeditor/src/api/recordModel.ts)

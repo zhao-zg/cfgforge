@@ -4,8 +4,8 @@
  * The top-level data model: a map of table names to DTable, plus statistics.
  */
 
-import type { DTable } from './DTable';
-import type { CfgDataStat } from './CfgDataStat';
+import type { DTable } from './DTable.js';
+import type { CfgDataStat } from './CfgDataStat.js';
 
 export class CfgData {
   readonly tables: Map<string, DTable>;

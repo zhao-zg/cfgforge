@@ -4,10 +4,10 @@
  * Java record: name, type, fmt, meta.
  */
 
-import type { FieldType } from './FieldType';
-import type { FieldFormat } from './FieldFormat';
-import type { Metadata } from './Metadata';
-import { copyFieldType } from './FieldType';
+import type { FieldType } from './FieldType.js';
+import type { FieldFormat } from './FieldFormat.js';
+import type { Metadata } from './Metadata.js';
+import { copyFieldType } from './FieldType.js';
 
 export class FieldSchema {
   constructor(

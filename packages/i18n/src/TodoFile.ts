@@ -12,9 +12,9 @@
 
 import * as XLSX from 'xlsx';
 import { getDefaultFileSystem } from '@cfgforge/shared';
-import type { LangTextFinder } from './LangTextFinder';
-import { TextByIdFinder, OneText } from './TextByIdFinder';
-import { normalize } from './I18nUtils';
+import type { LangTextFinder } from './LangTextFinder.js';
+import { TextByIdFinder, OneText } from './TextByIdFinder.js';
+import { normalize } from './I18nUtils.js';
 
 // ---------------------------------------------------------------------------
 // TodoFileLine — one row in a TodoFile (top-level class)

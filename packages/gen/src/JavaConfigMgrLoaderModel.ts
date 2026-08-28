@@ -5,7 +5,7 @@
  */
 
 import type { CfgValue } from '@cfgforge/value';
-import { getCodeTopPkg, tableDataFullName, isEnumAndHasOnlyPrimaryKeyAndEnumStr } from './JavaName';
+import { getCodeTopPkg, tableDataFullName, isEnumAndHasOnlyPrimaryKeyAndEnumStr } from './JavaName.js';
 
 export interface TableInfo {
   name: string;

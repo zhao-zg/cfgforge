@@ -9,9 +9,9 @@
  * Java source: configgen.value.SearchService.java (144 lines)
  */
 
-import type { PrimitiveValue, VTable, CfgValue, Value } from './CfgValue';
-import { VInt, VLong, VString, VText } from './CfgValue';
-import { ForeachValue, type ValueVisitorForSearch } from './ForeachValue';
+import type { PrimitiveValue, VTable, CfgValue, Value } from './CfgValue.js';
+import { VInt, VLong, VString, VText } from './CfgValue.js';
+import { ForeachValue, type ValueVisitorForSearch } from './ForeachValue.js';
 
 // ---------------------------------------------------------------------------
 // Types

@@ -33,7 +33,7 @@ import {
 import { InterfaceSchema, StructSchema } from '@cfgforge/schema';
 import { AutoOrPack, Sep, isSep, isBlock } from '@cfgforge/schema';
 import { span, fieldSpan, simpleTypeSpan } from '@cfgforge/schema';
-import type { Value, SimpleValue } from './CfgValue';
+import type { Value, SimpleValue } from './CfgValue.js';
 import {
   VBool,
   VInt,
@@ -45,10 +45,10 @@ import {
   VInterface,
   VList,
   VMap,
-} from './CfgValue';
-import { CfgValueErrs } from './CfgValueErrs';
-import * as Errs from './CfgValueErrs';
-import { DCells } from './ValueUtil';
+} from './CfgValue.js';
+import { CfgValueErrs } from './CfgValueErrs.js';
+import * as Errs from './CfgValueErrs.js';
+import { DCells } from './ValueUtil.js';
 
 // ---------------------------------------------------------------------------
 // decodeInt — mimics Java Integer.decode (supports 0x/0X/# hex prefixes)

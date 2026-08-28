@@ -26,7 +26,7 @@ import * as path from 'path';
 
 import { CfgReader, ParseError, CfgSchemaException, CfgSchemaErrs } from '@cfgforge/schema';
 import { getDefaultFileSystem } from '@cfgforge/shared';
-import type { EditorService } from './EditorService';
+import type { EditorService } from './EditorService.js';
 
 // Re-import fs for readSchemaText (reads from disk, not cached content)
 

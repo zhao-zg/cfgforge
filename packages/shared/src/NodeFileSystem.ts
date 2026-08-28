@@ -7,7 +7,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import type { CfgFileSystem } from './CfgFileSystem';
+import type { CfgFileSystem } from './CfgFileSystem.js';
 
 export class NodeFileSystem implements CfgFileSystem {
   // ---- 环境检测 ----

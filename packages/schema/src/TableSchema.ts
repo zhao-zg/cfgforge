@@ -5,16 +5,16 @@
  * fmt() always returns AUTO.
  */
 
-import { AutoOrPack } from './FieldFormat';
-import type { FieldFormat } from './FieldFormat';
-import type { Metadata } from './Metadata';
-import { KeySchema } from './KeySchema';
-import { FieldSchema } from './FieldSchema';
-import type { ForeignKeySchema } from './ForeignKeySchema';
-import type { EntryType } from './EntryType';
-import type { FieldType } from './FieldType';
-import { defaultNamespace, defaultLastName } from './Nameable';
-import type { Structural } from './interfaces';
+import { AutoOrPack } from './FieldFormat.js';
+import type { FieldFormat } from './FieldFormat.js';
+import type { Metadata } from './Metadata.js';
+import { KeySchema } from './KeySchema.js';
+import { FieldSchema } from './FieldSchema.js';
+import type { ForeignKeySchema } from './ForeignKeySchema.js';
+import type { EntryType } from './EntryType.js';
+import type { FieldType } from './FieldType.js';
+import { defaultNamespace, defaultLastName } from './Nameable.js';
+import type { Structural } from './interfaces.js';
 
 export class TableSchema implements Structural {
   constructor(

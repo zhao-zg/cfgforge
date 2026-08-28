@@ -11,7 +11,7 @@
  */
 
 import { parseToIdAndMap } from '@cfgforge/shared';
-import type { Parameter } from './Parameter';
+import type { Parameter } from './Parameter.js';
 
 export class ParameterParser implements Parameter {
   private readonly arg: string;

@@ -6,8 +6,8 @@
  * Provides: name(), fmt(), meta(), namespace(), lastName(), fullName(), comment(), copy()
  */
 
-import type { FieldFormat } from './FieldFormat';
-import type { Metadata } from './Metadata';
+import type { FieldFormat } from './FieldFormat.js';
+import type { Metadata } from './Metadata.js';
 
 export interface Nameable {
   name(): string;

@@ -7,7 +7,7 @@
  */
 
 import type { InterfaceSchema } from '@cfgforge/schema';
-import type { GoName } from './GoName';
+import type { GoName } from './GoName.js';
 
 export class GoInterfaceModel {
   constructor(

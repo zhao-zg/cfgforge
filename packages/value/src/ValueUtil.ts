@@ -21,11 +21,11 @@ import {
   VText,
   VStruct,
   type StringValue,
-} from './CfgValue';
+} from './CfgValue.js';
 import type { ForeignKeySchema, TableSchema } from '@cfgforge/schema';
 import { findFieldIndices, findFieldIndexByName } from '@cfgforge/schema';
 import { RefPrimary, RefUniq, RefList } from '@cfgforge/schema';
-import type { CfgValue } from './CfgValue';
+import type { CfgValue } from './CfgValue.js';
 
 // ---------------------------------------------------------------------------
 // DCells

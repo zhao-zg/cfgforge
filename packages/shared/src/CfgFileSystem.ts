@@ -151,7 +151,7 @@ export function hasDefaultFileSystem(): boolean {
  * 打包浏览器 bundle 时，构建工具按打包目标 tree-shake 或忽略 node:fs 导入
  * （Tauri 前端不应把 shared 包打进浏览器 bundle，而是由 Tauri 侧运行）。
  */
-import { NodeFileSystem } from './NodeFileSystem';
+import { NodeFileSystem } from './NodeFileSystem.js';
 
 export function ensureDefaultFileSystem(): void {
   if (defaultFileSystem !== null) return;

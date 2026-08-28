@@ -18,9 +18,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as XLSX from 'xlsx';
 import { getDefaultFileSystem } from '@cfgforge/shared';
-import type { TextFinder, TextVisitor } from './LangTextFinder';
-import { LangTextFinder } from './LangTextFinder';
-import { normalize, fieldChainStr } from './I18nUtils';
+import type { TextFinder, TextVisitor } from './LangTextFinder.js';
+import { LangTextFinder } from './LangTextFinder.js';
+import { normalize, fieldChainStr } from './I18nUtils.js';
 
 // ---------------------------------------------------------------------------
 // OneText / OneRecord
@@ -442,4 +442,4 @@ export class TextByIdFinder implements TextFinder {
 // TodoFile — TODO translation workflow
 // ---------------------------------------------------------------------------
 
-import { TodoFile } from './TodoFile';
+import { TodoFile } from './TodoFile.js';

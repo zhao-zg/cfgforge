@@ -14,7 +14,7 @@
  */
 
 import { join as pathJoin } from '@cfgforge/shared';
-import type { Context } from './Context';
+import type { Context } from './Context.js';
 import { DTable, FileFmt, getFileFormat, getTableNameIndex, HeadParser, CellParser, CfgDataStat, readExcel, readCsvAsync } from '@cfgforge/data';
 import { CfgSchemaErrs } from '@cfgforge/schema';
 

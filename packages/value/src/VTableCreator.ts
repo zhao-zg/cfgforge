@@ -19,16 +19,16 @@ import {
   VTable,
   valueEquals,
   type Value,
-} from './CfgValue';
-import type { CfgValueErrs } from './CfgValueErrs';
+} from './CfgValue.js';
+import type { CfgValueErrs } from './CfgValueErrs.js';
 import {
   primaryOrUniqueKeyDuplicated,
   enumEmpty,
   entryContainsSpace,
   entryDuplicated,
   seqValueNotContinuous,
-} from './CfgValueErrs';
-import { ValueUtil } from './ValueUtil';
+} from './CfgValueErrs.js';
+import { ValueUtil } from './ValueUtil.js';
 import { DCellList, type Source } from '@cfgforge/data';
 import {
   type TableSchema,

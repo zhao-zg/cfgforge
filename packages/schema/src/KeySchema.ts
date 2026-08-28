@@ -5,7 +5,7 @@
  * Has a mutable fieldSchemas pointer that gets filled during resolution.
  */
 
-import type { FieldSchema } from './FieldSchema';
+import type { FieldSchema } from './FieldSchema.js';
 
 export class KeySchema {
   private _fieldSchemas: FieldSchema[] | null = null;

@@ -14,9 +14,9 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { readCSV, readCSVAsync, getDefaultFileSystem } from '@cfgforge/shared';
-import { normalize } from './I18nUtils';
-import type { TextFinder, TextVisitor } from './LangTextFinder';
-import { LangTextFinder } from './LangTextFinder';
+import { normalize } from './I18nUtils.js';
+import type { TextFinder, TextVisitor } from './LangTextFinder.js';
+import { LangTextFinder } from './LangTextFinder.js';
 
 export class TextByValueFinder implements TextFinder {
   private readonly _originalToTranslated = new Map<string, string>();

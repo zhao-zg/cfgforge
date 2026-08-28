@@ -6,7 +6,7 @@
  * Java source: configgen.write.TableFile.java (35 lines)
  */
 
-import type { RecordBlockTransformed } from './RecordBlock';
+import type { RecordBlockTransformed } from './RecordBlock.js';
 
 export interface TableFile {
   /**

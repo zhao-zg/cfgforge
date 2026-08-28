@@ -22,12 +22,12 @@ import type { CfgValue } from '@cfgforge/value';
 import type { CfgSchema, Structural } from '@cfgforge/schema';
 import { StructSchema, InterfaceSchema } from '@cfgforge/schema';
 import type { VTable } from '@cfgforge/value';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
-import { GdStructModel } from './GdStructModel';
-import { GdInterfaceModel } from './GdInterfaceModel';
-import { GdProcessorModel } from './GdProcessorModel';
-import { genStruct, genInterface, genProcessor } from './gdTemplates';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
+import { GdStructModel } from './GdStructModel.js';
+import { GdInterfaceModel } from './GdInterfaceModel.js';
+import { GdProcessorModel } from './GdProcessorModel.js';
+import { genStruct, genInterface, genProcessor } from './gdTemplates.js';
 
 const COPY_FILES = [
   'ConfigStream.gd',

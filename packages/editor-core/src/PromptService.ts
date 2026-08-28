@@ -9,7 +9,7 @@
 
 import { PromptGen } from '@cfgforge/gen';
 import type { Prompt } from '@cfgforge/gen';
-import type { EditorService } from './EditorService';
+import type { EditorService } from './EditorService.js';
 
 // ---------------------------------------------------------------------------
 // Types

@@ -40,7 +40,7 @@ import {
   type EntryType,
   type FieldType,
 } from '@cfgforge/schema';
-import type { HeadRow } from './HeadRows';
+import type { HeadRow } from './HeadRows.js';
 
 // Error factory imports (functions from CfgSchemaErrs)
 import {
@@ -52,9 +52,9 @@ import {
 } from '@cfgforge/schema';
 
 // Data model imports
-import type { DTable } from './DTable';
-import type { DField } from './DField';
-import type { CfgData } from './CfgData';
+import type { DTable } from './DTable.js';
+import type { DField } from './DField.js';
+import type { CfgData } from './CfgData.js';
 
 // Type guard: Nameable → TableSchema discrimination
 function isTableSchema(item: Nameable): item is TableSchema {

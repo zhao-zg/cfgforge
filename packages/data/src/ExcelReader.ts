@@ -12,11 +12,11 @@
  */
 
 import ExcelJS from 'exceljs';
-import { type DRawRow, EMPTY_ROW } from './DRawRow';
-import { DRawSheet } from './DRawSheet';
-import { ReadResult, OneSheet } from './ReadResult';
-import { CfgDataStat } from './CfgDataStat';
-import { getTableNameIndex } from './DataUtil';
+import { type DRawRow, EMPTY_ROW } from './DRawRow.js';
+import { DRawSheet } from './DRawSheet.js';
+import { ReadResult, OneSheet } from './ReadResult.js';
+import { CfgDataStat } from './CfgDataStat.js';
+import { getTableNameIndex } from './DataUtil.js';
 import { getDefaultFileSystem } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------

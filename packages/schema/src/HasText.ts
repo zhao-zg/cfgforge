@@ -2,15 +2,15 @@
  * HasText — TypeScript port of Java `configgen.schema.HasText`.
  */
 
-import type { CfgSchema } from './CfgSchema';
-import type { Nameable } from './Nameable';
-import { StructSchema } from './StructSchema';
-import { TableSchema } from './TableSchema';
-import type { Structural } from './Structural';
-import { Primitive, isFList, isFMap, isPrimitive } from './FieldType';
-import { isMetaInt } from './Metadata';
-import { foreachNameable } from './ForeachSchema';
-import { checkAnyOk, CheckResult } from './IncludedStructs';
+import type { CfgSchema } from './CfgSchema.js';
+import type { Nameable } from './Nameable.js';
+import { StructSchema } from './StructSchema.js';
+import { TableSchema } from './TableSchema.js';
+import type { Structural } from './Structural.js';
+import { Primitive, isFList, isFMap, isPrimitive } from './FieldType.js';
+import { isMetaInt } from './Metadata.js';
+import { foreachNameable } from './ForeachSchema.js';
+import { checkAnyOk, CheckResult } from './IncludedStructs.js';
 
 export function preCalculateAllHasText(schema: CfgSchema): void {
   foreachNameable(calcHasText, schema);

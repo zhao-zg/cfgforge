@@ -8,7 +8,7 @@
  * The AST faithfully represents the CFG grammar structure, including comments.
  */
 
-import { Token } from './CfgLexer';
+import { Token } from './CfgLexer.js';
 
 // ---- Comment Data ----
 

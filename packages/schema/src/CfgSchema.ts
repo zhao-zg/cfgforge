@@ -8,11 +8,11 @@
  * The resolve() method delegates to CfgSchemaResolver (to be implemented in T2.12-T2.17).
  */
 
-import type { Nameable } from './Nameable';
-import type { Fieldable } from './Fieldable';
-import type { TableSchema } from './TableSchema';
-import { CfgSchemaErrs } from './CfgSchemaErrs';
-import { CfgSchemaResolver } from './CfgSchemaResolver';
+import type { Nameable } from './Nameable.js';
+import type { Fieldable } from './Fieldable.js';
+import type { TableSchema } from './TableSchema.js';
+import { CfgSchemaErrs } from './CfgSchemaErrs.js';
+import { CfgSchemaResolver } from './CfgSchemaResolver.js';
 
 export class CfgSchema {
   private readonly _items: Nameable[] = [];

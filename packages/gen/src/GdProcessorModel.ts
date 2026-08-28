@@ -5,8 +5,8 @@
  */
 
 import type { Nameable, TableSchema } from '@cfgforge/schema';
-import { GdName } from './GdName';
-import type { GdCodeGenerator } from './GdCodeGenerator';
+import { GdName } from './GdName.js';
+import type { GdCodeGenerator } from './GdCodeGenerator.js';
 
 export class GdProcessorModel {
   readonly tableSchemas: Iterable<TableSchema>;

@@ -18,16 +18,16 @@ import type { TableSchema } from '@cfgforge/schema';
 import {
   type CfgValueErrs,
   jsonFileReadErr,
-} from './CfgValueErrs';
+} from './CfgValueErrs.js';
 import {
   type CfgValueStat,
   VTable,
   VStruct,
   type Value,
-} from './CfgValue';
-import { ValueJsonParser } from './ValueJsonParser';
-import { VTableCreator } from './VTableCreator';
-import { ValueUtil } from './ValueUtil';
+} from './CfgValue.js';
+import { ValueJsonParser } from './ValueJsonParser.js';
+import { VTableCreator } from './VTableCreator.js';
+import { ValueUtil } from './ValueUtil.js';
 
 export class VTableJsonParser {
   private readonly subTableSchema: TableSchema;

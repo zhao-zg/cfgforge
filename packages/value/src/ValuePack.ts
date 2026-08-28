@@ -20,8 +20,8 @@ import {
   VFloat,
   VString,
   VText,
-} from './CfgValue';
-import type { CfgValueErrs } from './CfgValueErrs';
+} from './CfgValue.js';
+import type { CfgValueErrs } from './CfgValueErrs.js';
 import type { FieldType } from '@cfgforge/schema';
 import { AutoOrPack } from '@cfgforge/schema';
 import { FieldSchema } from '@cfgforge/schema';
@@ -31,8 +31,8 @@ import { Metadata_of } from '@cfgforge/schema';
 import type { TableSchema } from '@cfgforge/schema';
 import { DCell } from '@cfgforge/data';
 import { HeadRows } from '@cfgforge/data';
-import { ValueParser, ParseContext, dummyBlockParser } from './ValueParser';
-import { ValueUtil } from './ValueUtil';
+import { ValueParser, ParseContext, dummyBlockParser } from './ValueParser.js';
+import { ValueUtil } from './ValueUtil.js';
 
 export class ValuePack {
   /**

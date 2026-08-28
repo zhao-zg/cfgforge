@@ -23,10 +23,10 @@ import type { Context } from '@cfgforge/context';
 import type { CfgValue, VTable } from '@cfgforge/value';
 import type { CfgData } from '@cfgforge/data';
 import { StructSchema, InterfaceSchema, isEEnum, isENo } from '@cfgforge/schema';
-import type { EntryBase } from './JavaEntryOrEnumModel';
+import type { EntryBase } from './JavaEntryOrEnumModel.js';
 import type { LangSwitchable } from '@cfgforge/i18n';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
 import {
   NameableName,
   setCodeTopPkg,
@@ -35,13 +35,13 @@ import {
   setIsLangSwitch,
   isEnumAndHasOnlyPrimaryKeyAndEnumStr,
   getCodeTopPkg,
-} from './JavaName';
-import { sourceCommentOf } from './JavaSourceComment';
-import { JavaStructuralClassModel } from './JavaStructuralClassModel';
-import { JavaInterfaceModel } from './JavaInterfaceModel';
-import { JavaEntryOrEnumModel } from './JavaEntryOrEnumModel';
-import { JavaConfigMgrLoaderModel } from './JavaConfigMgrLoaderModel';
-import { JavaTextModel } from './JavaTextModel';
+} from './JavaName.js';
+import { sourceCommentOf } from './JavaSourceComment.js';
+import { JavaStructuralClassModel } from './JavaStructuralClassModel.js';
+import { JavaInterfaceModel } from './JavaInterfaceModel.js';
+import { JavaEntryOrEnumModel } from './JavaEntryOrEnumModel.js';
+import { JavaConfigMgrLoaderModel } from './JavaConfigMgrLoaderModel.js';
+import { JavaTextModel } from './JavaTextModel.js';
 import {
   genStructuralClass,
   genInterface,
@@ -51,7 +51,7 @@ import {
   genConfigMgrLoader,
   genTableBuilder,
   genText,
-} from './javaTemplates';
+} from './javaTemplates.js';
 
 export class JavaCodeGenerator extends GeneratorWithTag {
   readonly dir: string;
@@ -77,7 +77,7 @@ export class JavaCodeGenerator extends GeneratorWithTag {
   async generate(ctx: Context): Promise<void> {
     const cfgValue: CfgValue = ctx.makeValueWithTag(this.tag);
     const cfgData = ctx.cfgData();
-    this.dstDir = path.join(this.dir, this.pkg.replace('.', '/'));
+    this.dstDir = path.join(this.dir, ...this.pkg.split('.'));
 
     // Set static state for name resolution
     setCodeTopPkg(this.pkg);

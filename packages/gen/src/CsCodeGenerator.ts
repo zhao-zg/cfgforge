@@ -24,13 +24,13 @@ import { StructSchema, InterfaceSchema } from '@cfgforge/schema';
 import type { TableSchema } from '@cfgforge/schema';
 import type { VTable } from '@cfgforge/value';
 import type { LangSwitchable } from '@cfgforge/i18n';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
-import { CsStructModel } from './CsStructModel';
-import { CsInterfaceModel } from './CsInterfaceModel';
-import { CsModuleModel } from './CsModuleModel';
-import { CsProcessorModel } from './CsProcessorModel';
-import { CsName } from './CsName';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
+import { CsStructModel } from './CsStructModel.js';
+import { CsInterfaceModel } from './CsInterfaceModel.js';
+import { CsModuleModel } from './CsModuleModel.js';
+import { CsProcessorModel } from './CsProcessorModel.js';
+import { CsName } from './CsName.js';
 import {
   genStruct,
   genInterface,
@@ -38,7 +38,7 @@ import {
   genServerText,
   genClientText,
   genModuleLoader,
-} from './csTemplates';
+} from './csTemplates.js';
 
 export class CsCodeGenerator extends GeneratorWithTag {
   readonly dir: string;
@@ -65,7 +65,7 @@ export class CsCodeGenerator extends GeneratorWithTag {
     const cfgValue: CfgValue = ctx.makeValueWithTag(this.tag);
     const cfgSchema: CfgSchema = cfgValue.schema;
 
-    this.dstDir = path.join(this.dir, this.pkg.replace('.', '/'));
+    this.dstDir = path.join(this.dir, ...this.pkg.split('.'));
 
     this.isLangSwitch = ctx.nullableLangSwitch() !== null;
 

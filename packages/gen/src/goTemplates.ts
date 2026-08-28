@@ -34,10 +34,10 @@ import type {
 import { upper1, lower1, removeLineSep } from '@cfgforge/shared';
 import type { VTable } from '@cfgforge/value';
 
-import { GoName } from './GoName';
-import { GoStructModel } from './GoStructModel';
-import type { GoInterfaceModel } from './GoInterfaceModel';
-import type { GoCfgMgrModel } from './GoCfgMgrModel';
+import { GoName } from './GoName.js';
+import { GoStructModel } from './GoStructModel.js';
+import type { GoInterfaceModel } from './GoInterfaceModel.js';
+import type { GoCfgMgrModel } from './GoCfgMgrModel.js';
 
 // ---------------------------------------------------------------------------
 // genStruct — GenStruct.jte

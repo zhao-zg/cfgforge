@@ -10,8 +10,8 @@
 
 import type { FieldType, Nameable } from '@cfgforge/schema';
 import { Primitive, isStructRef, isFList, isFMap } from '@cfgforge/schema';
-import { sqlTableName } from './SqlRender';
-import { boxTypeOf, upperStartSegments, type TypeOpts } from './JavaTypeUtil';
+import { sqlTableName } from './SqlRender.js';
+import { boxTypeOf, upperStartSegments, type TypeOpts } from './JavaTypeUtil.js';
 
 // ---------------------------------------------------------------------------
 // mapperNames

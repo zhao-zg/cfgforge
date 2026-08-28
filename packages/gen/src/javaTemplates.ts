@@ -62,12 +62,12 @@ import {
   equalsExpr,
   equal,
   tableGet,
-} from './JavaName';
-import type { JavaStructuralClassModel } from './JavaStructuralClassModel';
-import type { JavaInterfaceModel } from './JavaInterfaceModel';
-import type { JavaEntryOrEnumModel } from './JavaEntryOrEnumModel';
-import type { JavaConfigMgrLoaderModel } from './JavaConfigMgrLoaderModel';
-import type { JavaTextModel } from './JavaTextModel';
+} from './JavaName.js';
+import type { JavaStructuralClassModel } from './JavaStructuralClassModel.js';
+import type { JavaInterfaceModel } from './JavaInterfaceModel.js';
+import type { JavaEntryOrEnumModel } from './JavaEntryOrEnumModel.js';
+import type { JavaConfigMgrLoaderModel } from './JavaConfigMgrLoaderModel.js';
+import type { JavaTextModel } from './JavaTextModel.js';
 
 // ---------------------------------------------------------------------------
 // genStructuralClass — GenStructuralClass.jte

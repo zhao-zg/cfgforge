@@ -24,19 +24,19 @@ import { StructSchema, InterfaceSchema } from '@cfgforge/schema';
 import type { Structural } from '@cfgforge/schema';
 import type { VTable } from '@cfgforge/value';
 import type { LangSwitchable } from '@cfgforge/i18n';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
-import { GoName } from './GoName';
-import { GoStructModel } from './GoStructModel';
-import { GoInterfaceModel } from './GoInterfaceModel';
-import { GoCfgMgrModel } from './GoCfgMgrModel';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
+import { GoName } from './GoName.js';
+import { GoStructModel } from './GoStructModel.js';
+import { GoInterfaceModel } from './GoInterfaceModel.js';
+import { GoCfgMgrModel } from './GoCfgMgrModel.js';
 import {
   genStruct,
   genInterface,
   genCfgMgr,
   genServerText,
   genClientText,
-} from './goTemplates';
+} from './goTemplates.js';
 
 const COPY_FILES = ['stream.go', 'LoadErrors.go'];
 
@@ -62,7 +62,7 @@ export class GoCodeGenerator extends GeneratorWithTag {
     const cfgValue: CfgValue = ctx.makeValueWithTag(this.tag);
     const cfgSchema: CfgSchema = cfgValue.schema;
 
-    this.dstDir = path.join(this.dir, this.pkg.replace('.', '/'));
+    this.dstDir = path.join(this.dir, ...this.pkg.split('.'));
     this.isLangSwitch = ctx.nullableLangSwitch() !== null;
 
     // Copy runtime files (stream.go, LoadErrors.go)

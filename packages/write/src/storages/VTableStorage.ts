@@ -20,10 +20,10 @@ import type { Context } from '@cfgforge/context';
 import { VTable, VStruct, VInterface, VList, VMap, type Value, valueEquals } from '@cfgforge/value';
 import type { DTable, DRawSheet, DRowId, Source } from '@cfgforge/data';
 import { DCell, DCellList } from '@cfgforge/data';
-import { TableFileLocator } from '../TableFileLocator';
-import type { TableFile } from '../TableFile';
-import { RecordBlock, RecordBlockTransformed } from '../RecordBlock';
-import { RecordBlockMapper } from '../RecordBlockMapper';
+import { TableFileLocator } from '../TableFileLocator.js';
+import type { TableFile } from '../TableFile.js';
+import { RecordBlock, RecordBlockTransformed } from '../RecordBlock.js';
+import { RecordBlockMapper } from '../RecordBlockMapper.js';
 
 /**
  * Function type for mapping a VStruct to a RecordBlock.

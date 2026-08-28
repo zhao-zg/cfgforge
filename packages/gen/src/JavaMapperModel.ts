@@ -13,7 +13,7 @@
  */
 
 import type { FieldType } from '@cfgforge/schema';
-import type { MapperNames } from './JavaMapperName';
+import type { MapperNames } from './JavaMapperName.js';
 
 /** 字段语义（模型层判定，模板仅按此分派） */
 export type PojoFieldKind = 'scalar' | 'struct' | 'interface' | 'list' | 'map';

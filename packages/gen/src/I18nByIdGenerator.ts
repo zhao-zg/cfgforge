@@ -31,9 +31,9 @@ import {
   TodoFileLine,
 } from '@cfgforge/i18n';
 import { Logger } from '@cfgforge/shared';
-import type { Parameter } from './Parameter';
-import { Generator } from './Generator';
-import { LangText, LangStat } from './LangText';
+import type { Parameter } from './Parameter.js';
+import { Generator } from './Generator.js';
+import { LangText, LangStat } from './LangText.js';
 
 export class I18nByIdGenerator extends Generator {
   private readonly outputDir: string;

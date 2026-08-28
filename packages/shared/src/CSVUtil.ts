@@ -10,8 +10,8 @@
 
 import * as fs from 'fs';
 import { parse as csvParseSync } from 'csv-parse/sync';
-import { readFromBuffer, readTextFileAsync } from './UnicodeReader';
-import { BomUtf8Writer, writeTextFileWithBomAsync } from './BomUtf8Writer';
+import { readFromBuffer, readTextFileAsync } from './UnicodeReader.js';
+import { BomUtf8Writer, writeTextFileWithBomAsync } from './BomUtf8Writer.js';
 
 export type CSVRow = string[];
 

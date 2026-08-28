@@ -7,7 +7,7 @@
  * by name), or enum (generates enum for switch).
  */
 
-import type { FieldSchema } from './FieldSchema';
+import type { FieldSchema } from './FieldSchema.js';
 
 // ---------------------------------------------------------------------------
 // ENo (singleton)

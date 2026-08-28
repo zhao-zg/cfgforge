@@ -2,17 +2,17 @@
  * HasBlock — TypeScript port of Java `configgen.schema.HasBlock`.
  */
 
-import type { CfgSchema } from './CfgSchema';
-import type { CfgSchemaErrs } from './CfgSchemaErrs';
-import type { Nameable } from './Nameable';
-import { StructSchema } from './StructSchema';
-import { TableSchema } from './TableSchema';
-import type { Structural } from './Structural';
-import { isBlock } from './FieldFormat';
-import { isMetaInt } from './Metadata';
-import { foreachNameable } from './ForeachSchema';
-import { checkAnyOk, CheckResult } from './IncludedStructs';
-import * as Errs from './CfgSchemaErrs';
+import type { CfgSchema } from './CfgSchema.js';
+import type { CfgSchemaErrs } from './CfgSchemaErrs.js';
+import type { Nameable } from './Nameable.js';
+import { StructSchema } from './StructSchema.js';
+import { TableSchema } from './TableSchema.js';
+import type { Structural } from './Structural.js';
+import { isBlock } from './FieldFormat.js';
+import { isMetaInt } from './Metadata.js';
+import { foreachNameable } from './ForeachSchema.js';
+import { checkAnyOk, CheckResult } from './IncludedStructs.js';
+import * as Errs from './CfgSchemaErrs.js';
 
 export function preCalculateAllHasBlock(schema: CfgSchema, errs: CfgSchemaErrs): void {
   foreachNameable((nameable) => calcHasBlock(nameable, errs), schema);

@@ -30,8 +30,8 @@ import { CfgValueParser, CfgValueErrs, ValueEnv } from '@cfgforge/value';
 import type { LangTextFinder, LangSwitchable } from '@cfgforge/i18n';
 import { LangTextFinder as I18nLangTextFinder, LangSwitchable as I18nLangSwitchable } from '@cfgforge/i18n';
 
-import { ContextCfg } from './ContextCfg';
-import { DirectoryStructure } from './DirectoryStructure';
+import { ContextCfg } from './ContextCfg.js';
+import { DirectoryStructure } from './DirectoryStructure.js';
 
 // ---------------------------------------------------------------------------
 // Reader function types (matching CfgDataReader's expected signatures)

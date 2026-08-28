@@ -11,8 +11,8 @@
  * Java source: configgen.i18n.LangSwitchableRuntime.java (52 lines)
  */
 
-import type { LangSwitchable } from './LangSwitchable';
-import type { TextFinder } from './LangTextFinder';
+import type { LangSwitchable } from './LangSwitchable.js';
+import type { TextFinder } from './LangTextFinder.js';
 
 export class LangSwitchableRuntime {
   private readonly langSwitch: LangSwitchable;

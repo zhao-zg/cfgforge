@@ -7,7 +7,7 @@
  */
 
 import * as fs from 'fs';
-import { getDefaultFileSystem } from './CfgFileSystem';
+import { getDefaultFileSystem } from './CfgFileSystem.js';
 
 const UTF8_BOM = Buffer.from([0xef, 0xbb, 0xbf]);
 

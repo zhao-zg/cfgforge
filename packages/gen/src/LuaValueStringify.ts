@@ -20,10 +20,10 @@ import {
   VBool, VInt, VLong, VFloat, VString, VText,
   VStruct, VInterface, VList, VMap,
 } from '@cfgforge/value';
-import type { LuaAContext } from './LuaAContext';
-import type { LuaCtx } from './LuaCtx';
-import { isDoPackBool } from './LuaTypeStr';
-import { luaFullName } from './LuaName';
+import type { LuaAContext } from './LuaAContext.js';
+import type { LuaCtx } from './LuaCtx.js';
+import { isDoPackBool } from './LuaTypeStr.js';
+import { luaFullName } from './LuaName.js';
 
 // ---------------------------------------------------------------------------
 // Lua keyword set

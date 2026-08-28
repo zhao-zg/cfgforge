@@ -5,15 +5,15 @@
  * foreachFieldStructRef.
  */
 
-import type { CfgSchema } from './CfgSchema';
-import type { Nameable } from './Nameable';
-import type { Fieldable } from './Fieldable';
-import type { Structural } from './Structural';
-import type { FieldSchema } from './FieldSchema';
-import { isStructRef, isFList, isFMap } from './FieldType';
-import { StructSchema } from './StructSchema';
-import { InterfaceSchema } from './InterfaceSchema';
-import { TableSchema } from './TableSchema';
+import type { CfgSchema } from './CfgSchema.js';
+import type { Nameable } from './Nameable.js';
+import type { Fieldable } from './Fieldable.js';
+import type { Structural } from './Structural.js';
+import type { FieldSchema } from './FieldSchema.js';
+import { isStructRef, isFList, isFMap } from './FieldType.js';
+import { StructSchema } from './StructSchema.js';
+import { InterfaceSchema } from './InterfaceSchema.js';
+import { TableSchema } from './TableSchema.js';
 
 // ---------------------------------------------------------------------------
 // Visitor interfaces (using plain functions)

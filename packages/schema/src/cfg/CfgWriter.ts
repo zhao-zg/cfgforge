@@ -9,26 +9,26 @@
  * - includeMetaStartWith_: include internal metadata tags starting with '_'
  */
 
-import type { CfgSchema } from '../CfgSchema';
-import type { Nameable } from '../Nameable';
-import { StructSchema } from '../StructSchema';
-import { TableSchema } from '../TableSchema';
-import { InterfaceSchema } from '../InterfaceSchema';
-import type { FieldSchema } from '../FieldSchema';
-import type { ForeignKeySchema } from '../ForeignKeySchema';
-import type { KeySchema } from '../KeySchema';
-import type { Structural } from '../Structural';
-import type { FieldType, SimpleType } from '../FieldType';
-import { Primitive, FList, FMap, isStructRef } from '../FieldType';
-import type { FieldFormat } from '../FieldFormat';
-import type { Metadata, MetaValue } from '../Metadata';
-import { Metadata_of } from '../Metadata';
+import type { CfgSchema } from '../CfgSchema.js';
+import type { Nameable } from '../Nameable.js';
+import { StructSchema } from '../StructSchema.js';
+import { TableSchema } from '../TableSchema.js';
+import { InterfaceSchema } from '../InterfaceSchema.js';
+import type { FieldSchema } from '../FieldSchema.js';
+import type { ForeignKeySchema } from '../ForeignKeySchema.js';
+import type { KeySchema } from '../KeySchema.js';
+import type { Structural } from '../Structural.js';
+import type { FieldType, SimpleType } from '../FieldType.js';
+import { Primitive, FList, FMap, isStructRef } from '../FieldType.js';
+import type { FieldFormat } from '../FieldFormat.js';
+import type { Metadata, MetaValue } from '../Metadata.js';
+import { Metadata_of } from '../Metadata.js';
 import {
   isMetaTag, isMetaInt, isMetaFloat, isMetaStr,
-} from '../Metadata';
-import { CommentData } from '../CommentData';
-import { isRefPrimary, isRefUniq, isRefList } from '../RefKey';
-import type { MetaEnumValues } from '../Metadata';
+} from '../Metadata.js';
+import { CommentData } from '../CommentData.js';
+import { isRefPrimary, isRefUniq, isRefList } from '../RefKey.js';
+import type { MetaEnumValues } from '../Metadata.js';
 
 // ---------------------------------------------------------------------------
 // CfgWriter

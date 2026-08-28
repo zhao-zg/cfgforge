@@ -20,7 +20,7 @@ import {
   VInterface,
   VList,
   VMap,
-} from './CfgValue';
+} from './CfgValue.js';
 import { type Source } from '@cfgforge/data';
 import {
   type FieldType,

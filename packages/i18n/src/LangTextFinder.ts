@@ -8,8 +8,8 @@
  */
 
 import { getDefaultFileSystem } from '@cfgforge/shared';
-import { TextByValueFinder } from './TextByValueFinder';
-import { TextByIdFinder } from './TextByIdFinder';
+import { TextByValueFinder } from './TextByValueFinder.js';
+import { TextByIdFinder } from './TextByIdFinder.js';
 
 // ---------------------------------------------------------------------------
 // TextVisitor — visit (original, translated) pairs

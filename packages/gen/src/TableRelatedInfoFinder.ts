@@ -22,8 +22,8 @@ import { CfgWriter } from '@cfgforge/schema';
 import { isEEnum } from '@cfgforge/schema';
 import { isMetaStr } from '@cfgforge/schema';
 import { readMarkdown, readMarkdownAsync, getDefaultFileSystem } from '@cfgforge/shared';
-import type { Example } from './PromptModel';
-import { example } from './PromptModel';
+import type { Example } from './PromptModel.js';
+import { example } from './PromptModel.js';
 
 // ---------------------------------------------------------------------------
 // Record types (matching Java records)

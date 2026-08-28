@@ -11,8 +11,8 @@
  * Java source: configgen.genbytes.TextPool.java (48 lines)
  */
 
-import { ConfigOutput } from './ConfigOutput';
-import { StringPool } from './StringPool';
+import { ConfigOutput } from './ConfigOutput.js';
+import { StringPool } from './StringPool.js';
 
 export class TextPool {
   private readonly _langName: string;

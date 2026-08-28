@@ -20,10 +20,10 @@ import {
   type VTable,
   type CfgValue,
   valueEquals,
-} from './CfgValue';
-import { ForeachVStruct, type ForeachContext, type VStructVisitor } from './ForeachVStruct';
-import { ValueUtil } from './ValueUtil';
-import { RefId } from './ValueRefCollector';
+} from './CfgValue.js';
+import { ForeachVStruct, type ForeachContext, type VStructVisitor } from './ForeachVStruct.js';
+import { ValueUtil } from './ValueUtil.js';
+import { RefId } from './ValueRefCollector.js';
 import type { TableSchemaRefGraph } from '@cfgforge/schema';
 import { TableSchema } from '@cfgforge/schema';
 import type { ForeignKeySchema, Structural } from '@cfgforge/schema';

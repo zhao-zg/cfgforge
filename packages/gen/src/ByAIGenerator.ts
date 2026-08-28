@@ -14,17 +14,17 @@
 
 import type { Context } from '@cfgforge/context';
 import { getDefaultFileSystem } from '@cfgforge/shared';
-import type { Parameter } from './Parameter';
-import { Generator } from './Generator';
+import type { Parameter } from './Parameter.js';
+import { Generator } from './Generator.js';
 import type { VTable } from '@cfgforge/value';
 import { ValueJsonParser } from '@cfgforge/value';
 import { CfgValueErrs } from '@cfgforge/value';
 import { ValueUtil } from '@cfgforge/value';
 import { VTableStorage } from '@cfgforge/write';
 import { VTableJsonStorage } from '@cfgforge/write';
-import { readAICfgFromFileAsync, type AICfg } from './AICfg';
-import { PromptGen } from './PromptGen';
-import { FIX_ERROR } from './PromptDefault';
+import { readAICfgFromFileAsync, type AICfg } from './AICfg.js';
+import { PromptGen } from './PromptGen.js';
+import { FIX_ERROR } from './PromptDefault.js';
 
 // ---------------------------------------------------------------------------
 // AskStat — statistics for AI generation

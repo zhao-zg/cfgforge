@@ -4,10 +4,10 @@
  * Class with mutable refTableSchema and keyIndices pointers.
  */
 
-import { KeySchema } from './KeySchema';
-import type { RefKey } from './RefKey';
-import type { Metadata } from './Metadata';
-import type { TableSchema } from './TableSchema';
+import { KeySchema } from './KeySchema.js';
+import type { RefKey } from './RefKey.js';
+import type { Metadata } from './Metadata.js';
+import type { TableSchema } from './TableSchema.js';
 
 export class ForeignKeySchema {
   private _refTableSchema: TableSchema | null = null;

@@ -9,10 +9,10 @@
  * so we parse sequentially. Worker threads can be added later if needed.
  */
 
-import { CfgSchema } from './CfgSchema';
-import { CfgReader } from './cfg/CfgReader';
-import { CfgWriter } from './cfg/CfgWriter';
-import { CfgUtil } from './cfg/CfgUtil';
+import { CfgSchema } from './CfgSchema.js';
+import { CfgReader } from './cfg/CfgReader.js';
+import { CfgWriter } from './cfg/CfgWriter.js';
+import { CfgUtil } from './cfg/CfgUtil.js';
 import { CachedFiles, getDefaultFileSystem } from '@cfgforge/shared';
 
 // ---------------------------------------------------------------------------

@@ -25,9 +25,9 @@ import {
   VMap,
   VTable,
   CfgValue,
-} from './CfgValue';
-import { ForeachValue, ValueVisitorForPrimitive } from './ForeachValue';
-import type { LangTextFinder, TextFinder } from './LangTextFinder';
+} from './CfgValue.js';
+import { ForeachValue, ValueVisitorForPrimitive } from './ForeachValue.js';
+import type { LangTextFinder, TextFinder } from './LangTextFinder.js';
 
 export class TextValue {
   /**

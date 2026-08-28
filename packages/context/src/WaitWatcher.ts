@@ -11,7 +11,7 @@
  * Java source: configgen.ctx.WaitWatcher.java (100 lines)
  */
 
-import type { Watcher } from './Watcher';
+import type { Watcher } from './Watcher.js';
 
 export class WaitWatcher {
   private readonly _watcher: Watcher;

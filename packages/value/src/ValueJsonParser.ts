@@ -41,7 +41,7 @@ import {
   VInterface,
   VList,
   VMap,
-} from './CfgValue';
+} from './CfgValue.js';
 import {
   type CfgValueErrs,
   jsonStrEmpty,
@@ -51,8 +51,8 @@ import {
   jsonValueNotMatchType,
   jsonHasExtraFields,
   EType,
-} from './CfgValueErrs';
-import { ValueDefault } from './ValueDefault';
+} from './CfgValueErrs.js';
+import { ValueDefault } from './ValueDefault.js';
 
 // ---------------------------------------------------------------------------
 // JSON value type aliases (TS replacements for FastJSON2 types)

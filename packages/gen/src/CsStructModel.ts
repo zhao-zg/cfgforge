@@ -38,8 +38,8 @@ import type {
 import { isEEnum, isEEntry, isRefPrimary, isRefUniq, isRefList, type RefSimple, type RefUniq } from '@cfgforge/schema';
 import { upper1, lower1 } from '@cfgforge/shared';
 import type { VTable } from '@cfgforge/value';
-import type { CsCodeGenerator } from './CsCodeGenerator';
-import { CsName } from './CsName';
+import type { CsCodeGenerator } from './CsCodeGenerator.js';
+import { CsName } from './CsName.js';
 
 const RESERVED = new Set([
   'object', 'string', 'event', 'params', 'ref', 'base', 'namespace', 'class', 'struct',

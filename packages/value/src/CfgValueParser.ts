@@ -17,13 +17,13 @@
 
 import type { CfgSchema, TableSchema } from '@cfgforge/schema';
 import type { DTable } from '@cfgforge/data';
-import { CfgValue, CfgValueStat, VTable } from './CfgValue';
-import { CfgValueErrs } from './CfgValueErrs';
-import { ValueEnv } from './ValueEnv';
-import { VTableParser } from './VTableParser';
-import { VTableJsonParser } from './VTableJsonParser';
-import { TextValue } from './TextValue';
-import { RefValidator } from './RefValidator';
+import { CfgValue, CfgValueStat, VTable } from './CfgValue.js';
+import { CfgValueErrs } from './CfgValueErrs.js';
+import { ValueEnv } from './ValueEnv.js';
+import { VTableParser } from './VTableParser.js';
+import { VTableJsonParser } from './VTableJsonParser.js';
+import { TextValue } from './TextValue.js';
+import { RefValidator } from './RefValidator.js';
 
 // ---------------------------------------------------------------------------
 // OneTableParserResult — internal result from parsing one table

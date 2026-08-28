@@ -48,12 +48,12 @@ import {
   isRefUniq,
   InterfaceSchema as InterfaceSchemaClass,
 } from '@cfgforge/schema';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
 import { upper1 } from '@cfgforge/shared';
-import { sqlTableName } from './SqlRender';
-import { upperStartSegments, enumFieldNameOf, type TypeOpts } from './JavaTypeUtil';
-import { mapperNames, mapperFieldType } from './JavaMapperName';
+import { sqlTableName } from './SqlRender.js';
+import { upperStartSegments, enumFieldNameOf, type TypeOpts } from './JavaTypeUtil.js';
+import { mapperNames, mapperFieldType } from './JavaMapperName.js';
 import type {
   PojoModel,
   PojoFieldModel,
@@ -62,8 +62,8 @@ import type {
   RawFieldModel,
   RawUniqueKeyModel,
   RawFkModel,
-} from './JavaMapperModel';
-import { genPojoClass, genInterfacePojo, genRawClass, genChildClass, genInitAll } from './JavaMapperTemplates';
+} from './JavaMapperModel.js';
+import { genPojoClass, genInterfacePojo, genRawClass, genChildClass, genInitAll } from './JavaMapperTemplates.js';
 
 export class JavaMapperGenerator extends GeneratorWithTag {
   readonly dir: string;

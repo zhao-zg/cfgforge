@@ -14,7 +14,7 @@
  */
 
 import type { Context } from '@cfgforge/context';
-import type { Parameter } from './Parameter';
+import type { Parameter } from './Parameter.js';
 
 /**
  * Runs all tasks concurrently (Promise.all) and returns results in

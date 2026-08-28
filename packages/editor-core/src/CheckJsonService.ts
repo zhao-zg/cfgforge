@@ -11,7 +11,7 @@
 import { CfgValueErrs, ValueJsonParser, ValueToJson } from '@cfgforge/value';
 import type { VStruct, VTable } from '@cfgforge/value';
 import { ByAIGenerator, FIX_ERROR } from '@cfgforge/gen';
-import type { EditorService } from './EditorService';
+import type { EditorService } from './EditorService.js';
 
 // ---------------------------------------------------------------------------
 // Types

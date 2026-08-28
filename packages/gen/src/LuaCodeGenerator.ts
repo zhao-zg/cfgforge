@@ -31,21 +31,21 @@ import { StructSchema, InterfaceSchema } from '@cfgforge/schema';
 import type { CfgSchema } from '@cfgforge/schema';
 import type { Context } from '@cfgforge/context';
 import type { CfgValue, VTable, Value } from '@cfgforge/value';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
-import { LuaAContext } from './LuaAContext';
-import { LuaCtx } from './LuaCtx';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
+import { LuaAContext } from './LuaAContext.js';
+import { LuaCtx } from './LuaCtx.js';
 import {
   luaFullName, luaTablePath,
-} from './LuaName';
+} from './LuaName.js';
 import {
   getLuaUniqKeysString, getLuaEnumString, getLuaRefsString,
   getLuaFieldsString, getLuaFieldsStringEmmyLua,
   getLuaUniqKeysStringEmmyLua, getLuaEnumStringEmmyLua,
   getLuaRefsStringEmmyLua, getLuaTextFieldsString,
-} from './LuaTypeStr';
-import { LuaValueStringify, getLuaString } from './LuaValueStringify';
-import { hasSubFieldable } from './LuaCtx';
+} from './LuaTypeStr.js';
+import { LuaValueStringify, getLuaString } from './LuaValueStringify.js';
+import { hasSubFieldable } from './LuaCtx.js';
 
 export class LuaCodeGenerator extends GeneratorWithTag {
   readonly dir: string;
@@ -92,7 +92,7 @@ export class LuaCodeGenerator extends GeneratorWithTag {
     );
     this.isLangSwitch = aCtx.nullableLangSwitchSupportVal() !== null;
 
-    this.dstDir = path.join(this.dir, this.pkg.replace('.', '/'));
+    this.dstDir = path.join(this.dir, ...this.pkg.split('.'));
 
     this.cfgValue = ctx.makeValueWithTag(this.tag);
     this.cfgSchema = this.cfgValue.schema;

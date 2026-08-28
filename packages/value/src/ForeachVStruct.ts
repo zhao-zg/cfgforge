@@ -21,7 +21,7 @@ import {
   VMap,
   VTable,
   CfgValue,
-} from './CfgValue';
+} from './CfgValue.js';
 
 // ---------------------------------------------------------------------------
 // Context — carries the origin of the current VStruct

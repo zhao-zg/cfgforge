@@ -14,7 +14,7 @@ import {
   refType,
   getCodeTopPkg,
   getIsSealedInterface,
-} from './JavaName';
+} from './JavaName.js';
 
 export interface InterfaceImpl {
   name: string;

@@ -35,12 +35,12 @@ import type { Context } from '@cfgforge/context';
 import { CachedFiles, XorCipher } from '@cfgforge/shared';
 import { LangSwitchableRuntime } from '@cfgforge/i18n';
 import type { LangSwitchable } from '@cfgforge/i18n';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
-import { ConfigOutput } from './ConfigOutput';
-import { StringPool } from './StringPool';
-import { LangTextPool } from './LangTextPool';
-import { CfgValueSerializer } from './CfgValueSerializer';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
+import { ConfigOutput } from './ConfigOutput.js';
+import { StringPool } from './StringPool.js';
+import { LangTextPool } from './LangTextPool.js';
+import { CfgValueSerializer } from './CfgValueSerializer.js';
 
 export class BytesGenerator extends GeneratorWithTag {
   private readonly dir: string;

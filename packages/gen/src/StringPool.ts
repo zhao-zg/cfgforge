@@ -9,7 +9,7 @@
  * Java source: configgen.genbytes.StringPool.java (31 lines)
  */
 
-import { ConfigOutput } from './ConfigOutput';
+import { ConfigOutput } from './ConfigOutput.js';
 
 export class StringPool {
   private stringToIndex = new Map<string, number>();

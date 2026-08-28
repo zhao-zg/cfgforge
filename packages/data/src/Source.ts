@@ -10,7 +10,7 @@
  * DCell is defined separately in DCell.ts.
  */
 
-import type { DCell } from './DCell';
+import type { DCell } from './DCell.js';
 
 /**
  * Union type representing the source of a value.

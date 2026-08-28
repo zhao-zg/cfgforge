@@ -8,7 +8,7 @@ import type { TableSchema } from '@cfgforge/schema';
 import { isEEnum, EEntry, EEnum } from '@cfgforge/schema';
 import type { VTable } from '@cfgforge/value';
 
-import { NameableName, getCodeTopPkg } from './JavaName';
+import { NameableName, getCodeTopPkg } from './JavaName.js';
 
 // Re-export EntryBase type for convenience
 export type EntryBase = EEntry | EEnum;

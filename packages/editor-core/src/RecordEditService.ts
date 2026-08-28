@@ -25,7 +25,7 @@ import {
   DeleteService,
   DeleteErrorCode,
 } from '@cfgforge/write';
-import type { EditorService } from './EditorService';
+import type { EditorService } from './EditorService.js';
 
 // ---------------------------------------------------------------------------
 // Types (mirror cfgeditor/src/api/recordModel.ts)

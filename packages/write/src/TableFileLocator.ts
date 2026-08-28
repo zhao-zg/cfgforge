@@ -10,9 +10,9 @@
 import { join as pathJoin } from '@cfgforge/shared';
 import type { DRowId, DTable, DRawSheet } from '@cfgforge/data';
 import { DCell, DCellList, DFile } from '@cfgforge/data';
-import type { TableFile } from './TableFile';
-import { CsvTableFile } from './storages/CsvTableFile';
-import { ExcelTableFile } from './storages/ExcelTableFile';
+import type { TableFile } from './TableFile.js';
+import { CsvTableFile } from './storages/CsvTableFile.js';
+import { ExcelTableFile } from './storages/ExcelTableFile.js';
 
 // Minimal VStruct shape needed by this module
 interface VStructLike {

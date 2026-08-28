@@ -10,10 +10,10 @@
 
 import type { Nameable } from '@cfgforge/schema';
 import { upper1 } from '@cfgforge/shared';
-import type { CsCodeGenerator } from './CsCodeGenerator';
-import type { CsStructModel } from './CsStructModel';
-import type { CsInterfaceModel } from './CsInterfaceModel';
-import { CsName } from './CsName';
+import type { CsCodeGenerator } from './CsCodeGenerator.js';
+import type { CsStructModel } from './CsStructModel.js';
+import type { CsInterfaceModel } from './CsInterfaceModel.js';
+import { CsName } from './CsName.js';
 
 export class CsModuleModel {
   readonly topPkg: string;

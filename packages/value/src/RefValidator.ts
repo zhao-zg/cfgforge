@@ -22,10 +22,10 @@ import {
   VMap,
   CfgValue,
   valueEquals,
-} from './CfgValue';
-import { CfgValueErrs, foreignValueNotFound, refNotNullableButCellEmpty } from './CfgValueErrs';
-import { ForeachVStruct, type ForeachContext, type VStructVisitor } from './ForeachVStruct';
-import { ValueUtil } from './ValueUtil';
+} from './CfgValue.js';
+import { CfgValueErrs, foreignValueNotFound, refNotNullableButCellEmpty } from './CfgValueErrs.js';
+import { ForeachVStruct, type ForeachContext, type VStructVisitor } from './ForeachVStruct.js';
+import { ValueUtil } from './ValueUtil.js';
 import type { ForeignKeySchema, TableSchema, FieldType } from '@cfgforge/schema';
 import {
   isFList,

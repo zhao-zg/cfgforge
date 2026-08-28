@@ -11,11 +11,11 @@
  * Java source: configgen.value.ValueToCsv.java (44 lines)
  */
 
-import { VStruct, VTable } from './CfgValue';
-import { ValueUtil } from './ValueUtil';
+import { VStruct, VTable } from './CfgValue.js';
+import { ValueUtil } from './ValueUtil.js';
 import { writeCSV, type CSVRow } from '@cfgforge/shared';
-import type { StringValue } from './CfgValue';
-import { VString, VText } from './CfgValue';
+import type { StringValue } from './CfgValue.js';
+import { VString, VText } from './CfgValue.js';
 
 export class ValueToCsv {
 

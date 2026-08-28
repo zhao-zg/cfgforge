@@ -5,12 +5,12 @@
  * to determine whether a Nameable transitively contains a property.
  */
 
-import type { Nameable } from './Nameable';
-import { StructSchema } from './StructSchema';
-import { TableSchema } from './TableSchema';
-import { InterfaceSchema } from './InterfaceSchema';
-import type { Structural } from './Structural';
-import { foreachFieldStructRef } from './ForeachSchema';
+import type { Nameable } from './Nameable.js';
+import { StructSchema } from './StructSchema.js';
+import { TableSchema } from './TableSchema.js';
+import { InterfaceSchema } from './InterfaceSchema.js';
+import type { Structural } from './Structural.js';
+import { foreachFieldStructRef } from './ForeachSchema.js';
 
 export enum CheckResult {
   Ok,

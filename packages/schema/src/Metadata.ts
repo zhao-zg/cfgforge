@@ -6,11 +6,11 @@
  * TS Map preserves insertion order; putFirst rebuilds the Map, putLast uses delete+set.
  */
 
-import type { CommentData } from './CommentData';
-import type { EntryType } from './EntryType';
-import { ENo, EEntry, EEnum, isENo, isEEntry, isEEnum } from './EntryType';
-import type { FieldFormat } from './FieldFormat';
-import { AutoOrPack, Sep, Fix, Block, isSep, isFix, isBlock } from './FieldFormat';
+import type { CommentData } from './CommentData.js';
+import type { EntryType } from './EntryType.js';
+import { ENo, EEntry, EEnum, isENo, isEEntry, isEEnum } from './EntryType.js';
+import type { FieldFormat } from './FieldFormat.js';
+import { AutoOrPack, Sep, Fix, Block, isSep, isFix, isBlock } from './FieldFormat.js';
 
 // ---------------------------------------------------------------------------
 // MetaValue types (discriminated union via _tag)

@@ -20,23 +20,23 @@
  * - Phase 2: filter foreign keys against phase1 table map
  */
 
-import { CfgSchema } from './CfgSchema';
-import type { CfgSchemaErrs } from './CfgSchemaErrs';
-import type { Structural } from './Structural';
-import type { FieldSchema } from './FieldSchema';
-import type { ForeignKeySchema } from './ForeignKeySchema';
-import type { KeySchema } from './KeySchema';
-import { TableSchema } from './TableSchema';
-import { InterfaceSchema } from './InterfaceSchema';
-import { StructSchema } from './StructSchema';
-import type { EntryType } from './EntryType';
-import { ENo, EEntry, EEnum, isEEntry, isEEnum } from './EntryType';
-import { isRefPrimary, isRefUniq, isRefList } from './RefKey';
-import { makeName } from './Nameable';
+import { CfgSchema } from './CfgSchema.js';
+import type { CfgSchemaErrs } from './CfgSchemaErrs.js';
+import type { Structural } from './Structural.js';
+import type { FieldSchema } from './FieldSchema.js';
+import type { ForeignKeySchema } from './ForeignKeySchema.js';
+import type { KeySchema } from './KeySchema.js';
+import { TableSchema } from './TableSchema.js';
+import { InterfaceSchema } from './InterfaceSchema.js';
+import { StructSchema } from './StructSchema.js';
+import type { EntryType } from './EntryType.js';
+import { ENo, EEntry, EEnum, isEEntry, isEEnum } from './EntryType.js';
+import { isRefPrimary, isRefUniq, isRefList } from './RefKey.js';
+import { makeName } from './Nameable.js';
 import {
   filterRefIgnoredByRefTableNotFound,
   filterRefIgnoredByRefKeyNotFound,
-} from './CfgSchemaErrs';
+} from './CfgSchemaErrs.js';
 
 // ---------------------------------------------------------------------------
 // RefErr (internal enum)

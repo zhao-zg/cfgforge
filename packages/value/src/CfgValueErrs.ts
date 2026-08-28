@@ -10,7 +10,7 @@
 
 import { DFile, type Source } from '@cfgforge/data';
 import type { FieldType } from '@cfgforge/schema';
-import type { Value } from './CfgValue';
+import type { Value } from './CfgValue.js';
 
 // ---------------------------------------------------------------------------
 // Msg interfaces (discriminated unions via _tag) — mirrors CfgSchemaErrs pattern

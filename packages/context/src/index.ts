@@ -1,9 +1,9 @@
-export { ContextCfg } from './ContextCfg';
-export { ExplicitDir } from './ExplicitDir';
-export { DirectoryStructure } from './DirectoryStructure';
-export { Context } from './Context';
-export { DataUpdater } from './DataUpdater';
-export { Watcher } from './Watcher';
-export { WaitWatcher } from './WaitWatcher';
-export { WatchAndPostRun } from './WatchAndPostRun';
-export type { PostRunCallback } from './WatchAndPostRun';
+export { ContextCfg } from './ContextCfg.js';
+export { ExplicitDir } from './ExplicitDir.js';
+export { DirectoryStructure } from './DirectoryStructure.js';
+export { Context } from './Context.js';
+export { DataUpdater } from './DataUpdater.js';
+export { Watcher } from './Watcher.js';
+export { WaitWatcher } from './WaitWatcher.js';
+export { WatchAndPostRun } from './WatchAndPostRun.js';
+export type { PostRunCallback } from './WatchAndPostRun.js';

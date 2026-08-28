@@ -9,7 +9,7 @@
 
 import { SearchService as ValueSearchService } from '@cfgforge/value';
 import type { SearchResult, SearchResultItem, SearchResultCode } from '@cfgforge/value';
-import type { EditorService } from './EditorService';
+import type { EditorService } from './EditorService.js';
 
 // Re-export types for convenience
 export type { SearchResult, SearchResultItem, SearchResultCode };

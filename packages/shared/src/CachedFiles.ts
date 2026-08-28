@@ -11,8 +11,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { getDefaultFileSystem } from './CfgFileSystem';
-import { Logger } from './Logger';
+import { getDefaultFileSystem } from './CfgFileSystem.js';
+import { Logger } from './Logger.js';
 
 const META_SUFFIXES = ['.meta', '.uid'];
 

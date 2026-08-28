@@ -7,8 +7,8 @@
 
 import { Generators } from '@cfgforge/gen';
 import { Logger, LocaleUtil } from '@cfgforge/shared';
-import { Tools } from './Tools';
-import { ParameterInfoCollector } from './ParameterInfoCollector';
+import { Tools } from './Tools.js';
+import { ParameterInfoCollector } from './ParameterInfoCollector.js';
 
 export function printHelp(reason?: string | null): void {
   if (reason !== null && reason !== undefined && reason.trim().length > 0) {

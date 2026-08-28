@@ -28,8 +28,8 @@ import {
   VText,
   type CfgValue,
   valueEquals,
-} from './CfgValue';
-import { ValueUtil } from './ValueUtil';
+} from './CfgValue.js';
+import { ValueUtil } from './ValueUtil.js';
 import { upper1 } from '@cfgforge/shared';
 import type { ForeignKeySchema, Structural } from '@cfgforge/schema';
 import { isRefPrimary, isRefUniq, isFList, isFMap, isSimpleType, type RefSimple } from '@cfgforge/schema';

@@ -30,7 +30,7 @@ import type {
 import { isRefList, RefPrimary, RefUniq, type RefSimple } from '@cfgforge/schema';
 import { upper1, lower1 } from '@cfgforge/shared';
 import type { VTable } from '@cfgforge/value';
-import type { TsCodeGenerator } from './TsCodeGenerator';
+import type { TsCodeGenerator } from './TsCodeGenerator.js';
 
 export class StructModel {
   readonly structural: Structural;

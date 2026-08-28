@@ -20,8 +20,8 @@ import {
 import { ForeachValue, ValueVisitorForSearch } from '@cfgforge/value';
 import { writeCSVToFileAsync, getDefaultFileSystem } from '@cfgforge/shared';
 import type { CSVRow } from '@cfgforge/shared';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
 
 export class I18nByValueGenerator extends GeneratorWithTag {
   private readonly file: string;

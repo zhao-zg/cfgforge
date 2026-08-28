@@ -19,7 +19,7 @@ import {
   formalParams,
   hashCodes,
   equalsExpr,
-} from './JavaName';
+} from './JavaName.js';
 
 export interface FieldInfo {
   name: string;

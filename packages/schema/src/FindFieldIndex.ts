@@ -4,9 +4,9 @@
  * Finds field indices within a Structural's fields() array.
  */
 
-import type { Structural } from './Structural';
-import type { FieldSchema } from './FieldSchema';
-import type { KeySchema } from './KeySchema';
+import type { Structural } from './Structural.js';
+import type { FieldSchema } from './FieldSchema.js';
+import type { KeySchema } from './KeySchema.js';
 
 export function findFieldIndices(structural: Structural, key: KeySchema): number[] {
   const fieldSchemas = key.fieldSchemas();

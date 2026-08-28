@@ -5,16 +5,16 @@
  * Has mutable nullableInterface pointer.
  */
 
-import type { FieldFormat } from './FieldFormat';
-import { AutoOrPack, isSep } from './FieldFormat';
-import type { Metadata } from './Metadata';
-import type { FieldSchema } from './FieldSchema';
-import { FieldSchema as FieldSchemaClass } from './FieldSchema';
-import type { ForeignKeySchema } from './ForeignKeySchema';
-import type { InterfaceSchema } from './InterfaceSchema';
-import type { FieldType } from './FieldType';
-import { defaultNamespace, defaultLastName } from './Nameable';
-import type { Fieldable, Structural } from './interfaces';
+import type { FieldFormat } from './FieldFormat.js';
+import { AutoOrPack, isSep } from './FieldFormat.js';
+import type { Metadata } from './Metadata.js';
+import type { FieldSchema } from './FieldSchema.js';
+import { FieldSchema as FieldSchemaClass } from './FieldSchema.js';
+import type { ForeignKeySchema } from './ForeignKeySchema.js';
+import type { InterfaceSchema } from './InterfaceSchema.js';
+import type { FieldType } from './FieldType.js';
+import { defaultNamespace, defaultLastName } from './Nameable.js';
+import type { Fieldable, Structural } from './interfaces.js';
 
 export class StructSchema implements Fieldable, Structural {
   private _nullableInterface: InterfaceSchema | null = null;

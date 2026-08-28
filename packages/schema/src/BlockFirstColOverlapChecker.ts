@@ -11,10 +11,10 @@
  * range where VTableBlockParser would trigger first-column overlap at parse time.
  */
 
-import type { CfgSchema } from './CfgSchema';
-import type { CfgSchemaErrs } from './CfgSchemaErrs';
-import * as Errs from './CfgSchemaErrs';
-import { walkBlockAncestors } from './BlockAncestorWalker';
+import type { CfgSchema } from './CfgSchema.js';
+import type { CfgSchemaErrs } from './CfgSchemaErrs.js';
+import * as Errs from './CfgSchemaErrs.js';
+import { walkBlockAncestors } from './BlockAncestorWalker.js';
 
 export function checkBlockFirstColOverlap(cfgSchema: CfgSchema, errs: CfgSchemaErrs): void {
   const tableMap = cfgSchema.tableMap();

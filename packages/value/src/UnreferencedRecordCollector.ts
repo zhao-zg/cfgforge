@@ -19,9 +19,9 @@ import {
   VText,
   type VTable,
   type CfgValue,
-} from './CfgValue';
-import { ValueUtil } from './ValueUtil';
-import { ValueRefInCollector } from './ValueRefInCollector';
+} from './CfgValue.js';
+import { ValueUtil } from './ValueUtil.js';
+import { ValueRefInCollector } from './ValueRefInCollector.js';
 import { TableSchemaRefGraph } from '@cfgforge/schema';
 import type { TableSchema } from '@cfgforge/schema';
 import { isEEnum, isEEntry } from '@cfgforge/schema';

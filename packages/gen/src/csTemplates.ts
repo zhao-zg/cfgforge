@@ -36,10 +36,10 @@ import {
 } from '@cfgforge/schema';
 import { StructSchema as StructSchemaClass, EEntry, EEnum } from '@cfgforge/schema';
 import { removeLineSep, upper1, lower1 } from '@cfgforge/shared';
-import { CsStructModel } from './CsStructModel';
-import { CsInterfaceModel } from './CsInterfaceModel';
-import { CsModuleModel } from './CsModuleModel';
-import { CsProcessorModel } from './CsProcessorModel';
+import { CsStructModel } from './CsStructModel.js';
+import { CsInterfaceModel } from './CsInterfaceModel.js';
+import { CsModuleModel } from './CsModuleModel.js';
+import { CsProcessorModel } from './CsProcessorModel.js';
 
 // ---------------------------------------------------------------------------
 // 1. genMapGetBy (GenMapGetBy.jte)

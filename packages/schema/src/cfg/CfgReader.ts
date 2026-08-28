@@ -7,28 +7,28 @@
  * Also includes CommentUtil functionality (ported from Java CommentUtil.java).
  */
 
-import { CfgParser } from './CfgParser';
+import { CfgParser } from './CfgParser.js';
 import type {
   StructDeclAst, InterfaceDeclAst, TableDeclAst, EnumDeclAst,
   FieldDeclAst, ForeignDeclAst,
   FieldTypeAst, FieldTypeEleAst, MetadataAst, MetaValueAst,
   RefAst, KeyAst, CommentData as AstCommentData,
-} from './AstNode';
-import { CfgSchema } from '../CfgSchema';
-import { StructSchema } from '../StructSchema';
-import { TableSchema } from '../TableSchema';
-import { InterfaceSchema } from '../InterfaceSchema';
-import { FieldSchema } from '../FieldSchema';
-import { ForeignKeySchema } from '../ForeignKeySchema';
-import { KeySchema } from '../KeySchema';
-import { RefPrimary, RefUniq, RefList } from '../RefKey';
-import { EEnum } from '../EntryType';
-import { Primitive, FList, FMap, StructRef } from '../FieldType';
-import type { FieldType, SimpleType } from '../FieldType';
-import { AutoOrPack } from '../FieldFormat';
-import { Metadata, Metadata_of, metaInt, metaFloat, metaStr, TAG } from '../Metadata';
-import type { MetaValue } from '../Metadata';
-import { CommentData } from '../CommentData';
+} from './AstNode.js';
+import { CfgSchema } from '../CfgSchema.js';
+import { StructSchema } from '../StructSchema.js';
+import { TableSchema } from '../TableSchema.js';
+import { InterfaceSchema } from '../InterfaceSchema.js';
+import { FieldSchema } from '../FieldSchema.js';
+import { ForeignKeySchema } from '../ForeignKeySchema.js';
+import { KeySchema } from '../KeySchema.js';
+import { RefPrimary, RefUniq, RefList } from '../RefKey.js';
+import { EEnum } from '../EntryType.js';
+import { Primitive, FList, FMap, StructRef } from '../FieldType.js';
+import type { FieldType, SimpleType } from '../FieldType.js';
+import { AutoOrPack } from '../FieldFormat.js';
+import { Metadata, Metadata_of, metaInt, metaFloat, metaStr, TAG } from '../Metadata.js';
+import type { MetaValue } from '../Metadata.js';
+import { CommentData } from '../CommentData.js';
 
 // ---------------------------------------------------------------------------
 // CommentUtil (ported from Java CommentUtil.java)

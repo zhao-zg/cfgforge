@@ -46,15 +46,15 @@ import type { FieldType } from '@cfgforge/schema';
 import { Primitive, isStructRef } from '@cfgforge/schema';
 import { upper1 } from '@cfgforge/shared';
 
-import { mapperFieldType, parseExpr, rowReadExpr } from './JavaMapperName';
-import { boxTypeOf, type TypeOpts } from './JavaTypeUtil';
+import { mapperFieldType, parseExpr, rowReadExpr } from './JavaMapperName.js';
+import { boxTypeOf, type TypeOpts } from './JavaTypeUtil.js';
 import type {
   PojoFieldModel,
   PojoModel,
   InterfacePojoModel,
   RawTableModel,
   RawFieldModel,
-} from './JavaMapperModel';
+} from './JavaMapperModel.js';
 
 // ---------------------------------------------------------------------------
 // Task 5：child 子类 / CfgMapperInit 模型

@@ -5,8 +5,8 @@
  */
 
 import type { Nameable, InterfaceSchema } from '@cfgforge/schema';
-import { GdName } from './GdName';
-import type { GdCodeGenerator } from './GdCodeGenerator';
+import { GdName } from './GdName.js';
+import type { GdCodeGenerator } from './GdCodeGenerator.js';
 
 export class GdInterfaceModel {
   readonly name: GdName;

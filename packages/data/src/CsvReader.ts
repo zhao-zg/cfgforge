@@ -10,10 +10,10 @@
  */
 
 import { readCSV, readCSVAsync, type CSVRow } from '@cfgforge/shared';
-import { type DRawRow } from './DRawRow';
-import { DRawSheet } from './DRawSheet';
-import { ReadResult, OneSheet } from './ReadResult';
-import { CfgDataStat } from './CfgDataStat';
+import { type DRawRow } from './DRawRow.js';
+import { DRawSheet } from './DRawSheet.js';
+import { ReadResult, OneSheet } from './ReadResult.js';
+import { CfgDataStat } from './CfgDataStat.js';
 
 // ---------------------------------------------------------------------------
 // DRawCsvRow — CSV-backed implementation of DRawRow

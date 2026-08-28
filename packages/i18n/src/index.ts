@@ -5,11 +5,11 @@
  *                       I18nUtils, LangSwitchable, LangSwitchableRuntime, TodoFile
  */
 
-export { LangTextFinder } from './LangTextFinder';
-export type { TextVisitor, TextFinder } from './LangTextFinder';
-export { TextByValueFinder } from './TextByValueFinder';
-export { TextByIdFinder, OneText, OneRecord } from './TextByIdFinder';
-export { LangSwitchable } from './LangSwitchable';
-export { LangSwitchableRuntime } from './LangSwitchableRuntime';
-export { TodoFile, TodoFileLine } from './TodoFile';
-export { normalize, fieldChainStr } from './I18nUtils';
+export { LangTextFinder } from './LangTextFinder.js';
+export type { TextVisitor, TextFinder } from './LangTextFinder.js';
+export { TextByValueFinder } from './TextByValueFinder.js';
+export { TextByIdFinder, OneText, OneRecord } from './TextByIdFinder.js';
+export { LangSwitchable } from './LangSwitchable.js';
+export { LangSwitchableRuntime } from './LangSwitchableRuntime.js';
+export { TodoFile, TodoFileLine } from './TodoFile.js';
+export { normalize, fieldChainStr } from './I18nUtils.js';

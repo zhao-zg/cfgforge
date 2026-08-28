@@ -8,7 +8,7 @@
  * Implementation: `DirectoryStructure` (ctx layer, Phase 5).
  */
 
-import type { JsonFileInfo } from './JsonFileInfo';
+import type { JsonFileInfo } from './JsonFileInfo.js';
 
 export interface JsonTableFiles {
   /**

@@ -16,8 +16,8 @@
  */
 
 import { readAndNormalizeCSVAsync, writeCSVToFileAsync, type CSVRow } from '@cfgforge/shared';
-import type { RecordBlockTransformed } from '../RecordBlock';
-import type { TableFile } from '../TableFile';
+import type { RecordBlockTransformed } from '../RecordBlock.js';
+import type { TableFile } from '../TableFile.js';
 
 export class CsvTableFile implements TableFile {
   private readonly _filePath: string;

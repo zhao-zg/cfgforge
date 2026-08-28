@@ -16,8 +16,8 @@ import { hasMap } from '@cfgforge/schema';
 import type { Context } from '@cfgforge/context';
 import { VTableJsonStorage } from '@cfgforge/write';
 import type { CfgValue } from '@cfgforge/value';
-import type { Parameter } from './Parameter';
-import { GeneratorWithTag } from './GeneratorWithTag';
+import type { Parameter } from './Parameter.js';
+import { GeneratorWithTag } from './GeneratorWithTag.js';
 
 export class JsonGenerator extends GeneratorWithTag {
   private readonly tables: string;

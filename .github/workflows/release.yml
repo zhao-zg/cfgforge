@@ -65,7 +65,7 @@ jobs:
       - name: Create cfgeditor.yml
         working-directory: cfgeditor
         shell: pwsh
-        run: Set-Content -Path cfgeditor.yml -Value 'dataDir: ""' -NoNewline
+        run: 'Set-Content -Path cfgeditor.yml -Value "dataDir: ''"  -NoNewline'
 
       - name: Build Tauri
         working-directory: cfgeditor
@@ -132,7 +132,8 @@ jobs:
 
       - name: Create cfgeditor.yml
         working-directory: cfgeditor
-        run: echo 'dataDir: ""' > cfgeditor.yml
+        run: |
+          printf '%s' 'dataDir: ""' > cfgeditor.yml
 
       - name: Build Tauri
         working-directory: cfgeditor
@@ -197,7 +198,8 @@ jobs:
 
       - name: Create cfgeditor.yml
         working-directory: cfgeditor
-        run: echo 'dataDir: ""' > cfgeditor.yml
+        run: |
+          printf '%s' 'dataDir: ""' > cfgeditor.yml
 
       - name: Build Tauri
         working-directory: cfgeditor

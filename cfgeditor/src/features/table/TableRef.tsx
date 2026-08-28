@@ -6,10 +6,11 @@ import {MenuItem} from "@/flow/FlowContextMenu.tsx";
 import {useTranslation} from "react-i18next";
 import {SItem} from "@/api/schemaModel.ts";
 import {fillHandles} from "@/flow/layout/entityToNodeAndEdge.ts";
-import {memo, useCallback, useMemo} from "react";
+import {memo, useCallback, useMemo, useState} from "react";
 import {useEntityToGraph} from "@/flow/useEntityToGraph.ts";
 import {EntityNode} from "@/flow/FlowGraph.tsx";
 import {getDefaultIdInTable, SchemaTableType} from "@/domain/schema.ts";
+import {RelationEditModal} from "./RelationEditModal.tsx";
 
 export const TableRef = memo(function TableRef() {
     const {schema, notes, curTable} = useOutletContext<SchemaTableType>();
@@ -17,6 +18,7 @@ export const TableRef = memo(function TableRef() {
     const {curId, pathname} = useLocationData();
     const {t} = useTranslation();
     const navigate = useNavigate();
+    const [relationTable, setRelationTable] = useState<string | null>(null);
     // entityMap 构建含 fillHandles 副作用，React Compiler 不会 memo，需手动 useMemo
     const entityMap = useMemo(() => {
         const map = new Map<string, Entity>();
@@ -49,6 +51,10 @@ export const TableRef = memo(function TableRef() {
             label: `${sItem.name}\n${t('tableRef')}`,
             key: 'entityTableRef',
             handler: () => navigate(navTo('tableRef', sItem.name, getTableDefaultId(sItem.name)))
+        }, {
+            label: `${sItem.name}\n${t('editRelations')}`,
+            key: 'editRelations',
+            handler: () => setRelationTable(sItem.name)
         }];
     }, [navigate, getTableDefaultId, t]);
 
@@ -62,5 +68,17 @@ export const TableRef = memo(function TableRef() {
         nodeDoubleClickFunc
     });
 
-    return null;
+    return (
+        <>
+            {relationTable !== null && (
+                <RelationEditModal
+                    key={relationTable}
+                    table={schema.getSTable(relationTable)!}
+                    schema={schema}
+                    open
+                    onClose={() => setRelationTable(null)}
+                />
+            )}
+        </>
+    );
 });

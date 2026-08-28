@@ -9,7 +9,8 @@ import {fillHandles} from "@/flow/layout/entityToNodeAndEdge.ts";
 import {getDefaultIdInTable, SchemaTableType} from "@/domain/schema.ts";
 import {useEntityToGraph} from "@/flow/useEntityToGraph.ts";
 import {EntityNode} from "@/flow/FlowGraph.tsx";
-import {memo, useCallback, useMemo} from "react";
+import {memo, useCallback, useMemo, useState} from "react";
+import {RelationEditModal} from "./RelationEditModal.tsx";
 
 
 export const Table = memo(function Table() {
@@ -18,6 +19,7 @@ export const Table = memo(function Table() {
     const {pathname, curId} = useLocationData();
     const {t} = useTranslation();
     const navigate = useNavigate();
+    const [relationTable, setRelationTable] = useState<string | null>(null);
 
     const getTableDefaultId = useCallback((tableName: string) =>
         getDefaultIdInTable(schema, tableName, curId), [schema, curId]);
@@ -56,11 +58,28 @@ export const Table = memo(function Table() {
             key: 'entityTableRef',
             handler: () => navigate(navTo('tableRef', userData.table, getTableDefaultId(userData.table)))
         });
+        menuItems.push({
+            label: `${userData.table}\n${t('editRelations')}`,
+            key: 'editRelations',
+            handler: () => setRelationTable(userData.table)
+        });
         return menuItems;
     }, [curTable.name, t, navigate, getTableDefaultId]);
 
     useEntityToGraph({type: 'table', pathname, entityMap, notes, nodeMenuFunc, paneMenu});
-    return null;
+    return (
+        <>
+            {relationTable !== null && (
+                <RelationEditModal
+                    key={relationTable}
+                    table={schema.getSTable(relationTable)!}
+                    schema={schema}
+                    open
+                    onClose={() => setRelationTable(null)}
+                />
+            )}
+        </>
+    );
 });
 
 

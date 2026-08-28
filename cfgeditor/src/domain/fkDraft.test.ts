@@ -143,4 +143,26 @@ describe('validateFkDraft', () => {
         }, item, getTable)
         expect(errs).toContain('外键名与字段冲突: owner')
     })
+
+    it('编辑态（editingFkName）豁免内联 FK 原名冲突', () => {
+        // 内联 FK：FK 名 == 字段名（如 owner:int ->user）。编辑该 FK 时保留原名
+        // 不应被当作"与字段冲突"拒绝（与后端 pickFkName 的 exemptName 语义一致）。
+        const errs = validateFkDraft({
+            fkName: 'owner',
+            keys: ['owner'],
+            refTable: 'user',
+            nullable: false,
+        }, item, getTable, 'owner')
+        expect(errs).toStrictEqual([])
+    })
+
+    it('编辑态下改名与其他字段冲突仍报错', () => {
+        const errs = validateFkDraft({
+            fkName: 'code',
+            keys: ['owner'],
+            refTable: 'user',
+            nullable: false,
+        }, item, getTable, 'owner')
+        expect(errs).toContain('外键名与字段冲突: code')
+    })
 })

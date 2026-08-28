@@ -62,6 +62,7 @@ export function validateFkDraft(
     draft: FkDraft,
     table: STable,
     getTable: (name: string) => STable | null,
+    editingFkName?: string,
 ): string[] {
     const errors: string[] = [];
 
@@ -102,7 +103,9 @@ export function validateFkDraft(
     }
 
     if (draft.fkName && draft.fkName.trim().length > 0) {
-        if (getField(table, draft.fkName) !== null) {
+        // 编辑态豁免：FK 名 == 编辑前的 FK 名时（如内联 FK：FK 名 == 字段名）
+        // 不视为字段冲突（与后端 pickFkName 的 exemptName 语义一致）
+        if (draft.fkName !== editingFkName && getField(table, draft.fkName) !== null) {
             errors.push(`外键名与字段冲突: ${draft.fkName}`);
         }
     }

@@ -58,6 +58,9 @@ import type {JSONObject} from './recordModel';
 // ---------------------------------------------------------------------------
 
 let editor: EditorService | null = null;
+// initEditor 失败时保存原始错误，让后续 getEditor() 抛出的信息包含真正原因，
+// 而非笼统的 "Editor not initialized"（那是次生错误，用户看不到 initEditor 的真正报错）。
+let initError: Error | null = null;
 
 /** Join path segments using the OS-appropriate separator. */
 function joinPath(base: string, file: string): string {
@@ -70,7 +73,14 @@ function joinPath(base: string, file: string): string {
  * Must be called before any API function.
  */
 export async function initEditor(dataDir: string): Promise<void> {
-    editor = await EditorService.create(dataDir);
+    try {
+        editor = await EditorService.create(dataDir);
+        initError = null;
+    } catch (e) {
+        editor = null;
+        initError = e instanceof Error ? e : new Error(String(e));
+        throw e;
+    }
 }
 
 /**
@@ -95,6 +105,9 @@ export function shutdownEditor(): void {
  */
 function getEditor(): EditorService {
     if (editor === null) {
+        if (initError !== null) {
+            throw new Error(`Editor initialization failed: ${initError.message}`);
+        }
         throw new Error('Editor not initialized. Call initEditor(dataDir) first.');
     }
     return editor;

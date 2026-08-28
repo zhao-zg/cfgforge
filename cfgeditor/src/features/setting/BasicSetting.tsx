@@ -1,5 +1,6 @@
 import {memo} from "react";
-import {Divider, Form, InputNumber, Switch, Typography} from "antd";
+import {Form, InputNumber, Switch} from "antd";
+import {ApartmentOutlined, CarryOutOutlined, LinkOutlined, SettingOutlined} from "@ant-design/icons";
 import {
     setIsNextIdShow,
     setMaxImpl,
@@ -12,8 +13,7 @@ import {
     useMyStore
 } from "@/store/store.ts";
 import {useTranslation} from "react-i18next";
-
-const {Title} = Typography;
+import {SettingCard} from "./SettingCard.tsx";
 
 export const BasicSetting = memo(function TableSetting() {
     const {t} = useTranslation();
@@ -32,66 +32,65 @@ export const BasicSetting = memo(function TableSetting() {
                      isNextIdShow, searchMax,
                  }}>
 
-        <Title level={4} style={{marginTop: -4}}>{t('tableRefSettingTitle')}</Title>
-        <Form.Item label={t('implsShowCnt')} name='maxImpl'>
-            <InputNumber min={1} max={500} onChange={setMaxImpl}/>
-        </Form.Item>
+        <SettingCard icon={<ApartmentOutlined/>} title={t('tableRefSettingTitle')}>
+            <Form.Item label={t('implsShowCnt')} name='maxImpl'>
+                <InputNumber min={1} max={500} onChange={setMaxImpl}/>
+            </Form.Item>
 
-        <Form.Item name='refIn' label={t('refIn')} valuePropName="checked">
-            <Switch onChange={setRefIn}/>
-        </Form.Item>
+            <Form.Item name='refIn' label={t('refIn')} valuePropName="checked">
+                <Switch onChange={setRefIn}/>
+            </Form.Item>
 
-        <Form.Item name='refOutDepth' label={t('refOutDepth')}>
-            <InputNumber min={1} max={500} onChange={setRefOutDepth}/>
-        </Form.Item>
+            <Form.Item name='refOutDepth' label={t('refOutDepth')}>
+                <InputNumber min={1} max={500} onChange={setRefOutDepth}/>
+            </Form.Item>
 
-        <Form.Item name='maxNode' label={t('maxNode')}>
-            <InputNumber min={1} max={500} onChange={setMaxNode}/>
-        </Form.Item>
+            <Form.Item name='maxNode' label={t('maxNode')}>
+                <InputNumber min={1} max={500} onChange={setMaxNode}/>
+            </Form.Item>
+        </SettingCard>
 
-        <Divider/>
-        <Title level={4}>{t('recordRefSettingTitle')}</Title>
-        <Form.Item name='recordRefIn' label={t('recordRefIn')} valuePropName="checked">
-            <Switch onChange={setRecordRefIn}/>
-        </Form.Item>
+        <SettingCard icon={<CarryOutOutlined/>} title={t('recordRefSettingTitle')}>
+            <Form.Item name='recordRefIn' label={t('recordRefIn')} valuePropName="checked">
+                <Switch onChange={setRecordRefIn}/>
+            </Form.Item>
 
-        <Form.Item name='recordRefInShowLinkMaxNode' label={t('recordRefInShowLinkMaxNode')}>
-            <InputNumber min={1} max={20} onChange={setRecordRefInShowLinkMaxNode}/>
-        </Form.Item>
+            <Form.Item name='recordRefInShowLinkMaxNode' label={t('recordRefInShowLinkMaxNode')}>
+                <InputNumber min={1} max={20} onChange={setRecordRefInShowLinkMaxNode}/>
+            </Form.Item>
 
-        <Form.Item name='recordRefOutDepth' label={t('recordRefOutDepth')}>
-            <InputNumber min={1} max={500} onChange={setRecordRefOutDepth}/>
-        </Form.Item>
+            <Form.Item name='recordRefOutDepth' label={t('recordRefOutDepth')}>
+                <InputNumber min={1} max={500} onChange={setRecordRefOutDepth}/>
+            </Form.Item>
 
-        <Form.Item name='recordMaxNode' label={t('recordMaxNode')}>
-            <InputNumber min={1} max={500} onChange={setRecordMaxNode}/>
-        </Form.Item>
+            <Form.Item name='recordMaxNode' label={t('recordMaxNode')}>
+                <InputNumber min={1} max={500} onChange={setRecordMaxNode}/>
+            </Form.Item>
+        </SettingCard>
 
+        <SettingCard icon={<LinkOutlined/>} title={t('refIdSettingTitle')}>
+            <Form.Item name='refIdsInDepth' label={t('refIdsInDepth')}>
+                <InputNumber min={0} max={5} onChange={setRefIdsInDepth}/>
+            </Form.Item>
 
-        <Divider/>
-        <Title level={4}>{t('refIdSettingTitle')}</Title>
-        <Form.Item name='refIdsInDepth' label={t('refIdsInDepth')}>
-            <InputNumber min={0} max={5} onChange={setRefIdsInDepth}/>
-        </Form.Item>
+            <Form.Item name='refIdsOutDepth' label={t('refIdsOutDepth')}>
+                <InputNumber min={0} max={5} onChange={setRefIdsOutDepth}/>
+            </Form.Item>
 
-        <Form.Item name='refIdsOutDepth' label={t('refIdsOutDepth')}>
-            <InputNumber min={0} max={5} onChange={setRefIdsOutDepth}/>
-        </Form.Item>
+            <Form.Item name='refIdsMaxNode' label={t('refIdsMaxNode')}>
+                <InputNumber min={1} max={500} onChange={setRefIdsMaxNode}/>
+            </Form.Item>
+        </SettingCard>
 
-        <Form.Item name='refIdsMaxNode' label={t('refIdsMaxNode')}>
-            <InputNumber min={1} max={500} onChange={setRefIdsMaxNode}/>
-        </Form.Item>
+        <SettingCard icon={<SettingOutlined/>} title={t('otherSetting')}>
+            <Form.Item name='isNextIdShow' label={t('isNextIdShow')} valuePropName="checked">
+                <Switch onChange={setIsNextIdShow}/>
+            </Form.Item>
 
-
-        <Divider/>
-        <Title level={4}>{t('otherSetting')}</Title>
-        <Form.Item name='isNextIdShow' label={t('isNextIdShow')} valuePropName="checked">
-            <Switch onChange={setIsNextIdShow}/>
-        </Form.Item>
-
-        <Form.Item name='searchMax' label={t('searchMaxReturn')}>
-            <InputNumber min={1} max={500} onChange={setSearchMax}/>
-        </Form.Item>
+            <Form.Item name='searchMax' label={t('searchMaxReturn')}>
+                <InputNumber min={1} max={500} onChange={setSearchMax}/>
+            </Form.Item>
+        </SettingCard>
 
     </Form>;
 });

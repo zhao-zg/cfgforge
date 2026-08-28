@@ -33,14 +33,15 @@ if (isTauri()) {
     }
 }
 
-import React, { useState, useEffect } from 'react'
+import React, {useEffect, useMemo, useState} from 'react'
 import ReactDOM from 'react-dom/client'
 import {QueryClientProvider} from '@tanstack/react-query'
 import {queryClient} from "./services/queryClient.ts";
 
 import '@xyflow/react/dist/style.css';
+import './styles/tokens.css'
 import './style.css'
-import {App, Button, ConfigProvider, Result} from "antd";
+import {App, Button, ConfigProvider, Result, theme} from "antd";
 import './app/i18n.js'
 import {createBrowserRouter} from "react-router";
 import {RouterProvider} from "react-router/dom";
@@ -48,7 +49,7 @@ import {AppLoader} from "./app/AppLoader.tsx";
 import {flushAllPrefsAsync} from "./store/storage.ts";
 import {Window} from "@tauri-apps/api/window";
 import {useMyStore} from "./store/store.ts";
-import {loadTheme} from "./services/themeService.ts";
+import {loadTheme, AntdThemeConfig} from "./services/themeService.ts";
 // import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 
 
@@ -85,8 +86,44 @@ const router = createBrowserRouter([
     }
 ]);
 
-// 默认主题配置
+// 默认主题配置（Soft Nordic 暖调浅色）
 const defaultTheme = {
+    token: {
+        colorPrimary: '#7B9E89',
+        colorBgLayout: '#F7F4EE',
+        colorBgContainer: '#FFFFFF',
+        colorText: '#3D3935',
+        colorBorder: '#E2DCD0',
+        colorBorderSecondary: '#EEE9DE',
+        colorTextSecondary: '#8B8479',
+        colorBgTextHover: '#F0EBE0',
+        borderRadius: 6,
+        fontFamily: 'Inter, "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',
+        fontSize: 14,
+    },
+    components: {
+        Tabs: {
+            horizontalMargin: '0,0,0,0'
+        },
+    },
+}
+
+// 深色主题配置（Refined Dark，与 tokens.css 的 [data-theme="dark"] 变量保持一致）
+const darkTheme = {
+    algorithm: theme.darkAlgorithm,
+    token: {
+        colorPrimary: '#7DBA9E',
+        colorBgLayout: '#1C1B1A',
+        colorBgContainer: '#252423',
+        colorText: '#D0CCC8',
+        colorBorder: '#3A3835',
+        colorBorderSecondary: '#333130',
+        colorTextSecondary: '#8A847E',
+        colorBgTextHover: '#363330',
+        borderRadius: 6,
+        fontFamily: 'Inter, "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif',
+        fontSize: 14,
+    },
     components: {
         Tabs: {
             horizontalMargin: '0,0,0,0'
@@ -111,40 +148,63 @@ if (isTauri()) {
 
 // 动态主题提供者组件
 function ThemeProvider({ children }: { children: React.ReactNode }) {
-    const { themeConfig } = useMyStore();
-    const [currentTheme, setCurrentTheme] = useState(defaultTheme);
+    const { themeConfig, themeMode } = useMyStore();
+    // 自定义主题文件（异步加载，冷路径）与明暗基座分离：明暗切换是同步派生，不触发额外渲染
+    const [customTheme, setCustomTheme] = useState<AntdThemeConfig | null>(null);
+
+    // 明暗基座（同步派生，themeMode 变化立即生效；同时同步 data-theme 驱动 tokens.css 变量）
+    const baseTheme = useMemo(() => themeMode === 'dark' ? darkTheme : defaultTheme, [themeMode]);
 
     useEffect(() => {
+        document.documentElement.dataset.theme = themeMode;
+    }, [themeMode]);
+
+    // 自定义主题文件加载：themeFile 或明暗切换时重新加载/清除，结果异步合并进 currentTheme
+    useEffect(() => {
+        let cancelled = false;
         const applyTheme = async () => {
             if (themeConfig.themeFile) {
                 try {
                     const theme = await loadTheme(themeConfig.themeFile);
-                    if (theme) {
-                        // 合并自定义主题和默认主题
-                        setCurrentTheme({
-                            ...defaultTheme,
-                            ...theme,
-                            components: {
-                                ...defaultTheme.components,
-                                ...(theme.components || {})
-                            }
-                        });
-                    } else {
-                        // 主题文件加载失败，使用默认主题
-                        setCurrentTheme(defaultTheme);
+                    if (!cancelled) {
+                        setCustomTheme(theme || null);
                     }
                 } catch (error) {
                     console.error('加载主题失败:', error);
-                    setCurrentTheme(defaultTheme);
+                    if (!cancelled) {
+                        setCustomTheme(null);
+                    }
                 }
             } else {
-                // 没有设置主题文件，使用默认主题
-                setCurrentTheme(defaultTheme);
+                setCustomTheme(null);
             }
         };
 
         void applyTheme();
-    }, [themeConfig.themeFile]);
+        return () => {
+            cancelled = true;
+        };
+    }, [themeConfig.themeFile, themeMode]);
+
+    // 合并当前生效主题：自定义主题 token/components 浅合并进明暗基座，
+    // 保证自定义文件只覆盖个别 token 时仍保留基座的完整明暗配色
+    const currentTheme = useMemo(() => {
+        if (!customTheme) {
+            return baseTheme;
+        }
+        return {
+            ...baseTheme,
+            ...customTheme,
+            token: {
+                ...baseTheme.token,
+                ...(customTheme.token || {}),
+            },
+            components: {
+                ...baseTheme.components,
+                ...(customTheme.components || {})
+            }
+        };
+    }, [baseTheme, customTheme]);
 
     return (
         <ConfigProvider theme={currentTheme}>

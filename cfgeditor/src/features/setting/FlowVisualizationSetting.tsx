@@ -1,11 +1,9 @@
 import {memo} from "react";
-import {Form, InputNumber, ColorPicker, Divider, Typography} from "antd";
+import {Form, InputNumber, ColorPicker, Card} from "antd";
 import {useTranslation} from "react-i18next";
 import {useMyStore, setNodeShow} from "@/store/store.ts";
 import {fixColor} from "./colorUtils.ts";
 import {NodeShowType} from "@/domain/storageJson.ts";
-
-const {Title} = Typography;
 
 export const FlowVisualizationSetting = memo(function FlowVisualizationSetting() {
     const {t} = useTranslation();
@@ -31,69 +29,66 @@ export const FlowVisualizationSetting = memo(function FlowVisualizationSetting()
 
     return (
         <Form layout="vertical" size={"small"}
-              initialValues={nodeShow}
-              onValuesChange={onValuesChange}>
-            <Title level={4}>{t('nodeDimensions')}</Title>
-            <Form.Item label={t('nodeWidth')} name="nodeWidth">
-                <InputNumber min={100} max={500} step={10} suffix="px"/>
-            </Form.Item>
-            <Form.Item label={t('editNodeWidth')} name="editNodeWidth">
-                <InputNumber min={100} max={500} step={10} suffix="px"/>
-            </Form.Item>
+               initialValues={nodeShow}
+               onValuesChange={onValuesChange}>
+            <Card title={t('nodeDimensions')} size="small" style={{marginBottom: 12}}>
+                <Form.Item label={t('nodeWidth')} name="nodeWidth">
+                    <InputNumber min={100} max={500} step={10} suffix="px"/>
+                </Form.Item>
+                <Form.Item label={t('editNodeWidth')} name="editNodeWidth">
+                    <InputNumber min={100} max={500} step={10} suffix="px"/>
+                </Form.Item>
+            </Card>
 
+            <Card title={t('edgeStyling')} size="small" style={{marginBottom: 12}}>
+                <Form.Item label={t('edgeColor')} name="edgeColor">
+                    <ColorPicker format="hex" showText/>
+                </Form.Item>
 
-            <Divider/>
-            <Title level={4}>{t('edgeStyling')}</Title>
-            <Form.Item label={t('edgeColor')} name="edgeColor">
-                <ColorPicker format="hex" showText/>
-            </Form.Item>
+                <Form.Item label={t('edgeStrokeWidth')} name="edgeStrokeWidth">
+                    <InputNumber min={1} max={10} step={0.5} suffix="px"/>
+                </Form.Item>
 
-            <Form.Item label={t('edgeStrokeWidth')} name="edgeStrokeWidth">
-                <InputNumber min={1} max={10} step={0.5} suffix="px"/>
-            </Form.Item>
+                <Form.Item label={t('editFoldColor')} name="editFoldColor">
+                    <ColorPicker format="hex" showText/>
+                </Form.Item>
+            </Card>
 
-            <Form.Item label={t('editFoldColor')} name="editFoldColor">
-                <ColorPicker format="hex" showText/>
-            </Form.Item>
+            <Card title={t('nodeColors')} size="small" style={{marginBottom: 12}}>
+                <Form.Item label={t('nodeColor')} name="nodeColor">
+                    <ColorPicker format="hex" showText/>
+                </Form.Item>
 
+                <Form.Item label={t('nodeRefColor')} name="nodeRefColor">
+                    <ColorPicker format="hex" showText/>
+                </Form.Item>
 
-            <Divider/>
-            <Title level={4}>{t('nodeColors')}</Title>
-            <Form.Item label={t('nodeColor')} name="nodeColor">
-                <ColorPicker format="hex" showText/>
-            </Form.Item>
+                <Form.Item label={t('nodeRef2Color')} name="nodeRef2Color">
+                    <ColorPicker format="hex" showText/>
+                </Form.Item>
 
-            <Form.Item label={t('nodeRefColor')} name="nodeRefColor">
-                <ColorPicker format="hex" showText/>
-            </Form.Item>
+                <Form.Item label={t('nodeRefInColor')} name="nodeRefInColor">
+                    <ColorPicker format="hex" showText/>
+                </Form.Item>
+            </Card>
 
-            <Form.Item label={t('nodeRef2Color')} name="nodeRef2Color">
-                <ColorPicker format="hex" showText/>
-            </Form.Item>
-
-            <Form.Item label={t('nodeRefInColor')} name="nodeRefInColor">
-                <ColorPicker format="hex" showText/>
-            </Form.Item>
-
-
-            <Divider/>
-            <Title level={4}>{t('layoutSpacing')}</Title>
-            <Form.Item label={t('mrtreeSpacing')}
-                       name="mrtreeSpacing"
-                       tooltip={t('mrtreeSpacingTooltip')}>
-                <InputNumber min={20} max={200} step={10} suffix="px"/>
-            </Form.Item>
-            <Form.Item label={t('layeredSpacing')}
-                       name="layeredSpacing"
-                       tooltip={t('layeredSpacingTooltip')}>
-                <InputNumber min={20} max={200} step={10} suffix="px"/>
-            </Form.Item>
-            <Form.Item label={t('layeredNodeSpacing')}
-                       name="layeredNodeSpacing"
-                       tooltip={t('layeredNodeSpacingTooltip')}>
-                <InputNumber min={20} max={200} step={10} suffix="px"/>
-            </Form.Item>
-
+            <Card title={t('layoutSpacing')} size="small">
+                <Form.Item label={t('mrtreeSpacing')}
+                           name="mrtreeSpacing"
+                           tooltip={t('mrtreeSpacingTooltip')}>
+                    <InputNumber min={20} max={200} step={10} suffix="px"/>
+                </Form.Item>
+                <Form.Item label={t('layeredSpacing')}
+                           name="layeredSpacing"
+                           tooltip={t('layeredSpacingTooltip')}>
+                    <InputNumber min={20} max={200} step={10} suffix="px"/>
+                </Form.Item>
+                <Form.Item label={t('layeredNodeSpacing')}
+                           name="layeredNodeSpacing"
+                           tooltip={t('layeredNodeSpacingTooltip')}>
+                    <InputNumber min={20} max={200} step={10} suffix="px"/>
+                </Form.Item>
+            </Card>
         </Form>
     );
 });

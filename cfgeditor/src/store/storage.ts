@@ -66,7 +66,12 @@ export async function readPrefAsyncOnce() {
     try {
         localStorage.clear();
         await readConf(CFGEDITOR_YML);
-        await readConf(CFGEDITOR_SELF_YML);
+        try {
+            await readConf(CFGEDITOR_SELF_YML);
+        } catch {
+            // 个人配置文件不存在是正常情况（首次使用、团队共享场景下可能没有），忽略错误继续
+            console.log('[readPref] cfgeditorSelf.yml not found, skipping');
+        }
         return true;
     } catch (e) {
         // 读失败：放行重试（重连当前服务器 / 重新 mount 会再调本函数），避免 alreadyRead 永久卡死，

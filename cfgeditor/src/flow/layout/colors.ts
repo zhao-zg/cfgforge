@@ -13,11 +13,11 @@ import type {NodeShowType} from "@/domain/storageJson";
 // store.ts 里的同值是持久化进 NodeShowType 的初始值（另一关注点，且 oxlint 禁 store→flow），
 // 二者刻意保持同值但不互相 import。
 export const NODE_SHOW_DEFAULTS = {
-    nodeColor: "#0898b5",
-    nodeRefColor: "#207b4a",
-    nodeRef2Color: "#006d75",
-    nodeRefInColor: "#003eb3",
-    edgeColor: "#0898b5",
+    nodeColor: "#6B8E7F",
+    nodeRefColor: "#7B8EA3",
+    nodeRef2Color: "#8A7B9E",
+    nodeRefInColor: "#A3876B",
+    edgeColor: "#C5BCAA",
 } as const;
 
 // ============================================================================
@@ -142,9 +142,9 @@ export function getEdgeColor(nodeShow?: NodeShowType): string {
 // 节点标题/资源按钮原硬编码 #fff，浅底色上白字会糊掉不可读——按底色自动反色解决。
 //
 // 用 YIQ 感知亮度（Bootstrap color-yiq 同款）而非 WCAG 相对亮度：
-// 阈值 150 刻意偏低，保证本仓默认调色板（#0898b5/#207b4a/#006d75/#003eb3，YIQ 均 <150）
+// 阈值 150 刻意偏低，保证本仓默认调色板（#6B8E7F/#7B8EA3/#8A7B9E/#A3876B，YIQ 均 <150）
 // 全部保留白字、视觉一致；只有真正浅色底（黄/浅蓝/粉等，YIQ≥150）才翻黑字。
-// 若改用 WCAG 0.179 阈值，#0898b5(YIQ≈112, L≈0.26) 会被判为"该用黑字"，
+// 若改用 WCAG 0.179 阈值，部分莫兰迪色会被判为"该用黑字"，
 // 导致主节点色翻黑、与其它默认色白字不一致——故取 YIQ。
 const READABLE_BRIGHTNESS_THRESHOLD = 150;
 

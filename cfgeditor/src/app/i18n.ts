@@ -62,6 +62,10 @@ i18n.use(LanguageDetector)
                     setDefaultValue: 'clear',
 
                     themeSetting: 'Theme Setting',
+                    themeMode: 'Appearance',
+                    themeModeLight: 'Light',
+                    themeModeDark: 'Dark',
+                    themeModeSaved: 'Appearance saved',
                     themeFile: 'Theme File',
                     themeFileHelp: 'Theme file name, e.g. colourpurple.json',
                     themeFileNotFound: 'Theme file not found',
@@ -155,6 +159,11 @@ i18n.use(LanguageDetector)
                     none: "None",
 
                     keyCode: "Shortcut",
+
+                    goto: "Go to",
+                    dataExport: "Data export",
+                    imageExport: "Image export",
+                    otherTools: "Other tools",
 
                     showDescription: "Description",
                     show: "Show",
@@ -354,6 +363,11 @@ i18n.use(LanguageDetector)
                     deleteCurRecord: '删除当前数据',
                     keyCode: "快捷键",
 
+                    goto: '跳转',
+                    dataExport: '数据导出',
+                    imageExport: '图片导出',
+                    otherTools: '其他工具',
+
                     showDescription: '描述',
                     show: '显示',
                     showFallbackValue: '无则显示值',
@@ -469,6 +483,10 @@ i18n.use(LanguageDetector)
                     create: '创建',
 
                     themeSetting: '主题',
+                    themeMode: '外观',
+                    themeModeLight: '浅色',
+                    themeModeDark: '深色',
+                    themeModeSaved: '外观设置已保存',
                     themeFile: '主题文件',
                     themeFileHelp: '主题文件名，如 colourpurple.json',
                     themeFileNotFound: '主题文件不存在',

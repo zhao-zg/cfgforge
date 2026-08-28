@@ -1,5 +1,5 @@
 import {memo} from "react";
-import {Divider} from "antd";
+import {Card} from "antd";
 import {NodeShowSetting} from "./NodeShowSetting.tsx";
 import {FlowVisualizationSetting} from "./FlowVisualizationSetting.tsx";
 
@@ -9,8 +9,11 @@ import {FlowVisualizationSetting} from "./FlowVisualizationSetting.tsx";
  */
 export const DisplaySetting = memo(function DisplaySetting() {
     return <>
-        <NodeShowSetting/>
-        <Divider/>
-        <FlowVisualizationSetting/>
+        <Card size="small" variant="borderless" style={{marginBottom: 12}}>
+            <NodeShowSetting/>
+        </Card>
+        <Card size="small" variant="borderless">
+            <FlowVisualizationSetting/>
+        </Card>
     </>;
 });

@@ -1,0 +1,73 @@
+/* ==========================================================================
+   Design Tokens — Soft Nordic 暖调设计系统
+   浅色为默认，深色通过 [data-theme="dark"] 切换。
+   ========================================================================== */
+
+:root {
+    /* --- 浅色（Soft Nordic）--- */
+    --color-bg: #F7F4EE;
+    --color-bg-panel: #FFFFFF;
+    --color-bg-elevated: #FBF9F4;
+    --color-bg-hover: #F0EBE0;
+    --color-border: #E2DCD0;
+    --color-border-light: #EEE9DE;
+    --color-text: #3D3935;
+    --color-text-dim: #8B8479;
+    --color-text-bright: #2A2722;
+    --color-accent: #7B9E89;
+
+    /* 节点 header 色（莫兰迪低饱和） */
+    --color-node: #6B8E7F;
+    --color-node-ref: #7B8EA3;
+    --color-node-ref2: #8A7B9E;
+    --color-node-refin: #A3876B;
+    --color-edge: #C5BCAA;
+
+    /* 字体 */
+    --font-ui: "Inter", "Noto Sans SC", -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", Consolas, "Courier New", monospace;
+
+    /* 圆角 */
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 10px;
+
+    /* 阴影 */
+    --shadow-sm: 0 1px 2px rgba(60, 55, 50, 0.04);
+    --shadow-md: 0 2px 8px rgba(60, 55, 50, 0.06), 0 1px 2px rgba(60, 55, 50, 0.04);
+    --shadow-node: 0 1px 3px rgba(60, 55, 50, 0.08), 0 1px 2px rgba(60, 55, 50, 0.04);
+
+    /* 折叠态边框色 */
+    --color-fold-border: #E8C9A8;
+
+    /* 滚动条 */
+    --scrollbar-thumb: #C5BCAA;
+    --scrollbar-thumb-hover: #B0A690;
+    --scrollbar-track: transparent;
+}
+
+[data-theme="dark"] {
+    /* --- 深色（Refined Dark）--- */
+    --color-bg: #1C1B1A;
+    --color-bg-panel: #252423;
+    --color-bg-elevated: #2D2B2A;
+    --color-bg-hover: #363330;
+    --color-border: #3A3835;
+    --color-border-light: #333130;
+    --color-text: #D0CCC8;
+    --color-text-dim: #8A847E;
+    --color-text-bright: #E8E4DF;
+    --color-accent: #7DBA9E;
+
+    --color-node: #5B8A72;
+    --color-node-ref: #6B88A3;
+    --color-node-ref2: #8A7B9E;
+    --color-node-refin: #A3876B;
+    --color-edge: #4A4641;
+
+    --color-fold-border: #5A4D3A;
+
+    --scrollbar-thumb: #4A4641;
+    --scrollbar-thumb-hover: #5A564F;
+    --scrollbar-track: transparent;
+}

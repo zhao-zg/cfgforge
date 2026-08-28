@@ -1,16 +1,24 @@
 import {memo, useState, useEffect} from "react";
-import {App, Button, Form, Input, Space, Typography} from "antd";
+import {App, Button, Form, Input, Radio, Space, Typography} from "antd";
+import {BgColorsOutlined, MoonOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
-import {useMyStore, setThemeConfig} from "@/store/store.ts";
+import {useMyStore, setThemeConfig, setThemeMode, ThemeMode} from "@/store/store.ts";
 import {loadTheme, themeExists as themeFileExists} from "@/services/themeService.ts";
-const {Text, Title} = Typography;
+import {SettingCard} from "./SettingCard.tsx";
+const {Text} = Typography;
 
 export const ThemeSetting = memo(function ThemeSetting() {
     const {t} = useTranslation();
     const {message} = App.useApp();
-    const {themeConfig} = useMyStore();
+    const {themeConfig, themeMode} = useMyStore();
     const [loading, setLoading] = useState(false);
     const [themeExists, setThemeExists] = useState<boolean | null>(null);
+
+    // 明暗切换
+    const handleModeChange = (mode: ThemeMode) => {
+        setThemeMode(mode);
+        message.success(t('themeModeSaved'));
+    };
 
     // 检查当前主题文件是否存在
     useEffect(() => {
@@ -95,35 +103,48 @@ export const ThemeSetting = memo(function ThemeSetting() {
     };
 
     return <>
-        <Form layout="vertical" size={"small"}
-              initialValues={themeConfig}
-              onFinish={handleThemeChange}>
+        <SettingCard icon={<MoonOutlined/>} title={t('themeMode')}>
+            <Radio.Group
+                value={themeMode}
+                onChange={(e) => handleModeChange(e.target.value as ThemeMode)}
+                optionType="button"
+                buttonStyle="solid"
+            >
+                <Radio.Button value="light">{t('themeModeLight')}</Radio.Button>
+                <Radio.Button value="dark">{t('themeModeDark')}</Radio.Button>
+            </Radio.Group>
+        </SettingCard>
 
-            <Title level={4} style={{marginTop: -4}}>{t('themeSetting')}</Title>
-            <Form.Item label={t('themeFile')}
-                       name="themeFile"
-                       help={
-                           themeExists === false ? (
-                               <Text type="danger">{t('themeFileNotFound')}</Text>
-                           ) : themeExists === true ? (
-                               <Text type="success">{t('themeFileExists')}</Text>
-                           ) : (
-                               t('themeFileHelp')
-                           )
-                       }>
-                <Input placeholder="colourpurple.json" allowClear/>
-            </Form.Item>
+        <SettingCard icon={<BgColorsOutlined/>} title={t('themeSetting')}>
+            <Form layout="vertical" size={"small"}
+                  initialValues={themeConfig}
+                  onFinish={handleThemeChange}>
 
-            <Form.Item>
-                <Space>
-                    <Button type="primary" htmlType="submit" loading={loading}>
-                        {t('save')}
-                    </Button>
-                    <Button onClick={testTheme} loading={loading} disabled={!themeConfig.themeFile}>
-                        {t('testTheme')}
-                    </Button>
-                </Space>
-            </Form.Item>
-        </Form>
+                <Form.Item label={t('themeFile')}
+                           name="themeFile"
+                           help={
+                               themeExists === false ? (
+                                   <Text type="danger">{t('themeFileNotFound')}</Text>
+                               ) : themeExists === true ? (
+                                   <Text type="success">{t('themeFileExists')}</Text>
+                               ) : (
+                                   t('themeFileHelp')
+                               )
+                           }>
+                    <Input placeholder="colourpurple.json" allowClear/>
+                </Form.Item>
+
+                <Form.Item style={{marginBottom: 0}}>
+                    <Space>
+                        <Button type="primary" htmlType="submit" loading={loading}>
+                            {t('save')}
+                        </Button>
+                        <Button onClick={testTheme} loading={loading} disabled={!themeConfig.themeFile}>
+                            {t('testTheme')}
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </Form>
+        </SettingCard>
     </>;
 });

@@ -1,6 +1,8 @@
 import {CSSProperties, lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState} from "react";
-import {Alert, Button, Empty, Flex, Modal, Splitter, Spin, Typography,} from "antd";
+import {Alert, Flex, Modal, Splitter, Spin, Typography,} from "antd";
+import {FileAddOutlined, FolderOpenOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
+import {EmptyStateCard} from "./EmptyStateCard";
 import {Schema} from "@/domain/schema";
 import {
     getFixedPage,
@@ -41,13 +43,13 @@ const RecordRef = lazy(() => import("@/features/record/RecordRef").then(m => ({d
 
 const contentDivStyle: CSSProperties = {
     position: "absolute",
-    background: '#fff',
+    background: 'var(--color-bg)',
     display: 'flex',
     height: "100vh",
     width: "100vw"
 };
 
-const fullDivStyle = {height: "100vh", width: "100vw"};
+const fullDivStyle: CSSProperties = {height: "100vh", width: "100vw", background: 'var(--color-bg)'};
 const disabledProps = {disabled: true}
 const autoOverflow = {overflow: 'auto'}
 const fullHeight = {height: '100%'}
@@ -200,17 +202,16 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
     if (!dataDir && dragPanel !== 'setting') {
         // 桌面端首次启动 / 未配置数据目录：引导用户选择目录
         const isDesktop = isTauri();
-        content = <Flex justify="center" align="center" vertical gap="middle" style={fullDivStyle}>
-            <Empty description={false}/>
-            <Typography.Title level={4}>{t('noDataDirTitle')}</Typography.Title>
-            <Typography.Text type="secondary">{t('noDataDirDesc')}</Typography.Text>
-            {isDesktop
-                ? <Button type="primary" onClick={handleSelectDir}>{t('selectDataDir')}</Button>
-                : <>
-                    <Button type="primary" onClick={handleSelectDir}>{t('selectDataDir')}</Button>
-                    <Button onClick={handleGoToSetting}>{t('goToSetting')}</Button>
-                </>
-            }
+        content = <Flex justify="center" align="center" style={fullDivStyle}>
+            <EmptyStateCard
+                icon={<FolderOpenOutlined/>}
+                title={t('noDataDirTitle')}
+                desc={t('noDataDirDesc')}
+                primaryText={t('selectDataDir')}
+                onPrimary={handleSelectDir}
+                secondaryText={isDesktop ? undefined : t('goToSetting')}
+                onSecondary={isDesktop ? undefined : handleGoToSetting}
+            />
         </Flex>;
     } else if (!dataDir && dragPanel === 'setting') {
         // Web 端未配置 dataDir 但用户点了「前往设置」：直接渲染 Setting 面板
@@ -227,14 +228,15 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
         </Flex>;
     } else if (schema && schema.itemMap.size === 0) {
         // 空 schema：数据目录无 config.cfg 或文件为空，显示引导提示
-        content = <Flex justify="center" align="center" vertical gap="middle" style={fullDivStyle}>
-            <Empty description={false}/>
-            <Typography.Title level={4}>{t('emptySchemaTitle')}</Typography.Title>
-            <Typography.Text type="secondary">{t('emptySchemaDesc')}</Typography.Text>
-            <Button type="primary" onClick={() => setCreateTableOpen(true)}>
-                {t('createTableTitle')}
-            </Button>
-            <Typography.Text type="secondary">{t('emptySchemaServer')}: {dataDir}</Typography.Text>
+        content = <Flex justify="center" align="center" style={fullDivStyle}>
+            <EmptyStateCard
+                icon={<FileAddOutlined/>}
+                title={t('emptySchemaTitle')}
+                desc={t('emptySchemaDesc')}
+                primaryText={t('createTableTitle')}
+                onPrimary={() => setCreateTableOpen(true)}
+                extra={<Typography.Text type="secondary">{t('emptySchemaServer')}: {dataDir}</Typography.Text>}
+            />
         </Flex>;
     } else if (schema && curTable == null) {
         // 有表但未选中：提示从下拉列表选择

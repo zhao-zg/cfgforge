@@ -9,6 +9,7 @@ import {
 } from "@/domain/storageJson";
 import {
     getPrefBool,
+    getPrefEnumStr,
     getPrefInt,
     getPrefJson,
     getPrefStr,
@@ -27,10 +28,15 @@ export * from './navigation.ts';
 export const pageEnums = ['table', 'tableRef', 'record', 'recordRef', 'recordUnref'] as const;
 export type PageType = typeof pageEnums[number];
 
+// 明暗主题模式（sharedPrefState 持久化 → cfgeditor.yml 团队共享）
+export const themeModeEnums = ['light', 'dark'] as const;
+export type ThemeMode = typeof themeModeEnums[number];
+
 export type StoreState = {
     dataDir: string;
     aiConf: AIConf;
     themeConfig: ThemeConfig;
+    themeMode: ThemeMode;
 
     maxImpl: number;
     refIn: boolean;
@@ -84,6 +90,7 @@ const sharedPrefState = {
     themeConfig: {
         themeFile: '',
     },
+    themeMode: 'light' as ThemeMode,
 
     maxImpl: 10,
 
@@ -112,7 +119,7 @@ const sharedPrefState = {
         nodeColorsByValue: [],
         nodeColorsByLabel: [],
         fieldColorsByName: [],
-        editFoldColor: '#ffd6e7',
+        editFoldColor: '#E8C9A8',
 
         refTableHides: [],
         refIsShowCopyable: false,
@@ -122,16 +129,16 @@ const sharedPrefState = {
         // NEW: Flow visualization defaults
         nodeWidth: 240,
         editNodeWidth: 280,
-        edgeColor: '#0898b5',
+        edgeColor: '#C5BCAA',
         edgeStrokeWidth: 3,
         mrtreeSpacing: 100,
         layeredSpacing: 60,
         layeredNodeSpacing: 80,
         // NEW: Node color defaults
-        nodeColor: '#0898b5',
-        nodeRefColor: '#207b4a',
-        nodeRef2Color: '#006d75',
-        nodeRefInColor: '#003eb3',
+        nodeColor: '#6B8E7F',
+        nodeRefColor: '#7B8EA3',
+        nodeRef2Color: '#8A7B9E',
+        nodeRefInColor: '#A3876B',
     } satisfies NodeShowType,
 
     searchMax: 50,
@@ -232,6 +239,11 @@ export function readStoreStateOnce() {
                 store(key, () => getPrefInt(key, value));
                 break;
             case "string":
+                // themeMode 是枚举字符串：用 getPrefEnumStr 读取（非法值回退默认），其余普通字符串走 getPrefStr
+                if (key === 'themeMode') {
+                    store(key, () => getPrefEnumStr('themeMode', themeModeEnums) ?? value as ThemeMode);
+                    break;
+                }
                 store(key, () => getPrefStr(key, value));
                 break;
             default:
@@ -282,7 +294,8 @@ function boolPrefSetter(key: BoolPrefKey) {
     };
 }
 
-type StrPrefKey = {[K in keyof StoreState]: StoreState[K] extends string ? K : never}[keyof StoreState];
+// 排除 themeMode（枚举字符串）：普通字符串 setter 只处理非枚举 key
+type StrPrefKey = Exclude<{[K in keyof StoreState]: StoreState[K] extends string ? K : never}[keyof StoreState], 'themeMode'>;
 
 // 字符串 pref setter 工厂：写 store + 持久化
 function strPrefSetter(key: StrPrefKey) {
@@ -307,6 +320,15 @@ export const setRefIdsMaxNode = numPrefSetter('refIdsMaxNode');
 export const setSearchMax = numPrefSetter('searchMax');
 export const setImageSizeScale = numPrefSetter('imageSizeScale');
 export const setExportFilePattern = strPrefSetter('exportFilePattern');
+
+// themeMode setter：仅接受合法枚举值（'light' | 'dark'），非法值直接忽略；写 store + 持久化
+export function setThemeMode(value: ThemeMode) {
+    if (!themeModeEnums.includes(value)) {
+        return;
+    }
+    store.themeMode = value;
+    setPref('themeMode', value);
+}
 
 export function setDragPanel(value: string) {
     store.dragPanel = value;

@@ -140,10 +140,10 @@ describe('getFieldBackgroundColor', () => {
 
 describe('getReadableTextColor', () => {
     it('默认调色板四色全部返回白字（保持视觉一致）', () => {
-        expect(getReadableTextColor(NODE_SHOW_DEFAULTS.nodeColor)).toBe('#ffffff')     // #0898b5
-        expect(getReadableTextColor(NODE_SHOW_DEFAULTS.nodeRefColor)).toBe('#ffffff')  // #207b4a
-        expect(getReadableTextColor(NODE_SHOW_DEFAULTS.nodeRef2Color)).toBe('#ffffff') // #006d75
-        expect(getReadableTextColor(NODE_SHOW_DEFAULTS.nodeRefInColor)).toBe('#ffffff')// #003eb3
+        expect(getReadableTextColor(NODE_SHOW_DEFAULTS.nodeColor)).toBe('#ffffff')     // #6B8E7F
+        expect(getReadableTextColor(NODE_SHOW_DEFAULTS.nodeRefColor)).toBe('#ffffff')  // #7B8EA3
+        expect(getReadableTextColor(NODE_SHOW_DEFAULTS.nodeRef2Color)).toBe('#ffffff') // #8A7B9E
+        expect(getReadableTextColor(NODE_SHOW_DEFAULTS.nodeRefInColor)).toBe('#ffffff')// #A3876B
     })
 
     it('浅色底翻黑字（解决白字糊掉）', () => {

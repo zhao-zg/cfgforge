@@ -1,5 +1,6 @@
 import {memo, useCallback, useState} from "react";
-import {Button, Divider, Form, Input, Space, Typography, App} from "antd";
+import {Button, Form, Input, Space, App} from "antd";
+import {CloudServerOutlined, RobotOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
 import {setDataDir, useMyStore} from "@/store/store.ts";
 import {AiSetting} from "./AiSetting.tsx";
@@ -7,8 +8,7 @@ import {open} from "@tauri-apps/plugin-dialog";
 import {isTauri} from "@tauri-apps/api/core";
 import {setDefaultFileSystem} from "@cfgforge/shared";
 import {saveDirHandle, ensurePermission, LocalFsApi} from "@/services/LocalFsApi.ts";
-
-const {Title, Text} = Typography;
+import {SettingCard} from "./SettingCard.tsx";
 
 /**
  * "数据目录" tab：
@@ -80,27 +80,27 @@ export const ConnectionSetting = memo(function ConnectionSetting() {
     }, [t, message, isDesktop]);
 
     return <>
-        <Title level={4} style={{marginTop: -4}}>{t('connection')}</Title>
-        <Form layout="vertical" size="small">
-            <Form.Item label={t('dataDir')}>
-                <Space.Compact style={{width: '100%'}}>
-                    <Input
-                        value={dataDir}
-                        readOnly
-                        placeholder={t('selectDataDirHint')}
-                        style={{flex: 1}}
-                    />
-                    <Button onClick={handleSelectDir} loading={connecting}>
-                        {t('browse')}
-                    </Button>
-                </Space.Compact>
-            </Form.Item>
-            <Form.Item>
-                <Text type="secondary">{t('dataDirTip')}</Text>
-            </Form.Item>
-        </Form>
+        <SettingCard icon={<CloudServerOutlined/>} title={t('connection')}
+                     desc={t('dataDirTip')}>
+            <Form layout="vertical" size="small">
+                <Form.Item label={t('dataDir')} style={{marginBottom: 0}}>
+                    <Space.Compact style={{width: '100%'}}>
+                        <Input
+                            value={dataDir}
+                            readOnly
+                            placeholder={t('selectDataDirHint')}
+                            style={{flex: 1}}
+                        />
+                        <Button onClick={handleSelectDir} loading={connecting}>
+                            {t('browse')}
+                        </Button>
+                    </Space.Compact>
+                </Form.Item>
+            </Form>
+        </SettingCard>
 
-        <Divider/>
-        <AiSetting/>
+        <SettingCard icon={<RobotOutlined/>} title={t('aiConf')}>
+            <AiSetting/>
+        </SettingCard>
     </>;
 });

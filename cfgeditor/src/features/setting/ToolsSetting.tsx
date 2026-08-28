@@ -1,14 +1,14 @@
 import {memo, RefObject, useCallback} from "react";
 import {useNavigate} from "react-router";
 import {useTranslation} from "react-i18next";
-import {App, Button, Divider, Form, Input, InputNumber, Popconfirm, Radio, Space} from "antd";
+import {App, Button, Form, Input, InputNumber, Popconfirm, Radio, Space} from "antd";
 import {
     setImageSizeScale,
     setExportFilePattern,
     useMyStore,
 } from "@/store/store.ts";
 import {invalidateAllQueries} from "@/services/queryClient.ts";
-import {CloseOutlined} from "@ant-design/icons";
+import {CloseOutlined, CompassOutlined, DatabaseOutlined, FileOutlined, ThunderboltOutlined} from "@ant-design/icons";
 import {Schema} from "@/domain/schema.ts";
 import {STable} from "@/api/schemaModel.ts";
 import {useMutation} from "@tanstack/react-query";
@@ -20,6 +20,7 @@ import {saveAs} from "file-saver";
 import {PageType, navTo, useLocationData} from "@/store/store.ts";
 import {KeyShortcut} from "./KeyShortcut.tsx";
 import {toggleFullScreen} from "@/services/windowUtils.ts";
+import {SettingCard} from "./SettingCard.tsx";
 
 
 export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRef}: {
@@ -170,54 +171,62 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
 
 
     return <>
-        <Radio.Group optionType="button"
-                     value={curPage}
-                     options={options}
-                     onChange={(e) => onChangeCurPage(e.target.value)}/>
-        <Divider/>
+        <SettingCard icon={<CompassOutlined/>} title={t('goto')}>
+            <Radio.Group optionType="button"
+                         value={curPage}
+                         options={options}
+                         onChange={(e) => onChangeCurPage(e.target.value)}/>
+        </SettingCard>
 
-        <Form layout={'vertical'} initialValues={{imageSizeScale}}>
-            <Form.Item name='imageSizeScale' label={t('imageSizeScale')}>
-                <Space>
-                    <InputNumber min={1} max={256} onChange={setImageSizeScale}/>
-                    <Button type="primary" onClick={onToPng}>
-                        {t('toPng')}
-                    </Button>
-                </Space>
-            </Form.Item>
-        </Form>
+        <SettingCard icon={<FileOutlined/>} title={t('imageExport')}>
+            <Form layout={'vertical'} initialValues={{imageSizeScale}}>
+                <Form.Item name='imageSizeScale' label={t('imageSizeScale')} style={{marginBottom: 0}}>
+                    <Space>
+                        <InputNumber min={1} max={256} onChange={setImageSizeScale}/>
+                        <Button type="primary" onClick={onToPng}>
+                            {t('toPng')}
+                        </Button>
+                    </Space>
+                </Form.Item>
+            </Form>
+        </SettingCard>
 
-        <Divider/>
-        <Form layout={'vertical'} initialValues={{exportFilePattern}}>
-            <Form.Item name='exportFilePattern'
-                       label={t('exportFilePattern')}
-                       extra={t('exportFilePatternTip')}>
-                <Input placeholder="{table}_{date}" allowClear
-                       onChange={(e) => setExportFilePattern(e.target.value)}/>
-            </Form.Item>
-        </Form>
-        <Space>
-            <Button onClick={() => onExport('csv')}>{t('exportCsv')}</Button>
-            <Button onClick={() => onExport('sql')}>{t('exportSql')}</Button>
-            <Button onClick={onExportAllSql}>{t('exportAllSql')}</Button>
-        </Space>
+        <SettingCard icon={<DatabaseOutlined/>} title={t('dataExport')}>
+            <Form layout={'vertical'} initialValues={{exportFilePattern}}>
+                <Form.Item name='exportFilePattern'
+                           label={t('exportFilePattern')}
+                           extra={t('exportFilePatternTip')}>
+                    <Input placeholder="{table}_{date}" allowClear
+                           onChange={(e) => setExportFilePattern(e.target.value)}/>
+                </Form.Item>
+            </Form>
+            <Space>
+                <Button onClick={() => onExport('csv')}>{t('exportCsv')}</Button>
+                <Button onClick={() => onExport('sql')}>{t('exportSql')}</Button>
+                <Button onClick={onExportAllSql}>{t('exportAllSql')}</Button>
+            </Space>
 
-        {schema && curTable && schema.isEditable &&
-            <Popconfirm title={t('deleteCurRecord')}
-                        okText={t('delete')}
-                        cancelText={t('cancel')}
-                        okButtonProps={{danger: true}}
-                        onConfirm={() => deleteRecordMutation.mutate()}>
-                <Button type="primary" danger>
-                    <CloseOutlined/>{t('deleteCurRecord')}
-                </Button>
-            </Popconfirm>
-        }
+            {schema && curTable && schema.isEditable &&
+                <div style={{marginTop: 12}}>
+                    <Popconfirm title={t('deleteCurRecord')}
+                                okText={t('delete')}
+                                cancelText={t('cancel')}
+                                okButtonProps={{danger: true}}
+                                onConfirm={() => deleteRecordMutation.mutate()}>
+                        <Button type="primary" danger>
+                            <CloseOutlined/>{t('deleteCurRecord')}
+                        </Button>
+                    </Popconfirm>
+                </div>
+            }
+        </SettingCard>
 
-        <Divider/>
-        <Button onClick={toggleFullScreen}> {t('toggleFullScreen')}</Button>
-        <Divider/>
+        <SettingCard icon={<ThunderboltOutlined/>} title={t('otherTools')}>
+            <Button onClick={toggleFullScreen}> {t('toggleFullScreen')}</Button>
+        </SettingCard>
 
-        <KeyShortcut/>
+        <SettingCard title={t('keyCode')}>
+            <KeyShortcut/>
+        </SettingCard>
     </>;
 });

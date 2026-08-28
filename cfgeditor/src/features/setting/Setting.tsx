@@ -1,4 +1,4 @@
-import {Divider, Tabs} from "antd";
+import {ConfigProvider, Tabs} from "antd";
 
 import {useTranslation} from "react-i18next";
 import {STable} from "@/api/schemaModel.ts";
@@ -65,8 +65,14 @@ export const Setting = memo(function Setting({schema, curTable, flowRef}: {
         });
     }
 
-    return <div style={{paddingRight: 24}}>
-        <Divider/>
-        <Tabs items={items} tabPlacement='start' destroyOnHidden/>
-    </div>
+    return <ConfigProvider theme={{
+        // 设置面板表单控件 label 12px（C 项 2：表单控件 label 12px）
+        components: {
+            Form: {labelFontSize: 12},
+        },
+    }}>
+        <div style={{paddingRight: 16, paddingTop: 8}}>
+            <Tabs items={items} tabPlacement='start' destroyOnHidden/>
+        </div>
+    </ConfigProvider>
 });

@@ -2,6 +2,7 @@ import type {CSSProperties} from "react";
 import {BookOutlined} from "@ant-design/icons";
 
 // 纯图标按钮的统一外观：无边框、透明底（按钮语义全靠图标 + aria-label 表达）。
+// hover/active 通过 CSS class `.iconButton` 在 style.css 中定义。
 // FlowNode / NodeNote / NodeToolbar / NoteShowOrEdit 共用单源（原四处复制同一字面量）。
 export const iconButtonStyle: CSSProperties = {borderWidth: 0, backgroundColor: 'transparent'};
 

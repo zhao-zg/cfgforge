@@ -28,7 +28,7 @@ function buildFieldLabel({comment, name}: { name: string, comment?: string }) {
     return name;
 }
 
-const listStyle: CSSProperties = {backgroundColor: '#fff'};
+const listStyle: CSSProperties = {backgroundColor: 'transparent'};
 const listItemStyle: CSSProperties = {position: 'relative'};
 const flexStyle = {width: '100%'};
 const ellipsis = {tooltip: true};

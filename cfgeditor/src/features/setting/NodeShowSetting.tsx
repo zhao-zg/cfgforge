@@ -1,5 +1,5 @@
-import {Button, ColorPicker, Form, Input, Radio, Select, Space, Switch, Typography} from "antd";
-import {CloseOutlined, PlusOutlined} from "@ant-design/icons";
+import {Button, ColorPicker, Form, Input, Radio, Select, Space, Switch} from "antd";
+import {BgColorsOutlined, CloseOutlined, LayoutOutlined, PlusOutlined, SettingOutlined} from "@ant-design/icons";
 import {useTranslation} from "react-i18next";
 
 import {NodeShowType} from "@/domain/storageJson.ts";
@@ -10,8 +10,8 @@ import {
 import {CSSProperties, memo, ReactNode, useMemo} from "react";
 
 import {fixColors} from "./colorUtils.ts";
+import {SettingCard} from "./SettingCard.tsx";
 
-const {Title} = Typography;
 const selectStyle: CSSProperties = {width: 160};
 
 // Form.List 行骨架：每行渲染 children(name) 加删除按钮，底部一个添加按钮
@@ -88,50 +88,51 @@ export const NodeShowSetting = memo(function () {
                      setNodeShow(newNodeShow);
                  }}>
 
-        <Title level={4} style={{marginTop: -4}}>{t('layoutSettingTitle')}</Title>
-        <Form.Item name='recordLayout' label={t('recordLayout')}>
-            <Select style={selectStyle} options={layoutOptions}/>
-        </Form.Item>
+        <SettingCard icon={<LayoutOutlined/>} title={t('layoutSettingTitle')}>
+            <Form.Item name='recordLayout' label={t('recordLayout')}>
+                <Select style={selectStyle} options={layoutOptions}/>
+            </Form.Item>
 
-        <Form.Item name='editLayout' label={t('editLayout')}>
-            <Select style={selectStyle} options={layoutOptions}/>
-        </Form.Item>
-        <Form.Item name='refLayout' label={t('refLayout')}>
-            <Select style={selectStyle} options={layoutOptions}/>
-        </Form.Item>
+            <Form.Item name='editLayout' label={t('editLayout')}>
+                <Select style={selectStyle} options={layoutOptions}/>
+            </Form.Item>
+            <Form.Item name='refLayout' label={t('refLayout')}>
+                <Select style={selectStyle} options={layoutOptions}/>
+            </Form.Item>
 
-        <Form.Item name='tableLayout' label={t('tableLayout')}>
-            <Select style={selectStyle} options={layoutOptions}/>
-        </Form.Item>
-        <Form.Item name='tableRefLayout' label={t('tableRefLayout')}>
-            <Select style={selectStyle} options={layoutOptions}/>
-        </Form.Item>
+            <Form.Item name='tableLayout' label={t('tableLayout')}>
+                <Select style={selectStyle} options={layoutOptions}/>
+            </Form.Item>
+            <Form.Item name='tableRefLayout' label={t('tableRefLayout')}>
+                <Select style={selectStyle} options={layoutOptions}/>
+            </Form.Item>
+        </SettingCard>
 
-        <Title level={4}>{t('colorSettingTitle')}</Title>
+        <SettingCard icon={<BgColorsOutlined/>} title={t('colorSettingTitle')}>
+            <KeywordColorList name="nodeColorsByValue" placeholder="keyword"/>
+            <KeywordColorList name="nodeColorsByLabel" placeholder="keyword"/>
+            <KeywordColorList name="fieldColorsByName" placeholder="field"/>
+        </SettingCard>
 
-        <KeywordColorList name="nodeColorsByValue" placeholder="keyword"/>
-        <KeywordColorList name="nodeColorsByLabel" placeholder="keyword"/>
-        <KeywordColorList name="fieldColorsByName" placeholder="field"/>
+        <SettingCard icon={<SettingOutlined/>} title={t('otherSetting')}>
+            <Form.Item name='refIsShowCopyable' label={t('refIsShowCopyable')} valuePropName='checked'>
+                <Switch/>
+            </Form.Item>
 
-        <Title level={4}>{t('otherSetting')}</Title>
+            <Form.Item name='refShowDescription' label={t('refShowDescription')}>
+                <Radio.Group optionType='button' buttonStyle='solid' options={descOptions}/>
+            </Form.Item>
 
-        <Form.Item name='refIsShowCopyable' label={t('refIsShowCopyable')} valuePropName='checked'>
-            <Switch/>
-        </Form.Item>
+            <Form.Item name='refContainEnum' label={t('refContainEnum')} valuePropName='checked'>
+                <Switch/>
+            </Form.Item>
 
-        <Form.Item name='refShowDescription' label={t('refShowDescription')}>
-            <Radio.Group optionType='button' buttonStyle='solid' options={descOptions}/>
-        </Form.Item>
-
-        <Form.Item name='refContainEnum' label={t('refContainEnum')} valuePropName='checked'>
-            <Switch/>
-        </Form.Item>
-
-        <FormRowList name="refTableHides" label={t('refTableHides')} addText={t('addTableHide')}>
-            {(name) => <Form.Item name={name} noStyle>
-                <Input placeholder="table"/>
-            </Form.Item>}
-        </FormRowList>
+            <FormRowList name="refTableHides" label={t('refTableHides')} addText={t('addTableHide')}>
+                {(name) => <Form.Item name={name} noStyle>
+                    <Input placeholder="table"/>
+                </Form.Item>}
+            </FormRowList>
+        </SettingCard>
 
     </Form>;
 });

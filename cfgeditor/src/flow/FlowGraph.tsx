@@ -130,7 +130,7 @@ export const FlowGraph = memo(function FlowGraph({children}: {
                     onPaneContextMenu={onPaneContextMenu}
                     // onlyRenderVisibleElements
                     proOptions={proOptions}>
-                    <Background/>
+                    <Background gap={20} size={1} color="var(--color-border-light)"/>
                     <Controls showZoom={false}/>
                 </ReactFlow>
                 {(menuStyle && menuItems && menuItems.length > 0) &&

@@ -30,6 +30,16 @@ const foldPlaceholderStyle: CSSProperties = {
     paddingBottom: 0,
 };
 
+// 节点 header 样式：彩色背景区域
+const headerStyle = (color: string): CSSProperties => ({
+    backgroundColor: color,
+});
+
+// 节点 body 样式：中性背景
+const bodyStyle: CSSProperties = {
+    backgroundColor: 'var(--color-bg-panel)',
+};
+
 const foldIcon = <ShrinkOutlined />;
 const unfoldIcon = <ArrowsAltOutlined />;
 
@@ -55,12 +65,12 @@ export const FlowNode = memo(function FlowNode(nodeProps: NodeProps<EntityNode>)
     const color: string = useMemo(() => getNodeBackgroundColor(entity, nodeShow), [entity, nodeShow]);
     const width = getNodeWidth(entity, nodeShow);
     const nodeStyle: CSSProperties = useMemo(() => {
-        return { width: width, backgroundColor: color, outlineColor: nodeShow?.editFoldColor };
-    }, [width, color, nodeShow?.editFoldColor]);
+        return { width: width, outlineColor: nodeShow?.editFoldColor };
+    }, [width, nodeShow?.editFoldColor]);
 
     const unfoldIconButtonStyle = useMemo(() => {
-        return { borderWidth: 0, backgroundColor: nodeShow?.editFoldColor ?? '#ffd6e7' };
-    }, [nodeShow?.editFoldColor]);
+        return { borderWidth: 0, backgroundColor: 'transparent' };
+    }, []);
 
     const unfoldNode = useCallback(() => {
         edit?.editOnUpdateFold?.(false, nodeAnchor(nodeProps));
@@ -111,6 +121,7 @@ export const FlowNode = memo(function FlowNode(nodeProps: NodeProps<EntityNode>)
     return <div key={id} className={edit && edit.fold ? 'flowNodeWithBorder' : 'flowNode'} style={nodeStyle}>
         {/* HeightDriftGuard 已停用并归档（见 ./__dev__/HeightDriftGuard.tsx） */}
         {noteBlock}
+        <div className="flowNodeHeader" style={headerStyle(color)}>
         <NodeTitle
             foldButton={foldButton}
             label={label}
@@ -122,9 +133,12 @@ export const FlowNode = memo(function FlowNode(nodeProps: NodeProps<EntityNode>)
             nodeProps={nodeProps}
             nodeBgColor={color}
         />
+        </div>
+        <div className="flowNodeBody" style={bodyStyle}>
         {fields && <EntityProperties fields={fields} nodeShow={nodeShow} color={color} />}
         {brief && <EntityCard entity={entity} image={firstImage} nodeShow={nodeShow} />}
         {edit && <EntityForm edit={edit} nodeProps={nodeProps} nodeShow={nodeShow} />}
+        </div>
         {(handleIn && <Handle type='target' position={Position.Left} id={HANDLE_IN} style={handleStyle} />)}
         {(handleOut && <Handle type='source' position={Position.Right} id={HANDLE_OUT} style={handleStyle} />)}
     </div>;

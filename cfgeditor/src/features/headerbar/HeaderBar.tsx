@@ -37,8 +37,8 @@ const {Text} = Typography;
 const prevIcon = <LeftOutlined/>;
 const nextIcon = <RightOutlined/>;
 
-const HEADER_STYLE = {position: 'relative'} as const;
-const SPACE_STYLE = {position: 'absolute', zIndex: 1} as const;
+const HEADER_STYLE = {position: 'relative', height: 40, background: 'var(--color-bg-panel)', borderBottom: '1px solid var(--color-border)', padding: '0 8px'} as const;
+const SPACE_STYLE = {position: 'absolute', zIndex: 1, left: 8, right: 8, top: 4} as const;
 
 
 export const HeaderBar = memo(function ({schema, curTable}: {

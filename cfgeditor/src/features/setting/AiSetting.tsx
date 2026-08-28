@@ -1,25 +1,20 @@
 import {memo,} from "react";
 import {useTranslation} from "react-i18next";
-import {Button, Form, Input, Typography} from "antd";
+import {Button, Form, Input} from "antd";
 import {
     setAIConf,
     useMyStore
 } from "@/store/store.ts";
 
-const {Title} = Typography;
-
 export const AiSetting = memo(function () {
     const {t} = useTranslation();
     const {aiConf} = useMyStore();
-
 
     return <>
         <Form name="aiConf" layout={"vertical"} size={"small"} initialValues={aiConf} autoComplete="off" onFinish={
             (values) => {
                 setAIConf(values);
             }}>
-
-            <Title level={4} style={{marginTop: -4}}>{t('aiConf')}</Title>
 
             <Form.Item name='baseUrl' label={t('baseUrl')}>
                 <Input placeholder="base url"/>
@@ -32,7 +27,7 @@ export const AiSetting = memo(function () {
                 <Input placeholder="model"/>
             </Form.Item>
 
-            <Form.Item>
+            <Form.Item style={{marginBottom: 0}}>
                 <Button type="primary" htmlType="submit">
                     {t('setAIConf')}
                 </Button>

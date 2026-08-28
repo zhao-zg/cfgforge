@@ -1,15 +1,39 @@
+/* App 全局字体：由 tokens.css 的 --font-ui 提供 */
 .App {
-    font-family: sans-serif;
+    font-family: var(--font-ui);
 }
 
 body {
     overflow: hidden;
     margin: 0;
     padding: 0;
+    font-family: var(--font-ui);
+}
+
+/* 滚动条：窄条圆角 */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: var(--radius-sm);
+}
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover);
+}
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+}
+
+/* 焦点环：使用 accent 色 */
+*:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 1px;
 }
 
 mark {
-    color: #2986ff;
+    color: var(--color-accent);
     font-weight: bold;
 }
 
@@ -17,23 +41,31 @@ mark {
     --edge-stroke-width: 3px;
 }
 
-svg .react-flow__edge-path{
+svg .react-flow__edge-path {
     stroke-width: var(--edge-stroke-width, 3);
 }
 
 
+/* 节点：彩色 header + 中性 body 结构。
+   外层只定圆角/边框/阴影，backgroundColor 由内联 style 分配到 header/body */
 .flowNode {
-    border: 0;
-    padding: 5px;
-    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    padding: 0;
+    border-radius: var(--radius-md);
     min-height: 60px;
+    overflow: hidden;
+    box-shadow: var(--shadow-node);
+    background: var(--color-bg-panel);
 }
 
 .flowNodeWithBorder {
-    outline: 8px solid #ffd6e7;
-    padding: 5px;
-    border-radius: 8px;
+    outline: 3px solid var(--color-fold-border);
+    padding: 0;
+    border-radius: var(--radius-md);
     min-height: 60px;
+    overflow: hidden;
+    box-shadow: var(--shadow-node);
+    background: var(--color-bg-panel);
 }
 
 .react-flow__pane {
@@ -55,7 +87,7 @@ svg .react-flow__edge-path{
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.55);
+    background: color-mix(in srgb, var(--color-bg) 55%, transparent);
     pointer-events: none;
 }
 
@@ -64,15 +96,41 @@ svg .react-flow__edge-path{
 }
 
 .contextMenu {
-    border-color: #2986ff;
+    border-color: var(--color-accent);
     border-style: solid;
-    border-radius: 8px;
-    border-width: 2px;
+    border-radius: var(--radius-md);
+    border-width: 1px;
     position: fixed;
-
     z-index: 10;
+    box-shadow: var(--shadow-md);
 }
 
+/* 节点 header 区域：彩色背景，标题文字自动反色 */
+.flowNodeHeader {
+    padding: 5px 8px;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+}
+
+/* 节点 body 区域：中性背景 */
+.flowNodeBody {
+    padding: 4px 8px;
+}
+
+/* 图标按钮 hover：通过 CSS class 实现（sharedStyles.tsx 的纯 CSSProperties 无法做 hover） */
+.iconButton:hover {
+    background: var(--color-bg-hover);
+}
+.iconButton:active {
+    transform: scale(0.95);
+}
+
+/* 设置分组卡片 hover 阴影增强（C 项 3） */
+.settingCard {
+    transition: box-shadow 0.2s ease;
+}
+.settingCard:hover {
+    box-shadow: var(--shadow-md);
+}
 
 .player {
     width: 320px;

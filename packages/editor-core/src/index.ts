@@ -45,6 +45,12 @@ export type {
   FieldRequest,
   EnumValueRequest,
 } from './TableCreateService.js';
+export { SchemaRelationService } from './SchemaRelationService.js';
+export type {
+  FKAddRequest,
+  FKListResult,
+  FKMutateResult,
+} from './SchemaRelationService.js';
 export { CheckJsonService } from './CheckJsonService.js';
 export type {
   CheckJsonResult,

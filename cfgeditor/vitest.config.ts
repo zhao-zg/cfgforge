@@ -18,5 +18,8 @@ export default defineConfig({
         setupFiles: ['./src/test/setup.ts'],
         include: ['src/**/*.{test,spec}.{ts,tsx}'],
         // 测试用显式 import { describe, it, expect } from 'vitest'，不开启 globals
+        // editor-core 改为动态 import() 懒加载后，首次 beforeEach 加载整棵依赖树
+        // 可能超过默认 10s（尤其 Windows 冷盘），放宽到 30s
+        hookTimeout: 30_000,
     },
 })

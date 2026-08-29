@@ -3,10 +3,10 @@ AIGC:
   ContentProducer: '001191110102MAD55U9H0F10002'
   ContentPropagator: '001191110102MAD55U9H0F10002'
   Label: '1'
-  ProduceID: 'bf6b6d92-0a52-416c-bb06-fafd52b51fe4'
-  PropagateID: 'bf6b6d92-0a52-416c-bb06-fafd52b51fe4'
-  ReservedCode1: 'b018b0e4-9f82-404e-bc4d-7d90148566c9'
-  ReservedCode2: 'b018b0e4-9f82-404e-bc4d-7d90148566c9'
+  ProduceID: '6e449eea-bd05-475e-8b98-9f3976045270'
+  PropagateID: '6e449eea-bd05-475e-8b98-9f3976045270'
+  ReservedCode1: 'e92df2bd-5eda-4394-ba9a-24492f990c93'
+  ReservedCode2: 'e92df2bd-5eda-4394-ba9a-24492f990c93'
 ---
 
 # 更新日志
@@ -16,6 +16,19 @@ AIGC:
 
 
 ### [Unreleased]
+
+### [v0.2.0] - 2026-08-30
+
+UI 全面审查修复与启动性能优化。
+
+#### Fixed
+- **UI 全面审查修复**：修复侧栏与节点标题爆框（`PathNotFound` 布局）、删除 `TauriSetting` 重复的 `Form.Item`、`Chat/AddJson/ShortcutSetting` 视觉一致性、`notification` 硬编码英文国际化（4 处改为 i18n）。
+- **vitest 超时**：editor-core 改为动态 `import()` 懒加载后，首次初始化需加载约 1.6MB 依赖树，超过 vitest 默认 `hookTimeout` 10s，在 `vitest.config.ts` 增加 `hookTimeout: 30_000`。
+- **测试与实现不一致**：`AppLoader.test.ts` 仍描述旧的串行等待逻辑，同步更新 `shouldEnableEditorInit` 签名、Phase 3 断言与三阶段依赖链描述。
+
+#### Changed
+- **启动性能优化**：`vite.config.ts` `manualChunks` 拆分 `antd-vendor` / `react-vendor`；新建 `editorCoreLoader.ts` 将 `apiClient.ts` 中 16 个运行时类静态导入改为动态 `import()`；`AppLoader` 瀑布流并行化（`readStoreStateOnce` 完成后同步设 `dataDir`，资源扫描与建库并行）；`HeaderBar` valueErrs 校验延迟到 schema 加载后（`enabled: !!schema`）。
+- 首屏加载量从约 3.26MB 降至约 413KB（gzip 131KB），减少约 87%。
 
 ### [v1.6.0] - 2026-08-27
 

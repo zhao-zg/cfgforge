@@ -1,11 +1,12 @@
 /**
  * AppLoader 三阶段加载逻辑测试 — Task 7 [P2]
  *
- * AppLoader.tsx 编排三个串联的 React Query：
+ * AppLoader.tsx 编排三个 React Query（Phase 2/3 并行启动）：
  *   Phase 1: setting()  → readPrefAsyncOnce    （staleTime: Infinity, retry: 0）
  *   Phase 2: resInfo()  → readResInfosAsync    （enabled: !!data）
- *   Phase 3: editor-init → initEditor(dataDir)  （enabled: !!data && !resInfoQuery.isPending）
+ *   Phase 3: editor-init → initEditor(dataDir)  （enabled: !!data）
  *
+ * Phase 1 完成后 readStoreStateOnce() 同步设置 dataDir，Phase 2/3 不再串行等待。
  * 渲染门控：isError || (data && !resInfoQuery.isPending && !editorInitQuery.isPending)
  *
  * 项目无 @testing-library/react，不渲染 React 组件。
@@ -31,9 +32,9 @@ function shouldEnableResInfo(data: unknown): boolean {
     return !!data;
 }
 
-/** Phase 3 (editorInitQuery) enabled 条件 — AppLoader.tsx line 36: `enabled: !!data && !resInfoQuery.isPending` */
-function shouldEnableEditorInit(data: unknown, resInfoIsPending: boolean): boolean {
-    return !!data && !resInfoIsPending;
+/** Phase 3 (editorInitQuery) enabled 条件 — AppLoader.tsx line 36: `enabled: !!data`（并行化后不再等 resInfo） */
+function shouldEnableEditorInit(data: unknown): boolean {
+    return !!data;
 }
 
 /** 渲染门控 — AppLoader.tsx line 46: `isError || (data && !resInfoQuery.isPending && !editorInitQuery.isPending)` */
@@ -159,41 +160,38 @@ describe('AppLoader 三阶段加载逻辑', () => {
     });
 
     // -----------------------------------------------------------------------
-    // Phase 3 enabled: !!data && !resInfoQuery.isPending
+    // Phase 3 enabled: !!data（并行化后与 Phase 2 相同条件，不再等 resInfo）
     // -----------------------------------------------------------------------
 
     describe('Phase 3 (editorInitQuery) enabled 条件', () => {
-        it('data 有值且 resInfo 未在加载时启用', () => {
-            expect(shouldEnableEditorInit(true, false)).toBe(true);
+        it('data 为 true 时启用', () => {
+            expect(shouldEnableEditorInit(true)).toBe(true);
         });
 
-        it('data 有值但 resInfo 正在加载时禁用', () => {
-            expect(shouldEnableEditorInit(true, true)).toBe(false);
+        it('data 为 truthy 非布尔值时启用', () => {
+            expect(shouldEnableEditorInit(1)).toBe(true);
+            expect(shouldEnableEditorInit('hello')).toBe(true);
+            expect(shouldEnableEditorInit({})).toBe(true);
         });
 
-        it('data 为 undefined 时禁用（无论 resInfo 状态）', () => {
-            expect(shouldEnableEditorInit(undefined, false)).toBe(false);
-            expect(shouldEnableEditorInit(undefined, true)).toBe(false);
+        it('data 为 undefined 时禁用', () => {
+            expect(shouldEnableEditorInit(undefined)).toBe(false);
         });
 
-        it('data 为 false 时禁用（无论 resInfo 状态）', () => {
-            expect(shouldEnableEditorInit(false, false)).toBe(false);
-            expect(shouldEnableEditorInit(false, true)).toBe(false);
+        it('data 为 false 时禁用', () => {
+            expect(shouldEnableEditorInit(false)).toBe(false);
         });
 
-        it('data 为 null 时禁用（无论 resInfo 状态）', () => {
-            expect(shouldEnableEditorInit(null, false)).toBe(false);
-            expect(shouldEnableEditorInit(null, true)).toBe(false);
+        it('data 为 null 时禁用', () => {
+            expect(shouldEnableEditorInit(null)).toBe(false);
         });
 
-        it('data truthy + resInfo pending=false 时启用', () => {
-            expect(shouldEnableEditorInit('dir', false)).toBe(true);
-            expect(shouldEnableEditorInit(1, false)).toBe(true);
+        it('data 为 0 时禁用', () => {
+            expect(shouldEnableEditorInit(0)).toBe(false);
         });
 
-        it('data truthy + resInfo pending=true 时禁用', () => {
-            expect(shouldEnableEditorInit('dir', true)).toBe(false);
-            expect(shouldEnableEditorInit(1, true)).toBe(false);
+        it('data 为空字符串时禁用', () => {
+            expect(shouldEnableEditorInit('')).toBe(false);
         });
     });
 
@@ -283,14 +281,12 @@ describe('AppLoader 三阶段加载逻辑', () => {
             expect(shouldEnableResInfo(undefined)).toBe(false);
         });
 
-        it('Phase 3 依赖 Phase 1 + Phase 2：两者都完成时才启用', () => {
-            // Phase 1 完成 + Phase 2 完成
-            expect(shouldEnableEditorInit(true, false)).toBe(true);
-            // Phase 1 完成 + Phase 2 未完成
-            expect(shouldEnableEditorInit(true, true)).toBe(false);
+        it('Phase 3 依赖 Phase 1（不再等 Phase 2）：data 为真时 Phase 3 即启用', () => {
+            // Phase 1 完成 → data = true → Phase 3 enabled（与 resInfo 是否完成无关）
+            expect(shouldEnableEditorInit(true)).toBe(true);
             // Phase 1 未完成（data falsy）
-            expect(shouldEnableEditorInit(false, false)).toBe(false);
-            expect(shouldEnableEditorInit(undefined, true)).toBe(false);
+            expect(shouldEnableEditorInit(false)).toBe(false);
+            expect(shouldEnableEditorInit(undefined)).toBe(false);
         });
 
         it('渲染门控 = isError || (Phase1完成 && Phase2完成 && Phase3完成)', () => {

@@ -63,11 +63,14 @@ export const HeaderBar = memo(function ({schema, curTable}: {
     useHotkeys('alt+4', () => navigate(navTo('recordRef', curTableId, curId)));
     useHotkeys('alt+enter', toggleFullScreen);
 
-    // 错误数 Badge：与 ErrorsPanel 共享同一 queryKey，面板内 invalidate 时自动更新
+    // 错误数 Badge：与 ErrorsPanel 共享同一 queryKey，面板内 invalidate 时自动更新。
+    // 延迟到 schema 加载完成后才触发全库校验（collectValueErrs 依赖 CfgValue 解析完成），
+    // 避免首屏与 schema/notes 争抢主线程。
     const {data: valueErrs} = useQuery({
         queryKey: queryKeys.valueErrs(),
         queryFn: ({signal}) => fetchValueErrs(signal),
         retry: false,
+        enabled: !!schema,
     });
     const errCount = valueErrs?.length ?? 0;
 

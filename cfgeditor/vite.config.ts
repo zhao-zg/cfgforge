@@ -53,7 +53,25 @@ export default defineConfig({
         modulePreload: {
             polyfill: false
         },
-
+        // 分割巨型的 store chunk（原 2.1MB 单包）为多个独立 chunk：
+        // - antd-vendor: antd + @ant-design/icons + rc-* 组件（~1.5MB）
+        // - react-vendor: react + react-dom + react-router + scheduler
+        // @cfgforge/editor-core 通过 apiClient.ts 的动态 import() 自动分割为懒加载 chunk，
+        // 不需要在此手动指定——Vite 会将动态导入的模块自动拆为独立 chunk。
+        rollupOptions: {
+            output: {
+                manualChunks(id) {
+                    if (id.includes('node_modules')) {
+                        if (id.includes('antd') || id.includes('@ant-design') || id.match(/[\\/]rc-/)) {
+                            return 'antd-vendor';
+                        }
+                        if (id.includes('react-dom') || id.includes('react-router') || id.includes('scheduler') || id.includes('use-sync-external-store')) {
+                            return 'react-vendor';
+                        }
+                    }
+                },
+            },
+        },
     },
 
 })

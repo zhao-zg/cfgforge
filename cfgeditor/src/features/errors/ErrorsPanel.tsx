@@ -36,6 +36,9 @@ export const ErrorsPanel = memo(function ErrorsPanel() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
 
+    // 与 HeaderBar 的 Badge 共享同一 queryKey。不需要 enabled 守卫：
+    // ErrorsPanel 只在用户切到 errors 面板时才挂载（dragPanel === 'errors'），
+    // 此时 schema 必已加载（CfgEditorApp 的渲染前提），全库校验可直接执行。
     const {data: errs, isFetching} = useQuery({
         queryKey: queryKeys.valueErrs(),
         queryFn: ({signal}) => fetchValueErrs(signal),

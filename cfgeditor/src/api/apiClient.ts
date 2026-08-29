@@ -8,25 +8,10 @@
  * AbortSignal 参数保留但不使用（直接调用无法中途取消）。
  */
 
-import {
-    EditorService,
-    SchemaService,
-    RecordService,
-    RecordEditService,
-    RecordRefIdsService,
-    SchemaWriteService,
-    SchemaRelationService,
-    SchemaFieldService,
-    TableCreateService,
-    CheckJsonService,
-    PromptService,
-    NoteEditService,
-    SearchService,
-    ExportService,
-    SingleTableReloadService,
-    AutoReloadService,
-    ValueErrsService,
-} from '@cfgforge/editor-core';
+// editor-core 运行时类通过懒加载器动态获取，使整个 @cfgforge/editor-core 依赖树
+// 不进入首屏 bundle（Vite 自动将动态 import() 拆为独立 chunk）。
+import {loadAndCacheCore, getCachedCore} from './editorCoreLoader';
+import type {EditorCoreModule} from './editorCoreLoader';
 
 import type {
     RawSchema,
@@ -73,7 +58,10 @@ import type {SForeignKey} from './schemaModel';
 // EditorService instance management
 // ---------------------------------------------------------------------------
 
-let editor: EditorService | null = null;
+// editor 实例类型从 EditorService.create 的返回值推断（EditorService 构造函数是 private，
+// InstanceType 无法使用）。Awaited<> 提取 Promise 的值类型。
+type EditorInstance = Awaited<ReturnType<EditorCoreModule['EditorService']['create']>>;
+let editor: EditorInstance | null = null;
 // initEditor 失败时保存原始错误，让后续 getEditor() 抛出的信息包含真正原因，
 // 而非笼统的 "Editor not initialized"（那是次生错误，用户看不到 initEditor 的真正报错）。
 let initError: Error | null = null;
@@ -90,7 +78,8 @@ function joinPath(base: string, file: string): string {
  */
 export async function initEditor(dataDir: string): Promise<void> {
     try {
-        editor = await EditorService.create(dataDir);
+        const core = await loadAndCacheCore();
+        editor = await core.EditorService.create(dataDir);
         initError = null;
     } catch (e) {
         editor = null;
@@ -119,7 +108,7 @@ export function shutdownEditor(): void {
 /**
  * Get the current EditorService instance (internal).
  */
-function getEditor(): EditorService {
+function getEditor(): NonNullable<typeof editor> {
     if (editor === null) {
         if (initError !== null) {
             throw new Error(`Editor initialization failed: ${initError.message}`);
@@ -134,6 +123,7 @@ function getEditor(): EditorService {
 // ---------------------------------------------------------------------------
 
 export async function fetchSchema(_signal?: AbortSignal): Promise<RawSchema> {
+    const {SchemaService} = getCachedCore();
     return SchemaService.fromCfgValue(getEditor().cfgValue());
 }
 
@@ -146,6 +136,7 @@ export async function fetchRecord(
     id: string,
     _signal?: AbortSignal,
 ): Promise<RecordResult> {
+    const {RecordService} = getCachedCore();
     const editor = getEditor();
     const svc = new RecordService(
         editor.cfgValue(),
@@ -168,6 +159,7 @@ export async function fetchRecordRefIds(
     maxIds: number,
     _signal?: AbortSignal,
 ): Promise<RecordRefIdsResult> {
+    const {RecordRefIdsService} = getCachedCore();
     const editor = getEditor();
     const svc = new RecordRefIdsService(
         editor.cfgValue(),
@@ -189,6 +181,7 @@ export async function fetchRecordRefs(
     refIn: boolean,
     _signal?: AbortSignal,
 ): Promise<RecordRefsResult> {
+    const {RecordService} = getCachedCore();
     const editor = getEditor();
     const svc = new RecordService(
         editor.cfgValue(),
@@ -208,6 +201,7 @@ export async function fetchUnreferencedRecords(
     maxNode: number,
     _signal?: AbortSignal,
 ): Promise<UnreferencedRecordsResult> {
+    const {RecordService} = getCachedCore();
     const editor = getEditor();
     const svc = new RecordService(
         editor.cfgValue(),
@@ -231,6 +225,7 @@ export async function addOrUpdateRecord(
     editingObject: JSONObject,
     _signal?: AbortSignal,
 ): Promise<RecordEditResult> {
+    const {RecordEditService} = getCachedCore();
     const editor = getEditor();
     return RecordEditService.addOrUpdateRecord(
         editor,
@@ -244,6 +239,7 @@ export async function deleteRecord(
     id: string,
     _signal?: AbortSignal,
 ): Promise<RecordEditResult> {
+    const {RecordEditService} = getCachedCore();
     const editor = getEditor();
     return RecordEditService.deleteRecord(editor, tableId, id);
 }
@@ -253,6 +249,7 @@ export async function deleteRecord(
 // ---------------------------------------------------------------------------
 
 export async function fetchNotes(_signal?: AbortSignal): Promise<Notes> {
+    const {NoteEditService} = getCachedCore();
     const editor = getEditor();
     const notePath = joinPath(editor.rootDir(), 'note.csv');
     const svc = await NoteEditService.create(notePath);
@@ -264,6 +261,7 @@ export async function updateNote(
     note: string,
     _signal?: AbortSignal,
 ): Promise<LocalNoteEditResult> {
+    const {NoteEditService} = getCachedCore();
     const editor = getEditor();
     const notePath = joinPath(editor.rootDir(), 'note.csv');
     const svc = await NoteEditService.create(notePath);
@@ -284,6 +282,7 @@ export async function getPrompt(
     table: string,
     _signal?: AbortSignal,
 ): Promise<PromptResult> {
+    const {PromptService} = getCachedCore();
     return PromptService.genAsync(getEditor(), table);
 }
 
@@ -296,6 +295,7 @@ export async function checkJson(
     raw: string,
     _signal?: AbortSignal,
 ): Promise<CheckJsonResult> {
+    const {CheckJsonService} = getCachedCore();
     return CheckJsonService.checkJson(getEditor(), tableId, raw);
 }
 
@@ -308,6 +308,7 @@ export async function searchConfig(
     max: number,
     _signal?: AbortSignal,
 ): Promise<SearchResult> {
+    const {SearchService} = getCachedCore();
     return SearchService.search(getEditor(), q, max);
 }
 
@@ -316,6 +317,7 @@ export async function searchConfig(
 // ---------------------------------------------------------------------------
 
 export async function fetchSchemaText(_signal?: AbortSignal): Promise<SchemaTextResult> {
+    const {SchemaWriteService} = getCachedCore();
     return SchemaWriteService.readSchemaTextAsync(getEditor());
 }
 
@@ -323,6 +325,7 @@ export async function writeSchemaText(
     cfgText: string,
     _signal?: AbortSignal,
 ): Promise<SchemaWriteResult> {
+    const {SchemaWriteService} = getCachedCore();
     const editor = getEditor();
     const result = await SchemaWriteService.writeSchemaTextAsync(editor, cfgText);
     if (result.ok) {
@@ -339,6 +342,7 @@ export async function createTable(
     request: TableCreateRequest,
     _signal?: AbortSignal,
 ): Promise<CreateResult> {
+    const {TableCreateService} = getCachedCore();
     const editor = getEditor();
     const result = await TableCreateService.createTableAsync(editor, request);
     if (result.ok) {
@@ -351,6 +355,7 @@ export async function createDataFile(
     tableName: string,
     _signal?: AbortSignal,
 ): Promise<CreateResult> {
+    const {TableCreateService} = getCachedCore();
     const editor = getEditor();
     return TableCreateService.createDataFileAsync(editor, tableName);
 }
@@ -364,6 +369,7 @@ export async function fetchTableFks(
     table: string,
     _signal?: AbortSignal,
 ): Promise<SForeignKey[]> {
+    const {SchemaRelationService} = getCachedCore();
     const editor = getEditor();
     const res = SchemaRelationService.listFks(editor, table);
     if (!res.ok) {
@@ -377,6 +383,7 @@ export async function addForeignKey(
     req: FKAddRequest,
     _signal?: AbortSignal,
 ): Promise<FKMutateResult> {
+    const {SchemaRelationService} = getCachedCore();
     const editor = getEditor();
     const result = await SchemaRelationService.addForeignKeyAsync(editor, req);
     if (result.ok) {
@@ -392,6 +399,7 @@ export async function updateForeignKey(
     req: FKAddRequest,
     _signal?: AbortSignal,
 ): Promise<FKMutateResult> {
+    const {SchemaRelationService} = getCachedCore();
     const editor = getEditor();
     const result = await SchemaRelationService.updateForeignKeyAsync(editor, table, fkName, req);
     if (result.ok) {
@@ -406,6 +414,7 @@ export async function removeForeignKey(
     fkName: string,
     _signal?: AbortSignal,
 ): Promise<FKMutateResult> {
+    const {SchemaRelationService} = getCachedCore();
     const editor = getEditor();
     const result = await SchemaRelationService.removeForeignKeyAsync(editor, table, fkName);
     if (result.ok) {
@@ -424,6 +433,7 @@ export async function addField(
     req: FieldAddRequest,
     _signal?: AbortSignal,
 ): Promise<FieldMutateResult> {
+    const {SchemaFieldService} = getCachedCore();
     const editor = getEditor();
     const result = await SchemaFieldService.addFieldAsync(editor, table, req);
     if (result.ok) {
@@ -439,6 +449,7 @@ export async function updateField(
     req: FieldUpdateRequest,
     _signal?: AbortSignal,
 ): Promise<FieldMutateResult> {
+    const {SchemaFieldService} = getCachedCore();
     const editor = getEditor();
     const result = await SchemaFieldService.updateFieldAsync(editor, table, oldName, req);
     if (result.ok) {
@@ -453,6 +464,7 @@ export async function removeField(
     fieldName: string,
     _signal?: AbortSignal,
 ): Promise<FieldMutateResult> {
+    const {SchemaFieldService} = getCachedCore();
     const editor = getEditor();
     const result = await SchemaFieldService.removeFieldAsync(editor, table, fieldName);
     if (result.ok) {
@@ -470,10 +482,12 @@ export async function exportTable(
     format: ExportFormat,
     _signal?: AbortSignal,
 ): Promise<ExportResult> {
+    const {ExportService} = getCachedCore();
     return ExportService.export(getEditor(), tableId, format);
 }
 
 export async function exportAllSql(_signal?: AbortSignal): Promise<ExportAllResult> {
+    const {ExportService} = getCachedCore();
     return ExportService.exportAllSql(getEditor());
 }
 
@@ -489,6 +503,7 @@ export async function reloadTable(
     tableName: string,
     _signal?: AbortSignal,
 ): Promise<SingleTableReloadResult> {
+    const {SingleTableReloadService} = getCachedCore();
     return SingleTableReloadService.reloadTable(getEditor(), tableName);
 }
 
@@ -496,11 +511,14 @@ export async function reloadTable(
 // Auto Reload API (P2-11)
 // ---------------------------------------------------------------------------
 
-let autoReloadService: AutoReloadService | null = null;
+// AutoReloadService 实例类型从 create 的返回值推断
+type AutoReloadInstance = InstanceType<EditorCoreModule['AutoReloadService']>;
+let autoReloadService: AutoReloadInstance | null = null;
 
 /** 启动自动刷新轮询（默认 2s 间隔）。已运行则忽略。 */
 export function startAutoReload(intervalMs = 2000): void {
     if (autoReloadService === null) {
+        const {AutoReloadService} = getCachedCore();
         autoReloadService = new AutoReloadService();
     }
     autoReloadService.start(getEditor(), intervalMs);
@@ -524,5 +542,6 @@ export function isAutoReloadRunning(): boolean {
 
 /** 收集全部校验错误（VErr + VWarn），返回扁平数组供 UI 按表分组展示。 */
 export async function fetchValueErrs(_signal?: AbortSignal): Promise<ValueErrInfo[]> {
+    const {ValueErrsService} = getCachedCore();
     return ValueErrsService.collectValueErrs(getEditor());
 }

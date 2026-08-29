@@ -28,6 +28,7 @@ import {CreateTableForm} from "@/features/schema/CreateTableForm";
 import {FlowGraph} from "@/flow/FlowGraph";
 import {FlowStyleManager} from "@/flow/FlowStyleManager";
 import {Finder} from "@/features/finder/Finder";
+import {ErrorsPanel} from "@/features/errors/ErrorsPanel";
 import {SidePanelShell} from "./SidePanelShell";
 import {getCurrentEditingSession} from "@/services/editingSession";
 import {isTauri} from "@tauri-apps/api/core";
@@ -258,6 +259,9 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
         } else if (dragPanel == 'setting') {
             dragPage = <SidePanelShell><Suspense fallback={null}><Setting schema={schema} curTable={curTable} flowRef={ref}/></Suspense></SidePanelShell>
 
+        } else if (dragPanel == 'errors') {
+            dragPage = <ErrorsPanel/>;
+
         } else if (dragPanel != 'none') {
             const fix = getFixedPage(pageConf, dragPanel);
             if (fix) {
@@ -319,7 +323,7 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
                onOk={handleModalOk}>
 
             <Flex vertical>
-                <Alert title={error ? error.message : ''} type='error'/>
+                <Alert message={error ? error.message : ''} type='error' style={{ wordBreak: 'break-word' }}/>
                 <p> {t('dataDirErrTip')} </p>
                 <p> {t('curDataDir')}: {dataDir}</p>
             </Flex>

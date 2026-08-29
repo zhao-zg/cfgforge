@@ -7,7 +7,7 @@ import {
     RightOutlined,
     FileAddOutlined,
     FileTextOutlined,
-    SettingOutlined, BarsOutlined
+    SettingOutlined, BarsOutlined, WarningOutlined
 } from "@ant-design/icons";
 import {TableList} from "./TableList.tsx";
 import {IdList} from "./IdList.tsx";
@@ -32,6 +32,9 @@ import {toggleFullScreen} from "@/services/windowUtils.ts";
 import {SchemaTextEditor} from "@/features/schema/SchemaTextEditor.tsx";
 import {CreateTableForm} from "@/features/schema/CreateTableForm.tsx";
 import {useState} from "react";
+import {useQuery} from "@tanstack/react-query";
+import {fetchValueErrs} from "@/api/apiClient";
+import {queryKeys} from "@/services/queryKeys";
 
 const {Text} = Typography;
 const prevIcon = <LeftOutlined/>;
@@ -58,6 +61,14 @@ export const HeaderBar = memo(function ({schema, curTable}: {
     useHotkeys('alt+3', () => navigate(navTo('record', curTableId, curId, isEditMode)));
     useHotkeys('alt+4', () => navigate(navTo('recordRef', curTableId, curId)));
     useHotkeys('alt+enter', toggleFullScreen);
+
+    // 错误数 Badge：与 ErrorsPanel 共享同一 queryKey，面板内 invalidate 时自动更新
+    const {data: valueErrs} = useQuery({
+        queryKey: queryKeys.valueErrs(),
+        queryFn: ({signal}) => fetchValueErrs(signal),
+        retry: false,
+    });
+    const errCount = valueErrs?.length ?? 0;
 
     const prev = useCallback(() => {
         const path = historyPrev(curPage, curTableId, curId, history, isEditMode);
@@ -93,6 +104,12 @@ export const HeaderBar = memo(function ({schema, curTable}: {
         {
             type: 'group' as const, label: t('builtinPanel'), children: [
                 {key: 'finder', label: t('finder'), icon: <CompassOutlined/>},
+                {key: 'errors', label: (
+                    <span style={{display: 'inline-flex', alignItems: 'center', gap: 4}}>
+                        {t('errors')}
+                        {errCount > 0 && <Badge count={errCount} size="small" offset={[2, 0]}/>}
+                    </span>
+                ), icon: <WarningOutlined/>},
                 {key: 'recordRef', label: t('recordRef'), icon: <ApartmentOutlined/>},
                 {key: 'add', label: t('addData'), icon: <FileAddOutlined/>},
                 {key: 'setting', label: t('setting'), icon: <SettingOutlined/>},
@@ -104,7 +121,7 @@ export const HeaderBar = memo(function ({schema, curTable}: {
             label: t('pages'),
             children: pageConf.pages.map(fp => ({key: fp.label, label: fp.label})),
         }] : []),
-    ], [pageConf.pages, t]);
+    ], [pageConf.pages, t, errCount]);
 
     // 定位条：表 + 记录 收成一个视觉整体
     const locator = schema

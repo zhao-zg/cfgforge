@@ -99,10 +99,10 @@ export const ToolsSetting = memo(function ToolsSetting({schema, curTable, flowRe
                     ? `${curPage}_${curTableId}_${curId}.png`
                     : `${curPage}_${curTableId}.png`;
                 saveAs(blob, fn);
-                notification.info({title: "save png to " + fn, duration: 3});
+                notification.info({title: t('savePngSuccess', {file: fn}), duration: 3});
             }
         }).catch(() => {
-            notification.error({title: "save png failed: limit the max node count", duration: 3});
+            notification.error({title: t('savePngFail'), duration: 3});
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps -- flowRef 在 body 中经解构使用（const {current} = flowRef），oxlint exhaustive-deps 未追踪解构引用而误报
     }, [flowRef, imageSizeScale, curPage, notification, curTableId, curId]);

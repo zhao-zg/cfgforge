@@ -30,20 +30,20 @@ export const TauriSetting = memo(function ({schema}: {
         if (schema) {
             summarizeResAsync(schema, resMap).then((fullPath: string) => {
                 notification.info({
-                    title: `saveTo ${fullPath}`,
+                    title: t('summarizeResSuccess', {path: fullPath}),
                     placement: 'topRight',
                     duration: 3
                 });
             }).catch((e) => {
                 // 失败也要给用户反馈，且兜底 unhandled rejection
                 notification.error({
-                    title: `summarizeRes failed: ${e}`,
+                    title: t('summarizeResFail', {error: String(e)}),
                     placement: 'topRight',
                     duration: 3
                 });
             })
         }
-    }, [notification, schema, resMap])
+    }, [notification, schema, resMap, t])
 
     return <>
         <SettingCard icon={<DatabaseOutlined/>} title={t('tauriConf')}>
@@ -55,10 +55,6 @@ export const TauriSetting = memo(function ({schema}: {
 
                 <Form.Item name='assetDir' label={t('assetDir')}>
                     <Input placeholder={t('assetDir')}/>
-                </Form.Item>
-
-                <Form.Item name='assetRefTable' label={t('assetRefTable')}>
-                    <Input placeholder={t('assetRefTable')}/>
                 </Form.Item>
 
                 <Form.Item name='assetRefTable' label={t('assetRefTable')}>

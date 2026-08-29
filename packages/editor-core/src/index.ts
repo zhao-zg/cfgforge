@@ -93,3 +93,5 @@ export type {
   SingleTableReloadResult,
 } from './SingleTableReloadService.js';
 export { AutoReloadService } from './AutoReloadService.js';
+export { ValueErrsService } from './ValueErrsService.js';
+export type { ValueErrInfo } from './ValueErrsService.js';

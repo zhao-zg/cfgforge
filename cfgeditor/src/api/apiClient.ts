@@ -25,6 +25,7 @@ import {
     ExportService,
     SingleTableReloadService,
     AutoReloadService,
+    ValueErrsService,
 } from '@cfgforge/editor-core';
 
 import type {
@@ -50,6 +51,7 @@ import type {
     ExportAllResult,
     ExportFormat,
     SingleTableReloadResult,
+    ValueErrInfo,
 } from '@cfgforge/editor-core';
 
 // Re-export types needed by UI components ( CreateTableForm 等)
@@ -514,4 +516,13 @@ export function stopAutoReload(): void {
 /** 查询自动刷新是否在运行。 */
 export function isAutoReloadRunning(): boolean {
     return autoReloadService !== null && autoReloadService.isRunning;
+}
+
+// ---------------------------------------------------------------------------
+// Value Errors API (Error List Panel)
+// ---------------------------------------------------------------------------
+
+/** 收集全部校验错误（VErr + VWarn），返回扁平数组供 UI 按表分组展示。 */
+export async function fetchValueErrs(_signal?: AbortSignal): Promise<ValueErrInfo[]> {
+    return ValueErrsService.collectValueErrs(getEditor());
 }

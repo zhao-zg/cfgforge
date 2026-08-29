@@ -57,6 +57,9 @@ export const queryKeys = {
 
     // AI
     prompt: (tableId: string) => ['prompt', tableId],
+
+    // 校验错误列表（全表扫描，无入参；re-check 走 invalidateQueries 即可）
+    valueErrs: () => ['valueErrs'],
 };
 
 /** 结构编辑后清该 pathname 的编辑态 layout 缓存（前缀失效：['layout', pathname, 'e']）。

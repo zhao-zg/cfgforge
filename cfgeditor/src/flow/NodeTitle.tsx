@@ -10,6 +10,11 @@ import {getReadableTextColor} from "./layout/colors.ts";
 
 const {Text} = Typography;
 const titleStyle = { width: '100%' };
+// 标题文本包裹层：占满剩余空间并允许收缩（flex-shrink），ellipsis 才可能生效——
+// Flex 子项默认 flex-shrink:1 但 min-width:auto 会按内容撑宽，长表名/字段名会把节点撑爆。
+const titleWrapStyle = { flex: 1, minWidth: 0 };
+// 标题文本省略 + 完整名 tooltip：长标签不再撑破节点标题栏，悬停可见全名。
+const titleEllipsis = { tooltip: true };
 
 interface NodeTitleProps {
     foldButton: ReactNode;
@@ -38,9 +43,11 @@ export const NodeTitle = memo(function NodeTitle({
 
     return <Flex justify="space-between" style={titleStyle}>
         {foldButton}
-        <Text strong style={titleTextStyle} ellipsis={false} copyable={copyable}>
-            {query ? <Highlight text={label} keyword={query} /> : label}
-        </Text>
+        <div style={titleWrapStyle}>
+            <Text strong style={titleTextStyle} ellipsis={titleEllipsis} copyable={copyable}>
+                {query ? <Highlight text={label} keyword={query} /> : label}
+            </Text>
+        </div>
         {editNoteButton}
         {resBriefButton}
         <NodeToolbar edit={edit} nodeProps={nodeProps} />

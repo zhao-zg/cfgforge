@@ -32,7 +32,10 @@ const listStyle: CSSProperties = {backgroundColor: 'transparent'};
 const listItemStyle: CSSProperties = {position: 'relative'};
 const flexStyle = {width: '100%'};
 const ellipsis = {tooltip: true};
-const itemValueStyle = {maxWidth: '70%'};
+// 值列上限 70%（相对节点宽）。minWidth:0 是关键——Flex 子项默认 min-width:auto 按内容撑宽，
+// 连续长英文/数字串会让 Text ellipsis 失效、把节点撑爆（横向溢出）。
+// 常规内容由 ellipsis 省略；若在极窄容器里 ellipsis 兜不住，overflowWrap 让长串折行而非溢出。
+const itemValueStyle = {maxWidth: '70%', minWidth: 0, overflowWrap: 'break-word'} as CSSProperties;
 
 export const EntityProperties = memo(function EntityProperties({fields, nodeShow, color}: {
     fields: DisplayField[],
@@ -43,7 +46,7 @@ export const EntityProperties = memo(function EntityProperties({fields, nodeShow
     const {query: keyword} = useMyStore();
 
     const itemKeyStyle = useMemo(() => {
-        return {color: color, maxWidth: '80%'}
+        return {color: color, maxWidth: '80%', minWidth: 0}
     }, [color]);
 
     const handleInStyle: CSSProperties = useMemo(() => {

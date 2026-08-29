@@ -1,7 +1,7 @@
 import {Empty, List, Typography} from "antd";
 import {navTo, useCurPageRecordOrRecordRef, useMyStore} from "@/store/store.ts";
 import {useNavigate} from "react-router";
-import {CSSProperties, ReactNode} from "react";
+import type {CSSProperties, ReactNode} from "react";
 
 interface NavListProps<T> {
     items: T[];
@@ -18,6 +18,16 @@ interface NavListProps<T> {
 }
 
 const itemStyle: CSSProperties = {cursor: 'pointer', paddingInline: 8};
+// 链接包裹层：占满 List.Item 剩余宽度并允许收缩。List.Item 是 flex 布局，正文默认 min-width:auto
+// 会按内容撑宽——超长 title（如「表名 id-长标题」）会把侧栏条目顶爆。
+// minWidth:0 + 内层 Typography.Link ellipsis 才能在剩余宽度内省略。
+const linkWrapStyle: CSSProperties = {flex: 1, minWidth: 0};
+const linkStyle: CSSProperties = {
+    display: 'block',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+};
 
 /**
  * 泛型导航列表：一组可点击条目，点击按 curPage 跳转到 (table,id)。
@@ -43,7 +53,11 @@ export function NavList<T>({items, rowKey, toNav, renderTitle, renderExtra, empt
                   <List.Item style={itemStyle}
                              extra={renderExtra ? renderExtra(item) : undefined}
                              onClick={() => navigate(navTo(curPage, toNav(item).table, toNav(item).id, isEditMode, addHistory))}>
-                      <Typography.Link>{renderTitle(item)}</Typography.Link>
+                      <div style={linkWrapStyle}>
+                          <Typography.Link style={linkStyle} title={typeof renderTitle(item) === 'string' ? renderTitle(item) as string : undefined}>
+                              {renderTitle(item)}
+                          </Typography.Link>
+                      </div>
                   </List.Item>
               )}/>
     );

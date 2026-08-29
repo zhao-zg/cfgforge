@@ -319,7 +319,13 @@ i18n.use(LanguageDetector)
                     fieldType: 'Type',
                     fieldComment: 'Comment',
                     fieldNameRequired: 'Field name is required',
-                    fieldDeleteConfirm: 'Delete field "{name}"?'
+                    fieldDeleteConfirm: 'Delete field "{name}"?',
+
+                    // 校验错误列表面板
+                    errors: 'Errors',
+                    errorsEmpty: 'No validation errors',
+                    recheck: 'Re-check',
+                    rechecking: 'Checking...',
                 }
             },
             zh: {
@@ -581,6 +587,12 @@ i18n.use(LanguageDetector)
                     fieldComment: '注释',
                     fieldNameRequired: '字段名不能为空',
                     fieldDeleteConfirm: '确定删除字段 "{name}"？',
+
+                    // 校验错误列表面板
+                    errors: '校验错误',
+                    errorsEmpty: '无校验错误',
+                    recheck: '重新校验',
+                    rechecking: '校验中...',
 
                     themeSetting: '主题',
                     themeMode: '外观',

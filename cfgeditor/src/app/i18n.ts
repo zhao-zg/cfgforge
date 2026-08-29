@@ -326,6 +326,38 @@ i18n.use(LanguageDetector)
                     errorsEmpty: 'No validation errors',
                     recheck: 'Re-check',
                     rechecking: 'Checking...',
+
+                    // 404 页面
+                    pathNotFound: '"{path}" not found',
+                    returnHome: 'Return to home page',
+
+                    // AI Chat
+                    chatTitle: 'AI Chat',
+                    chatWelcome: 'Welcome to AI Chat',
+                    chatDesc: 'I can help you generate and edit configuration data',
+                    chatPlaceholder: 'Ask me to generate configuration data...',
+                    chatNotConfigured: 'Please configure AI baseUrl and apiKey in Settings first',
+                    chatThinking: 'Thinking...',
+                    chatCancelled: 'Request was cancelled',
+                    chatError: 'Error: {error}',
+                    checkJsonErr: 'checkJson err: {error}',
+                    chatNoSession: 'No open editing session, AI result discarded',
+                    chatSessionChanged: 'Editing session changed while generating, AI result discarded to avoid writing to the wrong record',
+                    chatUnsavedEdits: 'Record has unsaved manual edits, AI result not applied (would overwrite them)',
+                    chatParseFail: 'parse jsonResult failed: {error}',
+                    chatCheckFailed: 'checkJson failed: {resultCode}',
+
+                    // 快捷键提示
+                    keyPageSwitch: 'Page switch',
+                    keyTable: 'Table view (Alt+1)',
+                    keyTableRef: 'Table relation view (Alt+2)',
+                    keyRecord: 'Record view (Alt+3)',
+                    keyRecordRef: 'Record relation view (Alt+4)',
+                    keyHistory: 'History navigation',
+                    keyBack: 'Back (Alt+C)',
+                    keyForward: 'Forward (Alt+V)',
+                    keySubmit: 'Submit current record (Alt+S)',
+                    keyFullScreen: 'Fullscreen (Alt+Enter)',
                 }
             },
             zh: {
@@ -593,6 +625,38 @@ i18n.use(LanguageDetector)
                     errorsEmpty: '无校验错误',
                     recheck: '重新校验',
                     rechecking: '校验中...',
+
+                    // 404 页面
+                    pathNotFound: '"{path}" 页面不存在',
+                    returnHome: '返回首页',
+
+                    // AI Chat
+                    chatTitle: 'AI 对话',
+                    chatWelcome: '欢迎使用 AI 对话',
+                    chatDesc: '我可以帮你生成和编辑配置数据',
+                    chatPlaceholder: '输入指令生成配置数据...',
+                    chatNotConfigured: '请先在设置中配置 AI baseUrl 和 apiKey',
+                    chatThinking: '思考中...',
+                    chatCancelled: '请求已取消',
+                    chatError: '错误：{error}',
+                    checkJsonErr: 'checkJson 错误：{error}',
+                    chatNoSession: '无打开的编辑会话，AI 结果已丢弃',
+                    chatSessionChanged: '生成期间编辑会话已变更，AI 结果已丢弃以避免写入错误记录',
+                    chatUnsavedEdits: '记录有未保存的手动编辑，AI 结果未应用（避免覆盖）',
+                    chatParseFail: '解析 jsonResult 失败：{error}',
+                    chatCheckFailed: 'checkJson 失败：{resultCode}',
+
+                    // 快捷键提示
+                    keyPageSwitch: '页面切换',
+                    keyTable: '表视图 (Alt+1)',
+                    keyTableRef: '表关系视图 (Alt+2)',
+                    keyRecord: '记录视图 (Alt+3)',
+                    keyRecordRef: '记录关系视图 (Alt+4)',
+                    keyHistory: '历史导航',
+                    keyBack: '后退 (Alt+C)',
+                    keyForward: '前进 (Alt+V)',
+                    keySubmit: '提交当前记录 (Alt+S)',
+                    keyFullScreen: '全屏 (Alt+Enter)',
 
                     themeSetting: '主题',
                     themeMode: '外观',

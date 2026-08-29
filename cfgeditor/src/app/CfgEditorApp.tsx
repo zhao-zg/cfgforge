@@ -283,8 +283,18 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
         }
 
         if (dragPage) {
+            // 左面板初始宽度按面板类型差异化：表单类需要更宽，列表类可以更窄
+            // （defaultSize 仅在 Splitter 首次 mount 生效，面板切换时用 key 强制重挂以应用新宽度）
+            const panelWidths: Record<string, string> = {
+                setting: '30%',
+                add: '25%',
+                errors: '25%',
+                finder: '20%',
+                recordRef: '50%',
+            };
+            const defaultSize = panelWidths[dragPanel] ?? '20%';
             content = <Splitter style={contentDivStyle}>
-                <Splitter.Panel defaultSize="20%" style={autoOverflow}>
+                <Splitter.Panel key={'panel-' + dragPanel} defaultSize={defaultSize} style={autoOverflow}>
                     <div style={fullHeight}>
                         <Suspense fallback={null}>
                             {dragPage}

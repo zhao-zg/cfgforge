@@ -1,13 +1,13 @@
 import {CSSProperties, ReactNode} from "react";
 
 /**
- * HeaderBar 浮层的渲染高度（= antd 默认控件高度 32px）。
+ * HeaderBar 浮层的渲染高度（= HeaderBar.tsx HEADER_STYLE 的 height 40px）。
  * HeaderBar 是有意的 overlay——让 FlowGraph 占满全屏，
  * 代价是遮挡文字类侧栏面板的顶部。文字面板套 SidePanelShell 统一避让这个高度。
- * 若改动 HeaderBar 高度，同步改这里。
+ * 若改动 HeaderBar 高度，必须同步改这里（两处注释互相引用）。
  */
 
-const HEADER_HEIGHT = 32;
+const HEADER_HEIGHT = 40;
 const shellStyle: CSSProperties = {height: '100%', display: 'flex', flexDirection: 'column'};
 const spacerStyle: CSSProperties = {flexShrink: 0, height: HEADER_HEIGHT};
 const bodyStyle: CSSProperties = {flex: 1, minHeight: 0, overflow: 'auto'};

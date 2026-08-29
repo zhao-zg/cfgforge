@@ -100,7 +100,8 @@ export const AddJson = memo(function AddJson() {
             <Form.Item name='json' label={t('json')}>
                 <Input.TextArea placeholder="json" autoSize={{minRows: 8, maxRows: 20}}/>
             </Form.Item>
-            <Form.Item wrapperCol={{offset: 4, span: 20}}>
+            {/* vertical 布局下无需 wrapperCol offset：按钮左对齐表单主体，避免多余缩进 */}
+            <Form.Item>
                 <Space>
                     <Button type="primary" htmlType="submit">
                         {t('addJson')}

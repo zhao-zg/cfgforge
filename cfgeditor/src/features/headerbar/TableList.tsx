@@ -14,7 +14,7 @@ interface TableWithLastName {
 
 const SELECT_STYLE = {width: 200} as const;
 const LABEL_COUNT_STYLE: CSSProperties = {
-    color: '#597ef7', fontSize: '0.9em',
+    color: 'var(--color-accent)', fontSize: '0.9em',
     textOverflow: "clip", whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: 60
 }
 

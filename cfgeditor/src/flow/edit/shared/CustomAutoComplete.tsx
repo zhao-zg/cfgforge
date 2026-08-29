@@ -5,7 +5,7 @@ import {EntityEditFieldOption} from "@/domain/entityModel";
 import {FilterOption} from "./constants.ts";
 
 const suffixStyle: CSSProperties = {
-    color: '#597ef7', fontSize: '0.8em',
+    color: 'var(--color-accent)', fontSize: '0.8em',
     textOverflow: "clip", whiteSpace: 'nowrap', overflow: 'hidden', maxWidth: 85
 }
 

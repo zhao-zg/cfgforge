@@ -33,7 +33,8 @@ export const FILTER_SEARCH: FilterOption = {
 };
 
 // 主题配置（FORM_THEME）已上提到 FlowGraph 单实例 ConfigProvider（原每节点一个，N=45 时 mount 开销可观），见 FlowGraph.tsx。
-export const FORM_STYLE = {backgroundColor: "white", borderRadius: 15, padding: 10};
+// backgroundColor 用 design token：深色主题下不再刺眼的白。
+export const FORM_STYLE = {backgroundColor: "var(--color-bg-panel)", borderRadius: 15, padding: 10};
 
 // 各字段项组件的 props 接口与组件同文件导出（StructRefItemProps 等多数派约定）：
 // field 用具体字段类型（而非 EntityEditField 联合），组件内访问 value/autoCompleteOptions

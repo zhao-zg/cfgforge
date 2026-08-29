@@ -131,7 +131,3 @@ svg .react-flow__edge-path {
 .settingCard:hover {
     box-shadow: var(--shadow-md);
 }
-
-.player {
-    width: 320px;
-}

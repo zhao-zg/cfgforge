@@ -11,6 +11,7 @@ import {TauriSetting} from "./TauriSetting.tsx";
 import {ThemeSetting} from "./ThemeSetting.tsx";
 import {FixPages} from "./FixPages.tsx";
 import {ToolsSetting} from "./ToolsSetting.tsx";
+import {ShortcutSetting} from "./ShortcutSetting.tsx";
 import {memo, RefObject} from "react";
 import {isTauri} from "@tauri-apps/api/core";
 
@@ -33,6 +34,11 @@ export const Setting = memo(function Setting({schema, curTable, flowRef}: {
             key: 'behavior',
             label: t('behavior'),
             children: <BasicSetting/>,
+        },
+        {
+            key: 'shortcuts',
+            label: t('keySetting'),
+            children: <ShortcutSetting/>,
         },
         {
             key: 'dataDir',

@@ -4,6 +4,7 @@ import XMarkdown from "@ant-design/x-markdown";
 import {OpenAIChatProvider, useXChat, XModelParams, XModelResponse, XRequest} from "@ant-design/x-sdk";
 import {App, Flex, theme} from "antd";
 import {memo, useState, useEffect, useRef, type CSSProperties} from "react";
+import {useTranslation} from "react-i18next";
 
 import {useMyStore, useLocationData} from "@/store/store.ts";
 import {getPrefStr} from "@/store/storage";
@@ -30,6 +31,7 @@ const role: BubbleListProps["role"] = {
 // AI 未配置（baseUrl/apiKey 任一为空）时禁用 Sender 并给出配置引导——不做第三方端点兜底：
 // 静默把用户 prompt（含表结构）发往公共演示服务既是数据外泄，假 key 也必然 401 且无引导
 export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }) {
+    const {t} = useTranslation();
     const {token} = theme.useToken();
     const styles = {
         chatContainer: {
@@ -40,7 +42,8 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
             height: '100%',
         },
         chatHeader: {
-            height: 52,
+            // 高度与 HeaderBar（40px）对齐，Splitter 侧栏内视觉一致
+            height: 40,
             boxSizing: 'border-box',
             borderBottom: `1px solid ${token.colorBorder}`,
             display: 'flex',
@@ -102,7 +105,7 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
 
         onError: (error) => {
             // 不动输入框：异步回调到达时用户可能正在输入下一条消息
-            notification.error({title: `checkJson err: ${error.message}`, placement: 'topRight', duration: 4});
+            notification.error({title: t('checkJsonErr', {error: error.message}), placement: 'topRight', duration: 4});
         },
         onSuccess: (result: CheckJsonResult) => {
             const nowTableId = getPrefStr('curTableId', '');
@@ -112,26 +115,26 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
             }
             if (result.resultCode != 'ok') {
                 // jsonResult 仅 ParseJsonError 时有内容（chatModel.ts），其余结果码回退显示 resultCode，避免空 toast
-                notification.error({title: result.jsonResult || `checkJson failed: ${result.resultCode}`, placement: 'topRight', duration: 4});
+                notification.error({title: result.jsonResult || t('chatCheckFailed', {resultCode: result.resultCode}), placement: 'topRight', duration: 4});
                 return;
             }
             const session = getCurrentEditingSession();
             if (!session) {
-                notification.warning({title: 'No open editing session, AI result discarded', placement: 'topRight', duration: 4});
+                notification.warning({title: t('chatNoSession'), placement: 'topRight', duration: 4});
                 return;
             }
             if (session !== submitSessionRef.current) {
-                notification.warning({title: 'Editing session changed while generating, AI result discarded to avoid writing to the wrong record', placement: 'topRight', duration: 4});
+                notification.warning({title: t('chatSessionChanged'), placement: 'topRight', duration: 4});
                 return;
             }
             if (session.getIsEdited()) {
-                notification.warning({title: 'Record has unsaved manual edits, AI result not applied (would overwrite them)', placement: 'topRight', duration: 4});
+                notification.warning({title: t('chatUnsavedEdits'), placement: 'topRight', duration: 4});
                 return;
             }
             try {
                 session.replaceEditingObject(JSON.parse(result.jsonResult));
             } catch (e) {
-                notification.error({title: `parse jsonResult failed: ${e}`, placement: 'topRight', duration: 4});
+                notification.error({title: t('chatParseFail', {error: String(e)}), placement: 'topRight', duration: 4});
             }
         },
     });
@@ -178,19 +181,19 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
         }),
         requestPlaceholder: () => {
             return {
-                content: "Thinking...",
+                content: t('chatThinking'),
                 role: "assistant",
             };
         },
         requestFallback: (_, {error} :  {error: Error}) => {
             if (error.name === "AbortError") {
                 return {
-                    content: "Request was cancelled",
+                    content: t('chatCancelled'),
                     role: "assistant",
                 };
             }
             return {
-                content: `Error: ${error.message}`,
+                content: t('chatError', {error: error.message}),
                 role: "assistant",
             };
         },
@@ -236,7 +239,7 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
 
     const chatHeader = (
         <div style={styles.chatHeader}>
-            <div style={styles.headerTitle}>AI Chat</div>
+            <div style={styles.headerTitle}>{t('chatTitle')}</div>
             <div style={{color: token.colorTextSecondary, fontSize: 13}}>{model}</div>
         </div>
     );
@@ -258,8 +261,8 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
                 <>
                     <Welcome
                         variant="borderless"
-                        title={`👋 Welcome to AI Chat`}
-                        description="I can help you generate and edit configuration data"
+                        title={`👋 ${t('chatWelcome')}`}
+                        description={t('chatDesc')}
                         style={styles.chatWelcome}
                     />
                 </>
@@ -282,8 +285,8 @@ export const Chat = memo(function Chat({schema}: { schema: Schema | undefined; }
                     abort();
                 }}
                 placeholder={isAiSet
-                    ? "Ask me to generate configuration data..."
-                    : "Please configure AI baseUrl and apiKey in Settings first"}
+                    ? t('chatPlaceholder')
+                    : t('chatNotConfigured')}
             />
         </Flex>
     );

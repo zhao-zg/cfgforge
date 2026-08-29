@@ -489,6 +489,33 @@ export class Context {
     this._lastCfgValueAllowErr = allowValueErr;
     return this._lastCfgValue;
   }
+
+  // -------------------------------------------------------------------------
+  // collectErrsAsync — re-parse to collect all value errors (for error list UI)
+  // -------------------------------------------------------------------------
+
+  /**
+   * Re-parse the full CfgValue to collect all VErr/VWarn, WITHOUT caching
+   * and WITHOUT checkErrors (which prints + may throw). Used by
+   * ValueErrsService for the error list panel's "re-check" feature.
+   *
+   * This is a separate method (not a parameter on makeValueWithTagAndAllowErr)
+   * because the cache-hit path would skip error collection, and we don't want
+   * to pollute the cached CfgValue or the makeValue signature.
+   */
+  async collectErrsAsync(): Promise<CfgValueErrs> {
+    const valueErrs = CfgValueErrs.of();
+    const env = new ValueEnv(
+      this._cfgSchema,
+      this._cfgData,
+      this._contextCfg.headRow,
+      this._nullableLangTextFinder as unknown as null,
+      this._sourceStructure,
+    );
+    const parser = new CfgValueParser(this._cfgSchema, env, valueErrs);
+    await parser.parseCfgValueAsync();
+    return valueErrs;
+  }
 }
 
 // ---------------------------------------------------------------------------

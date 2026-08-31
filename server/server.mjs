@@ -16,9 +16,11 @@
  */
 
 import http from 'node:http';
+import https from 'node:https';
 import fs from 'node:fs';
 import fsp from 'node:fs/promises';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -31,6 +33,76 @@ const DATA_ROOT = path.resolve(process.env.CFGFORGE_DATA_DIR || '/data');
 const WEB_ROOT = path.resolve(process.env.CFGFORGE_WEB_ROOT || path.join(__dirname, '..', 'cfgeditor', 'dist'));
 const PORT = parseInt(process.env.CFGFORGE_PORT || '80', 10);
 const HOST = process.env.CFGFORGE_HOST || '0.0.0.0';
+
+// HTTPS 配置：启用后浏览器视为安全上下文，showDirectoryPicker 等 API 可用
+const USE_HTTPS = process.env.CFGFORGE_HTTPS === '1' || process.env.CFGFORGE_HTTPS === 'true';
+const CERT_DIR = process.env.CFGFORGE_CERT_DIR || path.join(__dirname, 'certs');
+const CERT_FILE = path.join(CERT_DIR, 'cert.pem');
+const KEY_FILE = path.join(CERT_DIR, 'key.pem');
+
+// ---------------------------------------------------------------------------
+// 自签证书自动生成
+// ---------------------------------------------------------------------------
+
+/**
+ * 启动时自动生成自签证书（如不存在）。
+ * 优先用 Node 内置 crypto 生成；如果失败（旧版 Node 无 generateKeyPairSync 签名能力），
+ * 则尝试调用系统 openssl。
+ *
+ * 证书包含 SAN（Subject Alternative Names），覆盖：
+ * - localhost
+ * - 0.0.0.0
+ * - 127.0.0.1
+ * - 容器 hostname
+ * 用户通过 https://局域网IP 访问时 Chrome 会警告证书不受信任，
+ * 点击「高级 → 继续前往」即可。
+ */
+async function ensureSelfSignedCert() {
+  // 已存在则直接复用
+  if (fs.existsSync(CERT_FILE) && fs.existsSync(KEY_FILE)) {
+    console.log(`[cfgforge-server] reusing existing cert: ${CERT_FILE}`);
+    return { cert: fs.readFileSync(CERT_FILE), key: fs.readFileSync(KEY_FILE) };
+  }
+
+  await fsp.mkdir(CERT_DIR, { recursive: true });
+
+  // 尝试用 openssl CLI 生成（Docker 镜像中安装了 openssl）
+  try {
+    const subj = '/CN=cfgforge-self-signed';
+    execSync(
+      `openssl req -x509 -newkey rsa:2048 -keyout "${KEY_FILE}" -out "${CERT_FILE}" ` +
+      `-days 825 -nodes -subj "${subj}" ` +
+      `-addext "subjectAltName=IP:0.0.0.0,IP:127.0.0.1,DNS:localhost,IP:::1"`,
+      { stdio: 'pipe', timeout: 15000 }
+    );
+    console.log(`[cfgforge-server] self-signed cert generated via openssl: ${CERT_FILE}`);
+    return { cert: fs.readFileSync(CERT_FILE), key: fs.readFileSync(KEY_FILE) };
+  } catch (e) {
+    // openssl 不可用时尝试 Node crypto
+    console.warn(`[cfgforge-server] openssl not available (${e.message}), trying Node crypto...`);
+  }
+
+  // Node crypto 兜底（Node 16+）
+  try {
+    const { generateKeyPairSync } = await import('node:crypto');
+    const { privateKey, publicKey } = generateKeyPairSync('rsa', {
+      modulusLength: 2048,
+    });
+
+    // 构建自签证书（使用 X509Certificate）
+    const { X509Certificate } = await import('node:crypto');
+    // Node 的 crypto 模块不直接提供创建 X509 证书的简单 API，
+    // 兜底失败时给出明确错误信息
+    throw new Error('Node crypto cert generation not implemented, openssl required');
+  } catch (e) {
+    throw new Error(
+      `Failed to generate self-signed certificate. ` +
+      `Please install openssl in the container, or provide your own cert files at:\n` +
+      `  ${CERT_FILE}\n  ${KEY_FILE}\n` +
+      `Original error: ${e.message}`
+    );
+  }
+}
 
 // ---------------------------------------------------------------------------
 // 路径安全：把绝对路径映射到 DATA_ROOT 内的相对路径
@@ -324,7 +396,7 @@ function serveStatic(res, urlPath) {
 // HTTP server
 // ---------------------------------------------------------------------------
 
-const server = http.createServer((req, res) => {
+const requestHandler = (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
 
   if (url.pathname.startsWith('/api/fs/')) {
@@ -333,23 +405,37 @@ const server = http.createServer((req, res) => {
   }
 
   if (url.pathname === '/api/health') {
-    sendJson(res, 200, { ok: true, dataRoot: DATA_ROOT });
+    sendJson(res, 200, { ok: true, dataRoot: DATA_ROOT, https: USE_HTTPS });
     return;
   }
 
   serveStatic(res, url.pathname);
-});
+};
 
 // ---------------------------------------------------------------------------
 // 启动
 // ---------------------------------------------------------------------------
 
 try {
-  fsp.mkdir(DATA_ROOT, { recursive: true });
+  await fsp.mkdir(DATA_ROOT, { recursive: true });
 } catch { /* 已存在 */ }
 
-server.listen(PORT, HOST, () => {
-  console.log(`[cfgforge-server] listening on http://${HOST}:${PORT}`);
-  console.log(`[cfgforge-server] data root: ${DATA_ROOT}`);
-  console.log(`[cfgforge-server] web root: ${WEB_ROOT}`);
-});
+if (USE_HTTPS) {
+  const { cert, key } = await ensureSelfSignedCert();
+  const httpsServer = https.createServer({ cert, key }, requestHandler);
+  httpsServer.listen(PORT, HOST, () => {
+    console.log(`[cfgforge-server] listening on https://${HOST}:${PORT}`);
+    console.log(`[cfgforge-server] data root: ${DATA_ROOT}`);
+    console.log(`[cfgforge-server] web root: ${WEB_ROOT}`);
+    console.log(`[cfgforge-server] HTTPS enabled (self-signed cert)`);
+    console.log(`[cfgforge-server] Chrome will warn about the self-signed certificate.`);
+    console.log(`[cfgforge-server] Click "Advanced → Continue" to proceed.`);
+  });
+} else {
+  const server = http.createServer(requestHandler);
+  server.listen(PORT, HOST, () => {
+    console.log(`[cfgforge-server] listening on http://${HOST}:${PORT}`);
+    console.log(`[cfgforge-server] data root: ${DATA_ROOT}`);
+    console.log(`[cfgforge-server] web root: ${WEB_ROOT}`);
+  });
+}

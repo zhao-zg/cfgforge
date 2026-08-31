@@ -24,6 +24,9 @@ RUN cd cfgeditor && pnpm build
 # ============================================================
 FROM node:24-alpine
 
+# openssl：用于启动时自动生成自签证书（HTTPS 模式）
+RUN apk add --no-cache openssl
+
 # Copy built frontend
 COPY --from=builder /build/cfgeditor/dist /app/web
 
@@ -37,6 +40,9 @@ ENV CFGFORGE_DATA_DIR=/data
 ENV CFGFORGE_WEB_ROOT=/app/web
 ENV CFGFORGE_PORT=80
 ENV CFGFORGE_HOST=0.0.0.0
+# 设为 1 启用 HTTPS（自签证书），浏览器视为安全上下文
+ENV CFGFORGE_HTTPS=0
+ENV CFGFORGE_CERT_DIR=/app/certs
 
 EXPOSE 80
 

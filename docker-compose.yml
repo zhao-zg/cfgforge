@@ -1,15 +1,19 @@
 services:
   cfgforge:
-    # 网页版编辑器：Node HTTP 后端托管前端 + 文件系统 REST API。
+    # 网页版编辑器：Node HTTP/HTTPS 后端托管前端 + 文件系统 REST API。
     # 数据目录通过 volume 挂载进容器，支持浏览/编辑/保存配表全流程。
     image: ghcr.io/zhao-zg/cfgforge:latest
     ports:
-      - "8181:80"
+      - "8181:80"  # HTTP（非安全上下文，showDirectoryPicker 不可用）
+      - "8443:443" # HTTPS（自签证书，安全上下文，showDirectoryPicker 可用）
     volumes:
       - ./config:/data
+      - ./certs:/app/certs  # 自签证书持久化（避免每次重启重新生成）
     environment:
       - CFGFORGE_DATA_DIR=/data
       - CFGFORGE_WEB_ROOT=/app/web
-      - CFGFORGE_PORT=80
+      - CFGFORGE_PORT=443
       - CFGFORGE_HOST=0.0.0.0
+      - CFGFORGE_HTTPS=1
+      - CFGFORGE_CERT_DIR=/app/certs
     restart: unless-stopped

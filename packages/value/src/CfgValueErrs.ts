@@ -232,6 +232,10 @@ function fmtVal(v: unknown): string {
   if (v instanceof DFile) {
     return v.fileName;
   }
+  // Value objects (VInt/VStr/VStruct/VList/... and test mocks) carry packStr()
+  if (typeof v === 'object' && v !== null && typeof (v as { packStr?: unknown }).packStr === 'function') {
+    return (v as { packStr(): string }).packStr();
+  }
   return String(v);
 }
 

@@ -8,6 +8,7 @@ import {open} from "@tauri-apps/plugin-dialog";
 import {isTauri} from "@tauri-apps/api/core";
 import {setDefaultFileSystem} from "@cfgforge/shared";
 import {saveDirHandle, ensurePermission, LocalFsApi} from "@/services/LocalFsApi.ts";
+import {detectDockerBackend, BrowserFsApi} from "@/services/BrowserFsApi.ts";
 import {SettingCard} from "./SettingCard.tsx";
 import {reloadEditor} from "@/api/apiClient.ts";
 import {invalidateAllQueries} from "@/services/queryClient.ts";
@@ -54,7 +55,16 @@ export const ConnectionSetting = memo(function ConnectionSetting() {
                     message.success(t('dataDirConnected'));
                 }
             } else {
-                // Web 端：调用 File System Access API 选择本地目录
+                // Web 端：优先检测 Docker 后端
+                const dockerInfo = await detectDockerBackend();
+                if (dockerInfo) {
+                    setConnecting(true);
+                    setDefaultFileSystem(new BrowserFsApi());
+                    await setDataDir(dockerInfo.dataRoot);
+                    message.success(t('dataDirConnected'));
+                    return;
+                }
+                // 非 Docker：调用 File System Access API 选择本地目录
                 if (typeof (window as any).showDirectoryPicker !== 'function') {
                     message.error(t('fsApiNotSupported'));
                     return;

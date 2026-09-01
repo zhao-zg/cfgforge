@@ -17,6 +17,12 @@ import {
   VInt,
   VStruct,
   VTable,
+  VList,
+  VMap,
+  VInterface,
+  VBool,
+  VLong,
+  VFloat,
   valueEquals,
   type Value,
 } from './CfgValue.js';
@@ -41,6 +47,27 @@ import {
   findFieldIndices,
   findFieldIndex,
 } from '@cfgforge/schema';
+
+/**
+ * Hash code for a Value used as a Map key, consistent with valueEquals:
+ * equal values must produce equal hashes (all Value classes implement
+ * equals-compatible hashCode). Falls back to a structural hash for the
+ * rare VList multi-field keys (single-field keys use the component's own
+ * hashCode, which is already equals-consistent).
+ */
+function valueHashCode(v: Value): number {
+  if (v instanceof VBool) return v.hashCode();
+  if (v instanceof VInt) return v.hashCode();
+  if (v instanceof VLong) return v.hashCode();
+  if (v instanceof VFloat) return v.hashCode();
+  if (v instanceof VString) return v.hashCode();
+  if (v instanceof VText) return v.hashCode();
+  if (v instanceof VStruct) return v.hashCode();
+  if (v instanceof VInterface) return v.hashCode();
+  if (v instanceof VList) return v.hashCode();
+  if (v instanceof VMap) return v.hashCode();
+  return 0;
+}
 
 export class VTableCreator {
   private readonly tableSchema: TableSchema;
@@ -198,23 +225,42 @@ export class VTableCreator {
     }
   }
 
+  /**
+   * Extracts key values into `keyMap` while detecting duplicates.
+   *
+   * TS Map uses reference equality (===) for keys, but Value types need
+   * value equality (valueEquals). Naively scanning keyMap.keys() for every
+   * row is O(n²) — a table with 89061 rows took ~55s. Instead we bucket keys
+   * by their hashCode() (equal values ⇒ equal hashes) so each lookup is
+   * O(1) amortized; only keys sharing a hash bucket need a valueEquals scan
+   * (bucket size stays tiny for well-distributed hashes).
+   *
+   * Hash collision buckets preserve the "first seen key wins as the stored
+   * key object, but last value wins" semantics of the old implementation.
+   */
   private extractKeyValues(
     keyMap: Map<Value, VStruct>,
     valueList: Iterable<VStruct>,
     key: KeySchema,
   ): void {
     const keyIndices = findFieldIndices(this.tableSchema, key);
+    // hash → previously seen keys sharing that hash
+    const hashBuckets = new Map<number, Value[]>();
+
     for (const value of valueList) {
       const keyValue = ValueUtil.extractKeyValue(value, keyIndices);
-      // TS Map uses reference equality (===), but Value types need equals() check.
-      // Must manually check for duplicates and replace the old entry.
+      const hash = valueHashCode(keyValue);
+      let bucket = hashBuckets.get(hash);
       let existingKey: Value | null = null;
-      for (const ek of keyMap.keys()) {
-        if (valueEquals(ek, keyValue)) {
-          existingKey = ek;
-          break;
+      if (bucket !== undefined) {
+        for (const candidate of bucket) {
+          if (valueEquals(candidate, keyValue)) {
+            existingKey = candidate;
+            break;
+          }
         }
       }
+
       if (existingKey !== null) {
         this.errs.addErr(primaryOrUniqueKeyDuplicated(
           keyValue,
@@ -223,6 +269,17 @@ export class VTableCreator {
         ));
         // Remove old key and set new one so the map has only one entry per value
         keyMap.delete(existingKey);
+        // Keep the bucket in sync with the map: the stored key reference must
+        // be the one currently present in keyMap, otherwise a later duplicate
+        // would delete() a stale (already-removed) key and leave a residue.
+        const idx = bucket!.indexOf(existingKey);
+        bucket![idx] = keyValue;
+      } else {
+        if (bucket === undefined) {
+          bucket = [];
+          hashBuckets.set(hash, bucket);
+        }
+        bucket.push(keyValue);
       }
       keyMap.set(keyValue, value);
     }

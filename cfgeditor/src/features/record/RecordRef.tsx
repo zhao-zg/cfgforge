@@ -5,7 +5,7 @@ import { createRefEntities } from "./recordRefUtils.ts";
 import { useTranslation } from "react-i18next";
 import {Schema, SchemaTableType} from "@/domain/schema.ts";
 import { NodeShowType } from "@/domain/storageJson.ts";
-import { navTo, useMyStore, useLocationData, PageType } from "@/store/store.ts";
+import { navTo, useMyStore, useLocationData, PageType, setDragPanel } from "@/store/store.ts";
 import { Navigate, useNavigate, useOutletContext } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { fetchRecordRefs, fetchUnreferencedRecords } from "@/api/apiClient.ts";
@@ -36,7 +36,7 @@ export function RecordRefWithResult({ schema, notes, curTable, curId, nodeShow, 
 }) {
     const [t] = useTranslation();
     const navigate = useNavigate();
-    const { recordRefInShowLinkMaxNode, tauriConf, resourceDir, resMap, isEditMode } = useMyStore();
+    const { recordRefInShowLinkMaxNode, tauriConf, resourceDir, resMap, isEditMode, chainConfs } = useMyStore();
     const { notification } = App.useApp();
 
     // 未引用模式：批量删除全部未引用记录（串行 for...of，收集失败数）
@@ -139,8 +139,19 @@ export function RecordRefWithResult({ schema, notes, curTable, curId, nodeShow, 
             });
         }
 
+        // 链入口：包含该节点所属表的链 → 打开链视图
+        for (const chain of chainConfs.chains) {
+            if (chain.tables.includes(refId.table)) {
+                menuItems.push({
+                    label: `${t('chainOpenFromRecord')}: ${chain.label}`,
+                    key: `chain-${chain.label}`,
+                    handler: () => setDragPanel(chain.label)
+                });
+            }
+        }
+
         return menuItems;
-    }, [t, schema, navigate, recordRefResult, isUnrefMode]);
+    }, [t, schema, navigate, recordRefResult, isUnrefMode, chainConfs]);
 
     const nodeDoubleClickFunc = useCallback((entityNode: EntityNode): void => {
         const refId = entityNode.data.entity.userData as RefId;

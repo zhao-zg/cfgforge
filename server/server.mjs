@@ -231,11 +231,14 @@ async function handleFsApi(req, res, url) {
       }
       case 'readFile': {
         // GET /api/fs/readFile?path=<abs> → 原始字节
+        // 按扩展名设置 Content-Type：图片等可直接作为 <img src> 使用
         const p = toAbs(q('path'));
         try {
           const data = await fsp.readFile(p);
+          const ext = path.extname(p).toLowerCase();
+          const contentType = MIME[ext] || 'application/octet-stream';
           res.writeHead(200, {
-            'Content-Type': 'application/octet-stream',
+            'Content-Type': contentType,
             'Content-Length': data.length,
           });
           res.end(data);

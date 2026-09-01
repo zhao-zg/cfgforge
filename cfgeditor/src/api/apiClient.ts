@@ -540,8 +540,10 @@ export function isAutoReloadRunning(): boolean {
 // Value Errors API (Error List Panel)
 // ---------------------------------------------------------------------------
 
-/** 收集全部校验错误（VErr + VWarn），返回扁平数组供 UI 按表分组展示。 */
-export async function fetchValueErrs(_signal?: AbortSignal): Promise<ValueErrInfo[]> {
+/** 收集全部校验错误（VErr + VWarn），返回扁平数组供 UI 按表分组展示。
+ * @param force  为 true 时强制重新解析（re-check 按钮使用）。
+ */
+export async function fetchValueErrs(_signal?: AbortSignal, force?: boolean): Promise<ValueErrInfo[]> {
     const {ValueErrsService} = getCachedCore();
-    return ValueErrsService.collectValueErrs(getEditor());
+    return ValueErrsService.collectValueErrs(getEditor(), force);
 }

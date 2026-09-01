@@ -35,12 +35,14 @@ import {isTauri} from "@tauri-apps/api/core";
 import {open as openDialog} from "@tauri-apps/plugin-dialog";
 import {setDefaultFileSystem} from "@cfgforge/shared";
 import {saveDirHandle, ensurePermission, LocalFsApi} from "@/services/LocalFsApi.ts";
+import {detectDockerBackend, BrowserFsApi} from "@/services/BrowserFsApi.ts";
 
 // Chat / Setting 仅在 dragPanel 切换到对应面板时才渲染，懒加载以推迟
 // @ant-design/x* + openai + marked + dompurify 等重依赖的解析（不进首屏）
 const AddPanel = lazy(() => import("@/features/add/AddPanel").then(m => ({default: m.AddPanel})));
 const Setting = lazy(() => import("@/features/setting/Setting").then(m => ({default: m.Setting})));
 const RecordRef = lazy(() => import("@/features/record/RecordRef").then(m => ({default: m.RecordRef})));
+const ChainView = lazy(() => import("@/features/chain/ChainView").then(m => ({default: m.ChainView})));
 
 const contentDivStyle: CSSProperties = {
     position: "absolute",
@@ -98,7 +100,7 @@ const schemaSelector = (rawSchema: RawSchema) => new Schema(rawSchema);
 
 export const CfgEditorApp = memo(function CfgEditorApp() {
     const {
-        dataDir, dragPanel, pageConf,
+        dataDir, dragPanel, pageConf, chainConfs,
         recordRefIn, recordRefOutDepth, recordMaxNode, nodeShow,
     } = useMyStore();
 
@@ -176,7 +178,14 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
                     await setDataDir(selected);
                 }
             } else {
-                // Web 端：调用 File System Access API
+                // Web 端：优先检测 Docker 后端（非安全上下文也能工作）
+                const dockerInfo = await detectDockerBackend();
+                if (dockerInfo) {
+                    setDefaultFileSystem(new BrowserFsApi());
+                    await setDataDir(dockerInfo.dataRoot);
+                    return;
+                }
+                // 非 Docker：调用 File System Access API
                 if (typeof (window as any).showDirectoryPicker !== 'function') {
                     return;
                 }
@@ -245,76 +254,83 @@ export const CfgEditorApp = memo(function CfgEditorApp() {
             <Typography.Text type="secondary">{t('selectTableHint')}</Typography.Text>
         </Flex>;
     } else if (schema && curTable != null) {
-        let dragPage = null;
-        if (dragPanel == 'recordRef') {
-            dragPage = <RefPageInFlow schema={schema} notes={notes} curTable={curTable} curTableId={curTableId}
-                                      curPage={'recordRef'} curId={curId} refIn={recordRefIn}
-                                      refOutDepth={recordRefOutDepth} maxNode={recordMaxNode} nodeShow={nodeShow}
-                                      inDragPanelAndFix={false}/>;
-        } else if (dragPanel == 'finder') {
-            dragPage = <SidePanelShell><Finder schema={schema}/></SidePanelShell>;
-        } else if (dragPanel == 'add') {
-            dragPage = <SidePanelShell><Suspense fallback={null}><AddPanel schema={schema} key={'add-' + curTableId}/></Suspense></SidePanelShell>;
-
-        } else if (dragPanel == 'setting') {
-            dragPage = <SidePanelShell><Suspense fallback={null}><Setting schema={schema} curTable={curTable} flowRef={ref}/></Suspense></SidePanelShell>
-
-        } else if (dragPanel == 'errors') {
-            dragPage = <ErrorsPanel/>;
-
-        } else if (dragPanel != 'none') {
-            const fix = getFixedPage(pageConf, dragPanel);
-            if (fix) {
-                const fixedTable = schema.getSTable(fix.table);
-                if (fixedTable) {
-                    if (isFixedRefPage(fix)) {  // 固定记录引用页面
-                        dragPage = <RefPageInFlow schema={schema} notes={notes} curTable={fixedTable} curTableId={fix.table}
-                                                  curPage={'recordRef'} curId={fix.id} refIn={fix.refIn}
-                                                  refOutDepth={fix.refOutDepth} maxNode={fix.maxNode} nodeShow={fix.nodeShow}
-                                                  inDragPanelAndFix={true}/>;
-                    } else if (isFixedUnrefPage(fix)) {  // 固定未引用记录页面
-                        dragPage = <RefPageInFlow schema={schema} notes={notes} curTable={fixedTable} curTableId={fix.table}
-                                                  curPage={'recordUnref'}
-                                                  refOutDepth={fix.refOutDepth} maxNode={fix.maxNode} nodeShow={fix.nodeShow}
-                                                  inDragPanelAndFix={true}/>;
+        // 链视图：dragPanel 匹配 chain label 时，主区域全屏渲染 ChainView（多画布并排）
+        const chain = chainConfs.chains.find(c => c.label === dragPanel);
+        if (chain && dragPanel != 'none') {
+            content = <div ref={ref} style={fullDivStyle}>
+                <Suspense fallback={null}>
+                    <ChainView schema={schema} notes={notes}/>
+                </Suspense>
+            </div>;
+        } else {
+            let dragPage = null;
+            if (dragPanel == 'recordRef') {
+                dragPage = <RefPageInFlow schema={schema} notes={notes} curTable={curTable} curTableId={curTableId}
+                                          curPage={'recordRef'} curId={curId} refIn={recordRefIn}
+                                          refOutDepth={recordRefOutDepth} maxNode={recordMaxNode} nodeShow={nodeShow}
+                                          inDragPanelAndFix={false}/>;
+            } else if (dragPanel == 'finder') {
+                dragPage = <SidePanelShell><Finder schema={schema}/></SidePanelShell>;
+            } else if (dragPanel == 'add') {
+                dragPage = <SidePanelShell><Suspense fallback={null}><AddPanel schema={schema} key={'add-' + curTableId}/></Suspense></SidePanelShell>;
+            } else if (dragPanel == 'setting') {
+                dragPage = <SidePanelShell><Suspense fallback={null}><Setting schema={schema} curTable={curTable} flowRef={ref}/></Suspense></SidePanelShell>
+            } else if (dragPanel == 'errors') {
+                dragPage = <ErrorsPanel/>;
+            } else if (dragPanel != 'none') {
+                const fix = getFixedPage(pageConf, dragPanel);
+                if (fix) {
+                    const fixedTable = schema.getSTable(fix.table);
+                    if (fixedTable) {
+                        if (isFixedRefPage(fix)) {  // 固定记录引用页面
+                            dragPage = <RefPageInFlow schema={schema} notes={notes} curTable={fixedTable} curTableId={fix.table}
+                                                      curPage={'recordRef'} curId={fix.id} refIn={fix.refIn}
+                                                      refOutDepth={fix.refOutDepth} maxNode={fix.maxNode} nodeShow={fix.nodeShow}
+                                                      inDragPanelAndFix={true}/>;
+                        } else if (isFixedUnrefPage(fix)) {  // 固定未引用记录页面
+                            dragPage = <RefPageInFlow schema={schema} notes={notes} curTable={fixedTable} curTableId={fix.table}
+                                                      curPage={'recordUnref'}
+                                                      refOutDepth={fix.refOutDepth} maxNode={fix.maxNode} nodeShow={fix.nodeShow}
+                                                      inDragPanelAndFix={true}/>;
+                        }
                     }
                 }
             }
-        }
 
-        if (dragPage) {
-            // 左面板初始宽度按面板类型差异化：表单类需要更宽，列表类可以更窄
-            // （defaultSize 仅在 Splitter 首次 mount 生效，面板切换时用 key 强制重挂以应用新宽度）
-            const panelWidths: Record<string, string> = {
-                setting: '30%',
-                add: '25%',
-                errors: '25%',
-                finder: '20%',
-                recordRef: '50%',
-            };
-            const defaultSize = panelWidths[dragPanel] ?? '20%';
-            content = <Splitter style={contentDivStyle}>
-                <Splitter.Panel key={'panel-' + dragPanel} defaultSize={defaultSize} style={autoOverflow}>
-                    <div style={fullHeight}>
-                        <Suspense fallback={null}>
-                            {dragPage}
-                        </Suspense>
-                    </div>
-                </Splitter.Panel>
-                <Splitter.Panel>
-                    <div ref={ref} style={fullHeight}>
-                        <FlowGraph>
-                            <Outlet context={outletCtx}/>
-                        </FlowGraph>
-                    </div>
-                </Splitter.Panel>
-            </Splitter>;
-        } else {
-            content = <div ref={ref} style={fullDivStyle}>
-                <FlowGraph>
-                    <Outlet context={outletCtx}/>
-                </FlowGraph>
-            </div>;
+            if (dragPage) {
+                // 左面板初始宽度按面板类型差异化：表单类需要更宽，列表类可以更窄
+                // （defaultSize 仅在 Splitter 首次 mount 生效，面板切换时用 key 强制重挂以应用新宽度）
+                const panelWidths: Record<string, string> = {
+                    setting: '30%',
+                    add: '25%',
+                    errors: '25%',
+                    finder: '20%',
+                    recordRef: '50%',
+                };
+                const defaultSize = panelWidths[dragPanel] ?? '20%';
+                content = <Splitter style={contentDivStyle}>
+                    <Splitter.Panel key={'panel-' + dragPanel} defaultSize={defaultSize} style={autoOverflow}>
+                        <div style={fullHeight}>
+                            <Suspense fallback={null}>
+                                {dragPage}
+                            </Suspense>
+                        </div>
+                    </Splitter.Panel>
+                    <Splitter.Panel>
+                        <div ref={ref} style={fullHeight}>
+                            <FlowGraph>
+                                <Outlet context={outletCtx}/>
+                            </FlowGraph>
+                        </div>
+                    </Splitter.Panel>
+                </Splitter>;
+            } else {
+                content = <div ref={ref} style={fullDivStyle}>
+                    <FlowGraph>
+                        <Outlet context={outletCtx}/>
+                    </FlowGraph>
+                </div>;
+            }
         }
     }
 

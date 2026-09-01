@@ -51,7 +51,7 @@ export const HeaderBar = memo(function ({schema, curTable}: {
 }) {
     const {curPage} = useCurPageRecordOrRecordRef();
     const {curTableId, curId} = useLocationData();
-    const {dragPanel, pageConf, history, isNextIdShow, isEditMode, dataDir} = useMyStore();
+    const {dragPanel, pageConf, chainConfs, history, isNextIdShow, isEditMode, dataDir} = useMyStore();
     const {editingCurTable, editingCurId, editingIsEdited} = useMyStore();
     const navigate = useNavigate();
     const {t} = useTranslation();
@@ -125,7 +125,12 @@ export const HeaderBar = memo(function ({schema, curTable}: {
             label: t('pages'),
             children: pageConf.pages.map(fp => ({key: fp.label, label: fp.label})),
         }] : []),
-    ], [pageConf.pages, t, errCount]);
+        ...(chainConfs.chains.length ? [{
+            type: 'group' as const,
+            label: t('chains'),
+            children: chainConfs.chains.map(c => ({key: c.label, label: c.label})),
+        }] : []),
+    ], [pageConf.pages, chainConfs.chains, t, errCount]);
 
     // 定位条：表 + 记录 收成一个视觉整体
     const locator = schema

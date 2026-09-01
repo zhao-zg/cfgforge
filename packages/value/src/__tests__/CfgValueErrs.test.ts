@@ -253,6 +253,18 @@ describe('CfgValueErrs', () => {
       expect(e.foreignKey).toBe('id');
     });
 
+    it('foreignValueNotFound msg() renders value via packStr (not [object Object])', () => {
+      const v = mockValue('activitybattlepasslevel-int');
+      const e = foreignValueNotFound(v, 'item-1', 'item', 'reward1');
+      expect(e.msg()).toBe('ForeignValueNotFound(activitybattlepasslevel-int, item-1, item, reward1)');
+    });
+
+    it('primaryOrUniqueKeyDuplicated msg() renders value packStr', () => {
+      const v = mockValue('sword');
+      const e = primaryOrUniqueKeyDuplicated(v, 'Item', ['ID']);
+      expect(e.msg()).toBe('PrimaryOrUniqueKeyDuplicated(sword, Item, [ID])');
+    });
+
     it('jsonFileReadErr', () => {
       const e = jsonFileReadErr('data.json', 'file not found');
       expect(e._tag).toBe('JsonFileReadErr');

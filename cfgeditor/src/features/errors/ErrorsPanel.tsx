@@ -1,4 +1,4 @@
-import {memo, useMemo} from 'react';
+import {memo, useMemo, useRef} from 'react';
 import {useTranslation} from 'react-i18next';
 import {useNavigate} from 'react-router';
 import {useQuery, useQueryClient} from '@tanstack/react-query';
@@ -13,9 +13,10 @@ import {groupByTable} from './errorsModel';
 
 /**
  * 从 ValueErrInfo.recordId 中提取纯 id。
- * ForeignValueNotFound 的 recordId 是 "table-id" 复合格式（如 "item-1"），
+ * recordId 是 "table-id" 复合格式（如 "item-1"），
  * 需要去掉 "table-" 前缀才能用于 navTo。
- * 其他错误的 recordId 可能已经是纯 id。
+ * 其他错误的 recordId 可能已经是纯 id（如 PrimaryOrUniqueKeyDuplicated
+ * 直接用 table-pkPackStr 构造，同样符合前缀剥离规则）。
  */
 function extractId(recordId: string | undefined, table: string): string {
     if (!recordId) return '';
@@ -24,6 +25,11 @@ function extractId(recordId: string | undefined, table: string): string {
         return recordId.substring(prefix.length);
     }
     return recordId;
+}
+
+/** 判断该错误是否可跳转到记录页（有 table 且有 recordId）。 */
+function isNavigable(err: ValueErrInfo): boolean {
+    return !!(err.table && extractId(err.recordId, err.table));
 }
 
 const tagColors: Record<string, string> = {
@@ -39,15 +45,24 @@ export const ErrorsPanel = memo(function ErrorsPanel() {
     // 与 HeaderBar 的 Badge 共享同一 queryKey。不需要 enabled 守卫：
     // ErrorsPanel 只在用户切到 errors 面板时才挂载（dragPanel === 'errors'），
     // 此时 schema 必已加载（CfgEditorApp 的渲染前提），全库校验可直接执行。
+    // re-check 按钮需要强制重新解析（绕过缓存）；用 ref 传递 force 标志，
+    // 在 queryFn 消费后立即重置，避免后续非 re-check 的 refetch 也触发 force。
+    const forceRef = useRef(false);
+
     const {data: errs, isFetching} = useQuery({
         queryKey: queryKeys.valueErrs(),
-        queryFn: ({signal}) => fetchValueErrs(signal),
+        queryFn: ({signal}) => {
+            const force = forceRef.current;
+            forceRef.current = false;
+            return fetchValueErrs(signal, force);
+        },
         retry: false,
     });
 
     const groups = useMemo(() => groupByTable(errs ?? []), [errs]);
 
     const handleRecheck = () => {
+        forceRef.current = true;
         queryClient.invalidateQueries({queryKey: queryKeys.valueErrs()});
     };
 
@@ -57,7 +72,6 @@ export const ErrorsPanel = memo(function ErrorsPanel() {
             navigate(navTo('record', err.table, id, true));
         }
     };
-
     const header = (
         <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 12px'}}>
             <Typography.Text strong>{t('errors')}</Typography.Text>
@@ -91,8 +105,8 @@ export const ErrorsPanel = memo(function ErrorsPanel() {
             <List size="small" split dataSource={g.errors}
                   rowKey={(item) => `${item.errType}-${item.sourceDesc}-${item.msg}`}
                   renderItem={(err) => (
-                      <List.Item style={{cursor: 'pointer', paddingInline: 8}}
-                                 onClick={() => handleClick(err)}>
+                      <List.Item style={{cursor: isNavigable(err) ? 'pointer' : 'default', paddingInline: 8}}
+                                  onClick={() => handleClick(err)}>
                           <div style={{flex: 1, minWidth: 0}}>
                               <div>
                                   <Tag color={tagColors[err.level] ?? 'default'}>

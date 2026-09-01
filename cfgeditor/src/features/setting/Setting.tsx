@@ -10,6 +10,7 @@ import {ConnectionSetting} from "./ConnectionSetting.tsx";
 import {TauriSetting} from "./TauriSetting.tsx";
 import {ThemeSetting} from "./ThemeSetting.tsx";
 import {FixPages} from "./FixPages.tsx";
+import {ChainSetting} from "./ChainSetting.tsx";
 import {ToolsSetting} from "./ToolsSetting.tsx";
 import {ShortcutSetting} from "./ShortcutSetting.tsx";
 import {memo, RefObject} from "react";
@@ -54,6 +55,11 @@ export const Setting = memo(function Setting({schema, curTable, flowRef}: {
             key: 'fixedPages',
             label: t('pages'),
             children: <FixPages schema={schema} curTable={curTable}/>,
+        },
+        {
+            key: 'chains',
+            label: t('chains'),
+            children: <ChainSetting schema={schema}/>,
         },
         {
             key: 'tools',

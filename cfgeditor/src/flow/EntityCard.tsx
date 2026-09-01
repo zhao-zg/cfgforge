@@ -9,6 +9,7 @@ import type {NodeShowType} from "@/domain/storageJson";
 import {getDsLenAndDesc} from "./layout/getDsLenAndDesc.ts";
 import {Highlight} from "./Highlight.tsx";
 import {useMyStore} from "@/store/store";
+import {isDockerMode} from "@/services/BrowserFsApi.ts";
 
 // ============================================================================
 // 常量定义
@@ -83,9 +84,17 @@ export const EntityCard = memo(function EntityCard({entity, image, nodeShow}: {
     const {brief} = entity;
 
     // 构建封面
-    const coverEl = image && isTauri()
-        ? <img alt="img" style={IMAGE_STYLE} src={convertFileSrc(image)}/>
-        : undefined;
+    // Tauri：convertFileSrc 将本地路径转为 WebView 可访问 URL
+    // Docker：通过后端 /api/fs/readFile?path= 获取图片，后端按扩展名返回正确 Content-Type
+    let coverEl: ReactElement | undefined;
+    if (image) {
+        if (isTauri()) {
+            coverEl = <img alt="img" style={IMAGE_STYLE} src={convertFileSrc(image)}/>;
+        } else if (isDockerMode()) {
+            const imgUrl = '/api/fs/readFile?path=' + encodeURIComponent(image);
+            coverEl = <img alt="img" style={IMAGE_STYLE} src={imgUrl}/>;
+        }
+    }
 
     // 构建标题
     const titleEl = brief.title

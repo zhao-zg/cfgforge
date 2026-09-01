@@ -17,19 +17,30 @@ if (isTauri()) {
     setDefaultFileSystem(new TauriFileSystem());
 } else {
     // 纯浏览器环境（Docker 网页版 / 本地 dev）：
-    // 尝试从 IndexedDB 恢复上次选择的目录句柄。
-    // 成功则注入 LocalFsApi（基于 File System Access API 直接读写本地文件）；
-    // 失败则不初始化，由 ConnectionSetting 引导用户选择目录。
+    // 1. 优先检测 Docker 后端（/api/health 可达）→ 注入 BrowserFsApi，自动设置 dataDir。
+    // 2. 非 Docker：尝试从 IndexedDB 恢复上次选择的目录句柄 → 注入 LocalFsApi。
+    // 3. 都失败则不初始化，由 ConnectionSetting 引导用户选择目录。
     Logger.setPrinter(createPrinter({ write: (s: string) => console.log(s) }));
     try {
-        const { loadDirHandle, ensurePermission, LocalFsApi } = await import('./services/LocalFsApi.ts');
-        const savedHandle = await loadDirHandle();
-        if (savedHandle && await ensurePermission(savedHandle)) {
-            setDefaultFileSystem(new LocalFsApi(savedHandle));
+        const { detectDockerBackend, BrowserFsApi } = await import('./services/BrowserFsApi.ts');
+        const dockerInfo = await detectDockerBackend();
+        if (dockerInfo) {
+            // Docker 网页版：后端已托管文件系统 REST API，直接注入 BrowserFsApi。
+            // dataDir 设为后端返回的 dataRoot（如 /data），localStorage 持久化供 AppLoader 读取。
+            setDefaultFileSystem(new BrowserFsApi());
+            localStorage.setItem('dataDir', dockerInfo.dataRoot);
+            console.log('[main] Docker backend detected, BrowserFsApi injected, dataDir:', dockerInfo.dataRoot);
+        } else {
+            // 非 Docker：尝试从 IndexedDB 恢复目录句柄（File System Access API）
+            const { loadDirHandle, ensurePermission, LocalFsApi } = await import('./services/LocalFsApi.ts');
+            const savedHandle = await loadDirHandle();
+            if (savedHandle && await ensurePermission(savedHandle)) {
+                setDefaultFileSystem(new LocalFsApi(savedHandle));
+            }
         }
     } catch (e) {
-        // IndexedDB 或权限获取失败：保持未初始化，由 UI 引导用户重新选择
-        console.warn('[main] Failed to restore directory handle:', e);
+        // IndexedDB / 权限获取 / Docker 检测失败：保持未初始化，由 UI 引导用户重新选择
+        console.warn('[main] Failed to initialize file system:', e);
     }
 }
 

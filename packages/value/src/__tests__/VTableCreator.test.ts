@@ -718,4 +718,68 @@ describe('VTableCreator', () => {
     expect(vt.schema).toBe(ts);
     expect(vt.name()).toBe('mytable');
   });
+
+  // -------------------------------------------------------------------------
+  // Large table performance / correctness (regression: O(n²) key extraction)
+  // -------------------------------------------------------------------------
+  // Regression test for the linear-scan duplicate detection in extractKeyValues.
+  // Old implementation scanned keyMap.keys() for every row (O(n²)) — a table
+  // with 89061 rows took ~55s. Fixed implementation must stay well under the
+  // timeout even at this scale.
+
+  it('handles 40000 unique string keys within timeout (no false duplicates)', () => {
+    const idField = makeFieldSchema('id', Primitive.STRING);
+    const pk = new KeySchema(['id']);
+    const ts = makeTableSchema('bigtable', [idField], pk);
+
+    const N = 40000;
+    const structs: VStruct[] = [];
+    for (let i = 0; i < N; i++) {
+      structs.push(new VStruct(
+        ts,
+        [new VString(`key-${i}`, EMPTY_SOURCE)],
+        EMPTY_SOURCE,
+      ));
+    }
+
+    const errs = CfgValueErrs.of();
+    const creator = new VTableCreator(ts, errs);
+    const vt = creator.create(structs);
+
+    expect(vt.primaryKeyMap.size).toBe(N);
+    expect(errs.errs).toHaveLength(0);
+  }, 8000);
+
+  it('detects duplicate keys inside a large table', () => {
+    const idField = makeFieldSchema('id', Primitive.STRING);
+    const pk = new KeySchema(['id']);
+    const ts = makeTableSchema('bigtable', [idField], pk);
+
+    const N = 60000;
+    const dupCount = 3; // three duplicated keys among N rows
+    const structs: VStruct[] = [];
+    for (let i = 0; i < N; i++) {
+      let key: string;
+      if (i < dupCount) {
+        key = 'duplicate-key'; // first 3 rows share the same key
+      } else {
+        key = `key-${i}`;
+      }
+      structs.push(new VStruct(
+        ts,
+        [new VString(key, EMPTY_SOURCE)],
+        EMPTY_SOURCE,
+      ));
+    }
+
+    const errs = CfgValueErrs.of();
+    const creator = new VTableCreator(ts, errs);
+    const vt = creator.create(structs);
+
+    // 3 rows share the same key → 2 duplicates reported
+    const dupErrs = errs.errs.filter((e) => e._tag === 'PrimaryOrUniqueKeyDuplicated');
+    expect(dupErrs.length).toBe(dupCount - 1);
+    // Only one entry remains for that key (last one wins)
+    expect(vt.primaryKeyMap.size).toBe(N - (dupCount - 1));
+  }, 8000);
 });

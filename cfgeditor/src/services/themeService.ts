@@ -1,5 +1,7 @@
 import { BaseDirectory, readFile, exists } from "@tauri-apps/plugin-fs";
 import { isTauri } from "@tauri-apps/api/core";
+import { isDockerMode } from "@/services/BrowserFsApi.ts";
+import { getDefaultFileSystem } from "@cfgforge/shared";
 
 /**
  * 主题配置接口，符合 Antd 主题配置规范
@@ -20,12 +22,15 @@ export interface AntdThemeConfig {
  * 检查主题文件是否存在
  */
 export async function themeExists(themeFile: string): Promise<boolean> {
-    if (!isTauri()) {
-        // Web 环境暂不支持文件系统操作
+    if (!isTauri() && !isDockerMode()) {
+        // 纯 Web 环境（无 Tauri、无 Docker 后端）不支持文件系统操作
         return false;
     }
 
     try {
+        if (isDockerMode()) {
+            return await getDefaultFileSystem().exists(themeFile);
+        }
         return await exists(themeFile, { baseDir: BaseDirectory.Resource });
     } catch (error) {
         console.error('检查主题文件失败:', error);
@@ -43,15 +48,21 @@ export async function loadTheme(themeFile: string): Promise<AntdThemeConfig | nu
         return null;
     }
 
-    if (!isTauri()) {
-        // Web 环境暂不支持文件系统操作
+    if (!isTauri() && !isDockerMode()) {
+        // 纯 Web 环境暂不支持文件系统操作
         console.warn('Web 环境暂不支持主题文件加载');
         return null;
     }
 
     try {
-        const contentBytes = await readFile(themeFile, { baseDir: BaseDirectory.Resource });
-        const content = new TextDecoder().decode(contentBytes);
+        let content: string;
+        if (isDockerMode()) {
+            const contentBytes = await getDefaultFileSystem().readFile(themeFile);
+            content = new TextDecoder().decode(contentBytes);
+        } else {
+            const contentBytes = await readFile(themeFile, { baseDir: BaseDirectory.Resource });
+            content = new TextDecoder().decode(contentBytes);
+        }
 
         const themeConfig = JSON.parse(content) as AntdThemeConfig;
 

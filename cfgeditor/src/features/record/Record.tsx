@@ -7,7 +7,7 @@ import {RecordEditEntityCreator} from "./recordEditEntityCreator.ts";
 import {EditingSession, getCurrentEditingSession, setCurrentEditingSession} from "@/services/editingSession.ts";
 import {isCopiedFitAllowedType, structCopy} from "@/services/clipboard.ts";
 import {useTranslation} from "react-i18next";
-import {navTo, setIsEditMode, setEditingState, useMyStore, useLocationData, getCurrentPathname} from "@/store/store.ts";
+import {navTo, setIsEditMode, setEditingState, setDragPanel, useMyStore, useLocationData, getCurrentPathname} from "@/store/store.ts";
 import {useNavigate, useOutletContext} from "react-router";
 import {useMutation, useQuery} from "@tanstack/react-query";
 import {addOrUpdateRecord, fetchRecord} from "@/api/apiClient.ts";
@@ -27,7 +27,7 @@ import {QueryGate} from "@/app/QueryGate.tsx";
 
 function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
     const {schema, notes, curTable} = useOutletContext<SchemaTableType>();
-    const {tauriConf, resourceDir, resMap} = useMyStore();
+    const {tauriConf, resourceDir, resMap, chainConfs} = useMyStore();
     const {notification} = App.useApp();
     const {curTableId, curId, edit, pathname} = useLocationData();
     const navigate = useNavigate();
@@ -203,12 +203,24 @@ function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
                 navigate(navTo('recordRef', curTable.name, curId));
             }
         });
+        // 链入口：包含当前表的链 → 打开链视图（多画布并排）
+        for (const chain of chainConfs.chains) {
+            if (chain.tables.includes(curTable.name)) {
+                menu.push({
+                    label: `${t('chainOpenFromRecord')}: ${chain.label}`,
+                    key: `chain-${chain.label}`,
+                    handler() {
+                        setDragPanel(chain.label);
+                    }
+                });
+            }
+        }
         if (isEditing) {
             menu.push({label: t('undo'), key: 'undo', handler: () => session.undo(), disabled: () => !session.canUndo()});
             menu.push({label: t('redo'), key: 'redo', handler: () => session.redo(), disabled: () => !session.canRedo()});
         }
         return menu;
-    }, [isEditing, isEditable, getEditMenu, curTable, curId, edit, t, navigate, session]);
+    }, [isEditing, isEditable, getEditMenu, curTable, curId, edit, t, navigate, session, chainConfs]);
 
 
     const nodeMenuFunc = useCallback(function (entityNode: EntityNode): MenuItem[] {
@@ -244,6 +256,18 @@ function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
                 navigate(navTo('recordRef', refId.table, refId.id));
             }
         })
+        // 链入口：包含该节点所属表的链 → 打开链视图
+        for (const chain of chainConfs.chains) {
+            if (chain.tables.includes(refId.table)) {
+                mm.push({
+                    label: `${t('chainOpenFromRecord')}: ${chain.label}`,
+                    key: `chain-${chain.label}`,
+                    handler() {
+                        setDragPanel(chain.label);
+                    }
+                });
+            }
+        }
         if (isEditing && isEditableEntity(entity)) {
             const {editObj, editFieldChain, editAllowObjType} = entity.edit;
             if (editObj) {
@@ -290,7 +314,7 @@ function RecordWithResult({recordResult}: { recordResult: RecordResult }) {
             }
         }
         return mm;
-    }, [curTable.name, curId, t, isEditing, isEditable, getEditMenu, edit, schema, navigate, session]);
+    }, [curTable.name, curId, t, isEditing, isEditable, getEditMenu, edit, schema, navigate, session, chainConfs]);
 
     // const ep = pathname + (isEditing ? ',' + editSeq : ''); // 用 editSeq触发layout
     useEntityToGraph({

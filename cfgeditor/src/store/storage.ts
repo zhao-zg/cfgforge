@@ -1,6 +1,8 @@
 import {BaseDirectory, readFile, writeTextFile} from "@tauri-apps/plugin-fs";
 import {parse, stringify} from "yaml";
 import {isTauri} from "@tauri-apps/api/core";
+import {isDockerMode} from "@/services/BrowserFsApi.ts";
+import {getDefaultFileSystem} from "@cfgforge/shared";
 
 // 持久化键集由 store 在初始化时注册，避免 storage 反向依赖 store（消除 store↔storage 循环）
 let prefKeySet: Set<string> = new Set();
@@ -60,25 +62,43 @@ export async function readPrefAsyncOnce() {
         return true;
     }
     alreadyRead = true;
-    if (!isTauri()) {
-        return true;
-    }
-    try {
-        localStorage.clear();
-        await readConf(CFGEDITOR_YML);
+    if (isTauri()) {
         try {
-            await readConf(CFGEDITOR_SELF_YML);
-        } catch {
-            // 个人配置文件不存在是正常情况（首次使用、团队共享场景下可能没有），忽略错误继续
-            console.log('[readPref] cfgeditorSelf.yml not found, skipping');
+            localStorage.clear();
+            await readConf(CFGEDITOR_YML);
+            try {
+                await readConf(CFGEDITOR_SELF_YML);
+            } catch {
+                // 个人配置文件不存在是正常情况（首次使用、团队共享场景下可能没有），忽略错误继续
+                console.log('[readPref] cfgeditorSelf.yml not found, skipping');
+            }
+            return true;
+        } catch (e) {
+            // 读失败：放行重试（重连当前服务器 / 重新 mount 会再调本函数），避免 alreadyRead 永久卡死，
+            // 也避免 localStorage 已 clear 却未回填导致偏好静默回退默认。re-throw 让 setting query 进入 isError。
+            alreadyRead = false;
+            throw e;
         }
-        return true;
-    } catch (e) {
-        // 读失败：放行重试（重连当前服务器 / 重新 mount 会再调本函数），避免 alreadyRead 永久卡死，
-        // 也避免 localStorage 已 clear 却未回填导致偏好静默回退默认。re-throw 让 setting query 进入 isError。
-        alreadyRead = false;
-        throw e;
     }
+    if (isDockerMode()) {
+        // Docker 网页版：通过 BrowserFsApi 从后端 /data 目录读取偏好文件
+        // 与 Tauri 模式对称：localStorage.clear → 读共享配置 → 读个人配置 → 回填 localStorage
+        try {
+            localStorage.clear();
+            await readConfDocker(CFGEDITOR_YML);
+            try {
+                await readConfDocker(CFGEDITOR_SELF_YML);
+            } catch {
+                console.log('[readPref] cfgeditorSelf.yml not found (Docker), skipping');
+            }
+            return true;
+        } catch (e) {
+            alreadyRead = false;
+            throw e;
+        }
+    }
+    // 非 Tauri 非 Docker（本地 dev / LocalFsApi）：偏好只从 localStorage 读取，无需落盘
+    return true;
 }
 
 async function readConf(conf: string) {
@@ -98,6 +118,20 @@ async function readConf(conf: string) {
     }
 }
 
+/** Docker 模式下从后端 /data 目录读取偏好文件，回填 localStorage。 */
+async function readConfDocker(conf: string) {
+    const fs = getDefaultFileSystem();
+    const contentBytes = await fs.readFile(conf);
+    const txt = new TextDecoder().decode(contentBytes);
+    const settings = parse(txt);
+    if (typeof settings == "object") {
+        for (const key in settings) {
+            const value = settings[key];
+            localStorage.setItem(key, value);
+        }
+    }
+}
+
 async function saveKeySetPrefAsync(keySet: Set<string>, fn: string) {
     const settings: Record<string, string> = {};
     for (const key of keySet) {
@@ -106,7 +140,14 @@ async function saveKeySetPrefAsync(keySet: Set<string>, fn: string) {
             settings[key] = value;
         }
     }
-    await writeTextFile(fn, stringify(settings, {sortMapEntries: true}), {baseDir: BaseDirectory.Resource});
+    if (isDockerMode()) {
+        // Docker 网页版：通过 BrowserFsApi 写入后端 /data 目录
+        const fs = getDefaultFileSystem();
+        const data = new TextEncoder().encode(stringify(settings, {sortMapEntries: true}));
+        await fs.writeFile(fn, data);
+    } else {
+        await writeTextFile(fn, stringify(settings, {sortMapEntries: true}), {baseDir: BaseDirectory.Resource});
+    }
 }
 
 function log(reason: unknown) {
@@ -168,7 +209,7 @@ export async function flushAllPrefsAsync() {
 
 export function setPref(key: string, value: string) {
     localStorage.setItem(key, value);
-    if (isTauri()) {
+    if (isTauri() || isDockerMode()) {
         savePrefAsyncIf(key);
     }
 }

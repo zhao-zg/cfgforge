@@ -83,3 +83,12 @@ export interface AIConf {
 export interface ThemeConfig {
     themeFile?: string;
 }
+
+export interface ChainConf {
+    label: string;
+    tables: string[];
+}
+
+export interface ChainConfs {
+    chains: ChainConf[];
+}

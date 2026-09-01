@@ -77,26 +77,39 @@ describe('toValueErrInfo', () => {
     expect(info.table).toBe('Reward');
   });
 
-  it('ForeignValueNotFound — table from foreignTable, recordId present', () => {
+  it('ForeignValueNotFound — table from recordId prefix, field from foreignKey', () => {
     const mockErr = {
       _tag: 'ForeignValueNotFound',
       value: null,
-      recordId: '1001',
+      recordId: 'item-1',
       foreignTable: 'reward',
       foreignKey: 'rewardId',
       msg: () => 'ForeignValueNotFound(reward, rewardId)',
     } as unknown as VErr;
 
     const info = toValueErrInfo(mockErr);
-    expect(info.table).toBe('reward');
-    expect(info.recordId).toBe('1001');
+    expect(info.table).toBe('item');
+    expect(info.recordId).toBe('item-1');
     expect(info.field).toBe('rewardId');
   });
 
-  it('PrimaryOrUniqueKeyDuplicated — table from table field', () => {
+  it('RefNotNullableButCellEmpty — table from recordId prefix', () => {
+    const mockErr = {
+      _tag: 'RefNotNullableButCellEmpty',
+      recordId: 'item-1',
+      foreignKey: 'rewardId',
+      msg: () => 'RefNotNullableButCellEmpty(item, rewardId)',
+    } as unknown as VErr;
+
+    const info = toValueErrInfo(mockErr);
+    expect(info.table).toBe('item');
+    expect(info.recordId).toBe('item-1');
+  });
+
+  it('PrimaryOrUniqueKeyDuplicated — table from table field, recordId from table-pk', () => {
     const mockErr = {
       _tag: 'PrimaryOrUniqueKeyDuplicated',
-      value: null,
+      value: {packStr: () => '1', source: null},
       table: 'item',
       keys: ['1'],
       msg: () => 'PrimaryOrUniqueKeyDuplicated(item, [1])',
@@ -104,6 +117,7 @@ describe('toValueErrInfo', () => {
 
     const info = toValueErrInfo(mockErr);
     expect(info.table).toBe('item');
+    expect(info.recordId).toBe('item-1');
     expect(info.level).toBe('err');
   });
 
@@ -202,8 +216,8 @@ describe('ValueErrsService.collectValueErrs', () => {
     const errs = await ValueErrsService.collectValueErrs(editor);
     const fkErr = errs.find(e => e.errType === 'ForeignValueNotFound');
     expect(fkErr).toBeDefined();
-    expect(fkErr!.table).toBe('reward');
-    expect(fkErr!.recordId).toContain('1');
+    expect(fkErr!.table).toBe('item');
+    expect(fkErr!.recordId).toBe('item-1');
     expect(fkErr!.level).toBe('err');
   });
 

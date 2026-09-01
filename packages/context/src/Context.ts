@@ -73,6 +73,11 @@ export class Context {
   private _lastCfgValueTag: string | null = null;
   private _lastCfgValueAllowErr = false;
 
+  // Cache for collectErrsAsync: stores the last-collected CfgValueErrs so
+  // repeated error-panel refreshes don't re-parse the full configuration.
+  // Invalidated whenever the CfgValue cache is invalidated (data/schema changes).
+  private _lastCollectedErrs: CfgValueErrs | null = null;
+
   // -------------------------------------------------------------------------
   // Static factory constructors (async due to ExcelJS)
   // -------------------------------------------------------------------------
@@ -434,6 +439,7 @@ export class Context {
     this._lastCfgValue = cfgValue;
     this._lastCfgValueTag = null;
     this._lastCfgValueAllowErr = false;
+    this._lastCollectedErrs = null;
   }
 
   // -------------------------------------------------------------------------
@@ -460,6 +466,7 @@ export class Context {
       return this._lastCfgValue;
     }
     this._lastCfgValue = null;
+    this._lastCollectedErrs = null;
 
     let tagSchema: CfgSchema;
     if (tag !== null) {
@@ -495,15 +502,20 @@ export class Context {
   // -------------------------------------------------------------------------
 
   /**
-   * Re-parse the full CfgValue to collect all VErr/VWarn, WITHOUT caching
-   * and WITHOUT checkErrors (which prints + may throw). Used by
-   * ValueErrsService for the error list panel's "re-check" feature.
+   * Re-parse the full CfgValue to collect all VErr/VWarn, WITHOUT
+   * checkErrors (which prints + may throw). Used by ValueErrsService for
+   * the error list panel's "re-check" feature.
    *
-   * This is a separate method (not a parameter on makeValueWithTagAndAllowErr)
-   * because the cache-hit path would skip error collection, and we don't want
-   * to pollute the cached CfgValue or the makeValue signature.
+   * Caching: the parsed CfgValueErrs is cached alongside the CfgValue cache.
+   * When data/schema changes (updateDataAndValue, makeValueWithTagAndAllowErrAsync
+   * cache miss, reload), the errs cache is invalidated. This avoids re-parsing
+   * the full configuration on every error-panel refresh.
    */
   async collectErrsAsync(): Promise<CfgValueErrs> {
+    if (this._lastCollectedErrs !== null) {
+      return this._lastCollectedErrs;
+    }
+
     const valueErrs = CfgValueErrs.of();
     const env = new ValueEnv(
       this._cfgSchema,
@@ -514,7 +526,17 @@ export class Context {
     );
     const parser = new CfgValueParser(this._cfgSchema, env, valueErrs);
     await parser.parseCfgValueAsync();
-    return valueErrs;
+    this._lastCollectedErrs = valueErrs;
+    return this._lastCollectedErrs;
+  }
+
+  /**
+   * Invalidate the collected-errs cache. Called when the error panel's
+   * "re-check" button is clicked, forcing a fresh full re-parse on the
+   * next collectErrsAsync() call.
+   */
+  invalidateCollectedErrs(): void {
+    this._lastCollectedErrs = null;
   }
 }
 

@@ -1,6 +1,7 @@
 import resso from "./resso.ts";
 import {
     AIConf,
+    ChainConfs,
     Convert,
     FixedPagesConf,
     NodeShowType,
@@ -63,6 +64,7 @@ export type StoreState = {
 
     dragPanel: string;  // 'recordRef', 'setting', 'none', 'finder', 'add',  page.label（page的label前面的）
     pageConf: FixedPagesConf;
+    chainConfs: ChainConfs;
     tauriConf: TauriConf;
 
     history: History;
@@ -145,6 +147,9 @@ const sharedPrefState = {
     pageConf: {
         pages: [],
     },
+    chainConfs: {
+        chains: [],
+    },
     tauriConf: {
         resDirs: [],
         assetDir: '',
@@ -202,11 +207,12 @@ let alreadyRead = false;
 
 // JSON 型 pref key → quicktype Convert 解析表：五个 key 同一形状（getPrefJson 成功才覆盖 store），
 // 表驱动后新增 JSON 型 key 只需加一行表项，其余 key 走下方 typeof 分支
-type JsonPrefKey = 'nodeShow' | 'aiConf' | 'pageConf' | 'tauriConf' | 'themeConfig';
+type JsonPrefKey = 'nodeShow' | 'aiConf' | 'pageConf' | 'chainConfs' | 'tauriConf' | 'themeConfig';
 const jsonPrefParsers: Record<JsonPrefKey, (jsonStr: string) => StoreState[JsonPrefKey]> = {
     nodeShow: Convert.toNodeShowType,
     aiConf: Convert.toAIConf,
     pageConf: Convert.toFixedPagesConf,
+    chainConfs: Convert.toChainConfs,
     tauriConf: Convert.toTauriConf,
     themeConfig: Convert.toThemeConfig,
 };
@@ -353,6 +359,23 @@ export function setFixedPagesConf(newPageConf: FixedPagesConf) {
     store.pageConf = newPageConf;
     setPref('pageConf', Convert.fixedPagesConfToJson(newPageConf));
     // pageConf 不改当前路由的 layout 输入（固定页各自有独立 pathname → 独立 layout query），无需清缓存。
+}
+
+export function setChainConfs(newChainConfs: ChainConfs) {
+    // 若当前 dragPanel 指向已被删除的链，则回退到 'none'
+    const currentDragPanel = store.dragPanel;
+    if (currentDragPanel && !BUILTIN_PANELS.includes(currentDragPanel)) {
+        // dragPanel 可能是 fixed page label 或 chain label，先检查 pageConf 再检查 chainConfs
+        const pageExists = store.pageConf.pages.some(page => page.label === currentDragPanel);
+        const chainExists = newChainConfs.chains.some(chain => chain.label === currentDragPanel);
+        if (!pageExists && !chainExists) {
+            store.dragPanel = 'none';
+            setPref('dragPanel', 'none');
+        }
+    }
+
+    store.chainConfs = newChainConfs;
+    setPref('chainConfs', Convert.chainConfsToJson(newChainConfs));
 }
 
 export async function setDataDir(value: string) {

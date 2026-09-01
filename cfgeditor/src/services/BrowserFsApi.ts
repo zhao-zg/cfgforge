@@ -20,6 +20,57 @@
 import type { CfgFileSystem } from '@cfgforge/shared';
 import { normalize as pathNormalize, join as pathJoin } from '@cfgforge/shared';
 
+// ---- Docker 后端检测 ----
+
+/** Docker 后端健康检查结果。 */
+export interface DockerBackendInfo {
+  /** 后端数据根目录（如 /data），用作 store.dataDir 的值。 */
+  dataRoot: string;
+}
+
+/**
+ * Docker 模式同步标志：detectDockerBackend() 返回正面结果后置 true。
+ *
+ * 使用场景：EntityCard（图片 URL）、storage.ts（偏好持久化）、themeService（主题加载）
+ * 等处需要同步判断是否在 Docker 模式，以选择 convertFileSrc/Tauri fs 还是 getDefaultFileSystem。
+ *
+ * 时序保证：main.tsx 顶层 await detectDockerBackend() → 设置标志 → React 渲染 AppLoader
+ * → readPrefAsyncOnce 等查询。标志在首次 React 渲染前已就绪。
+ */
+let dockerModeEnabled = false;
+
+/** 同步检查：当前是否在 Docker 模式？detectDockerBackend() 返回正面结果后为 true。 */
+export function isDockerMode(): boolean {
+  return dockerModeEnabled;
+}
+
+/**
+ * 检测当前页面是否由 Docker 后端托管（同源 /api/health 可达）。
+ *
+ * Docker 网页版部署时，server.mjs 托管前端静态文件并提供 /api/health 端点。
+ * 非 Docker 环境（Tauri 桌面端、本地 dev server）调用 /api/health 会 404 或网络错误，
+ * 返回 null 即可。
+ *
+ * 使用 fetch 的信号超时（2 秒）避免本地 dev 环境长时间等待。
+ * 检测成功后缓存正面结果到 dockerModeEnabled，供 isDockerMode() 同步查询。
+ */
+export async function detectDockerBackend(): Promise<DockerBackendInfo | null> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 2000);
+    const resp = await fetch('/api/health', { signal: controller.signal });
+    clearTimeout(timer);
+    if (!resp.ok) return null;
+    const body = await resp.json();
+    if (body.ok !== true || !body.dataRoot) return null;
+    dockerModeEnabled = true;
+    return { dataRoot: body.dataRoot as string };
+  } catch {
+    // 网络错误、超时、非 JSON 响应等：非 Docker 环境
+    return null;
+  }
+}
+
 // ---- 纯字符串路径工具（与 TauriFileSystem 相同的思路） ----
 
 function joinPath(...paths: string[]): string {
